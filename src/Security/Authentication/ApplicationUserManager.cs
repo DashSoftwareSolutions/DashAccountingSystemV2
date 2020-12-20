@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Extensions;
+using System.Threading.Tasks;
 
 namespace DashAccountingSystemV2.Security.Authentication
 {
@@ -37,6 +38,24 @@ namespace DashAccountingSystemV2.Security.Authentication
         public string GetUserLastName(ClaimsPrincipal user)
         {
             return user?.GetUserLastName();
+        }
+
+        public override async Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string token)
+        {
+            var result = await base.ConfirmEmailAsync(user, token);
+
+            if (result.Succeeded)
+            {
+                var retrievedUser = await Store.FindByIdAsync(user.Id.ToString(), CancellationToken);
+
+                if (retrievedUser != null)
+                {
+                    retrievedUser.EmailConfirmedDate = DateTime.UtcNow;
+                    await Store.UpdateAsync(retrievedUser, CancellationToken);
+                }
+            }
+
+            return result;
         }
     }
 }

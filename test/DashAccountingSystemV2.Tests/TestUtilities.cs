@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using IdentityServer4.EntityFramework.Options;
 using Npgsql;
 using DashAccountingSystemV2.Data;
+using DashAccountingSystemV2.Tests.Repositories;
 
 namespace DashAccountingSystemV2.Tests
 {

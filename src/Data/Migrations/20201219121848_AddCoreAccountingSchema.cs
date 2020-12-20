@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace DashAccountingSystemV2.Migrations
+namespace DashAccountingSystemV2.Data.Migrations
 {
     public partial class AddCoreAccountingSchema : Migration
     {

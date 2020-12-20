@@ -1,7 +1,7 @@
 using Xunit;
 using DashAccountingSystemV2.Repositories;
 
-namespace DashAccountingSystemV2.Tests
+namespace DashAccountingSystemV2.Tests.Repositories
 {
     public class SharedLookupRepositoryFixture
     {

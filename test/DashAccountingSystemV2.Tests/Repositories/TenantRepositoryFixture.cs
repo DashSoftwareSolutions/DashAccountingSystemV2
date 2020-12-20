@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Npgsql;
 using Xunit;
-using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Repositories;
 
-namespace DashAccountingSystemV2.Tests
+namespace DashAccountingSystemV2.Tests.Repositories
 {
     public class TenantRepositoryFixture
     {
@@ -20,11 +16,42 @@ namespace DashAccountingSystemV2.Tests
         [Trait("Category", "Requires Database")]
         public void GetTenant_Ok()
         {
-            TestUtilities.RunTestAsync(InitializeTenant, Cleanup, async () =>
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
             {
                 var repository = await GetTenantRepository();
                 var retrievedTenant = await repository.GetTenantAsync(_tenantId);
                 Assert.NotNull(retrievedTenant);
+                Assert.Equal(_tenantId, retrievedTenant.Id);
+                Assert.Equal(_tenantName, retrievedTenant.Name);
+            });
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
+        public void GetTenantByName_Ok()
+        {
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
+            {
+                var repository = await GetTenantRepository();
+                var retrievedTenant = await repository.GetTenantByNameAsync(_tenantName);
+                Assert.NotNull(retrievedTenant);
+                Assert.Equal(_tenantId, retrievedTenant.Id);
+                Assert.Equal(_tenantName, retrievedTenant.Name);
+            });
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
+        public void GetTenants_Ok()
+        {
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
+            {
+                var repository = await GetTenantRepository();
+                var retrievedTenants = await repository.GetTenantsAsync();
+                Assert.NotNull(retrievedTenants);
+                Assert.NotEmpty(retrievedTenants);
+
+                var retrievedTenant = Assert.Single(retrievedTenants, t => t.Id == _tenantId);
                 Assert.Equal(_tenantId, retrievedTenant.Id);
                 Assert.Equal(_tenantName, retrievedTenant.Name);
             });
@@ -36,7 +63,7 @@ namespace DashAccountingSystemV2.Tests
             return new TenantRepository(appDbContext);
         }
 
-        private void InitializeTenant()
+        private void Initialize()
         {
             var connString = TestUtilities.GetConnectionString();
             _tenantName = $"Unit Testing {Guid.NewGuid()}, Inc.";

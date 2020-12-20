@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace DashAccountingSystemV2.Migrations
+namespace DashAccountingSystemV2.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20201218162608_InitialIdentitySchema")]
