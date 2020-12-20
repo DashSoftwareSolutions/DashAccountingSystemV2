@@ -10,11 +10,11 @@ namespace DashAccountingSystemV2.Repositories
 
         Task<JournalEntry> GetByIdAsync(Guid journalEntryId);
 
-        Task<JournalEntry> GetByTenantAndEntryIdAsync(Guid tenantId, int entryId);
+        Task<JournalEntry> GetByTenantAndEntryIdAsync(Guid tenantId, uint entryId);
 
         Task<JournalEntry> GetDetailedByIdAsync(Guid journalEntryId);
 
-        Task<JournalEntry> GetDetailedByTenantAndEntryIdAsync(Guid tenantId, int entryId);
+        Task<JournalEntry> GetDetailedByTenantAndEntryIdAsync(Guid tenantId, uint entryId);
 
         Task<PagedResult<JournalEntry>> GetJournalEntriesAsync(
             Guid tenantId,

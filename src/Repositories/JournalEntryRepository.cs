@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -72,7 +71,7 @@ namespace DashAccountingSystemV2.Repositories
                 .SingleOrDefaultAsync();
         }
 
-        public Task<JournalEntry> GetByTenantAndEntryIdAsync(Guid tenantId, int entryId)
+        public Task<JournalEntry> GetByTenantAndEntryIdAsync(Guid tenantId, uint entryId)
         {
             return _db
                 .JournalEntry
@@ -98,29 +97,98 @@ namespace DashAccountingSystemV2.Repositories
                 .SingleOrDefaultAsync();
         }
 
-        public Task<JournalEntry> GetDetailedByTenantAndEntryIdAsync(Guid tenantId, int entryId)
+        public Task<JournalEntry> GetDetailedByTenantAndEntryIdAsync(Guid tenantId, uint entryId)
         {
-            throw new NotImplementedException();
+            return _db
+                .JournalEntry
+                .Where(je =>
+                    je.TenantId == tenantId &&
+                    je.EntryId == entryId
+                )
+                .Include(je => je.Tenant)
+                .Include(je => je.CreatedBy)
+                .Include(je => je.UpdatedBy)
+                .Include(je => je.PostedBy)
+                .Include(je => je.CanceledBy)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
+                .SingleOrDefaultAsync();
         }
 
         public Task<PagedResult<JournalEntry>> GetJournalEntriesAsync(Guid tenantId, DateTime dateRangeStart, DateTime dateRangeEnd, Pagination pagination)
         {
-            throw new NotImplementedException();
+            return _db
+                .JournalEntry
+                .Where(je =>
+                    je.TenantId == tenantId &&
+                    je.Status != TransactionStatus.Canceled &&
+                    (je.PostDate ?? je.EntryDate) >= dateRangeStart &&
+                    (je.PostDate ?? je.EntryDate) <= dateRangeEnd
+                )
+                .OrderByDescending(je => je.PostDate ?? je.EntryDate) // TODO: Honor other sorting options if needed
+                .ThenBy(je => je.EntryId)
+                .Include(je => je.CreatedBy)
+                .Include(je => je.PostedBy)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
+                .GetPagedAsync(pagination);
         }
 
-        public Task<uint> GetNextEntryIdAsync(Guid tenantId)
+        public async Task<uint> GetNextEntryIdAsync(Guid tenantId)
         {
-            throw new NotImplementedException();
+            var maxCurrentEntryId = await _db
+                .JournalEntry
+                .Where(je => je.TenantId == tenantId)
+                .Select(je => je.EntryId)
+                .MaxAsync<uint, uint?>(entryId => entryId) ?? 0;
+
+            return ++maxCurrentEntryId;
         }
 
         public Task<PagedResult<JournalEntry>> GetPendingJournalEntriesAsync(Guid tenantId, Pagination pagination)
         {
-            throw new NotImplementedException();
+            return _db
+                .JournalEntry
+                .Where(je =>
+                    je.TenantId == tenantId &&
+                    je.Status == TransactionStatus.Pending
+                )
+                .OrderByDescending(je => je.EntryDate) // TODO: Honor other sorting options if needed
+                .ThenBy(je => je.EntryId)
+                .Include(je => je.CreatedBy)
+                .Include(je => je.PostedBy)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.Account)
+                .Include(je => je.Accounts)
+                    .ThenInclude(jeAcct => jeAcct.AssetType)
+                .GetPagedAsync(pagination);
         }
 
-        public Task<JournalEntry> PostJournalEntryAsync(Guid journalEntryId, DateTime postDate, Guid postedByUserId, string note = null)
+        public async Task<JournalEntry> PostJournalEntryAsync(Guid journalEntryId, DateTime postDate, Guid postedByUserId, string note = null)
         {
-            throw new NotImplementedException();
+            var entry = await GetDetailedByIdAsync(journalEntryId);
+
+            if (entry == null)
+                return null;
+
+            entry.PostDate = postDate;
+            entry.PostedById = postedByUserId;
+            entry.Status = TransactionStatus.Posted;
+
+            if (!string.IsNullOrWhiteSpace(note) && !string.Equals(note, entry.Note))
+            {
+                entry.Note = note;
+                entry.Updated = DateTime.UtcNow;
+                entry.UpdatedById = postedByUserId;
+            }
+
+            await _db.SaveChangesAsync();
+
+            return await GetDetailedByIdAsync(journalEntryId);
         }
     }
 }
