@@ -12,12 +12,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using Serilog;
+using DashAccountingSystemV2.BusinessLogic;
 using DashAccountingSystemV2.Data;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
+using DashAccountingSystemV2.Repositories;
 using DashAccountingSystemV2.Security.Authentication;
 using DashAccountingSystemV2.Security.Authorization;
-using Serilog;
 
 namespace DashAccountingSystemV2
 {
@@ -63,8 +65,6 @@ namespace DashAccountingSystemV2
             Log.Logger.Information("Using connection string: '{0}'", _connectionString.MaskPassword());
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                //options.UseSqlite(
-                //    Configuration.GetConnectionString("DefaultConnection")));
                 options.UseNpgsql(
                     _connectionString,
                     options => options.SetPostgresVersion(new Version(9, 6))
@@ -79,6 +79,11 @@ namespace DashAccountingSystemV2
                 .AddUserManager<ApplicationUserManager>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
+
+            services.AddRepositories();
+            services.AddBusinessLogic();
 
             services.AddIdentityServer()
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
