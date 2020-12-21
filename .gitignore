@@ -4,6 +4,9 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # Custom Additions
+# Proprietary/confidential data scripts
+src/Data/Scripts/Dash
+# UI built files
 *.min.css
 *.min.js
 *.js.map
