@@ -91,7 +91,10 @@ namespace DashAccountingSystemV2
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
-            services.AddControllersWithViews();
+            services
+                .AddControllersWithViews()
+                .AddNewtonsoftJson();
+
             services.AddRazorPages();
 
             // In production, the React files will be served from this directory

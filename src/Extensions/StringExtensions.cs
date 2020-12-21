@@ -89,5 +89,31 @@ namespace DashAccountingSystemV2.Extensions
 
         private static readonly Regex s_passwordClausePattern =
             new Regex("password\\s*=\\s*([^,;]*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        public static DateTime? TryParseAsDateTime(this string viewModelDateTime, bool isUtc = false)
+        {
+            if (string.IsNullOrWhiteSpace(viewModelDateTime)) return null;
+
+            DateTime? returnDateTime = null;
+
+            if (long.TryParse(viewModelDateTime, out var parsedUnixTimestamp))
+            {
+                returnDateTime = parsedUnixTimestamp.ToDateTime();
+            }
+            else if (DateTime.TryParse(viewModelDateTime, out var parsedDate))
+            {
+                returnDateTime = parsedDate;
+            }
+
+            if (returnDateTime.HasValue)
+            {
+                if (isUtc)
+                    return returnDateTime.Value.ToUniversalTime();
+                else
+                    return returnDateTime;
+            }
+
+            return null;
+        }
     }
 }

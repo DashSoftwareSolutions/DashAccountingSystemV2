@@ -7,7 +7,8 @@ namespace DashAccountingSystemV2.BusinessLogic
         public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
         {
             services
-                .AddScoped<ITenantBusinessLogic, TenantBusinessLogic>();
+                .AddScoped<ITenantBusinessLogic, TenantBusinessLogic>()
+                .AddScoped<IAccountBusinessLogic, AccountBusinessLogic>();
 
             return services;
         }

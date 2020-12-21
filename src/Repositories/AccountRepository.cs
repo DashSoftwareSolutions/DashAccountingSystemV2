@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Dapper;
+using Npgsql;
 using DashAccountingSystemV2.Data;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
@@ -34,6 +36,38 @@ namespace DashAccountingSystemV2.Repositories
                     jeAcct.JournalEntry.Status == TransactionStatus.Posted &&
                     jeAcct.JournalEntry.PostDate <= date)
                 .SumAsync(jeAcct => jeAcct.Amount);
+        }
+
+        public async Task<Dictionary<Guid, decimal>> GetAccountBalancesAsync(Guid tenantId, DateTime date)
+        {
+            using (var connection = new NpgsqlConnection(_db.Database.GetConnectionString()))
+            {
+                var results = await connection.QueryAsync<AccountBalanceDto>($@"
+WITH transactions AS (
+      SELECT je_acct.""AccountId""
+            ,je_acct.""Amount""
+        FROM ""JournalEntryAccount"" je_acct
+             INNER JOIN ""JournalEntry"" je
+                   ON je_acct.""JournalEntryId"" = je.""Id""
+       WHERE je.""TenantId"" = @tenantId
+         AND je.""Status"" = {(int)TransactionStatus.Posted}
+         AND je.""PostDate"" <= @date
+)
+  SELECT acct.""Id"" AS ""AccountId""
+        ,COALESCE(SUM(tx.""Amount""), 0) AS ""Balance""
+    FROM ""Account"" acct
+         LEFT JOIN transactions tx
+                ON acct.""Id"" = tx.""AccountId""
+   WHERE acct.""TenantId"" = @tenantId
+GROUP BY acct.""Id""
+ORDER BY acct.""AccountNumber"";
+",
+                        new { tenantId, date }
+                    );
+
+                return results.ToDictionary(x => x.AccountId, x => x.Balance);
+            }
+
         }
 
         public Task<Account> GetAccountByIdAsync(Guid accountId)

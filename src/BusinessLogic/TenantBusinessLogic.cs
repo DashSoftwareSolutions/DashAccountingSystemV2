@@ -7,7 +7,7 @@ namespace DashAccountingSystemV2.BusinessLogic
 {
     public class TenantBusinessLogic : ITenantBusinessLogic
     {
-        private ITenantRepository _tenantRepository;
+        private readonly ITenantRepository _tenantRepository = null;
 
         public TenantBusinessLogic(ITenantRepository tenantRepository)
         {

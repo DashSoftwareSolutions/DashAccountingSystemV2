@@ -178,12 +178,12 @@ namespace DashAccountingSystemV2.Repositories
             entry.PostDate = postDate;
             entry.PostedById = postedByUserId;
             entry.Status = TransactionStatus.Posted;
+            entry.Updated = DateTime.UtcNow;
+            entry.UpdatedById = postedByUserId;
 
             if (!string.IsNullOrWhiteSpace(note) && !string.Equals(note, entry.Note))
             {
                 entry.Note = note;
-                entry.Updated = DateTime.UtcNow;
-                entry.UpdatedById = postedByUserId;
             }
 
             await _db.SaveChangesAsync();
