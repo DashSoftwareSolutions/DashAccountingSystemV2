@@ -34,7 +34,9 @@ export const actionCreators = {
     requestTenants: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
 
-        if (!isNil(appState?.tenants) && isEmpty(appState.tenants.tenants)) {
+        if (!isNil(appState?.tenants) &&
+            !appState.tenants.isLoading &&
+            isEmpty(appState.tenants.tenants)) {
             const accessToken = await authService.getAccessToken();
 
             fetch('api/tenant', {

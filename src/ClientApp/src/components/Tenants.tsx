@@ -1,20 +1,31 @@
 ﻿import * as React from 'react';
 import { isEmpty } from 'lodash';
 import { connect } from 'react-redux';
+import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import * as TenantsStore from '../store/Tenants';
 
 type TenantsProps =
     TenantsStore.TenantsState
-    & typeof TenantsStore.actionCreators;
+    & typeof TenantsStore.actionCreators
+    & RouteComponentProps;
 
 class Tenants extends React.PureComponent<TenantsProps> {
     public componentDidMount() {
         this.ensureDataFetched();
     }
 
-    public componentDidUpdate() {
+    public componentDidUpdate(prevProps: TenantsProps) {
         this.ensureDataFetched();
+
+        const {
+            history,
+            selectedTenant: nextSelectedTenant,
+        } = this.props;
+
+        if (!isEmpty(nextSelectedTenant)) {
+            history.push('/tenant-landing-page');
+        }
     }
 
     public render() {
@@ -63,7 +74,9 @@ class Tenants extends React.PureComponent<TenantsProps> {
     }
 }
 
-export default connect(
-    (state: ApplicationState) => state.tenants, // map state to props
-    TenantsStore.actionCreators // map dispatch to props
-)(Tenants as any);
+export default withRouter(
+    connect(
+        (state: ApplicationState) => state.tenants, // map state to props
+        TenantsStore.actionCreators // map dispatch to props
+    )(Tenants as any),
+);
