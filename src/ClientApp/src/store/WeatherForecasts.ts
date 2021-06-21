@@ -1,5 +1,6 @@
 ﻿import { Action, Reducer } from 'redux';
 import { AppThunkAction } from './';
+import authService from '../components/api-authorization/AuthorizeService';
 
 // -----------------
 // STATE - This defines the type of data maintained in the Redux store.
@@ -41,11 +42,17 @@ type KnownAction = RequestWeatherForecastsAction | ReceiveWeatherForecastsAction
 // They don't directly mutate state, but they can have external side-effects (such as loading data).
 
 export const actionCreators = {
-    requestWeatherForecasts: (startDateIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    requestWeatherForecasts: (startDateIndex: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
         const appState = getState();
         if (appState && appState.weatherForecasts && startDateIndex !== appState.weatherForecasts.startDateIndex) {
-            fetch(`weatherforecast`)
+            const accessToken = await authService.getAccessToken();
+
+            fetch('weatherforecast', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
                 .then(response => response.json() as Promise<WeatherForecast[]>)
                 .then(data => {
                     dispatch({ type: 'RECEIVE_WEATHER_FORECASTS', startDateIndex: startDateIndex, forecasts: data });
