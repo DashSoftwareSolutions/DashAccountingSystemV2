@@ -179,6 +179,7 @@ export class AuthorizeService {
             return;
         }
 
+        // TODO/FIXME: This call gets made a gazillion times.  Need to figure out how to tell everyone else to wait and only call this once while initializing.
         let response = await fetch(ApplicationPaths.ApiAuthorizationClientConfigurationUrl);
         if (!response.ok) {
             throw new Error(`Could not load settings for '${ApplicationName}'`);

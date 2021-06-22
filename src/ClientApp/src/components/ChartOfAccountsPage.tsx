@@ -7,10 +7,10 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import * as TenantsStore from '../store/Tenants';
 
-type TenantHomePageProps = TenantsStore.TenantsState
+type ChartOfAccountsPageProps = TenantsStore.TenantsState
     & RouteComponentProps;
 
-class TenantHomePage extends React.PureComponent<TenantHomePageProps> {
+class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> {
     public render() {
         const {
             selectedTenant,
@@ -23,15 +23,16 @@ class TenantHomePage extends React.PureComponent<TenantHomePageProps> {
         return (
             <React.Fragment>
                 <Jumbotron>
-                    <h1>{selectedTenant?.name}</h1>
+                    <h1>Chart of Accounts</h1>
+                    <p className="lead">{selectedTenant?.name}</p>
                 </Jumbotron>
-                {/* TODO: Make a Tenant Subnavigation component */ }
+                {/* TODO: Make a Tenant Subnavigation component */}
                 <Nav>
                     <NavItem>
-                        <NavLink active tag={Link} to="/tenant-landing-page">Dashboard</NavLink>
+                        <NavLink tag={Link} to="/tenant-landing-page">Dashboard</NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink tag={Link} to="/chart-of-accounts">Chart of Accounts</NavLink>
+                        <NavLink active tag={Link} to="/chart-of-accounts">Chart of Accounts</NavLink>
                     </NavItem>
                 </Nav>
             </React.Fragment>
@@ -42,5 +43,5 @@ class TenantHomePage extends React.PureComponent<TenantHomePageProps> {
 export default withRouter(
     connect(
         (state: ApplicationState) => state.tenants, // map state to props
-    )(TenantHomePage as any),
+    )(ChartOfAccountsPage as any),
 );
