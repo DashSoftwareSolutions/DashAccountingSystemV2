@@ -55,7 +55,6 @@ export const actionCreators = {
     },
 
     selectTenant: (tenant: Tenant): AppThunkAction<KnownAction> => (dispatch) => {
-        console.log('Selected a Tenant:', tenant);
         dispatch({ type: 'SELECT_TENANT', tenant });
     }
 };

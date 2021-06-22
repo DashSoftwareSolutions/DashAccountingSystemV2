@@ -1,4 +1,4 @@
 ﻿export default interface Tenant {
-    id: string;
+    id: string; // GUID
     name: string;
 };
