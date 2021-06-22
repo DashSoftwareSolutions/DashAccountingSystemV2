@@ -22,14 +22,6 @@ namespace DashAccountingSystemV2.Repositories
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry), "Journal Entry cannot be null");
 
-            // TODO: Is this check appropriate here?
-            //       Is there _ever_ a case when it is okay to have an unbalanced transaction?
-            //       Is this the responsibility of a business logic layer?
-            if (!entry.IsBalanced)
-                throw new ArgumentException(
-                    "Journal Entry is not balanced!  It cannot be persisted in this state.",
-                    nameof(entry));
-
             using (var transaction = await _db.Database.BeginTransactionAsync())
             {
                 try

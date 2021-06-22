@@ -46,7 +46,7 @@ namespace DashAccountingSystemV2.ViewModels
             if (!HasValue)
                 return !other.HasValue;
 
-            return Amount == other.Amount && AssetType.Equals(other.AssetType);
+            return Amount == other.Amount && AssetType.Id == other.AssetType.Id;
         }
 
         public override bool Equals(object obj)
@@ -63,7 +63,7 @@ namespace DashAccountingSystemV2.ViewModels
             {
                 var hash = 17;
                 hash = hash * 23 + (Amount ?? 0.0m).GetHashCode();
-                hash = hash * 23 + AssetType?.GetHashCode() ?? 0;
+                hash = hash * 23 + AssetType?.Id.GetHashCode() ?? 0;
                 return hash;
             }
         }
