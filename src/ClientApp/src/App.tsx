@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Route } from 'react-router';
 import Layout from './components/Layout';
+import AccountDetailsPage from './components/AccountDetailsPage';
 import AboutPage from './components/AboutPage';
 import ChartOfAccountsPage from './components/ChartOfAccountsPage';
 import DashboardPage from './components/DashboardPage';
@@ -18,6 +19,7 @@ export default () => (
     <Layout>
         <AuthorizeRoute exact path='/' component={SelectTenant} />
         <Route exact path='/about' component={AboutPage} />
+        <AuthorizeRoute path='/account-details' component={AccountDetailsPage} />
         <AuthorizeRoute path='/chart-of-accounts' component={ChartOfAccountsPage} />
         <AuthorizeRoute path='/dashboard' component={DashboardPage} />
         <AuthorizeRoute path='/ledger' component={LedgerPage} />

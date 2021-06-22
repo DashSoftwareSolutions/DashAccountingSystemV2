@@ -21,10 +21,10 @@ class Tenants extends React.PureComponent<TenantsProps> {
 
         const {
             history,
-            selectedTenant: nextSelectedTenant,
+            selectedTenant,
         } = this.props;
 
-        if (!isEmpty(nextSelectedTenant)) {
+        if (!isEmpty(selectedTenant)) {
             history.push('/dashboard');
         }
     }

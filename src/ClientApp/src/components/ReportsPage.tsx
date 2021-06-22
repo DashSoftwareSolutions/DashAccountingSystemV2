@@ -8,7 +8,7 @@ import TenantBasePage from './TenantBasePage';
 import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
 
 interface ReportsPageReduxProps {
-    selectedTenant: Tenant | null,
+    selectedTenant: Tenant | null;
 };
 
 const mapStateToProps = (state: ApplicationState) => {

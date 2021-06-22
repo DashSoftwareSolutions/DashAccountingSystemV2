@@ -11,7 +11,7 @@ import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
 import * as AccountsStore from '../store/Accounts';
 
 interface ChartOfAccountsPageReduxProps extends AccountsStore.AccountsState {
-    selectedTenant: Tenant | null,
+    selectedTenant: Tenant | null;
 };
 
 const mapStateToProps = (state: ApplicationState) => {
@@ -32,6 +32,15 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
 
     public componentDidUpdate() {
         this.ensureDataFetched();
+
+        const {
+            history,
+            selectedAccount,
+        } = this.props;
+
+        if (!isEmpty(selectedAccount)) {
+            history.push('/account-details');
+        }
     }
 
     public render() {

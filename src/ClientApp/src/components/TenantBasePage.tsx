@@ -4,7 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import Tenant from '../models/Tenant';
 
 interface TenantBasePageOwnProps {
-    selectedTenant: Tenant | null,
+    selectedTenant: Tenant | null;
 };
 
 type TenantBasePageProps = TenantBasePageOwnProps
