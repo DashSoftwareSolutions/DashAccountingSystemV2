@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { Route } from 'react-router';
 import Layout from './components/Layout';
-import Home from './components/Home';
+import AboutPage from './components/AboutPage';
 import ChartOfAccountsPage from './components/ChartOfAccountsPage';
+import DashboardPage from './components/DashboardPage';
 import FetchData from './components/FetchData';
-import Tenants from './components/Tenants';
-import TenantHomePage from './components/TenantHomePage';
+import LedgerPage from './components/LedgerPage';
+import ReportsPage from './components/ReportsPage';
+import SelectTenant from './components/SelectTenant';
 import AuthorizeRoute from './components/api-authorization/AuthorizeRoute';
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
 import { ApplicationPaths } from './components/api-authorization/ApiAuthorizationConstants';
@@ -14,10 +16,12 @@ import './custom.css'
 
 export default () => (
     <Layout>
-        <Route exact path='/' component={Home} />
+        <AuthorizeRoute exact path='/' component={SelectTenant} />
+        <Route exact path='/about' component={AboutPage} />
         <AuthorizeRoute path='/chart-of-accounts' component={ChartOfAccountsPage} />
-        <AuthorizeRoute path='/tenant-landing-page' component={TenantHomePage} />
-        <AuthorizeRoute path='/select-tenant' component={Tenants} />
+        <AuthorizeRoute path='/dashboard' component={DashboardPage} />
+        <AuthorizeRoute path='/ledger' component={LedgerPage} />
+        <AuthorizeRoute path='/reports' component={ReportsPage} />
         <AuthorizeRoute path='/fetch-data/:startDateIndex?' component={FetchData} />
         <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes} />
     </Layout>

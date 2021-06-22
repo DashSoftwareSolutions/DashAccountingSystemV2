@@ -3,6 +3,7 @@ import { isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
+import Tenant from '../models/Tenant';
 import * as TenantsStore from '../store/Tenants';
 
 type TenantsProps =
@@ -24,7 +25,7 @@ class Tenants extends React.PureComponent<TenantsProps> {
         } = this.props;
 
         if (!isEmpty(nextSelectedTenant)) {
-            history.push('/tenant-landing-page');
+            history.push('/dashboard');
         }
     }
 
@@ -62,7 +63,7 @@ class Tenants extends React.PureComponent<TenantsProps> {
                     </tr>
                 </thead>
                 <tbody>
-                    {tenants.map((tenant: TenantsStore.Tenant) =>
+                    {tenants.map((tenant: Tenant) =>
                         <tr key={tenant.id} onClick={() => selectTenant(tenant)} style={{ cursor : 'pointer' }}>
                             <td>{tenant.id}</td>
                             <td>{tenant.name}</td>

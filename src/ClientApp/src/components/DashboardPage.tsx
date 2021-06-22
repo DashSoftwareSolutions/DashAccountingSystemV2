@@ -7,7 +7,7 @@ import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
 import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
 
-interface ChartOfAccountsPageReduxProps {
+interface DashboardPageReduxProps {
     selectedTenant: Tenant | null,
 };
 
@@ -15,10 +15,10 @@ const mapStateToProps = (state: ApplicationState) => {
     return { selectedTenant: state.tenants?.selectedTenant };
 }
 
-type ChartOfAccountsPageProps = ChartOfAccountsPageReduxProps
+type DashboardPageProps = DashboardPageReduxProps
     & RouteComponentProps;
 
-class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> {
+class DashboardPage extends React.PureComponent<DashboardPageProps> {
     public render() {
         const {
             selectedTenant,
@@ -27,10 +27,10 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
         return (
             <TenantBasePage selectedTenant={selectedTenant}>
                 <Jumbotron>
-                    <h1>Chart of Accounts</h1>
-                    <p className="lead">{selectedTenant?.name}</p>
+                    <h1>{selectedTenant?.name}</h1>
+                    <p className="lead">Dashboard</p>
                 </Jumbotron>
-                <TenantSubNavigation activeSection={NavigationSection.ChartOfAccounts} />
+                <TenantSubNavigation activeSection={NavigationSection.Dashboard} />
             </TenantBasePage>
         );
     }
@@ -39,5 +39,5 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
 export default withRouter(
     connect(
         mapStateToProps,
-    )(ChartOfAccountsPage as any),
+    )(DashboardPage as any),
 );

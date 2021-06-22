@@ -18,7 +18,7 @@ export default class NavMenu extends React.PureComponent<{}, { isOpen: boolean }
                         <NavbarToggler onClick={this.toggle} className="mr-2"/>
                         <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={this.state.isOpen} navbar>
                             <ul className="navbar-nav flex-grow">
-                                <NavItem>
+                                {/* <NavItem>
                                     <NavLink tag={Link} className="text-dark" to="/">Home</NavLink>
                                 </NavItem>
                                 <NavItem>
@@ -26,6 +26,9 @@ export default class NavMenu extends React.PureComponent<{}, { isOpen: boolean }
                                 </NavItem>
                                 <NavItem>
                                     <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
+                                </NavItem> */}
+                                <NavItem>
+                                    <NavLink tag={Link} className="text-dark" to="/about">About</NavLink>
                                 </NavItem>
                                 <LoginMenu />
                             </ul>

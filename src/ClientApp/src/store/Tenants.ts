@@ -2,11 +2,7 @@
 import { isEmpty, isNil } from 'lodash';
 import { AppThunkAction } from './';
 import authService from '../components/api-authorization/AuthorizeService';
-
-export interface Tenant {
-    id: string;
-    name: string;
-}
+import Tenant from '../models/Tenant';
 
 export interface TenantsState {
     isLoading: boolean;
