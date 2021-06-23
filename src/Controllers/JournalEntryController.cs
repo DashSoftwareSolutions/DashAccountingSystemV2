@@ -34,5 +34,25 @@ namespace DashAccountingSystemV2.Controllers
 
             return this.Result(bizLogicResponse, JournalEntryResponseViewModel.FromModel);
         }
+
+        [HttpPost("entry")]
+        public Task<IActionResult> CreateJournalEntry([FromBody] JournalEntryCreateRequestViewModel viewModel)
+        {
+            if (viewModel == null)
+                return Task.FromResult(this.ErrorResponse("Invalid POST body"));
+
+            if (!viewModel.Validate(ModelState))
+                return Task.FromResult(this.ErrorResponse(ModelState));
+
+            var contextUserId = User.GetUserId();
+            
+            var inboundJournalEntry = JournalEntryCreateRequestViewModel.ToModel(
+                viewModel,
+                contextUserId);
+
+            var bizLogicResponse = _journalEntryBusinessLogic.CreateJournalEntry(inboundJournalEntry);
+
+            return this.Result(bizLogicResponse, JournalEntryResponseViewModel.FromModel);
+        }
     }
 }

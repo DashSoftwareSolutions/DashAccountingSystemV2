@@ -60,8 +60,8 @@ namespace DashAccountingSystemV2.ViewModels
 
             var unbalancedAssetTypeGroups = accountsGroupedByAssetType
                 .Where(assetTypeGroup =>
-                    assetTypeGroup.Value.Where(a => a.Amount.AmountType == AmountType.Debit).Sum(a => a.Amount.Amount) !=
-                    assetTypeGroup.Value.Where(a => a.Amount.AmountType == AmountType.Credit).Sum(a => a.Amount.Amount));
+                    Math.Abs(assetTypeGroup.Value.Where(a => a.Amount.AmountType == AmountType.Debit).Sum(a => a.Amount.Amount.Value)) !=
+                    Math.Abs(assetTypeGroup.Value.Where(a => a.Amount.AmountType == AmountType.Credit).Sum(a => a.Amount.Amount.Value)));
 
             if (unbalancedAssetTypeGroups.Any())
             {
@@ -76,7 +76,7 @@ namespace DashAccountingSystemV2.ViewModels
             return modelState.IsValid;
         }
 
-        public static JournalEntry ToModel(JournalEntryCreateRequestViewModel viewModel, Guid createdByUserId, Guid? postedByUserId)
+        public static JournalEntry ToModel(JournalEntryCreateRequestViewModel viewModel, Guid contextUserId)
         {
             if (viewModel == null)
                 return null;
@@ -87,8 +87,8 @@ namespace DashAccountingSystemV2.ViewModels
                 viewModel.PostDate.AsUtc(),
                 viewModel.Description,
                 viewModel.CheckNumber,
-                createdByUserId,
-                postedByUserId);
+                contextUserId,
+                viewModel.PostDate.HasValue ? contextUserId : null);
 
             result.Accounts = viewModel
                 .Accounts

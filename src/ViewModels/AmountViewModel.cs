@@ -5,12 +5,12 @@ using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.ViewModels
 {
-    public struct AmountViewModel : IEquatable<AmountViewModel>
+    public class AmountViewModel : IEquatable<AmountViewModel>
     {
         public static readonly AmountViewModel Empty = new AmountViewModel(null, null);
 
-        public decimal? Amount { get; private set; }
-        public LookupValueViewModel AssetType { get; private set; }
+        public decimal? Amount { get; set; }
+        public LookupValueViewModel AssetType { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public AmountType AmountType
@@ -29,6 +29,8 @@ namespace DashAccountingSystemV2.ViewModels
             get { return Amount.HasValue && AssetType != null; }
         }
 
+        public AmountViewModel() { }
+
         public AmountViewModel(decimal? amount, AssetType assetType)
         {
             Amount = amount;
@@ -43,10 +45,10 @@ namespace DashAccountingSystemV2.ViewModels
 
         public bool Equals(AmountViewModel other)
         {
-            if (!HasValue)
-                return !other.HasValue;
+            if (other == null)
+                return false;
 
-            return Amount == other.Amount && AssetType.Id == other.AssetType.Id;
+            return Amount == other.Amount && AssetType?.Id == other?.AssetType.Id;
         }
 
         public override bool Equals(object obj)
