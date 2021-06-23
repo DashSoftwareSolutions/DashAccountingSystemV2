@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Route } from 'react-router';
 import Layout from './components/Layout';
-import AccountDetailsPage from './components/AccountDetailsPage';
 import AboutPage from './components/AboutPage';
+import AccountDetailsPage from './components/AccountDetailsPage';
+import AddJournalEntryPage from './components/AddJournalEntryPage';
 import ChartOfAccountsPage from './components/ChartOfAccountsPage';
 import DashboardPage from './components/DashboardPage';
 import FetchData from './components/FetchData';
@@ -22,6 +23,7 @@ export default () => (
         <AuthorizeRoute path='/account-details' component={AccountDetailsPage} />
         <AuthorizeRoute path='/chart-of-accounts' component={ChartOfAccountsPage} />
         <AuthorizeRoute path='/dashboard' component={DashboardPage} />
+        <AuthorizeRoute path='/journal-entry/new' component={AddJournalEntryPage} />
         <AuthorizeRoute path='/ledger' component={LedgerPage} />
         <AuthorizeRoute path='/reports' component={ReportsPage} />
         <AuthorizeRoute path='/fetch-data/:startDateIndex?' component={FetchData} />

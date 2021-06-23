@@ -1,7 +1,8 @@
-﻿import LookupValue from './LookupValue';
+﻿import AmountType from './AmountType';
+import AssetType from './AssetType';
 
 export default interface Amount {
     amount: number | null;
-    assetType: LookupValue;
-    amountType: string; // "Debit" or "Credit"
+    assetType: AssetType | null;
+    amountType: AmountType | null; // "Debit" or "Credit"
 }

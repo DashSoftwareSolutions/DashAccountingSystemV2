@@ -1,5 +1,6 @@
 ﻿import Amount from './Amount';
-import LookupValue from './LookupValue';
+import AccountType from './AccountType';
+import AssetType from './AssetType';
 import UserLite from './UserLite';
 
 export default interface Account {
@@ -7,8 +8,8 @@ export default interface Account {
     accountNumber: number; // unsigned short
     name: string;
     description: string;
-    accountType: LookupValue;
-    assetType: LookupValue;
+    accountType: AccountType;
+    assetType: AssetType;
     normalBalanceType: string; // "Debit" or "Credit"
     created: string; // UTC Date/Time
     createdBy: UserLite;
