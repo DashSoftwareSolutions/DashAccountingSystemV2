@@ -9,7 +9,7 @@ namespace DashAccountingSystemV2.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/tenant")]
+    [Route("api/tenants")]
     public class TenantController : Controller
     {
         private readonly ITenantBusinessLogic _tenantBusinessLogic;

@@ -35,7 +35,7 @@ export const actionCreators = {
             isEmpty(appState.tenants.tenants)) {
             const accessToken = await authService.getAccessToken();
 
-            fetch('api/tenant', {
+            fetch('api/tenants', {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
