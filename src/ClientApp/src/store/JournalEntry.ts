@@ -259,7 +259,6 @@ const unloadedState: JournalEntryState = {
 
 export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | undefined, incomingAction: Action): JournalEntryState => {
     if (state === undefined) {
-        logger.debug('initializing Journal Entry Store state');
         return unloadedState;
     }
 

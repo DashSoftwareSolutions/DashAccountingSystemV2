@@ -1,7 +1,7 @@
 ﻿import * as React from 'react';
 import { ApplicationState } from '../store';
 import { ConnectedProps, connect } from 'react-redux';
-import { isNil } from 'lodash';
+import { isNaN, isNil } from 'lodash';
 import {
     Col,
     Form,
@@ -97,7 +97,10 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
             ]),
         };
 
+        this.onCheckNumberChanged = this.onCheckNumberChanged.bind(this);
+        this.onDescriptionChanged = this.onDescriptionChanged.bind(this);
         this.onEntryDateChanged = this.onEntryDateChanged.bind(this);
+        this.onNoteChanged = this.onNoteChanged.bind(this);
         this.onPostDateChanged = this.onPostDateChanged.bind(this);
     }
 
@@ -133,14 +136,13 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
             <React.Fragment>
                 <Form style={{ marginTop: 22 }}>
                     <Row form>
-                        <Col md={6}>
+                        <Col sm={6} md={4}>
                             <FormGroup>
                                 <Label for={`${this.bemBlockName}--entry_date_input`}>Entry Date</Label>
                                 <Input
                                     id={`${this.bemBlockName}--entry_date_input`}
                                     invalid={attributeValidation.get('entryDate')?.invalid}
                                     name="entry_date_input"
-                                    placeholder="date placeholder"
                                     onChange={this.onEntryDateChanged}
                                     type="date"
                                     valid={attributeValidation.get('entryDate')?.valid}
@@ -149,19 +151,75 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                 <FormFeedback>{attributeValidation.get('entryDate')?.error}</FormFeedback>
                             </FormGroup>
                         </Col>
+                        <Col sm={6} md={4}>
+                            <FormGroup>
+                                <Label for={`${this.bemBlockName}--post_date_input`}>Post Date</Label>
+                                <Input
+                                    id={`${this.bemBlockName}--post_date_input`}
+                                    invalid={attributeValidation.get('postDate')?.invalid}
+                                    name="post_date_input"
+                                    onChange={this.onPostDateChanged}
+                                    type="date"
+                                    valid={attributeValidation.get('postDate')?.valid}
+                                    value={dirtyEntry.postDate ?? ''}
+                                />
+                                <FormFeedback>{attributeValidation.get('postDate')?.error}</FormFeedback>
+                            </FormGroup>
+                        </Col>
+                        <Col sm={6} md={4}>
+                            <FormGroup>
+                                <Label for={`${this.bemBlockName}--check_number_input`}>Check Number</Label>
+                                <Input
+                                    id={`${this.bemBlockName}--check_number_input`}
+                                    invalid={attributeValidation.get('checkNumber')?.invalid}
+                                    name="check_number_input"
+                                    onChange={this.onCheckNumberChanged}
+                                    placeholder="check # reference (if applicable)"
+                                    type="number"
+                                    valid={attributeValidation.get('checkNumber')?.valid}
+                                    value={dirtyEntry.checkNumber?.toString() ?? ''}
+                                />
+                                <FormFeedback>{attributeValidation.get('checkNumber')?.error}</FormFeedback>
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                    <Row>
                         <Col md={6}>
-                            <Label for={`${this.bemBlockName}--post_date_input`}>Post Date</Label>
-                            <Input
-                                id={`${this.bemBlockName}--post_date_input`}
-                                invalid={attributeValidation.get('postDate')?.invalid}
-                                name="post_date_input"
-                                placeholder="date placeholder"
-                                onChange={this.onPostDateChanged}
-                                type="date"
-                                valid={attributeValidation.get('postDate')?.valid}
-                                value={dirtyEntry.postDate ?? ''}
-                            />
-                            <FormFeedback>{attributeValidation.get('postDate')?.error}</FormFeedback>
+                            <FormGroup>
+                                <Label for={`${this.bemBlockName}--description_textarea`}>Transaction Description</Label>
+                                <Input
+                                    id={`${this.bemBlockName}--description_textarea`}
+                                    invalid={attributeValidation.get('description')?.invalid}
+                                    maxLength={2048}
+                                    name="description_textarea"
+                                    onChange={this.onDescriptionChanged}
+                                    placeholder="description of transaction that will appear on all impacted accounts"
+                                    rows={3}
+                                    style={{ resize: 'none' }}
+                                    type="textarea"
+                                    valid={attributeValidation.get('description')?.valid}
+                                    value={dirtyEntry.description ?? ''}
+                                />
+                                <FormFeedback>{attributeValidation.get('description')?.error}</FormFeedback>
+                            </FormGroup>
+                        </Col>
+                        <Col md={6}>
+                            <FormGroup>
+                                <Label for={`${this.bemBlockName}--note_textarea`}>Additional Note</Label>
+                                <Input
+                                    id={`${this.bemBlockName}--note_textarea`}
+                                    invalid={attributeValidation.get('note')?.invalid}
+                                    name="note_textarea"
+                                    placeholder="optional additional note"
+                                    onChange={this.onNoteChanged}
+                                    rows={3}
+                                    style={{ resize: 'none' }}
+                                    type="textarea"
+                                    valid={attributeValidation.get('note')?.valid}
+                                    value={dirtyEntry.note ?? ''}
+                                />
+                                <FormFeedback>{attributeValidation.get('note')?.error}</FormFeedback>
+                            </FormGroup>
                         </Col>
                     </Row>
                 </Form>
@@ -179,16 +237,32 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
         requestAccounts();
     }
 
-    private onEntryDateChanged(e: React.FormEvent<HTMLInputElement>) {
-        this.logger.debug('Received value for entry date:', e.currentTarget.value);
+    private onDescriptionChanged(e: React.FormEvent<HTMLInputElement>) {
+        const { updateDescription } = this.props;
+        updateDescription(e.currentTarget.value ?? null);
+    }
 
+    private onCheckNumberChanged(e: React.FormEvent<HTMLInputElement>) {
+        const parsedCheckNumber = parseInt(e.currentTarget.value, 10);
+        const safeValueForUpdate = isFinite(parsedCheckNumber) ?
+            parsedCheckNumber :
+            null;
+
+        const { updateCheckNumber } = this.props;
+        updateCheckNumber(safeValueForUpdate);
+    }
+
+    private onEntryDateChanged(e: React.FormEvent<HTMLInputElement>) {
         const { updateEntryDate } = this.props;
         updateEntryDate(e.currentTarget.value ?? null);
     }
 
-    private onPostDateChanged(e: React.FormEvent<HTMLInputElement>) {
-        this.logger.debug('Received value for post date:', e.currentTarget.value);
+    private onNoteChanged(e: React.FormEvent<HTMLInputElement>) {
+        const { updateNote } = this.props;
+        updateNote(e.currentTarget.value ?? null);
+    }
 
+    private onPostDateChanged(e: React.FormEvent<HTMLInputElement>) {
         const { updatePostDate } = this.props;
         updatePostDate(e.currentTarget.value ?? null);
     }
