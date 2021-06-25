@@ -1,12 +1,20 @@
 ﻿import { Action, Reducer } from 'redux';
-import { isEmpty, isNil } from 'lodash';
+import {
+    groupBy,
+    isEmpty,
+    isNil,
+    map,
+} from 'lodash';
 import { AppThunkAction } from './';
 import authService from '../components/api-authorization/AuthorizeService';
 import Account from '../models/Account';
+import AccountCategoryList from '../models/AccountCategoryList';
+import AccountSelectOption from '../models/AccountSelectOption';
 
 export interface AccountsState {
     isLoading: boolean;
     accounts: Account[];
+    accountSelectOptions: AccountCategoryList[];
     selectedAccount: Account | null,
 }
 
@@ -57,7 +65,12 @@ export const actionCreators = {
     }
 };
 
-const unloadedState: AccountsState = { isLoading: false, accounts: [], selectedAccount: null };
+const unloadedState: AccountsState = {
+    isLoading: false,
+    accounts: [],
+    accountSelectOptions: [],
+    selectedAccount: null,
+};
 
 export const reducer: Reducer<AccountsState> = (state: AccountsState | undefined, incomingAction: Action): AccountsState => {
     if (state === undefined) {
@@ -75,11 +88,28 @@ export const reducer: Reducer<AccountsState> = (state: AccountsState | undefined
                 };
 
             case 'RECEIVE_ACCOUNTS':
+            {
+                const accountSelectOptions = map(
+                    groupBy(
+                        action.accounts,
+                        (a: Account): string => a.accountType.name,
+                    ),
+                    (accounts, categoryName): AccountCategoryList => ({
+                        category: categoryName,
+                        accounts: map(accounts, (a: Account): AccountSelectOption => ({
+                            id: a.id,
+                            name: `${a.accountNumber} - ${a.name}`,
+                        })),
+                    }),
+                );
+
                 return {
                     ...state,
                     accounts: action.accounts,
+                    accountSelectOptions,
                     isLoading: false
                 };
+            }
 
             case 'SELECT_ACCOUNT':
                 return {
