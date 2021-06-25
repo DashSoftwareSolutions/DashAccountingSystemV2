@@ -1,7 +1,7 @@
 ﻿import * as React from 'react';
 import { ApplicationState } from '../store';
 import { ConnectedProps, connect } from 'react-redux';
-import { isNaN, isNil } from 'lodash';
+import { isFinite, isNil } from 'lodash';
 import {
     Col,
     Form,
@@ -20,9 +20,11 @@ import Account from '../models/Account';
 import AssetType from '../models/AssetType';
 import Mode from '../models/Mode';
 import Tenant from '../models/Tenant';
+import AccountSelector from './AccountSelector';
 import * as AccountsStore from '../store/Accounts';
 import * as JournalEntryStore from '../store/JournalEntry';
 import * as LookupValuesStore from '../store/LookupValues';
+import AccountSelectOption from '../models/AccountSelectOption';
 
 interface JournalEntryEditorOwnProps {
     mode: Mode;
@@ -31,6 +33,7 @@ interface JournalEntryEditorOwnProps {
 const mapStateToProps = (state: ApplicationState, props: JournalEntryEditorOwnProps) => {
     return {
         accounts: state.accounts?.accounts,
+        accountSelectOptions: state.accounts?.accountSelectOptions,
         assetTypes: state.lookups?.assetTypes,
         journalEntry: state.journalEntry,
         selectedTenant: state.tenants?.selectedTenant,
@@ -71,6 +74,9 @@ const DEFAULT_ATTRIBUTE_VALIDATION_STATE: JournalEntryAttributeValidationState =
 interface JournalEntryEditorState {
     accountValidation: JournalEntryAccountsValidationState;
     attributeValidation: Map<string, JournalEntryAttributeValidationState>;
+
+    // TEMP FOR TESTING
+    selectedAccountId: string | null; // GUID - ID of selected account
 }
 
 class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, JournalEntryEditorState> {
@@ -95,6 +101,7 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                 ['note', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
                 ['checkNumber', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
             ]),
+            selectedAccountId: null,
         };
 
         this.onCheckNumberChanged = this.onCheckNumberChanged.bind(this);
@@ -102,6 +109,9 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
         this.onEntryDateChanged = this.onEntryDateChanged.bind(this);
         this.onNoteChanged = this.onNoteChanged.bind(this);
         this.onPostDateChanged = this.onPostDateChanged.bind(this);
+
+        // TEMP FOR TESTING
+        this.onAccountSelectorChange = this.onAccountSelectorChange.bind(this);
     }
 
     public componentDidMount() {
@@ -119,7 +129,7 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
 
     public render() {
         const {
-            mode,
+            accountSelectOptions,
             journalEntry,
         } = this.props;
 
@@ -130,7 +140,10 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
             return null;
         }
 
-        const { attributeValidation } = this.state;
+        const {
+            attributeValidation,
+            selectedAccountId,
+        } = this.state;
 
         return (
             <React.Fragment>
@@ -193,7 +206,7 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                     maxLength={2048}
                                     name="description_textarea"
                                     onChange={this.onDescriptionChanged}
-                                    placeholder="description of transaction that will appear on all impacted accounts"
+                                    placeholder="Description of transaction that will appear on all impacted accounts"
                                     rows={3}
                                     style={{ resize: 'none' }}
                                     type="textarea"
@@ -210,7 +223,7 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                     id={`${this.bemBlockName}--note_textarea`}
                                     invalid={attributeValidation.get('note')?.invalid}
                                     name="note_textarea"
-                                    placeholder="optional additional note"
+                                    placeholder="Optional additional note on the transaction"
                                     onChange={this.onNoteChanged}
                                     rows={3}
                                     style={{ resize: 'none' }}
@@ -219,6 +232,22 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                     value={dirtyEntry.note ?? ''}
                                 />
                                 <FormFeedback>{attributeValidation.get('note')?.error}</FormFeedback>
+                            </FormGroup>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={6}>
+                            {/* TEMP FOR TESTING */}
+                            <FormGroup>
+                                <Label for={`${this.bemBlockName}--account_selector`}>Account Selector</Label>
+                                <AccountSelector
+                                    accountSelectOptions={accountSelectOptions ?? []}
+                                    disabledAccountIds={[]}
+                                    id={`${this.bemBlockName}--account_selector`}
+                                    name="account_selector"
+                                    onChange={this.onAccountSelectorChange}
+                                    value={selectedAccountId ?? ''}
+                                />
                             </FormGroup>
                         </Col>
                     </Row>
@@ -265,6 +294,11 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
     private onPostDateChanged(e: React.FormEvent<HTMLInputElement>) {
         const { updatePostDate } = this.props;
         updatePostDate(e.currentTarget.value ?? null);
+    }
+
+    // TEMP FOR TESTING
+    private onAccountSelectorChange(selectedAccount: AccountSelectOption) {
+        this.setState({ selectedAccountId: selectedAccount.id });
     }
 }
 
