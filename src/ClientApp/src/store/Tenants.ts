@@ -1,6 +1,7 @@
 ﻿import { Action, Reducer } from 'redux';
 import { isEmpty, isNil } from 'lodash';
 import { AppThunkAction } from './';
+import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import Tenant from '../models/Tenant';
 
@@ -40,13 +41,22 @@ export const actionCreators = {
                     Authorization: `Bearer ${accessToken}`,
                 },
             })
-                .then(response => response.json() as Promise<Tenant[]>)
-                .then(data => {
-                    dispatch({ type: 'RECEIVE_TENANTS', tenants: data });
+                .then((response) => {
+                    if (!response.ok) {
+                        apiErrorHandler.handleError(response);
+                        return null;
+                    }
 
-                    if (!isEmpty(data) && data.length === 1) {
-                        const tenant = data[0];
-                        dispatch({ type: 'SELECT_TENANT', tenant });
+                    return response.json() as Promise<Tenant[]>;
+                })
+                .then((data) => {
+                    if (!isNil(data)) {
+                        dispatch({ type: 'RECEIVE_TENANTS', tenants: data });
+
+                        if (!isEmpty(data) && data.length === 1) {
+                            const tenant = data[0];
+                            dispatch({ type: 'SELECT_TENANT', tenant });
+                        }
                     }
                 });
 
