@@ -4,7 +4,6 @@ import {
     findIndex,
     isEmpty,
     isNil,
-
 } from 'lodash';
 import { AppThunkAction } from './';
 import authService from '../components/api-authorization/AuthorizeService';
@@ -155,13 +154,6 @@ const DEFAULT_JOURNAL_ENTRY: JournalEntry = {
     note: null,
     checkNumber: null,
     accounts: [],
-};
-
-const DEFAULT_JOURNAL_ENTRY_ACCOUNT = {
-    accountId: null,
-    accountNumber: null,
-    accountName: null,
-    amount: null,
 };
 
 const DEFAULT_ACCOUNT_AMOUNT = {

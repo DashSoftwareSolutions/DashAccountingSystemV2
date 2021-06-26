@@ -9,22 +9,20 @@ import {
     Label,
     Input,
     FormFeedback,
-    FormText,
     Row,
 } from 'reactstrap';
 import {
     ILogger,
     Logger,
 } from '../common/Logging';
-import Account from '../models/Account';
 import AssetType from '../models/AssetType';
 import Mode from '../models/Mode';
-import Tenant from '../models/Tenant';
-import AccountSelector from './AccountSelector';
+import AccountSelectOption from '../models/AccountSelectOption';
+import JournalEntryAccount from '../models/JournalEntryAccount';
+import JournalEntryAccountsEditor from './JournalEntryAccountsEditor';
 import * as AccountsStore from '../store/Accounts';
 import * as JournalEntryStore from '../store/JournalEntry';
 import * as LookupValuesStore from '../store/LookupValues';
-import AccountSelectOption from '../models/AccountSelectOption';
 
 interface JournalEntryEditorOwnProps {
     mode: Mode;
@@ -74,9 +72,6 @@ const DEFAULT_ATTRIBUTE_VALIDATION_STATE: JournalEntryAttributeValidationState =
 interface JournalEntryEditorState {
     accountValidation: JournalEntryAccountsValidationState;
     attributeValidation: Map<string, JournalEntryAttributeValidationState>;
-
-    // TEMP FOR TESTING
-    selectedAccountId: string | null; // GUID - ID of selected account
 }
 
 class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, JournalEntryEditorState> {
@@ -101,17 +96,16 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                 ['note', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
                 ['checkNumber', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
             ]),
-            selectedAccountId: null,
         };
 
+        this.onAccountAdded = this.onAccountAdded.bind(this);
+        this.onAccountAmountChanged = this.onAccountAmountChanged.bind(this);
+        this.onAccountRemoved = this.onAccountRemoved.bind(this);
         this.onCheckNumberChanged = this.onCheckNumberChanged.bind(this);
         this.onDescriptionChanged = this.onDescriptionChanged.bind(this);
         this.onEntryDateChanged = this.onEntryDateChanged.bind(this);
         this.onNoteChanged = this.onNoteChanged.bind(this);
         this.onPostDateChanged = this.onPostDateChanged.bind(this);
-
-        // TEMP FOR TESTING
-        this.onAccountSelectorChange = this.onAccountSelectorChange.bind(this);
     }
 
     public componentDidMount() {
@@ -129,20 +123,26 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
 
     public render() {
         const {
+            accounts,
             accountSelectOptions,
+            assetTypes,
             journalEntry,
+            mode,
         } = this.props;
 
         const { dirtyEntry } = journalEntry ?? {};
 
         if (isNil(dirtyEntry)) {
-            this.logger.warn('No journal entry was found in Redux state');
+            // this.logger.warn('No journal entry was found in Redux state');
             return null;
         }
 
         const {
             attributeValidation,
-            selectedAccountId,
+            accountValidation: {
+                hasSufficientAccounts,
+                isBalanced,
+            },
         } = this.state;
 
         return (
@@ -236,19 +236,18 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                         </Col>
                     </Row>
                     <Row>
-                        <Col md={6}>
-                            {/* TEMP FOR TESTING */}
-                            <FormGroup>
-                                <Label for={`${this.bemBlockName}--account_selector`}>Account Selector</Label>
-                                <AccountSelector
-                                    accountSelectOptions={accountSelectOptions ?? []}
-                                    disabledAccountIds={[]}
-                                    id={`${this.bemBlockName}--account_selector`}
-                                    name="account_selector"
-                                    onChange={this.onAccountSelectorChange}
-                                    value={selectedAccountId ?? ''}
-                                />
-                            </FormGroup>
+                        <Col sm={12}>
+                            <JournalEntryAccountsEditor
+                                accounts={accounts ?? []}
+                                accountSelectOptions={accountSelectOptions ?? []}
+                                assetTypes={assetTypes ?? []}
+                                isEntryUnbalanced={hasSufficientAccounts && !isBalanced}
+                                journalEntryAccounts={dirtyEntry.accounts ?? []}
+                                mode={mode}
+                                onAccountAdded={this.onAccountAdded}
+                                onAccountAmountChanged={this.onAccountAmountChanged}
+                                onAccountRemoved={this.onAccountRemoved}
+                            />
                         </Col>
                     </Row>
                 </Form>
@@ -264,6 +263,21 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
 
         requestLookupValues();
         requestAccounts();
+    }
+
+    private onAccountAdded(account: JournalEntryAccount) {
+        const { addAccount } = this.props;
+        addAccount(account);
+    }
+
+    private onAccountAmountChanged(accountId: string, amount: number | null) {
+        const { updateAccountAmount } = this.props;
+        updateAccountAmount(accountId, amount);
+    }
+
+    private onAccountRemoved(accountId: string) {
+        const { removeAccount } = this.props;
+        removeAccount(accountId);
     }
 
     private onDescriptionChanged(e: React.FormEvent<HTMLInputElement>) {
@@ -294,11 +308,6 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
     private onPostDateChanged(e: React.FormEvent<HTMLInputElement>) {
         const { updatePostDate } = this.props;
         updatePostDate(e.currentTarget.value ?? null);
-    }
-
-    // TEMP FOR TESTING
-    private onAccountSelectorChange(selectedAccount: AccountSelectOption) {
-        this.setState({ selectedAccountId: selectedAccount.id });
     }
 }
 
