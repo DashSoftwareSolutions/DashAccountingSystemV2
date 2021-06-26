@@ -10,6 +10,7 @@ src/Data/Scripts/Dash
 *.min.css
 *.min.js
 *.js.map
+!src/ClientApp/src/components/api-authorization/*.js
 src/wwwroot/js/
 src/wwwroot/lib/
 
