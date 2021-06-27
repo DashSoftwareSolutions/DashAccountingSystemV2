@@ -15,9 +15,7 @@ import {
     ILogger,
     Logger,
 } from '../common/Logging';
-import AssetType from '../models/AssetType';
 import Mode from '../models/Mode';
-import AccountSelectOption from '../models/AccountSelectOption';
 import JournalEntryAccount from '../models/JournalEntryAccount';
 import JournalEntryAccountsEditor from './JournalEntryAccountsEditor';
 import * as AccountsStore from '../store/Accounts';
@@ -51,30 +49,7 @@ type JournalEntryEditorReduxProps = ConnectedProps<typeof connector>;
 type JournalEntryEditorProps = JournalEntryEditorOwnProps
     & JournalEntryEditorReduxProps;
 
-interface JournalEntryAccountsValidationState {
-    error: string | null;
-    hasSufficientAccounts: boolean;
-    isBalanced: boolean;
-}
-
-interface JournalEntryAttributeValidationState {
-    valid: boolean | undefined;
-    invalid: boolean | undefined;
-    error: string | null;
-}
-
-const DEFAULT_ATTRIBUTE_VALIDATION_STATE: JournalEntryAttributeValidationState = {
-    error: null,
-    valid: undefined,
-    invalid: undefined,
-};
-
-interface JournalEntryEditorState {
-    accountValidation: JournalEntryAccountsValidationState;
-    attributeValidation: Map<string, JournalEntryAttributeValidationState>;
-}
-
-class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, JournalEntryEditorState> {
+class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps> {
     private logger: ILogger;
     private bemBlockName: string = 'journal_entry_editor';
 
@@ -82,21 +57,6 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
         super(props);
 
         this.logger = new Logger('Journal Entry Editor');
-
-        this.state = {
-            accountValidation: {
-                error: '',
-                hasSufficientAccounts: false,
-                isBalanced: true,
-            },
-            attributeValidation: new Map([
-                ['entryDate', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
-                ['postDate', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
-                ['description', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
-                ['note', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
-                ['checkNumber', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
-            ]),
-        };
 
         this.onAccountAdded = this.onAccountAdded.bind(this);
         this.onAccountAmountChanged = this.onAccountAmountChanged.bind(this);
@@ -130,20 +90,29 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
             mode,
         } = this.props;
 
-        const { dirtyEntry } = journalEntry ?? {};
+        const {
+            dirtyEntry,
+            validation,
+        } = journalEntry ?? {};
 
         if (isNil(dirtyEntry)) {
-            // this.logger.warn('No journal entry was found in Redux state');
             return null;
         }
 
         const {
-            attributeValidation,
-            accountValidation: {
-                hasSufficientAccounts,
-                isBalanced,
-            },
-        } = this.state;
+            attributes: attributeValidation,
+            accounts: accountsValidation,
+        } = validation ?? {};
+
+        const {
+            hasSufficientAccounts,
+            isBalanced,
+        } = accountsValidation ?? {
+            hasSufficientAccounts: false,
+            isBalanced: true,
+        };
+
+        const safeAttributeValidation = attributeValidation ?? new Map <string, JournalEntryStore.JournalEntryAttributeValidationState>();
 
         return (
             <React.Fragment>
@@ -154,14 +123,14 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                 <Label for={`${this.bemBlockName}--entry_date_input`}>Entry Date</Label>
                                 <Input
                                     id={`${this.bemBlockName}--entry_date_input`}
-                                    invalid={attributeValidation.get('entryDate')?.invalid}
+                                    invalid={safeAttributeValidation.get('entryDate')?.invalid}
                                     name="entry_date_input"
                                     onChange={this.onEntryDateChanged}
                                     type="date"
-                                    valid={attributeValidation.get('entryDate')?.valid}
+                                    valid={safeAttributeValidation.get('entryDate')?.valid}
                                     value={dirtyEntry.entryDate ?? ''}
                                 />
-                                <FormFeedback>{attributeValidation.get('entryDate')?.error}</FormFeedback>
+                                <FormFeedback>{safeAttributeValidation.get('entryDate')?.error}</FormFeedback>
                             </FormGroup>
                         </Col>
                         <Col sm={6} md={4}>
@@ -169,14 +138,14 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                 <Label for={`${this.bemBlockName}--post_date_input`}>Post Date</Label>
                                 <Input
                                     id={`${this.bemBlockName}--post_date_input`}
-                                    invalid={attributeValidation.get('postDate')?.invalid}
+                                    invalid={safeAttributeValidation.get('postDate')?.invalid}
                                     name="post_date_input"
                                     onChange={this.onPostDateChanged}
                                     type="date"
-                                    valid={attributeValidation.get('postDate')?.valid}
+                                    valid={safeAttributeValidation.get('postDate')?.valid}
                                     value={dirtyEntry.postDate ?? ''}
                                 />
-                                <FormFeedback>{attributeValidation.get('postDate')?.error}</FormFeedback>
+                                <FormFeedback>{safeAttributeValidation.get('postDate')?.error}</FormFeedback>
                             </FormGroup>
                         </Col>
                         <Col sm={6} md={4}>
@@ -184,15 +153,15 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                 <Label for={`${this.bemBlockName}--check_number_input`}>Check Number</Label>
                                 <Input
                                     id={`${this.bemBlockName}--check_number_input`}
-                                    invalid={attributeValidation.get('checkNumber')?.invalid}
+                                    invalid={safeAttributeValidation.get('checkNumber')?.invalid}
                                     name="check_number_input"
                                     onChange={this.onCheckNumberChanged}
                                     placeholder="check # reference (if applicable)"
                                     type="number"
-                                    valid={attributeValidation.get('checkNumber')?.valid}
+                                    valid={safeAttributeValidation.get('checkNumber')?.valid}
                                     value={dirtyEntry.checkNumber?.toString() ?? ''}
                                 />
-                                <FormFeedback>{attributeValidation.get('checkNumber')?.error}</FormFeedback>
+                                <FormFeedback>{safeAttributeValidation.get('checkNumber')?.error}</FormFeedback>
                             </FormGroup>
                         </Col>
                     </Row>
@@ -202,7 +171,7 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                 <Label for={`${this.bemBlockName}--description_textarea`}>Transaction Description</Label>
                                 <Input
                                     id={`${this.bemBlockName}--description_textarea`}
-                                    invalid={attributeValidation.get('description')?.invalid}
+                                    invalid={safeAttributeValidation.get('description')?.invalid}
                                     maxLength={2048}
                                     name="description_textarea"
                                     onChange={this.onDescriptionChanged}
@@ -210,10 +179,10 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                     rows={3}
                                     style={{ resize: 'none' }}
                                     type="textarea"
-                                    valid={attributeValidation.get('description')?.valid}
+                                    valid={safeAttributeValidation.get('description')?.valid}
                                     value={dirtyEntry.description ?? ''}
                                 />
-                                <FormFeedback>{attributeValidation.get('description')?.error}</FormFeedback>
+                                <FormFeedback>{safeAttributeValidation.get('description')?.error}</FormFeedback>
                             </FormGroup>
                         </Col>
                         <Col md={6}>
@@ -221,17 +190,17 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps, Jo
                                 <Label for={`${this.bemBlockName}--note_textarea`}>Additional Note</Label>
                                 <Input
                                     id={`${this.bemBlockName}--note_textarea`}
-                                    invalid={attributeValidation.get('note')?.invalid}
+                                    invalid={safeAttributeValidation.get('note')?.invalid}
                                     name="note_textarea"
                                     placeholder="Optional additional note on the transaction"
                                     onChange={this.onNoteChanged}
                                     rows={3}
                                     style={{ resize: 'none' }}
                                     type="textarea"
-                                    valid={attributeValidation.get('note')?.valid}
+                                    valid={safeAttributeValidation.get('note')?.valid}
                                     value={dirtyEntry.note ?? ''}
                                 />
-                                <FormFeedback>{attributeValidation.get('note')?.error}</FormFeedback>
+                                <FormFeedback>{safeAttributeValidation.get('note')?.error}</FormFeedback>
                             </FormGroup>
                         </Col>
                     </Row>

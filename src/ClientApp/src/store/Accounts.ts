@@ -6,6 +6,7 @@ import {
     map,
 } from 'lodash';
 import { AppThunkAction } from './';
+import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import Account from '../models/Account';
 import AccountCategoryList from '../models/AccountCategoryList';
@@ -50,9 +51,18 @@ export const actionCreators = {
                     Authorization: `Bearer ${accessToken}`,
                 },
             })
-                .then(response => response.json() as Promise<Account[]>)
+                .then(response => {
+                    if (!response.ok) {
+                        apiErrorHandler.handleError(response);
+                        return null;
+                    }
+
+                    return response.json() as Promise<Account[]>
+                })
                 .then(data => {
-                    dispatch({ type: 'RECEIVE_ACCOUNTS', accounts: data });
+                    if (!isNil(data)) {
+                        dispatch({ type: 'RECEIVE_ACCOUNTS', accounts: data });
+                    }
                 });
 
             dispatch({ type: 'REQUEST_ACCOUNTS' });

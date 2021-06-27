@@ -1,6 +1,7 @@
 ﻿import { Action, Reducer } from 'redux';
 import { isEmpty, isNil } from 'lodash';
 import { AppThunkAction } from './';
+import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import AccountType from '../models/AccountType';
 import AssetType from '../models/AssetType';
@@ -34,7 +35,7 @@ export const actionCreators = {
 
         if (!isNil(appState?.lookups) &&
             !appState.lookups.isLoading &&
-            isEmpty(appState.lookups.accountTypes) || isEmpty(appState.lookups?.assetTypes)) {
+            (isEmpty(appState.lookups.accountTypes) || isEmpty(appState.lookups?.assetTypes))) {
             const accessToken = await authService.getAccessToken();
 
             fetch('api/lookups', {
@@ -42,14 +43,23 @@ export const actionCreators = {
                     Authorization: `Bearer ${accessToken}`,
                 },
             })
-                .then(response => response.json() as Promise<LookupsApiResponse>)
-                .then(data => {
-                    const {
-                        accountTypes,
-                        assetTypes,
-                    } = data;
+                .then(response => {
+                    if (!response.ok) {
+                        apiErrorHandler.handleError(response);
+                        return null;
+                    }
 
-                    dispatch({ type: 'RECEIVE_LOOKUPS', accountTypes, assetTypes });
+                    return response.json() as Promise<LookupsApiResponse>
+                })
+                .then(data => {
+                    if (!isNil(data)) {
+                        const {
+                            accountTypes,
+                            assetTypes,
+                        } = data;
+
+                        dispatch({ type: 'RECEIVE_LOOKUPS', accountTypes, assetTypes });
+                    }
                 });
 
             dispatch({ type: 'REQUEST_LOOKUPS' });

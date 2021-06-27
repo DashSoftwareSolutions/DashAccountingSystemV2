@@ -4,27 +4,61 @@ import {
     findIndex,
     isEmpty,
     isNil,
+    map,
+    reduce,
+    size,
 } from 'lodash';
 import { AppThunkAction } from './';
+import { isStringNullOrWhiteSpace } from '../common/StringUtils';
+import { Logger } from '../common/Logging';
 import authService from '../components/api-authorization/AuthorizeService';
 import AmountType from '../models/AmountType';
 import JournalEntry from '../models/JournalEntry';
 import JournalEntryAccount from '../models/JournalEntryAccount';
-import { Logger } from '../common/Logging';
 
-interface JournalEntryValidationState { // TODO: Validation might go into component state ... stay tuned ...
+
+export interface JournalEntryAccountsValidationState {
     error: string;
     hasSufficientAccounts: boolean;
     isBalanced: boolean;
 }
+
+export interface JournalEntryAttributeValidationState {
+    valid: boolean | undefined;
+    invalid: boolean | undefined;
+    error: string | null;
+}
+
+const DEFAULT_ATTRIBUTE_VALIDATION_STATE: JournalEntryAttributeValidationState = {
+    error: null,
+    valid: undefined,
+    invalid: undefined,
+};
+
+interface JournalEntryValidationState {
+    accounts: JournalEntryAccountsValidationState;
+    attributes: Map<string, JournalEntryAttributeValidationState>;
+    canSave: boolean;
+}
+
+const DEFAULT_VALIDATION_STATE: JournalEntryValidationState = {
+    accounts: { error: '', hasSufficientAccounts: false, isBalanced: true },
+    attributes: new Map([
+        ['entryDate', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['postDate', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['description', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['note', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['checkNumber', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+    ]),
+    canSave: false,
+};
 
 export interface JournalEntryState {
     isLoading: boolean;
     isSaving: boolean;
     existingEntry: JournalEntry | null;
     dirtyEntry: JournalEntry | null;
-    validationState: JournalEntryValidationState | null; // TODO: Validation might go into component state ... stay tuned ...
-    // TODO: If handling 'Post a Pending Jounral Entry' separately (e.g. in a special modal or some such) define separate state for that if needed (if cannot use `dirtyEntry` for some reason)
+    validation: JournalEntryValidationState;
 }
 
 /* BEGIN: REST API Actions */
@@ -246,8 +280,25 @@ const unloadedState: JournalEntryState = {
     isSaving: false,
     existingEntry: null,
     dirtyEntry: null,
-    validationState: null,
+    validation: { ...DEFAULT_VALIDATION_STATE },
 };
+
+const updateAttributeValidationState = (journalEntry: JournalEntry, validationState: JournalEntryValidationState): JournalEntryValidationState => {
+    return validationState;
+}
+
+const updateAccountsValidationState = (journalEntry: JournalEntry, validationState: JournalEntryValidationState): JournalEntryValidationState => {
+    let accountValidation: JournalEntryAccountsValidationState = { hasSufficientAccounts: false, isBalanced: false, error: '' };
+
+    if (isEmpty(journalEntry.accounts)) {
+        accountValidation
+    }
+
+    const hasSufficientAccounts = !isEmpty(journalEntry.accounts) && size(journalEntry.accounts) >= 2;
+
+
+    return validationState;
+}
 
 export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | undefined, incomingAction: Action): JournalEntryState => {
     if (state === undefined) {
@@ -303,7 +354,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                         checkNumber: null,
                         accounts: [],
                     },
-                    validationState: null,
+                    validation: { ...DEFAULT_VALIDATION_STATE },
                 };
 
             case 'UPDATE_JOURNAL_ENTRY_ENTRY_DATE':
