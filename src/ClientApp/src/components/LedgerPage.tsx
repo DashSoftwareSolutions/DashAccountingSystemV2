@@ -1,6 +1,10 @@
 ﻿import * as React from 'react';
 import { connect } from 'react-redux';
-import { Button } from 'reactstrap';
+import {
+    Button,
+    Col,
+    Row,
+} from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
@@ -39,11 +43,17 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                 selectedTenant={selectedTenant}
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
-                    <h1>General Ledger</h1>
-                    <p className="lead">{selectedTenant?.name}</p>
-                    <Button color="primary" onClick={this.onClickNewJournalEntry}>
-                        New Journal Entry
-                    </Button>
+                    <Row>
+                        <Col md={6}>
+                            <h1>General Ledger</h1>
+                            <p className="lead">{selectedTenant?.name}</p>
+                        </Col>
+                        <Col md={6} style={{ textAlign: 'right' }}>
+                            <Button color="primary" onClick={this.onClickNewJournalEntry}>
+                                New Journal Entry
+                            </Button>
+                        </Col>
+                    </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
                     <p>Coming Soon...</p>

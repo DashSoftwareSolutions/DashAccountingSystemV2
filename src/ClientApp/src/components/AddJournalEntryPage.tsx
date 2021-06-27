@@ -1,6 +1,11 @@
 ﻿import * as React from 'react';
 import { ConnectedProps, connect } from 'react-redux';
-import { Button } from 'reactstrap';
+import {
+    Button,
+    Col,
+    Row,
+} from 'reactstrap';
+import { isNil } from 'lodash';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import {
@@ -12,10 +17,12 @@ import JournalEntryEditor from './JournalEntryEditor';
 import Mode from '../models/Mode';
 import TenantBasePage from './TenantBasePage';
 import * as JournalEntryStore from '../store/JournalEntry';
+import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
         canSaveJournalEntry: state.journalEntry?.validation.canSave ?? false,
+        savedEntry: state.journalEntry?.existingEntry ?? null,
         isSaving: state.journalEntry?.isSaving ?? false,
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
@@ -24,6 +31,7 @@ const mapStateToProps = (state: ApplicationState) => {
 const mapDispatchToProps = {
     resetJournalEntryStore: JournalEntryStore.actionCreators.reset,
     saveNewJournalEntry: JournalEntryStore.actionCreators.saveNewJournalEntry,
+    showAlert: SystemNotificationsStore.actionCreators.showAlert,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -48,10 +56,23 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
 
     public componentDidUpdate(prevProps: AddJournalEntryPageProps) {
         const { isSaving: wasSaving } = prevProps;
-        const { isSaving } = this.props;
 
-        if (wasSaving && !isSaving) {
+        const {
+            history,
+            isSaving,
+            savedEntry,
+            showAlert,
+            resetJournalEntryStore,
+        } = this.props;
+
+        if (wasSaving &&
+            !isSaving &&
+            !isNil(savedEntry)) {
             this.logger.debug('Just finished saving the journal entry.');
+            this.logger.debug('Saved Entry has Entry ID:', savedEntry.entryId);
+            showAlert('success', `Successfully created Journal Entry ID ${savedEntry.entryId}`, true);
+            resetJournalEntryStore(); // TODO: This might end up being a more targeted reset for just the `dirtyEntry` state
+            history.push('/ledger');
         }
     }
 
@@ -70,25 +91,31 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
                 selectedTenant={selectedTenant}
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
-                    <h1>Add Journal Entry</h1>
-                    <p className="lead">{selectedTenant?.name}</p>
-                    <Button
-                        color="success"
-                        disabled={isSaving || !canSaveJournalEntry}
-                        id={`${this.bemBlockName}--save_button`}
-                        onClick={this.onClickSave}
-                        style={{ marginRight: 22, width: 88 }}
-                    >
-                        {isSaving ? 'Saving...' : 'Save'}
-                    </Button>
-                    <Button
-                        color="secondary"
-                        id={`${this.bemBlockName}--cancel_button`}
-                        onClick={this.onClickCancel}
-                        style={{ width: 88 }}
-                    >
-                        Cancel
-                    </Button>
+                    <Row>
+                        <Col md={6}>
+                            <h1>Add Journal Entry</h1>
+                            <p className="lead">{selectedTenant?.name}</p>
+                        </Col>
+                        <Col md={6} style={{ textAlign: 'right' }}>
+                            <Button
+                                color="secondary"
+                                id={`${this.bemBlockName}--cancel_button`}
+                                onClick={this.onClickCancel}
+                                style={{ marginRight: 22, width: 88 }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                color="success"
+                                disabled={isSaving || !canSaveJournalEntry}
+                                id={`${this.bemBlockName}--save_button`}
+                                onClick={this.onClickSave}
+                                style={{ width: 88 }}
+                            >
+                                {isSaving ? 'Saving...' : 'Save'}
+                            </Button>
+                        </Col>
+                    </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
                     <JournalEntryEditor mode={Mode.Add} />

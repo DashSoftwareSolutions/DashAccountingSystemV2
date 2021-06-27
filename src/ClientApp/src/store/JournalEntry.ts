@@ -457,72 +457,69 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     },
                 };
 
-            case 'ADD_JOURNAL_ENTRY_ACCOUNT':
-                {
-                    const updatedJournalEntry: JournalEntry = {
-                        ...state.dirtyEntry as Pick<JournalEntry, keyof JournalEntry>,
-                        accounts: [
-                            ...state.dirtyEntry?.accounts ?? [],
-                            action.account,
-                        ],
-                    };
+            case 'ADD_JOURNAL_ENTRY_ACCOUNT': {
+                const updatedJournalEntry: JournalEntry = {
+                    ...state.dirtyEntry as Pick<JournalEntry, keyof JournalEntry>,
+                    accounts: [
+                        ...state.dirtyEntry?.accounts ?? [],
+                        action.account,
+                    ],
+                };
 
-                    return updateStateAfterAccountChange(state, updatedJournalEntry);
+                return updateStateAfterAccountChange(state, updatedJournalEntry);
+            }
+
+            case 'REMOVE_JOURNAL_ENTRY_ACCOUNT': {
+                const updatedJournalEntry: JournalEntry = {
+                    ...state.dirtyEntry as Pick<JournalEntry, keyof JournalEntry>,
+                    accounts: filter(
+                        state.dirtyEntry?.accounts,
+                        (a: JournalEntryAccount): boolean => a.accountId !== action.accountId,
+                    ),
+                };
+
+                return updateStateAfterAccountChange(state, updatedJournalEntry);
+            }
+
+            case 'UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT': {
+                const updatedDirtyEntry: JournalEntry = { ...(state.dirtyEntry ?? DEFAULT_JOURNAL_ENTRY) };
+                const existingAccounts = updatedDirtyEntry.accounts ?? [];
+
+                if (isEmpty(existingAccounts)) {
+                    logger.warn('No existing accounts');
+                    return state;
                 }
 
-            case 'REMOVE_JOURNAL_ENTRY_ACCOUNT':
-                {
-                    const updatedJournalEntry: JournalEntry = {
-                        ...state.dirtyEntry as Pick<JournalEntry, keyof JournalEntry>,
-                        accounts: filter(
-                            state.dirtyEntry?.accounts,
-                            (a: JournalEntryAccount): boolean => a.accountId !== action.accountId,
-                        ),
-                    };
+                const indexOfSpecifiedAccount = findIndex(
+                    existingAccounts,
+                    (a: JournalEntryAccount): boolean => a.accountId === action.accountId,
+                );
 
-                    return updateStateAfterAccountChange(state, updatedJournalEntry);
+                if (indexOfSpecifiedAccount === -1) {
+                    logger.warn(`Account with ID ${action.accountId} not presently in the accounts collection`)
+                    return state;
                 }
 
-            case 'UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT':
-                {
-                    const updatedDirtyEntry: JournalEntry = { ...(state.dirtyEntry ?? DEFAULT_JOURNAL_ENTRY) };
-                    const existingAccounts = updatedDirtyEntry.accounts ?? [];
+                const existingAccount = existingAccounts[indexOfSpecifiedAccount];
+                const updatedAccountAmount = existingAccount.amount ?? { ...DEFAULT_ACCOUNT_AMOUNT };
+                updatedAccountAmount.amount = action.amount;
+                updatedAccountAmount.amountType = !isNil(action.amount) ?
+                    (action.amount >= 0 ? AmountType.Debit : AmountType.Credit) :
+                    null;
 
-                    if (isEmpty(existingAccounts)) {
-                        logger.warn('No existing accounts');
-                        return state;
-                    }
+                const updatedAccount = {
+                    ...existingAccount,
+                    amount: updatedAccountAmount,
+                };
 
-                    const indexOfSpecifiedAccount = findIndex(
-                        existingAccounts,
-                        (a: JournalEntryAccount): boolean => a.accountId === action.accountId,
-                    );
+                updatedDirtyEntry.accounts = [
+                    ...existingAccounts.slice(0, indexOfSpecifiedAccount),
+                    updatedAccount,
+                    ...existingAccounts.slice(indexOfSpecifiedAccount + 1),
+                ];
 
-                    if (indexOfSpecifiedAccount === -1) {
-                        logger.warn(`Account with ID ${action.accountId} not presently in the accounts collection`)
-                        return state;
-                    }
-
-                    const existingAccount = existingAccounts[indexOfSpecifiedAccount];
-                    const updatedAccountAmount = existingAccount.amount ?? { ...DEFAULT_ACCOUNT_AMOUNT };
-                    updatedAccountAmount.amount = action.amount;
-                    updatedAccountAmount.amountType = !isNil(action.amount) ?
-                        (action.amount >= 0 ? AmountType.Debit : AmountType.Credit) :
-                        null;
-
-                    const updatedAccount = {
-                        ...existingAccount,
-                        amount: updatedAccountAmount,
-                    };
-
-                    updatedDirtyEntry.accounts = [
-                        ...existingAccounts.slice(0, indexOfSpecifiedAccount),
-                        updatedAccount,
-                        ...existingAccounts.slice(indexOfSpecifiedAccount + 1),
-                    ];
-
-                    return updateStateAfterAccountChange(state, updatedDirtyEntry);
-                }
+                return updateStateAfterAccountChange(state, updatedDirtyEntry);
+            }
 
             case 'RESET_JOURNAL_ENTRY_STORE_STATE':
                 return unloadedState;

@@ -235,6 +235,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                         <Input
                                             id={`${this.bemBlockName}--edit_debit_amount_input_${safeAccountId}`}
                                             onChange={(e) => this.onEditDebitAmountChanged(e, safeAccountId)}
+                                            step="any"
                                             style={{ textAlign: 'right' }}
                                             type="number"
                                             value={debitAmount?.toString() ?? ''}
@@ -245,6 +246,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                             id={`${this.bemBlockName}--edit_credit_amount_input_${safeAccountId}`}
                                             name="check_number_input"
                                             onChange={(e) => this.onEditCreditAmountChanged(e, safeAccountId)}
+                                            step="any"
                                             style={{ textAlign: 'right' }}
                                             type="number"
                                             value={creditAmount?.toString() ?? ''}
@@ -262,23 +264,6 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                 </tr>
                             );
                         })}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td className="col-md-5">
-                                <strong>TOTALS</strong>
-                            </td>
-                            <td className="col-md-2" />
-                            <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                {totalDebits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
-                            </td>
-                            <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                {totalCredits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
-                            </td>
-                            <td className="col-md-1" />
-                        </tr>
                         <tr>
                             <td className="col-md-5">
                                 <AccountSelector
@@ -303,6 +288,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                 <Input
                                     id={`${this.bemBlockName}--add_account_debit_amount_input`}
                                     onChange={this.onAddDebitAmountChanged}
+                                    step="any"
                                     style={{ textAlign: 'right' }}
                                     type="number"
                                     value={addDebit?.toString() ?? ''}
@@ -312,6 +298,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                 <Input
                                     id={`${this.bemBlockName}--add_account_credit_amount_input`}
                                     onChange={this.onAddCreditAmountChanged}
+                                    step="any"
                                     style={{ textAlign: 'right' }}
                                     type="number"
                                     value={addCredit?.toString() ?? ''}
@@ -328,6 +315,23 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                     Add
                                 </Button>
                             </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td className="col-md-5">
+                                <strong>TOTALS</strong>
+                            </td>
+                            <td className="col-md-2" />
+                            <td className="col-md-2" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+                                {/* TODO/FIXME: Be aware of asset type and user locale */}
+                                {totalDebits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                            </td>
+                            <td className="col-md-2" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+                                {/* TODO/FIXME: Be aware of asset type and user locale */}
+                                {totalCredits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                            </td>
+                            <td className="col-md-1" />
                         </tr>
                     </tfoot>
                 </table>

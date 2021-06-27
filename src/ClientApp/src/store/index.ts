@@ -1,6 +1,7 @@
 ﻿import * as Accounts from './Accounts';
 import * as JournalEntry from './JournalEntry';
 import * as LookupValues from './LookupValues';
+import * as SystemNotifications from './SystemNotifications';
 import * as Tenants from './Tenants';
 import * as WeatherForecasts from './WeatherForecasts';  // from scaffolded examples; TODO: remove
 
@@ -9,6 +10,7 @@ export interface ApplicationState {
     accounts: Accounts.AccountsState | undefined;
     journalEntry: JournalEntry.JournalEntryState | undefined;
     lookups: LookupValues.LookupValuesState | undefined;
+    systemNotifications: SystemNotifications.SystemNotificationsState | undefined;
     tenants: Tenants.TenantsState | undefined;
     weatherForecasts: WeatherForecasts.WeatherForecastsState | undefined; // from scaffolded examples; TODO: remove
 }
@@ -21,6 +23,7 @@ export const reducers = {
     journalEntry: JournalEntry.reducer,
     lookups: LookupValues.reducer,
     tenants: Tenants.reducer,
+    systemNotifications: SystemNotifications.reducer,
     weatherForecasts: WeatherForecasts.reducer, // from scaffolded examples; TODO: remove
 };
 

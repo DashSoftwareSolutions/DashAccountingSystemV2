@@ -1,6 +1,7 @@
 ﻿import * as React from 'react';
 import { History } from 'history';
 import { isEmpty } from 'lodash';
+import SystemNotificationsArea from './SystemNotificationsArea';
 import Tenant from '../models/Tenant';
 import TenantBasePageContent from './TenantBasePageContent';
 import TenantBasePageHeader from './TenantBasePageHeader';
@@ -42,6 +43,7 @@ class TenantBasePage extends React.PureComponent<TenantBasePageProps> {
         return (
             <React.Fragment>
                 <TenantSubNavigation activeSection={section} />
+                <SystemNotificationsArea />
                 {children}
             </React.Fragment>
         );
