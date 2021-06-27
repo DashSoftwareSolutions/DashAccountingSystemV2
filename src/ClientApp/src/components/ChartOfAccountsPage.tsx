@@ -1,13 +1,12 @@
 ﻿import * as React from 'react';
 import { connect } from 'react-redux';
 import { isEmpty } from 'lodash';
-import { Jumbotron } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
+import { NavigationSection } from './TenantSubNavigation';
 import Account from '../models/Account';
 import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
-import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
 import * as AccountsStore from '../store/Accounts';
 
 interface ChartOfAccountsPageReduxProps extends AccountsStore.AccountsState {
@@ -26,6 +25,8 @@ type ChartOfAccountsPageProps = ChartOfAccountsPageReduxProps
     & RouteComponentProps;
 
 class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> {
+    private bemBlockName: string = 'chart_of_accounts_page';
+
     public componentDidMount() {
         this.ensureDataFetched();
     }
@@ -45,17 +46,23 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
 
     public render() {
         const {
+            history,
             selectedTenant,
         } = this.props;
 
         return (
-            <TenantBasePage selectedTenant={selectedTenant}>
-                <Jumbotron>
+            <TenantBasePage
+                history={history}
+                section={NavigationSection.ChartOfAccounts}
+                selectedTenant={selectedTenant}
+            >
+                <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <h1>Chart of Accounts</h1>
                     <p className="lead">{selectedTenant?.name}</p>
-                </Jumbotron>
-                <TenantSubNavigation activeSection={NavigationSection.ChartOfAccounts} />
-                {this.renderAccountsTable()}
+                </TenantBasePage.Header>
+                <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
+                    {this.renderAccountsTable()}
+                </TenantBasePage.Content>
             </TenantBasePage>
         );
     }
@@ -72,7 +79,7 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
         } = this.props;
 
         if (isEmpty(accounts)) {
-            return null;
+            return (<React.Fragment />);
         }
 
         return (

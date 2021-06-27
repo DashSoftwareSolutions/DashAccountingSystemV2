@@ -1,11 +1,10 @@
 ﻿import * as React from 'react';
 import { connect } from 'react-redux';
-import { Jumbotron } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
+import { NavigationSection } from './TenantSubNavigation';
 import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
-import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
 
 interface ReportsPageReduxProps {
     selectedTenant: Tenant | null;
@@ -19,18 +18,27 @@ type ReportsPageProps = ReportsPageReduxProps
     & RouteComponentProps;
 
 class ReportsPage extends React.PureComponent<ReportsPageProps> {
+    private bemBlockName: string = 'reports_page';
+
     public render() {
         const {
+            history,
             selectedTenant,
         } = this.props;
 
         return (
-            <TenantBasePage selectedTenant={selectedTenant}>
-                <Jumbotron>
+            <TenantBasePage
+                history={history}
+                section={NavigationSection.Reports}
+                selectedTenant={selectedTenant}
+            >
+                <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <h1>Reports</h1>
                     <p className="lead">{selectedTenant?.name}</p>
-                </Jumbotron>
-                <TenantSubNavigation activeSection={NavigationSection.Reports} />
+                </TenantBasePage.Header>
+                <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
+                    <p>Coming Soon...</p>
+                </TenantBasePage.Content>
             </TenantBasePage>
         );
     }

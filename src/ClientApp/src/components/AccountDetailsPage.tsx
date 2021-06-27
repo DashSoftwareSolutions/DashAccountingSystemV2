@@ -1,13 +1,12 @@
 ﻿import * as React from 'react';
 import { connect } from 'react-redux';
 import { isEmpty } from 'lodash';
-import { Jumbotron } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
+import { NavigationSection } from './TenantSubNavigation';
 import Account from '../models/Account';
 import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
-import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
 
 interface AccountDetailsPageReduxProps {
     selectedAccount: Account | null;
@@ -25,6 +24,8 @@ type AccountDetailsPageProps = AccountDetailsPageReduxProps
     & RouteComponentProps;
 
 class AccountDetailsPage extends React.PureComponent<AccountDetailsPageProps> {
+    private bemBlockName: string = 'account_details_page';
+
     public componentDidMount() {
         const {
             history,
@@ -38,6 +39,7 @@ class AccountDetailsPage extends React.PureComponent<AccountDetailsPageProps> {
 
     public render() {
         const {
+            history,
             selectedAccount,
             selectedTenant,
         } = this.props;
@@ -47,8 +49,12 @@ class AccountDetailsPage extends React.PureComponent<AccountDetailsPageProps> {
         }
 
         return (
-            <TenantBasePage selectedTenant={selectedTenant}>
-                <Jumbotron>
+            <TenantBasePage
+                history={history}
+                section={NavigationSection.ChartOfAccounts}
+                selectedTenant={selectedTenant}
+            >
+                <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <h1>{`${selectedAccount?.accountNumber} - ${selectedAccount?.name}`}</h1>
                     <p className="lead">{selectedAccount?.accountType.name}</p>
                     <p className="lead">
@@ -58,8 +64,10 @@ class AccountDetailsPage extends React.PureComponent<AccountDetailsPageProps> {
                          */}
                         {Math.abs(selectedAccount?.balance.amount ?? 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
                     </p>
-                </Jumbotron>
-                <TenantSubNavigation activeSection={NavigationSection.ChartOfAccounts} />
+                </TenantBasePage.Header>
+                <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
+                    <p>Coming Soon...</p>
+                </TenantBasePage.Content>
             </TenantBasePage>
         );
     }

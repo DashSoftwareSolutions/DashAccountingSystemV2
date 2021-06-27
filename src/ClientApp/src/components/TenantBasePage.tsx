@@ -1,16 +1,22 @@
 ﻿import * as React from 'react';
+import { History } from 'history';
 import { isEmpty } from 'lodash';
-import { RouteComponentProps, withRouter } from 'react-router';
 import Tenant from '../models/Tenant';
+import TenantBasePageContent from './TenantBasePageContent';
+import TenantBasePageHeader from './TenantBasePageHeader';
+import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
 
-interface TenantBasePageOwnProps {
+interface TenantBasePageProps {
+    children?: JSX.Element | JSX.Element[];
+    history: History;
+    section: NavigationSection;
     selectedTenant: Tenant | null;
 };
 
-type TenantBasePageProps = TenantBasePageOwnProps
-    & RouteComponentProps;
-
 class TenantBasePage extends React.PureComponent<TenantBasePageProps> {
+    public static Header = TenantBasePageHeader;
+    public static Content = TenantBasePageContent;
+
     public componentDidMount() {
         const {
             history,
@@ -25,6 +31,7 @@ class TenantBasePage extends React.PureComponent<TenantBasePageProps> {
     public render() {
         const {
             children,
+            section,
             selectedTenant,
         } = this.props;
 
@@ -34,10 +41,11 @@ class TenantBasePage extends React.PureComponent<TenantBasePageProps> {
 
         return (
             <React.Fragment>
+                <TenantSubNavigation activeSection={section} />
                 {children}
             </React.Fragment>
         );
     }
 }
 
-export default withRouter(TenantBasePage);
+export default TenantBasePage;

@@ -1,11 +1,10 @@
 ﻿import * as React from 'react';
 import { connect } from 'react-redux';
-import { Jumbotron } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
-import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
+import { NavigationSection } from './TenantSubNavigation';
 
 interface DashboardPageReduxProps {
     selectedTenant: Tenant | null,
@@ -19,18 +18,27 @@ type DashboardPageProps = DashboardPageReduxProps
     & RouteComponentProps;
 
 class DashboardPage extends React.PureComponent<DashboardPageProps> {
+    private bemBlockName: string = 'dashboard_page';
+
     public render() {
         const {
+            history,
             selectedTenant,
         } = this.props;
 
         return (
-            <TenantBasePage selectedTenant={selectedTenant}>
-                <Jumbotron>
+            <TenantBasePage
+                history={history}
+                section={NavigationSection.Dashboard}
+                selectedTenant={selectedTenant}
+            >
+                <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <h1>{selectedTenant?.name}</h1>
                     <p className="lead">Dashboard</p>
-                </Jumbotron>
-                <TenantSubNavigation activeSection={NavigationSection.Dashboard} />
+                </TenantBasePage.Header>
+                <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
+                    <p>Coming Soon...</p>
+                </TenantBasePage.Content>
             </TenantBasePage>
         );
     }

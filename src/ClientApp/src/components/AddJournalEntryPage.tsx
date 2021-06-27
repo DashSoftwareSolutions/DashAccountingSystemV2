@@ -1,17 +1,16 @@
 ﻿import * as React from 'react';
 import { ConnectedProps, connect } from 'react-redux';
-import { Button, Jumbotron } from 'reactstrap';
+import { Button } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import {
     ILogger,
     Logger,
 } from '../common/Logging';
+import { NavigationSection } from './TenantSubNavigation';
 import JournalEntryEditor from './JournalEntryEditor';
 import Mode from '../models/Mode';
-
 import TenantBasePage from './TenantBasePage';
-import TenantSubNavigation, { NavigationSection } from './TenantSubNavigation';
 import * as JournalEntryStore from '../store/JournalEntry';
 
 const mapStateToProps = (state: ApplicationState) => {
@@ -59,13 +58,18 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
     public render() {
         const {
             canSaveJournalEntry,
+            history,
             isSaving,
             selectedTenant,
         } = this.props;
 
         return (
-            <TenantBasePage selectedTenant={selectedTenant}>
-                <Jumbotron>
+            <TenantBasePage
+                history={history}
+                section={NavigationSection.Ledger}
+                selectedTenant={selectedTenant}
+            >
+                <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <h1>Add Journal Entry</h1>
                     <p className="lead">{selectedTenant?.name}</p>
                     <Button
@@ -85,9 +89,10 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
                     >
                         Cancel
                     </Button>
-                </Jumbotron>
-                <TenantSubNavigation activeSection={NavigationSection.Ledger} />
-                <JournalEntryEditor mode={Mode.Add} />
+                </TenantBasePage.Header>
+                <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
+                    <JournalEntryEditor mode={Mode.Add} />
+                </TenantBasePage.Content>
             </TenantBasePage>
         );
     }
