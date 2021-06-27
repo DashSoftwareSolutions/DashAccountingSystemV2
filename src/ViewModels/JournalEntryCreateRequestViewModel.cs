@@ -90,6 +90,9 @@ namespace DashAccountingSystemV2.ViewModels
                 contextUserId,
                 viewModel.PostDate.HasValue ? contextUserId : null);
 
+            if (!string.IsNullOrWhiteSpace(viewModel.Note))
+                result.Note = viewModel.Note;
+
             result.Accounts = viewModel
                 .Accounts
                 .Select(JournalEntryAccountCreateRequestViewModel.ToModel)
