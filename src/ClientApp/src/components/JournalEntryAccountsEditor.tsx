@@ -38,6 +38,8 @@ interface JournalEntryAccountsEditorProps {
     onAccountAdded: Function;
     onAccountAmountChanged: Function;
     onAccountRemoved: Function;
+    totalCredits: number;
+    totalDebits: number;
 }
 
 interface JournalEntryAccountsEditorState {
@@ -149,6 +151,8 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
             assetTypes,
             isEntryUnbalanced,
             journalEntryAccounts,
+            totalCredits,
+            totalDebits,
         } = this.props;
 
         const {
@@ -160,36 +164,13 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
 
         const alreadySelectedAccountIds = map(journalEntryAccounts, acct => acct.accountId ?? '');
 
-        const totalDebits = reduce(
-            map(
-                filter(
-                    journalEntryAccounts,
-                    (a) => a?.amount?.amountType === AmountType.Debit,
-                ),
-                (a) => a?.amount?.amount ?? 0,
-            ),
-            (sum, next) => sum + next,
-            0);
-
-        const totalCredits = reduce(
-            map(
-                filter(
-                    journalEntryAccounts,
-                    (a) => a?.amount?.amountType === AmountType.Credit,
-                ),
-                (a) => (a?.amount?.amount ?? 0) * -1,
-            ),
-            (sum, next) => sum + next,
-            0);
-
-
         return (
             <div id={this.bemBlockName}>
-                <div className="row" style={{ minHeight: '52px' }}>
-                    <div className="col-md-10">
+                <div className="row" style={{ minHeight: '66px' }}>
+                    <div className="col-md-6">
                         <h4>Journal Entry Account Details</h4>
                     </div>
-                    <div className="col-md-2" style={{ textAlign: 'right' }}>
+                    <div className="col-md-6">
                         <Alert color="warning" isOpen={isEntryUnbalanced}>
                             Entry is not balanced
                         </Alert>

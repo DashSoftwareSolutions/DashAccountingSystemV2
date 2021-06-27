@@ -93,7 +93,12 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps> {
         const {
             dirtyEntry,
             validation,
-        } = journalEntry ?? {};
+            totalCredits,
+            totalDebits,
+        } = journalEntry ?? {
+            totalCredits: 0,
+            totalDebits: 0,
+        };
 
         if (isNil(dirtyEntry)) {
             return null;
@@ -216,6 +221,8 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps> {
                                 onAccountAdded={this.onAccountAdded}
                                 onAccountAmountChanged={this.onAccountAmountChanged}
                                 onAccountRemoved={this.onAccountRemoved}
+                                totalCredits={totalCredits}
+                                totalDebits={totalDebits}
                             />
                         </Col>
                     </Row>

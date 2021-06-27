@@ -6,7 +6,6 @@ import {
     isNil,
     map,
     reduce,
-    size,
 } from 'lodash';
 import { AppThunkAction } from './';
 import { isStringNullOrWhiteSpace } from '../common/StringUtils';
@@ -58,6 +57,8 @@ export interface JournalEntryState {
     isSaving: boolean;
     existingEntry: JournalEntry | null;
     dirtyEntry: JournalEntry | null;
+    totalCredits: number,
+    totalDebits: number,
     validation: JournalEntryValidationState;
 }
 
@@ -280,25 +281,79 @@ const unloadedState: JournalEntryState = {
     isSaving: false,
     existingEntry: null,
     dirtyEntry: null,
+    totalCredits: 0,
+    totalDebits: 0,
     validation: { ...DEFAULT_VALIDATION_STATE },
 };
 
-const updateAttributeValidationState = (journalEntry: JournalEntry, validationState: JournalEntryValidationState): JournalEntryValidationState => {
-    return validationState;
-}
+const areAllRequiredAttributesSet = (journalEntry: JournalEntry): boolean => {
+    return !isStringNullOrWhiteSpace(journalEntry.description) &&
+        !isNil(journalEntry.entryDate);
+};
 
-const updateAccountsValidationState = (journalEntry: JournalEntry, validationState: JournalEntryValidationState): JournalEntryValidationState => {
-    let accountValidation: JournalEntryAccountsValidationState = { hasSufficientAccounts: false, isBalanced: false, error: '' };
+const sumCredits = (accounts: JournalEntryAccount[]): number => {
+    return reduce(
+        map(
+            filter(
+                accounts,
+                (a) => a?.amount?.amountType === AmountType.Credit,
+            ),
+            (a) => (a?.amount?.amount ?? 0) * -1,
+        ),
+        (sum, next) => sum + next,
+        0);
+};
 
-    if (isEmpty(journalEntry.accounts)) {
-        accountValidation
+const sumDebits = (accounts: JournalEntryAccount[]): number => {
+    return reduce(
+        map(
+            filter(
+                accounts,
+                (a) => a?.amount?.amountType === AmountType.Debit,
+            ),
+            (a) => a?.amount?.amount ?? 0,
+        ),
+        (sum, next) => sum + next,
+        0);
+};
+
+const updateStateAfterAccountChange = (state: JournalEntryState, updatedJournalEntry: JournalEntry): JournalEntryState => {
+    let accountValidation: JournalEntryAccountsValidationState = { hasSufficientAccounts: false, isBalanced: true, error: '' };
+
+    // TODO: Right now, we are assuming all amounts are using same asset type (e.g. USD $, etc.)
+    //       If entry were to have mixed asset types, each group of amounts by asset type must balance.
+    //       Honestly, though, we might want to hide Asset Type and assume that all transactions against an account must be of same asset type.
+    //       Definitely no Asset Type exposed for every Journal Entry in QuickBooks; it is likely some global setting somewhere.
+
+    const totalDebits = sumDebits(updatedJournalEntry.accounts);
+    const totalCredits = sumCredits(updatedJournalEntry.accounts);
+
+    accountValidation.hasSufficientAccounts = updatedJournalEntry.accounts.length >= 2;
+
+    if (!accountValidation.hasSufficientAccounts) {
+        accountValidation.error = updatedJournalEntry.accounts.length === 0 ?
+            'Journal Entry does not have any accounts' :
+            'Journal Entry must have at least two accounts';
     }
 
-    const hasSufficientAccounts = !isEmpty(journalEntry.accounts) && size(journalEntry.accounts) >= 2;
+    accountValidation.isBalanced = accountValidation.hasSufficientAccounts && totalDebits === totalCredits;
 
+    if (!accountValidation.isBalanced) {
+        accountValidation.error = 'Journal Entry is not balanced';
+    }
 
-    return validationState;
-}
+    return {
+        ...state,
+        dirtyEntry: updatedJournalEntry,
+        validation: {
+            ...state.validation,
+            accounts: accountValidation,
+            canSave: isEmpty(accountValidation.error) && areAllRequiredAttributesSet(updatedJournalEntry),
+        },
+        totalCredits,
+        totalDebits,
+    };
+};
 
 export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | undefined, incomingAction: Action): JournalEntryState => {
     if (state === undefined) {
@@ -403,28 +458,30 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                 };
 
             case 'ADD_JOURNAL_ENTRY_ACCOUNT':
-                return {
-                    ...state,
-                    dirtyEntry: {
+                {
+                    const updatedJournalEntry: JournalEntry = {
                         ...state.dirtyEntry as Pick<JournalEntry, keyof JournalEntry>,
                         accounts: [
                             ...state.dirtyEntry?.accounts ?? [],
                             action.account,
                         ],
-                    },
-                };
+                    };
+
+                    return updateStateAfterAccountChange(state, updatedJournalEntry);
+                }
 
             case 'REMOVE_JOURNAL_ENTRY_ACCOUNT':
-                return {
-                    ...state,
-                    dirtyEntry: {
+                {
+                    const updatedJournalEntry: JournalEntry = {
                         ...state.dirtyEntry as Pick<JournalEntry, keyof JournalEntry>,
                         accounts: filter(
                             state.dirtyEntry?.accounts,
                             (a: JournalEntryAccount): boolean => a.accountId !== action.accountId,
                         ),
-                    },
-                };
+                    };
+
+                    return updateStateAfterAccountChange(state, updatedJournalEntry);
+                }
 
             case 'UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT':
                 {
@@ -464,10 +521,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                         ...existingAccounts.slice(indexOfSpecifiedAccount + 1),
                     ];
 
-                    return {
-                        ...state,
-                        dirtyEntry: updatedDirtyEntry,
-                    };
+                    return updateStateAfterAccountChange(state, updatedDirtyEntry);
                 }
 
             case 'RESET_JOURNAL_ENTRY_STORE_STATE':
