@@ -8,6 +8,7 @@
     "jquery": "^3.4.1",
     "lodash": "^4.17.21",
     "merge": "^1.2.1",
+    "moment-timezone": "^0.5.33",
     "oidc-client": "^1.9.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",

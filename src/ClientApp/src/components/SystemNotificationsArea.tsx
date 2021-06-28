@@ -68,7 +68,14 @@ class SystemNotificationsArea extends React.PureComponent<SystemNotificationsAre
             ): null;
 
         return (
-            <div style={{ height: 48, marginBottom: 22, marginTop: 22 }}>
+            <div
+                id="system_notifications_area"
+                style={{
+                    height: 48,
+                    marginBottom: 11,
+                    marginTop: 11
+                }}
+            >
                 {alertMarkup}
             </div>
         );

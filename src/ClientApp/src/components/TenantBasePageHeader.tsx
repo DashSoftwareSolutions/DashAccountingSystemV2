@@ -11,8 +11,9 @@ const TenantBasePageHeader: React.FC<TenantBasePageHeaderProps> = ({ children, i
         id={id}
         style={{
             marginTop: 11,
+            marginBottom: 22,
             paddingTop: 22,
-            paddingBottom: 22,
+            paddingBottom: 0,
         }}
     >
         {children}

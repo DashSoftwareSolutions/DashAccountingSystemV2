@@ -4,16 +4,19 @@ import {
     Button,
     Col,
     Row,
+    ListGroup,
+    ListGroupItem,
 } from 'reactstrap';
-import { isNil } from 'lodash';
+import {
+    isNil,
+    map,
+    sortBy,
+} from 'lodash';
+import moment from 'moment-timezone';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
-import {
-    ILogger,
-    Logger,
-} from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
-import Mode from '../models/Mode';
+import AmountType from '../models/AmountType';
 import TenantBasePage from './TenantBasePage';
 import TransactionStatus from '../models/TransactionStatus';
 import TransactionStatusLabel from './TransactionStatusLabel';
@@ -53,8 +56,6 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
     public render() {
         const {
             history,
-            isFetching,
-            journalEntry,
             selectedTenant,
         } = this.props;
 
@@ -65,43 +66,15 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                 selectedTenant={selectedTenant}
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
-                    <h1>Journal Entry Details</h1>
-                    <p className="lead">{selectedTenant?.name}</p>
+                    <Row>
+                        <Col>
+                            <h1>Journal Entry Details</h1>
+                            <p className="lead">{selectedTenant?.name}</p>
+                        </Col>
+                    </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    {isFetching ? (
-                        <p>{/* TODO: Some spinner or whatever */}Fetching...</p>
-                    ) : (
-                        <div className="list-group meta-data-table">
-                            {/* TODO: Consider using ReactStrap components...??? */}
-                            <div className="list-group-item row">
-                                <div className="col-xs-3 col-md-2"><strong>Transaction #</strong></div>
-                                <div className="col-xs-3 col-md-4">{journalEntry?.entryId}</div>
-                                <div className="col-xs-3 col-md-2"><strong>Check #</strong></div>
-                                <div className="col-xs-3 col-md-4">{journalEntry?.checkNumber?.toString() ?? 'N/A'}</div>
-                            </div>
-                            <div className="list-group-item row">
-                                <div className="col-xs-3 col-md-2"><strong>Entry Date</strong></div>
-                                <div className="col-xs-3 col-md-4">{journalEntry?.entryDate}</div>
-                                <div className="col-xs-3 col-md-2"><strong>Post Date</strong></div>
-                                <div className="col-xs-3 col-md-4">{journalEntry?.postDate ?? 'N/A'}</div>
-                            </div>
-                            <div className="list-group-item row">
-                                <div className="col-xs-3 col-md-2"><strong>Status</strong></div>
-                                <div className="col-xs-3 col-md-10">
-                                    <TransactionStatusLabel status={journalEntry?.status ?? TransactionStatus.Pending} />
-                                </div>
-                            </div>
-                            <div className="list-group-item row">
-                                <div className="col-md-2"><strong>Description</strong></div>
-                                <div className="col-md-10">{journalEntry?.description}</div>
-                            </div>
-                            <div className="list-group-item row">
-                                <div className="col-md-2"><strong>Note</strong></div>
-                                <div className="col-md-10">{journalEntry?.note ?? 'N/A'}</div>
-                            </div>
-                        </div>
-                    )}
+                    {this.renderJournalEntryData()}
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -117,6 +90,133 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
 
         const parsedEntryId = parseInt(entryId, 10) || 0;
         requestJournalEntry(parsedEntryId);
+    }
+
+    private renderJournalEntryData(): JSX.Element {
+        const {
+            isFetching,
+            journalEntry,
+        } = this.props;
+
+        if (isFetching) {
+            return (
+                <p>{/* TODO: Some spinner or whatever */}Fetching...</p>
+            );
+        }
+
+        if (isNil(journalEntry)) {
+            return (<React.Fragment />);
+        }
+
+        const formattEntryDate = moment(journalEntry.entryDate).format('L');
+        const formattedPostDate = !isNil(journalEntry.postDate) ? moment(journalEntry.postDate).format('L') : 'N/A';
+        const basisDateMoment = moment(journalEntry.postDate ?? journalEntry.entryDate);
+        const period = `${basisDateMoment.format('YYYY')} Q${basisDateMoment.format('Q')}`; // TODO: Maybe _someday_ support custom accounting period scheme other than calendar year
+
+        return (
+            <React.Fragment>
+                <ListGroup>
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2}><strong>Transaction #</strong></Col>
+                            <Col md={4}>{journalEntry.entryId}</Col>
+                            <Col md={2}><strong>Check #</strong></Col>
+                            <Col md={4}>{journalEntry.checkNumber?.toString() ?? 'N/A'}</Col>
+                        </Row>
+                    </ListGroupItem>
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2}><strong>Entry Date</strong></Col>
+                            <Col md={4}>{formattEntryDate}</Col>
+                            <Col md={2}><strong>Post Date</strong></Col>
+                            <Col md={4}>{formattedPostDate}</Col>
+                        </Row>
+                    </ListGroupItem>
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2} style={{ paddingTop: 4 }}><strong>Status</strong></Col>
+                            <Col md={4}>
+                                <TransactionStatusLabel status={journalEntry.status ?? TransactionStatus.Pending} />
+                            </Col>
+                            <Col md={2}><strong>Period</strong></Col>
+                            <Col md={4}>{period}</Col>
+                        </Row>
+                    </ListGroupItem>
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2}><strong>Description</strong></Col>
+                            <Col md={10}>{journalEntry.description}</Col>
+                        </Row>
+                    </ListGroupItem>
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2}><strong>Note</strong></Col>
+                            <Col md={10}>{journalEntry.note ?? 'N/A'}</Col>
+                        </Row>
+                    </ListGroupItem>
+                </ListGroup>
+                <table className="table" id={`${this.bemBlockName}--accounts_table`}>
+                    <thead>
+                        <tr>
+                            <th className="col-md-5">Account</th>
+                            <th className="col-md-2">Asset Type</th>
+                            <th className="col-md-2" style={{ textAlign: 'right' }}>Debit</th>
+                            <th className="col-md-2" style={{ textAlign: 'right' }}>Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {map(
+                            sortBy(
+                                journalEntry.accounts,
+                                (a) => a?.amount?.amountType === AmountType.Debit ? 1 : 2,
+                                (a) => a?.accountNumber,
+                            ),
+                            (account) => {
+                                const {
+                                    accountId,
+                                    accountName,
+                                    accountNumber,
+                                    amount: amountObject
+                                } = account;
+
+                                const {
+                                    amount,
+                                    amountType,
+                                    assetType
+                                } = amountObject ?? {};
+
+                                const assetTypeName = assetType?.name ?? '';
+
+                                const creditAmount = !isNil(amount) && amountType === AmountType.Credit ?
+                                    -1 * amount ?? 0 :
+                                    null;
+
+                                const debitAmount = !isNil(amount) && amountType === AmountType.Debit ?
+                                    amount ?? 0 :
+                                    null;
+
+                                const safeAccountId = accountId ?? '';
+
+                                return (
+                                    <tr key={safeAccountId}>
+                                        <td>{`${accountNumber} - ${accountName}`}</td>
+                                        <td>{assetTypeName}</td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            {/* TODO/FIXME: Be aware of asset type and user locale */}
+                                            {!isNil(debitAmount) ? debitAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }) : ''}
+                                        </td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            {/* TODO/FIXME: Be aware of asset type and user locale */}
+                                            {!isNil(creditAmount) ? creditAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }) : ''}
+                                        </td>
+                                    </tr>
+                                );
+                            },
+                        )}
+                    </tbody>
+                </table>
+            </React.Fragment>
+        );
     }
 }
 

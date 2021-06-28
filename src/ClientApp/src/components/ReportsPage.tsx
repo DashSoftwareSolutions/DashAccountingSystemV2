@@ -1,4 +1,5 @@
 ﻿import * as React from 'react';
+import { Col, Row } from 'reactstrap';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
@@ -33,8 +34,12 @@ class ReportsPage extends React.PureComponent<ReportsPageProps> {
                 selectedTenant={selectedTenant}
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
-                    <h1>Reports</h1>
-                    <p className="lead">{selectedTenant?.name}</p>
+                    <Row>
+                        <Col>
+                            <h1>Reports</h1>
+                            <p className="lead">{selectedTenant?.name}</p>
+                        </Col>
+                    </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
                     <p>Coming Soon...</p>

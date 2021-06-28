@@ -1,4 +1,5 @@
 ﻿import * as React from 'react';
+import { Col, Row } from 'reactstrap';
 import { connect } from 'react-redux';
 import { isEmpty } from 'lodash';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -57,8 +58,12 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
                 selectedTenant={selectedTenant}
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
-                    <h1>Chart of Accounts</h1>
-                    <p className="lead">{selectedTenant?.name}</p>
+                    <Row>
+                        <Col>
+                            <h1>Chart of Accounts</h1>
+                            <p className="lead">{selectedTenant?.name}</p>
+                        </Col>
+                    </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
                     {this.renderAccountsTable()}

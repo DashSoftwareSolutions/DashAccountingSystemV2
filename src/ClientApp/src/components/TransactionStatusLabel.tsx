@@ -22,7 +22,15 @@ const TransactionStatusLabel: React.FC<TransactionStatusLabelProps> = ({ status 
     }
 
     return (
-        <Alert color={color}>{status}</Alert>
+        <Alert
+            color={color}
+            style={{
+                marginBottom: 0,
+                padding: '3px 11px',
+            }}
+        >
+            {status}
+        </Alert>
     );
 }
 

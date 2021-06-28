@@ -3,6 +3,10 @@ a {
   color: #0366d6;
 }
 
+body {
+    overflow-y: scroll;
+}
+
 code {
   color: #E01A76;
 }
