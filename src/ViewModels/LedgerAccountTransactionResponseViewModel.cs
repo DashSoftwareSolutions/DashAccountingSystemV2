@@ -45,6 +45,8 @@ namespace DashAccountingSystemV2.ViewModels
 
         public AmountViewModel Amount { get; set; }
 
+        public AmountViewModel UpdatedBalance { get; set; }
+
         public static LedgerAccountTransactionResponseViewModel FromModel(JournalEntryAccount journalEntryAccount)
         {
             if (journalEntryAccount == null ||

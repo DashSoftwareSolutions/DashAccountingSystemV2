@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.ViewModels
@@ -34,7 +33,7 @@ namespace DashAccountingSystemV2.ViewModels
             if (ledgerReportAccountDto == null)
                 return null;
 
-            return new LedgerAccountResponseViewModel()
+            var viewModel = new LedgerAccountResponseViewModel()
             {
                 Id = ledgerReportAccountDto.Account.Id,
                 AccountNumber = ledgerReportAccountDto.Account.AccountNumber,
@@ -44,10 +43,26 @@ namespace DashAccountingSystemV2.ViewModels
                 AssetType = new LookupValueViewModel(ledgerReportAccountDto.Account.AssetType.Id, ledgerReportAccountDto.Account.AssetType.Name),
                 NormalBalanceType = ledgerReportAccountDto.Account.NormalBalanceType,
                 StartingBalance = new AmountViewModel(ledgerReportAccountDto.StartingBalance, ledgerReportAccountDto.Account.AssetType),
-                Transactions = ledgerReportAccountDto
-                    .Transactions
-                    .Select(LedgerAccountTransactionResponseViewModel.FromModel),
             };
+
+            var transactionsList = new List<LedgerAccountTransactionResponseViewModel>();
+
+            var runningBalance = ledgerReportAccountDto.StartingBalance;
+
+            if (ledgerReportAccountDto.Transactions.HasAny())
+            {
+                foreach (var transaction in ledgerReportAccountDto.Transactions)
+                {
+                    var txViewModel = LedgerAccountTransactionResponseViewModel.FromModel(transaction);
+                    runningBalance += transaction.Amount;
+                    txViewModel.UpdatedBalance = new AmountViewModel(runningBalance, transaction.AssetType);
+                    transactionsList.Add(txViewModel);
+                }
+            }
+
+            viewModel.Transactions = transactionsList;
+
+            return viewModel;
         }
     }
 }
