@@ -2,9 +2,9 @@
 import Amount from './Amount';
 import AmountType from './AmountType';
 import AssetType from './AssetType';
-import UserLite from './UserLite';
+import LedgerAccountTransaction from './LedgerAccountTransaction';
 
-export default interface Account {
+export default interface LedgerAccount {
     id: string; // GUID
     accountNumber: number; // unsigned short
     name: string;
@@ -12,10 +12,6 @@ export default interface Account {
     accountType: AccountType;
     assetType: AssetType;
     normalBalanceType: AmountType; // "Debit" or "Credit"
-    created: string; // UTC Date/Time
-    createdBy: UserLite;
-    updated: string | null; // UTC Date/Time
-    updatedBy: UserLite | null;
-    balance: Amount;
-    isBalanceNormal: boolean;
-};
+    startingBalance: Amount;
+    transactions: LedgerAccountTransaction[];
+}

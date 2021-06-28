@@ -11,6 +11,7 @@ import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
 import TenantBasePage from './TenantBasePage';
 import * as JournalEntryStore from '../store/JournalEntry';
+import * as LedgerStore from '../store/Ledger';
 
 const mapStateToProps = (state: ApplicationState) => {
     return { selectedTenant: state.tenants?.selectedTenant ?? null };
@@ -18,6 +19,7 @@ const mapStateToProps = (state: ApplicationState) => {
 
 const mapDispatchToProps = {
     editJournalEntry: JournalEntryStore.actionCreators.editJournalEntry,
+    ...LedgerStore.actionCreators,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -34,6 +36,10 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
         super(props);
         this.onClickEditJournalEntry = this.onClickEditJournalEntry.bind(this);
         this.onClickNewJournalEntry = this.onClickNewJournalEntry.bind(this);
+    }
+
+    public componentDidMount() {
+        this.ensureDataFetched();
     }
 
     public render() {
@@ -137,6 +143,11 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
+    }
+
+    private ensureDataFetched() {
+        const { requestLedgerReportData } = this.props;
+        requestLedgerReportData();
     }
 
     private onClickNewJournalEntry() {
