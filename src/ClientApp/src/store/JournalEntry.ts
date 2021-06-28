@@ -10,11 +10,11 @@ import {
 import { AppThunkAction } from './';
 import { isStringNullOrWhiteSpace } from '../common/StringUtils';
 import { Logger } from '../common/Logging';
+import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import AmountType from '../models/AmountType';
 import JournalEntry from '../models/JournalEntry';
 import JournalEntryAccount from '../models/JournalEntryAccount';
-
 
 export interface JournalEntryAccountsValidationState {
     error: string;
@@ -65,7 +65,6 @@ export interface JournalEntryState {
 /* BEGIN: REST API Actions */
 interface RequestJournalEntryAction {
     type: 'REQUEST_JOURNAL_ENTRY';
-    entryId: number; // unsigned integer
 };
 
 interface ReceiveJournalEntryAction {
@@ -210,6 +209,47 @@ export const actionCreators = {
         dispatch({ type: 'INITIALIZE_NEW_JOURNAL_ENTRY', tenantId });
     },
 
+    requestJournalEntry: (entryId: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const tenantId = appState.tenants?.selectedTenant?.id;
+
+        if (isNil(tenantId)) {
+            logger.warn('No selected Tenant.  Cannot fetch Journal Entry');
+            return;
+        }
+
+        const existingEntry = appState.journalEntry?.existingEntry;
+        const isFetching = appState.journalEntry?.isLoading ?? false;
+
+        if (!isFetching && (isNil(existingEntry) || existingEntry?.entryId !== entryId)) {
+            const accessToken = await authService.getAccessToken();
+
+            fetch(`api/journal/${tenantId}/entry/${entryId}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        apiErrorHandler.handleError(response);
+                        return null;
+                    }
+
+                    return response.json() as Promise<JournalEntry>
+                })
+                .then(entry => {
+                    if (!isNil(entry)) {
+                        dispatch({ type: 'RECEIVE_JOURNAL_ENTRY', entry });
+                    }
+                });
+
+            dispatch({ type: 'REQUEST_JOURNAL_ENTRY' });
+            return;
+        }
+
+        logger.debug('We seem to have already fetch Journal Entry ID', entryId);
+    },
+
     saveNewJournalEntry: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
         const entryToSave = appState.journalEntry?.dirtyEntry;
@@ -231,9 +271,18 @@ export const actionCreators = {
         };
 
         fetch('api/journal/entry', requestOptions)
-            .then(response => response.json() as Promise<JournalEntry>)
+            .then(response => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response);
+                    return null;
+                }
+
+                return response.json() as Promise<JournalEntry>;
+            })
             .then(savedEntry => {
-                dispatch({ type: 'NEW_JOURNAL_ENTRY_SAVE_COMPLETED', savedEntry });
+                if (!isNil(savedEntry)) {
+                    dispatch({ type: 'NEW_JOURNAL_ENTRY_SAVE_COMPLETED', savedEntry });
+                }
             });
 
         dispatch({ type: 'REQUEST_SAVE_NEW_JOURNAL_ENTRY' });

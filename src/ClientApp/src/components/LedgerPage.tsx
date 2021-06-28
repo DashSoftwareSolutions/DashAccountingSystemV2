@@ -5,6 +5,7 @@ import {
     Col,
     Row,
 } from 'reactstrap';
+import { Link } from 'react-router-dom';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
@@ -56,7 +57,32 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    <p>Coming Soon...</p>
+                    {/* TEMP FOR TESTING */}
+                    <table style={{ width: '100%' }}>
+                        <thead>
+                            <tr>
+                                <th className="col-md-1">ID</th>
+                                <th className="col-md-10">Description</th>
+                                <th className="col-md-1" />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="col-md-1">1</td>
+                                <td className="col-md-10">Foo entry.  Blah blah blah.</td>
+                                <td className="col-md-1">
+                                    <Link to={`/journal-entry/view/1`}>View</Link>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="col-md-1">2</td>
+                                <td className="col-md-10">Bar entry.  Blah blah blah.</td>
+                                <td className="col-md-1">
+                                    <Link to={`/journal-entry/view/2`}>View</Link>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
