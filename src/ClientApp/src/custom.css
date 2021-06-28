@@ -16,3 +16,11 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+
+.btn.btn-link {
+    color: #0366d6;
+    line-height: 1;
+    padding-top: 0;
+    padding-bottom: 0;
+    vertical-align: unset;
+}

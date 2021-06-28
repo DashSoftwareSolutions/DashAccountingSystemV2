@@ -9,12 +9,17 @@ import { Link } from 'react-router-dom';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
+import LinkButton from './LinkButton';
 import TenantBasePage from './TenantBasePage';
 import * as JournalEntryStore from '../store/JournalEntry';
 import * as LedgerStore from '../store/Ledger';
 
 const mapStateToProps = (state: ApplicationState) => {
-    return { selectedTenant: state.tenants?.selectedTenant ?? null };
+    return {
+        accounts: state.ledger?.accounts ?? [],
+        isFetching: state.ledger?.isLoading ?? false,
+        selectedTenant: state.tenants?.selectedTenant ?? null,
+    };
 }
 
 const mapDispatchToProps = {
@@ -83,19 +88,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                 <td className="col-md-9">Foo entry.  Blah blah blah.</td>
                                 <td className="col-md-2" style={{ textAlign: 'right' }}>
                                     <Link to={`/journal-entry/view/1`}>View</Link>
-                                    <Button
-                                        color="link"
-                                        onClick={() => this.onClickEditJournalEntry(1)}
-                                        style={{
-                                            color: '#0366d6',
-                                            lineHeight: 1,
-                                            paddingTop: 0,
-                                            paddingBottom: 0,
-                                            verticalAlign: 'unset',
-                                        }}
-                                    >
-                                        Edit
-                                    </Button>
+                                    <LinkButton onClick={() => this.onClickEditJournalEntry(1)}>Edit</LinkButton>
                                 </td>
                             </tr>
                             <tr>
@@ -103,19 +96,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                 <td className="col-md-9">Bar entry.  Blah blah blah.</td>
                                 <td className="col-md-2" style={{ textAlign: 'right' }}>
                                     <Link to={`/journal-entry/view/2`}>View</Link>
-                                    <Button
-                                        color="link"
-                                        onClick={() => this.onClickEditJournalEntry(2)}
-                                        style={{
-                                            color: '#0366d6',
-                                            lineHeight: 1,
-                                            paddingTop: 0,
-                                            paddingBottom: 0,
-                                            verticalAlign: 'unset',
-                                        }}
-                                    >
-                                        Edit
-                                    </Button>
+                                    <LinkButton onClick={() => this.onClickEditJournalEntry(2)}>Edit</LinkButton>
                                 </td>
                             </tr>
                             <tr>
@@ -123,19 +104,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                 <td className="col-md-9">Pending Baz entry.  Blah blah blah.</td>
                                 <td className="col-md-2" style={{ textAlign: 'right' }}>
                                     <Link to={`/journal-entry/view/52`}>View</Link>
-                                    <Button
-                                        color="link"
-                                        onClick={() => this.onClickEditJournalEntry(52)}
-                                        style={{
-                                            color: '#0366d6',
-                                            lineHeight: 1,
-                                            paddingTop: 0,
-                                            paddingBottom: 0,
-                                            verticalAlign: 'unset',
-                                        }}
-                                    >
-                                        Edit
-                                    </Button>
+                                    <LinkButton onClick={() => this.onClickEditJournalEntry(52)}>Edit</LinkButton>
                                 </td>
                             </tr>
                         </tbody>
