@@ -26,6 +26,7 @@ const TransactionStatusLabel: React.FC<TransactionStatusLabelProps> = ({ status 
             color={color}
             style={{
                 marginBottom: 0,
+                marginLeft: -12,
                 padding: '3px 11px',
             }}
         >

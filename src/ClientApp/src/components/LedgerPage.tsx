@@ -112,6 +112,26 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                     </Button>
                                 </td>
                             </tr>
+                            <tr>
+                                <td className="col-md-1">52</td>
+                                <td className="col-md-9">Pending Baz entry.  Blah blah blah.</td>
+                                <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                    <Link to={`/journal-entry/view/52`}>View</Link>
+                                    <Button
+                                        color="link"
+                                        onClick={() => this.onClickEditJournalEntry(52)}
+                                        style={{
+                                            color: '#0366d6',
+                                            lineHeight: 1,
+                                            paddingTop: 0,
+                                            paddingBottom: 0,
+                                            verticalAlign: 'unset',
+                                        }}
+                                    >
+                                        Edit
+                                    </Button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </TenantBasePage.Content>
