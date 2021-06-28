@@ -8,8 +8,10 @@ import {
     ListGroupItem,
 } from 'reactstrap';
 import {
+    filter,
     isNil,
     map,
+    reduce,
     sortBy,
 } from 'lodash';
 import moment from 'moment-timezone';
@@ -21,7 +23,6 @@ import TenantBasePage from './TenantBasePage';
 import TransactionStatus from '../models/TransactionStatus';
 import TransactionStatusLabel from './TransactionStatusLabel';
 import * as JournalEntryStore from '../store/JournalEntry';
-import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
@@ -113,6 +114,28 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
         const basisDateMoment = moment(journalEntry.postDate ?? journalEntry.entryDate);
         const period = `${basisDateMoment.format('YYYY')} Q${basisDateMoment.format('Q')}`; // TODO: Maybe _someday_ support custom accounting period scheme other than calendar year
 
+        const totalDebits = reduce(
+            map(
+                filter(
+                    journalEntry.accounts,
+                    (a) => a?.amount?.amountType === AmountType.Debit,
+                ),
+                (a) => a?.amount?.amount ?? 0,
+            ),
+            (sum, next) => sum + next,
+            0);
+
+        const totalCredits = reduce(
+            map(
+                filter(
+                    journalEntry.accounts,
+                    (a) => a?.amount?.amountType === AmountType.Credit,
+                ),
+                (a) => (a?.amount?.amount ?? 0) * -1,
+            ),
+            (sum, next) => sum + next,
+            0);
+
         return (
             <React.Fragment>
                 <ListGroup>
@@ -158,7 +181,7 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                 <table className="table" id={`${this.bemBlockName}--accounts_table`}>
                     <thead>
                         <tr>
-                            <th className="col-md-5">Account</th>
+                            <th className="col-md-6">Account</th>
                             <th className="col-md-2">Asset Type</th>
                             <th className="col-md-2" style={{ textAlign: 'right' }}>Debit</th>
                             <th className="col-md-2" style={{ textAlign: 'right' }}>Credit</th>
@@ -214,6 +237,22 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                             },
                         )}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td className="col-md-6">
+                                <strong>TOTALS</strong>
+                            </td>
+                            <td className="col-md-2" />
+                            <td className="col-md-2" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+                                {/* TODO/FIXME: Be aware of asset type and user locale */}
+                                {totalDebits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                            </td>
+                            <td className="col-md-2" style={{ fontWeight: 'bold', textAlign: 'right' }}>
+                                {/* TODO/FIXME: Be aware of asset type and user locale */}
+                                {totalCredits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </React.Fragment>
         );

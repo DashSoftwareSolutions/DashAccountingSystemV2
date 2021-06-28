@@ -6,6 +6,7 @@ import AccountDetailsPage from './components/AccountDetailsPage';
 import AddJournalEntryPage from './components/AddJournalEntryPage';
 import ChartOfAccountsPage from './components/ChartOfAccountsPage';
 import DashboardPage from './components/DashboardPage';
+import EditJournalEntryPage from './components/EditJournalEntryPage';
 import FetchData from './components/FetchData';
 import LedgerPage from './components/LedgerPage';
 import ReportsPage from './components/ReportsPage';
@@ -26,6 +27,7 @@ export default () => (
         <AuthorizeRoute path='/dashboard' component={DashboardPage} />
         <AuthorizeRoute path='/journal-entry/new' component={AddJournalEntryPage} />
         <AuthorizeRoute path='/journal-entry/view/:entryId' component={ViewJournalEntryPage} />
+        <AuthorizeRoute path='/journal-entry/edit/:entryId' component={EditJournalEntryPage} />
         <AuthorizeRoute path='/ledger' component={LedgerPage} />
         <AuthorizeRoute path='/reports' component={ReportsPage} />
         <AuthorizeRoute path='/fetch-data/:startDateIndex?' component={FetchData} />

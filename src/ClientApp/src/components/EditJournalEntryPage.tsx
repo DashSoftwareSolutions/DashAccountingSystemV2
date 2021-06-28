@@ -29,32 +29,37 @@ const mapStateToProps = (state: ApplicationState) => {
 }
 
 const mapDispatchToProps = {
+    requestJournalEntry: JournalEntryStore.actionCreators.requestJournalEntry,
     resetDirtyEditorState: JournalEntryStore.actionCreators.resetDirtyEditorState,
-    saveNewJournalEntry: JournalEntryStore.actionCreators.saveNewJournalEntry,
+    saveNewJournalEntry: JournalEntryStore.actionCreators.saveNewJournalEntry, // TODO: Replace with action creator for Update/PUT
     showAlert: SystemNotificationsStore.actionCreators.showAlert,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type AddJournalEntryPageReduxProps = ConnectedProps<typeof connector>;
+type EditJournalEntryPageReduxProps = ConnectedProps<typeof connector>;
 
-type AddJournalEntryPageProps = AddJournalEntryPageReduxProps
-    & RouteComponentProps;
+type EditJournalEntryPageProps = EditJournalEntryPageReduxProps
+    & RouteComponentProps<{ entryId: string }>;
 
-class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> {
+class EditJournalEntryPage extends React.PureComponent<EditJournalEntryPageProps> {
     private logger: ILogger;
-    private bemBlockName: string = 'add_new_journal_entry_page';
+    private bemBlockName: string = 'edit_journal_entry_page';
 
-    public constructor(props: AddJournalEntryPageProps) {
+    public constructor(props: EditJournalEntryPageProps) {
         super(props);
 
-        this.logger = new Logger('Add Journal Entry Page');
+        this.logger = new Logger('Edit Journal Entry Page');
 
         this.onClickCancel = this.onClickCancel.bind(this);
         this.onClickSave = this.onClickSave.bind(this);
     }
 
-    public componentDidUpdate(prevProps: AddJournalEntryPageProps) {
+    public componentDidMount() {
+        this.ensureDataFetched();
+    }
+
+    public componentDidUpdate(prevProps: EditJournalEntryPageProps) {
         const { isSaving: wasSaving } = prevProps;
 
         const {
@@ -93,7 +98,7 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <Row>
                         <Col md={6}>
-                            <h1>Add Journal Entry</h1>
+                            <h1>Edit Journal Entry</h1>
                             <p className="lead">{selectedTenant?.name}</p>
                         </Col>
                         <Col md={6} style={{ textAlign: 'right' }}>
@@ -118,10 +123,22 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    <JournalEntryEditor mode={Mode.Add} />
+                    <JournalEntryEditor mode={Mode.Edit} />
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
+    }
+
+    private ensureDataFetched() {
+        const {
+            match: {
+                params: { entryId },
+            },
+            requestJournalEntry,
+        } = this.props;
+
+        const parsedEntryId = parseInt(entryId, 10) || 0;
+        requestJournalEntry(parsedEntryId);
     }
 
     private onClickCancel() {
@@ -137,11 +154,12 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
     private onClickSave() {
         this.logger.debug('Saving the journal entry...');
 
+        // TODO: Replace with action creator for Update/PUT
         const { saveNewJournalEntry } = this.props;
         saveNewJournalEntry();
     }
 }
 
 export default withRouter(
-    connector(AddJournalEntryPage as any),
+    connector(EditJournalEntryPage as any),
 );

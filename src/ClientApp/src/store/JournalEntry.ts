@@ -1,5 +1,6 @@
 ﻿import { Action, Reducer } from 'redux';
 import {
+    cloneDeep,
     filter,
     findIndex,
     isEmpty,
@@ -110,6 +111,10 @@ interface InitializeNewJournalEntryAction {
     tenantId: string; // GUID
 }
 
+interface EditJournalEntryAction {
+    type: 'EDIT_JOURNAL_ENTRY';
+}
+
 interface UpdateEntryDateAction {
     type: 'UPDATE_JOURNAL_ENTRY_ENTRY_DATE';
     entryDate: string | null; // Date as YYYY-MM-DD / `null` to clear out an existing value
@@ -152,6 +157,10 @@ interface UpdateAccountAmountAction {
 }
 /* END: UI Gesture Actions */
 
+interface ResetDirtyEntryAction {
+    type: 'RESET_DIRTY_JOURNAL_ENTRY';
+}
+
 interface ResetStateAction {
     type: 'RESET_JOURNAL_ENTRY_STORE_STATE';
 };
@@ -165,6 +174,7 @@ type KnownAction = RequestJournalEntryAction |
     PostJournalEntryRequestAction |
     PostJournalEntryResponseAction |
     InitializeNewJournalEntryAction |
+    EditJournalEntryAction |
     UpdateEntryDateAction |
     UpdatePostDateAction |
     UpdateDescriptionAction |
@@ -173,6 +183,7 @@ type KnownAction = RequestJournalEntryAction |
     AddAccountAction |
     RemoveAccountAction |
     UpdateAccountAmountAction |
+    ResetDirtyEntryAction |
     ResetStateAction;
 
 const logger = new Logger('Journal Entry Store');
@@ -207,6 +218,10 @@ export const actionCreators = {
         }
 
         dispatch({ type: 'INITIALIZE_NEW_JOURNAL_ENTRY', tenantId });
+    },
+
+    editJournalEntry: (): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: 'EDIT_JOURNAL_ENTRY' });
     },
 
     requestJournalEntry: (entryId: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
@@ -318,6 +333,10 @@ export const actionCreators = {
 
     updateAccountAmount: (accountId: string, amount: number | null): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: 'UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT', accountId, amount });
+    },
+
+    resetDirtyEditorState: (): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: 'RESET_DIRTY_JOURNAL_ENTRY' });
     },
 
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {
@@ -461,6 +480,18 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     validation: { ...DEFAULT_VALIDATION_STATE },
                 };
 
+            case 'EDIT_JOURNAL_ENTRY': {
+                const { existingEntry } = state;
+
+                if (isNil(existingEntry)) {
+                    logger.warn('Existing Journal Entry was null');
+                    return state;
+                }
+
+                const dirtyEntry = cloneDeep(state.existingEntry) ?? { ...DEFAULT_JOURNAL_ENTRY };
+                return updateStateAfterAccountChange(state, dirtyEntry);
+            }
+
             case 'UPDATE_JOURNAL_ENTRY_ENTRY_DATE':
                 return {
                     ...state,
@@ -569,6 +600,15 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
 
                 return updateStateAfterAccountChange(state, updatedDirtyEntry);
             }
+
+            case 'RESET_DIRTY_JOURNAL_ENTRY':
+                return {
+                    ...state,
+                    dirtyEntry: null,
+                    totalCredits: 0,
+                    totalDebits: 0,
+                    validation: { ...DEFAULT_VALIDATION_STATE },
+                };
 
             case 'RESET_JOURNAL_ENTRY_STORE_STATE':
                 return unloadedState;

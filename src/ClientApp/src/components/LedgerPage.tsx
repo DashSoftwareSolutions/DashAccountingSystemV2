@@ -1,5 +1,5 @@
 ﻿import * as React from 'react';
-import { connect } from 'react-redux';
+import { ConnectedProps, connect } from 'react-redux';
 import {
     Button,
     Col,
@@ -9,16 +9,20 @@ import { Link } from 'react-router-dom';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
-import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
-
-interface LedgerPageReduxProps {
-    selectedTenant: Tenant | null;
-};
+import * as JournalEntryStore from '../store/JournalEntry';
 
 const mapStateToProps = (state: ApplicationState) => {
-    return { selectedTenant: state.tenants?.selectedTenant };
+    return { selectedTenant: state.tenants?.selectedTenant ?? null };
 }
+
+const mapDispatchToProps = {
+    editJournalEntry: JournalEntryStore.actionCreators.editJournalEntry,
+};
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+type LedgerPageReduxProps = ConnectedProps<typeof connector>;
 
 type LedgerPageProps = LedgerPageReduxProps
     & RouteComponentProps;
@@ -28,6 +32,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
 
     constructor(props: LedgerPageProps) {
         super(props);
+        this.onClickEditJournalEntry = this.onClickEditJournalEntry.bind(this);
         this.onClickNewJournalEntry = this.onClickNewJournalEntry.bind(this);
     }
 
@@ -62,23 +67,49 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                         <thead>
                             <tr>
                                 <th className="col-md-1">ID</th>
-                                <th className="col-md-10">Description</th>
-                                <th className="col-md-1" />
+                                <th className="col-md-9">Description</th>
+                                <th className="col-md-2" />
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td className="col-md-1">1</td>
-                                <td className="col-md-10">Foo entry.  Blah blah blah.</td>
-                                <td className="col-md-1">
+                                <td className="col-md-9">Foo entry.  Blah blah blah.</td>
+                                <td className="col-md-2" style={{ textAlign: 'right' }}>
                                     <Link to={`/journal-entry/view/1`}>View</Link>
+                                    <Button
+                                        color="link"
+                                        onClick={() => this.onClickEditJournalEntry(1)}
+                                        style={{
+                                            color: '#0366d6',
+                                            lineHeight: 1,
+                                            paddingTop: 0,
+                                            paddingBottom: 0,
+                                            verticalAlign: 'unset',
+                                        }}
+                                    >
+                                        Edit
+                                    </Button>
                                 </td>
                             </tr>
                             <tr>
                                 <td className="col-md-1">2</td>
-                                <td className="col-md-10">Bar entry.  Blah blah blah.</td>
-                                <td className="col-md-1">
+                                <td className="col-md-9">Bar entry.  Blah blah blah.</td>
+                                <td className="col-md-2" style={{ textAlign: 'right' }}>
                                     <Link to={`/journal-entry/view/2`}>View</Link>
+                                    <Button
+                                        color="link"
+                                        onClick={() => this.onClickEditJournalEntry(2)}
+                                        style={{
+                                            color: '#0366d6',
+                                            lineHeight: 1,
+                                            paddingTop: 0,
+                                            paddingBottom: 0,
+                                            verticalAlign: 'unset',
+                                        }}
+                                    >
+                                        Edit
+                                    </Button>
                                 </td>
                             </tr>
                         </tbody>
@@ -92,10 +123,18 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
         const { history } = this.props;
         history.push('/journal-entry/new');
     }
+
+    private onClickEditJournalEntry(entryId: number) {
+        const {
+            editJournalEntry,
+            history,
+        } = this.props;
+
+        editJournalEntry();
+        history.push(`/journal-entry/edit/${entryId}`);
+    }
 }
 
 export default withRouter(
-    connect(
-        mapStateToProps,
-    )(LedgerPage as any),
+    connector(LedgerPage as any),
 );
