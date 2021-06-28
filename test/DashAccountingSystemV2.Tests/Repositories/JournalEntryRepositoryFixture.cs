@@ -17,6 +17,64 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
         [Fact]
         [Trait("Category", "Requires Database")]
+        public void GetJournalEntryAccounts_Ok()
+        {
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
+            {
+                // ARRANGE
+                var accountRepository = await GetAccountRepository();
+                var sharedLookupRepository = await GetSharedLookupRepository();
+
+                var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
+                var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
+
+                var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
+                var assetTypeUSD = assetTypes.Single(at => at.Name == "USD $");
+
+                var cashAccount = await MakeAccount(
+                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+
+                var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+
+                var revenueAccount = await MakeAccount(
+                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+                var postDate = entryDate.AddDays(3);
+
+                var journalEntry = new JournalEntry(
+                    _tenantId,
+                    entryDate,
+                    postDate,
+                    "Payment for Invoice #1001",
+                    null,
+                    _userId,
+                    null);
+
+                var transactionAmount = 10000.00m;
+
+                journalEntry.Accounts.Add(new JournalEntryAccount(
+                    cashAccount.Id, transactionAmount, assetTypeUSD.Id));
+                journalEntry.Accounts.Add(new JournalEntryAccount(
+                    revenueAccount.Id, -transactionAmount, assetTypeUSD.Id));
+
+                var journalEntryRepository = await GetJournalEntryRepository();
+
+                var savedJournalEntry = await journalEntryRepository.CreateJournalEntryAsync(journalEntry);
+
+                // ACT
+                var journalEntryAccounts = await journalEntryRepository.GetJournalEntryAccountsAsync(
+                    _tenantId,
+                    entryDate,
+                    postDate);
+
+                // ASSERT
+                Assert.NotEmpty(journalEntryAccounts);
+            });
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
         public void InsertJournalEntry_Ok()
         {
             TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>

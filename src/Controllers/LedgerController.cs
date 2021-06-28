@@ -14,10 +14,14 @@ namespace DashAccountingSystemV2.Controllers
     public class LedgerController : Controller
     {
         private readonly IAccountBusinessLogic _accountBusinessLogic = null;
+        private readonly ILedgerBusinessLogic _ledgerBusinessLogic = null;
 
-        public LedgerController(IAccountBusinessLogic accountBusinessLogic)
+        public LedgerController(
+            IAccountBusinessLogic accountBusinessLogic,
+            ILedgerBusinessLogic ledgerBusinessLogic)
         {
             _accountBusinessLogic = accountBusinessLogic;
+            _ledgerBusinessLogic = ledgerBusinessLogic;
         }
 
         [HttpGet("{tenantId:guid}/accounts")]
@@ -29,6 +33,27 @@ namespace DashAccountingSystemV2.Controllers
             var accountsBizLogicResponse = _accountBusinessLogic.GetAccounts(tenantId, dateForAccountBalances);
 
             return this.Result(accountsBizLogicResponse, AccountResponseViewModel.FromModel);
+        }
+
+        [HttpGet("{tenantId:guid}/report")]
+        public Task<IActionResult> GetLedgerReport(
+            [FromRoute] Guid tenantId,
+            [FromQuery] string dateRangeStart,
+            [FromQuery] string dateRangeEnd)
+        {
+            var parsedDateRangeStart = dateRangeStart.TryParseAsDateTime();
+
+            if (!parsedDateRangeStart.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeStart was not a valid date/time value"));
+
+            var parsedDateRangeEnd = dateRangeEnd.TryParseAsDateTime();
+
+            if (!parsedDateRangeEnd.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeEnd was not a valid date/time value"));
+
+            var bizLogicResponse = _ledgerBusinessLogic.GetLedgerReport(tenantId, parsedDateRangeStart.Value, parsedDateRangeEnd.Value);
+
+            return this.Result(bizLogicResponse, LedgerAccountResponseViewModel.FromModel);
         }
     }
 }

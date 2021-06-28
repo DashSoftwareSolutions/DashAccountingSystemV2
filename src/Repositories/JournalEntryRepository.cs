@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -128,6 +129,27 @@ namespace DashAccountingSystemV2.Repositories
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.AssetType)
                 .GetPagedAsync(pagination);
+        }
+
+        public async Task<IEnumerable<JournalEntryAccount>> GetJournalEntryAccountsAsync(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd)
+        {
+            return await _db
+                .JournalEntryAccount
+                .Include(jeAcct => jeAcct.JournalEntry)
+                .Include(jeAcct => jeAcct.Account)
+                .Where(jeAcct =>
+                    jeAcct.JournalEntry.TenantId == tenantId &&
+                    (jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate) >= dateRangeStart &&
+                    (jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate) <= dateRangeEnd)
+                .OrderBy(jeAcct => jeAcct.Account.AccountTypeId)
+                .ThenBy(jeAcct => jeAcct.JournalEntry.Status != TransactionStatus.Pending ? 1 : 2)
+                .ThenBy(jeAcct => jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate)
+                .Include(jeAcct => jeAcct.JournalEntry.CreatedBy)
+                .Include(jeAcct => jeAcct.JournalEntry.UpdatedBy)
+                .ToListAsync();
         }
 
         public async Task<uint> GetNextEntryIdAsync(Guid tenantId)

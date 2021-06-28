@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Repositories;
 

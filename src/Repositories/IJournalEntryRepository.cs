@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DashAccountingSystemV2.Models;
 
@@ -21,6 +22,11 @@ namespace DashAccountingSystemV2.Repositories
             DateTime dateRangeStart,
             DateTime dateRangeEnd,
             Pagination pagination);
+
+        Task<IEnumerable<JournalEntryAccount>> GetJournalEntryAccountsAsync(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd);
 
         Task<uint> GetNextEntryIdAsync(Guid tenantId);
 

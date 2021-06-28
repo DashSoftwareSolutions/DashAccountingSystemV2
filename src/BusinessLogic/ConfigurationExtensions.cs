@@ -9,7 +9,8 @@ namespace DashAccountingSystemV2.BusinessLogic
             services
                 .AddScoped<ITenantBusinessLogic, TenantBusinessLogic>()
                 .AddScoped<IAccountBusinessLogic, AccountBusinessLogic>()
-                .AddScoped<IJournalEntryBusinessLogic, JournalEntryBusinessLogic>();
+                .AddScoped<IJournalEntryBusinessLogic, JournalEntryBusinessLogic>()
+                .AddScoped<ILedgerBusinessLogic, LedgerBusinessLogic>();
 
             return services;
         }

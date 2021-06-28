@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DashAccountingSystemV2.Models
 {
-    public class JournalEntryAccount
+    public class JournalEntryAccount : IEquatable<JournalEntryAccount>
     {
         [Required]
         public Guid JournalEntryId { get; private set; }
@@ -41,6 +41,34 @@ namespace DashAccountingSystemV2.Models
             : this(accountId, amount, assetTypeId)
         {
             JournalEntryId = journalEntryId;
+        }
+
+        public bool Equals(JournalEntryAccount other)
+        {
+            if (other == null)
+                return false;
+
+            return JournalEntryId == other.JournalEntryId &&
+                AccountId == other.AccountId;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is JournalEntryAccount other)
+                return Equals(other);
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = 17;
+                hash = hash * 23 + JournalEntryId.GetHashCode();
+                hash = hash * 23 + AccountId.GetHashCode();
+                return hash;
+            };
         }
     }
 }
