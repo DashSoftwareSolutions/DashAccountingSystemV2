@@ -5,13 +5,15 @@ import {
     Col,
     Row,
 } from 'reactstrap';
+import { map, reduce } from 'lodash';
 import { Link } from 'react-router-dom';
 import { RouteComponentProps, withRouter } from 'react-router';
+import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
-import LinkButton from './LinkButton';
+import LedgerAccount from '../models/LedgerAccount';
 import TenantBasePage from './TenantBasePage';
-import * as JournalEntryStore from '../store/JournalEntry';
+import TransactionStatus from '../models/TransactionStatus';
 import * as LedgerStore from '../store/Ledger';
 
 const mapStateToProps = (state: ApplicationState) => {
@@ -23,7 +25,6 @@ const mapStateToProps = (state: ApplicationState) => {
 }
 
 const mapDispatchToProps = {
-    editJournalEntry: JournalEntryStore.actionCreators.editJournalEntry,
     ...LedgerStore.actionCreators,
 };
 
@@ -39,7 +40,6 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
 
     constructor(props: LedgerPageProps) {
         super(props);
-        this.onClickEditJournalEntry = this.onClickEditJournalEntry.bind(this);
         this.onClickNewJournalEntry = this.onClickNewJournalEntry.bind(this);
     }
 
@@ -49,7 +49,9 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
 
     public render() {
         const {
+            accounts,
             history,
+            isFetching,
             selectedTenant,
         } = this.props;
 
@@ -73,42 +75,11 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    {/* TEMP FOR TESTING */}
-                    <table style={{ width: '100%' }}>
-                        <thead>
-                            <tr>
-                                <th className="col-md-1">ID</th>
-                                <th className="col-md-9">Description</th>
-                                <th className="col-md-2" />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td className="col-md-1">1</td>
-                                <td className="col-md-9">Foo entry.  Blah blah blah.</td>
-                                <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                    <Link to={`/journal-entry/view/1`}>View</Link>
-                                    <LinkButton onClick={() => this.onClickEditJournalEntry(1)}>Edit</LinkButton>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="col-md-1">2</td>
-                                <td className="col-md-9">Bar entry.  Blah blah blah.</td>
-                                <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                    <Link to={`/journal-entry/view/2`}>View</Link>
-                                    <LinkButton onClick={() => this.onClickEditJournalEntry(2)}>Edit</LinkButton>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="col-md-1">52</td>
-                                <td className="col-md-9">Pending Baz entry.  Blah blah blah.</td>
-                                <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                    <Link to={`/journal-entry/view/52`}>View</Link>
-                                    <LinkButton onClick={() => this.onClickEditJournalEntry(52)}>Edit</LinkButton>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    {isFetching ? (
+                        <p>Loading...</p>
+                    ): 
+                        this.renderLedgerReportTable(accounts)
+                    }
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -124,14 +95,108 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
         history.push('/journal-entry/new');
     }
 
-    private onClickEditJournalEntry(entryId: number) {
-        const {
-            editJournalEntry,
-            history,
-        } = this.props;
+    private renderLedgerReportTable(accounts: LedgerAccount[]): JSX.Element {
+        return (
+            <div className="table">
+                <table className="table table-sm" style={{ fontSize: '0.9em', width: '100%' }}>
+                    <thead>
+                        <tr>
+                            <th className="col-md-1 bg-white sticky-top sticky-border">Date</th>
+                            <th className="col-md-1 bg-white sticky-top sticky-border">Num</th>
+                            <th className="col-md-6 bg-white sticky-top sticky-border">Description</th>
+                            <th className="col-md-2 bg-white sticky-top sticky-border text-right">Amount</th>
+                            <th className="col-md-2 bg-white sticky-top sticky-border text-right">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {map(accounts, (account) => {
+                            let total = reduce(
+                                map(account.transactions, (tx) => tx.amount.amount ?? 0),
+                                (sum, next) => sum + next,
+                                0,
+                            );
 
-        editJournalEntry();
-        history.push(`/journal-entry/edit/${entryId}`);
+                            // TODO: Adjust total for positive/negative, depending on normal balance type
+
+                            // TODO: Adjust all displayed amounts for positive/negative, depending on normal balance type
+                            // We probably want a component for this! :-)
+                            const accountNormalBalanceType = account.normalBalanceType;
+                            const startingBalanceType = account.startingBalance.amountType;
+                            const isStartingBalanceNormal = startingBalanceType === accountNormalBalanceType;
+
+                            return (
+                                <React.Fragment>
+                                    <tr>
+                                        <td className="col-md-12" colSpan={5}>
+                                            <strong>{`${account.accountNumber} - ${account.name}`}</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="col-md-2" colSpan={2}>Beginning Balance</td>
+                                        <td className="col-md-10" colSpan={3} style={{ textAlign: 'right' }}>
+                                            {/* TODO/FIXME: Be aware of asset type and user locale */}
+                                            {Math.abs(account.startingBalance.amount ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                        </td>
+                                    </tr>
+                                    {map(account.transactions, (transaction) => {
+                                        const journalEntryViewRoute = `/journal-entry/view/${transaction.entryId}`;
+                                        return (
+                                            <tr>
+                                                <td className="col-md-1">
+                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                        {moment(transaction.postDate ?? transaction.entryDate).format('L')}
+                                                    </Link>
+                                                </td>
+                                                <td className="col-md-1">
+                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                        {transaction.entryId}
+                                                    </Link>
+                                                </td>
+                                                <td className="col-md-6" style={{ wordWrap: 'break-word' }}>
+                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                        {transaction.description}
+                                                    </Link>
+                                                    {transaction.status === TransactionStatus.Pending ? (
+                                                        <React.Fragment>
+                                                            {'\u00a0\u00a0\u00a0'}
+                                                            <span className="badge pending-badge">Pending</span>
+                                                        </React.Fragment>
+                                                    ): null}
+                                                    {/* TODO: Badge for Pending Transactions - sort of like Pending Comments on GitHub PRs ;-) */}
+                                                </td>
+                                                <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                        {(transaction.amount.amount ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                                    </Link>
+                                                </td>
+                                                <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                        {(transaction.updatedBalance.amount ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    <tr>
+                                        <td className="col-md-8" colSpan={3}>
+                                            <strong>
+                                                {`Total for ${account.accountNumber} - ${account.name}`}
+                                            </strong>
+                                        </td>
+                                        <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                            <strong>
+                                                {total.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                                            </strong>
+                                        </td>
+                                        <td className="col-md-2" />
+                                    </tr>
+                                </React.Fragment>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        );
     }
 }
 

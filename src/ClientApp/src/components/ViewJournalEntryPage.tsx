@@ -33,6 +33,7 @@ const mapStateToProps = (state: ApplicationState) => {
 }
 
 const mapDispatchToProps = {
+    editJournalEntry: JournalEntryStore.actionCreators.editJournalEntry,
     requestJournalEntry: JournalEntryStore.actionCreators.requestJournalEntry,
 };
 
@@ -48,6 +49,9 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
 
     public constructor(props: ViewJournalEntryPageProps) {
         super(props);
+        this.onClickBack = this.onClickBack.bind(this);
+        this.onClickEditJournalEntry = this.onClickEditJournalEntry.bind(this);
+        this.onClickPostJournalEntry = this.onClickPostJournalEntry.bind(this);
     }
 
     public componentDidMount() {
@@ -57,6 +61,7 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
     public render() {
         const {
             history,
+            journalEntry,
             selectedTenant,
         } = this.props;
 
@@ -68,9 +73,38 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <Row>
-                        <Col>
+                        <Col md={6}>
                             <h1>Journal Entry Details</h1>
                             <p className="lead">{selectedTenant?.name}</p>
+                        </Col>
+                        <Col md={6} style={{ textAlign: 'right' }}>
+                            <Button
+                                color="secondary"
+                                id={`${this.bemBlockName}--back_button`}
+                                onClick={this.onClickBack}
+                                style={{ marginRight: 22, width: 110 }}
+                            >
+                                Back
+                            </Button>
+
+                            <Button
+                                color="success"
+                                disabled={journalEntry?.status !== TransactionStatus.Pending}
+                                id={`${this.bemBlockName}--post_entry_button`}
+                                onClick={this.onClickPostJournalEntry}
+                                style={{ marginRight: 22, width: 110 }}
+                            >
+                                Post Entry
+                            </Button>
+
+                            <Button
+                                color="primary"
+                                id={`${this.bemBlockName}--edit_entry_button`}
+                                onClick={this.onClickEditJournalEntry}
+                                style={{ width: 110 }}
+                            >
+                                Edit Entry
+                            </Button>
                         </Col>
                     </Row>
                 </TenantBasePage.Header>
@@ -91,6 +125,26 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
 
         const parsedEntryId = parseInt(entryId, 10) || 0;
         requestJournalEntry(parsedEntryId);
+    }
+
+    private onClickBack() {
+        const { history } = this.props;
+        history.goBack();
+    }
+
+    private onClickEditJournalEntry() {
+        const {
+            editJournalEntry,
+            journalEntry,
+            history,
+        } = this.props;
+
+        editJournalEntry();
+        history.push(`/journal-entry/edit/${journalEntry?.entryId}`);
+    }
+
+    private onClickPostJournalEntry() {
+        console.log('Open up modal to post a pending journal entry...');
     }
 
     private renderJournalEntryData(): JSX.Element {

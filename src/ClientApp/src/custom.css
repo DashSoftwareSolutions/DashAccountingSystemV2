@@ -1,22 +1,32 @@
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    color: #0366d6;
 }
 
 body {
-  overflow-y: scroll;
+    overflow-y: scroll;
 }
 
 code {
-  color: #E01A76;
+    color: #E01A76;
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
+/* "Hoverable Links" - text is regular color but changes to link color when hovered - used on Ledger Report */
+a.hoverable-link {
+    color: #212529;
+}
+
+a.hoverable-link:hover {
+    color: #0366d6;
+}
+
+/* Link Buttons - Uses <button> element but looks like a hyperlink */
 .btn.btn-link {
     color: #0366d6;
     line-height: 1;
@@ -24,3 +34,32 @@ code {
     padding-bottom: 0;
     vertical-align: unset;
 }
+
+/* Sticky Table Header Borders */
+th.sticky-border:after,
+th.sticky-border:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+}
+
+th.sticky-border:before {
+    top: -1px;
+    border-top: 1px solid #dee2e6;
+}
+
+th.sticky-border:after {
+    bottom: -1px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Badge for Pending Transactions (not Posted Yet) */
+.pending-badge {
+    background-color: #fff3cd;
+    border: solid 1px #e2c45d;
+    color: #856404;
+    font-weight: 600;
+}
+
+
