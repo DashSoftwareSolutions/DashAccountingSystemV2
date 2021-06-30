@@ -54,5 +54,44 @@ namespace DashAccountingSystemV2.Controllers
 
             return this.Result(bizLogicResponse, JournalEntryResponseViewModel.FromModel);
         }
+
+        [HttpPut("{tenantId:guid}/entry/{entryId:long:min(1):max(4294967295)}")]
+        public Task<IActionResult> UpdateJournalEntry(
+            [FromRoute] Guid tenantId,
+            [FromRoute] uint entryId
+            /* TODO: Add View Model for PUT Body */)
+        {
+            // TODO: Implement Update operation
+
+            var bizLogicResponse = _journalEntryBusinessLogic.GetJournalEntryByTenantAndEntryId(
+                tenantId,
+                entryId);
+
+            return this.Result(bizLogicResponse, JournalEntryResponseViewModel.FromModel);
+        }
+
+        [HttpPut("{tenantId:guid}/entry/{entryId:long:min(1):max(4294967295)}/post-date")]
+        public Task<IActionResult> PostJournalEntry(
+            [FromRoute] Guid tenantId,
+            [FromRoute] uint entryId,
+            [FromBody] PostJournalEntryRequestViewModel viewModel)
+        {
+            if (viewModel == null)
+                return Task.FromResult(this.ErrorResponse("Invalid PUT body"));
+
+            if (!ModelState.IsValid)
+                return Task.FromResult(this.ErrorResponse(ModelState));
+
+            var contextUserId = User.GetUserId();
+
+            var bizLogicResponse = _journalEntryBusinessLogic.PostJournalEntry(
+                tenantId,
+                entryId,
+                viewModel.PostDate.AsUtc(),
+                contextUserId,
+                !string.IsNullOrWhiteSpace(viewModel.Note) ? viewModel.Note.Trim() : null);
+
+            return this.Result(bizLogicResponse, JournalEntryResponseViewModel.FromModel);
+        }
     }
 }

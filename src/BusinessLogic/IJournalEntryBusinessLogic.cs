@@ -11,7 +11,8 @@ namespace DashAccountingSystemV2.BusinessLogic
         Task<BusinessLogicResponse<JournalEntry>> CreateJournalEntry(JournalEntry journalEntry);
 
         Task<BusinessLogicResponse<JournalEntry>> PostJournalEntry(
-            Guid journalEntryId,
+            Guid tenantId,
+            uint entryId,
             DateTime postDate,
             Guid postedByUserId,
             string note = null);

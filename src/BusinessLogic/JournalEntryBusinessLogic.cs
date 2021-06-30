@@ -55,9 +55,27 @@ namespace DashAccountingSystemV2.BusinessLogic
             return new BusinessLogicResponse<JournalEntry>(journalEntry);
         }
 
-        public Task<BusinessLogicResponse<JournalEntry>> PostJournalEntry(Guid journalEntryId, DateTime postDate, Guid postedByUserId, string note = null)
+        public async Task<BusinessLogicResponse<JournalEntry>> PostJournalEntry(
+            Guid tenantId,
+            uint entryId,
+            DateTime postDate,
+            Guid postedByUserId,
+            string note = null)
         {
-            throw new NotImplementedException();
+            // TODO: Verify context user has access to the specified tenant and any other required permission
+            var journalEntry = await _journalEntryRepository.GetDetailedByTenantAndEntryIdAsync(tenantId, entryId);
+
+            if (journalEntry == null)
+                return new BusinessLogicResponse<JournalEntry>(ErrorType.RequestedEntityNotFound);
+
+            if (journalEntry.Status != TransactionStatus.Pending)
+                return new BusinessLogicResponse<JournalEntry>(
+                    ErrorType.RequestNotValid,
+                    "Journal Entry is not in Pending Status so Posting it is not a valid operation");
+
+            var updatedJounalEntry = await _journalEntryRepository.PostJournalEntryAsync(journalEntry.Id, postDate, postedByUserId, note);
+
+            return new BusinessLogicResponse<JournalEntry>(updatedJounalEntry);
         }
     }
 }
