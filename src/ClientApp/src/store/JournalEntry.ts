@@ -7,6 +7,7 @@ import {
     isNil,
     map,
     reduce,
+    trim,
 } from 'lodash';
 import { AppThunkAction } from './';
 import { isStringNullOrWhiteSpace } from '../common/StringUtils';
@@ -301,6 +302,50 @@ export const actionCreators = {
             });
 
         dispatch({ type: 'REQUEST_SAVE_NEW_JOURNAL_ENTRY' });
+    },
+
+    postJournalEntry: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const tenantId = appState.tenants?.selectedTenant?.id;
+        const entryToSave = appState.journalEntry?.dirtyEntry;
+
+        if (isNil(entryToSave)) {
+            logger.warn('No Journal Entry found in store state.  Bailing out.');
+            return;
+        }
+
+        const accessToken = await authService.getAccessToken();
+
+        const putBody = {
+            postDate: entryToSave.postDate,
+            note: !isStringNullOrWhiteSpace(entryToSave.note) ? trim(entryToSave.note ?? '') : undefined,
+        };
+
+        const requestOptions = {
+            method: 'PUT',
+            body: JSON.stringify(putBody),
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch(`api/journal/${tenantId}/entry/${entryToSave.entryId}/post-date`, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response);
+                    return null;
+                }
+
+                return response.json() as Promise<JournalEntry>;
+            })
+            .then(savedEntry => {
+                if (!isNil(savedEntry)) {
+                    dispatch({ type: 'POST_JOURNAL_ENTRY_COMPLETED', savedEntry });
+                }
+            });
+
+        dispatch({ type: 'REQUEST_POST_JOURNAL_ENTRY' });
     },
 
     updateEntryDate: (entryDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {

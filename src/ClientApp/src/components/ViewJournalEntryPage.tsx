@@ -17,16 +17,24 @@ import {
 import moment from 'moment-timezone';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
+import {
+    ILogger,
+    Logger,
+} from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
 import AmountType from '../models/AmountType';
+import PostJournalEntryModalDialog from './PostJournalEntryModalDialog';
 import TenantBasePage from './TenantBasePage';
 import TransactionStatus from '../models/TransactionStatus';
 import TransactionStatusLabel from './TransactionStatusLabel';
 import * as JournalEntryStore from '../store/JournalEntry';
+import * as LedgerStore from '../store/Ledger';
+import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
         isFetching: state.journalEntry?.isLoading ?? false,
+        isSaving: state.journalEntry?.isSaving ?? false,
         journalEntry: state.journalEntry?.existingEntry ?? null,
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
@@ -35,6 +43,9 @@ const mapStateToProps = (state: ApplicationState) => {
 const mapDispatchToProps = {
     editJournalEntry: JournalEntryStore.actionCreators.editJournalEntry,
     requestJournalEntry: JournalEntryStore.actionCreators.requestJournalEntry,
+    resetDirtyEditorState: JournalEntryStore.actionCreators.resetDirtyEditorState,
+    resetLedgerReportData: LedgerStore.actionCreators.reset,
+    showAlert: SystemNotificationsStore.actionCreators.showAlert,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -44,18 +55,51 @@ type ViewJournalEntryPageReduxProps = ConnectedProps<typeof connector>;
 type ViewJournalEntryPageProps = ViewJournalEntryPageReduxProps
     & RouteComponentProps<{ entryId: string }>;
 
-class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps> {
+interface ViewJournalEntryPageState {
+    isPostModalOpen: boolean;
+}
+
+class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps, ViewJournalEntryPageState> {
     private bemBlockName: string = 'view_journal_entry_page';
+    private logger: ILogger;
 
     public constructor(props: ViewJournalEntryPageProps) {
         super(props);
+
+        this.logger = new Logger('View Journal Entry Page');
+
+        this.state = { isPostModalOpen: false };
+
         this.onClickBack = this.onClickBack.bind(this);
         this.onClickEditJournalEntry = this.onClickEditJournalEntry.bind(this);
         this.onClickPostJournalEntry = this.onClickPostJournalEntry.bind(this);
+        this.onClosePostEntryDialog = this.onClosePostEntryDialog.bind(this);
     }
 
     public componentDidMount() {
         this.ensureDataFetched();
+    }
+
+    public componentDidUpdate(prevProps: ViewJournalEntryPageProps) {
+        const { isSaving: wasSaving } = prevProps;
+
+        const {
+            isSaving,
+            journalEntry,
+            showAlert,
+            resetDirtyEditorState,
+            resetLedgerReportData,
+        } = this.props;
+
+        if (wasSaving &&
+            !isSaving &&
+            !isNil(journalEntry)) {
+            this.logger.debug('Just finished posting the journal entry.');
+            showAlert('success', `Successfully posted Journal Entry ID ${journalEntry.entryId}`, true);
+            resetDirtyEditorState();
+            resetLedgerReportData();
+            this.setState({ isPostModalOpen: false });
+        }
     }
 
     public render() {
@@ -64,6 +108,8 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
             journalEntry,
             selectedTenant,
         } = this.props;
+
+        const { isPostModalOpen } = this.state;
 
         return (
             <TenantBasePage
@@ -110,6 +156,11 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
                     {this.renderJournalEntryData()}
+
+                    <PostJournalEntryModalDialog
+                        isOpen={isPostModalOpen}
+                        onClose={this.onClosePostEntryDialog}
+                    />
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -145,6 +196,13 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
 
     private onClickPostJournalEntry() {
         console.log('Open up modal to post a pending journal entry...');
+        const { editJournalEntry } = this.props;
+        editJournalEntry();
+        this.setState({ isPostModalOpen: true });
+    }
+
+    private onClosePostEntryDialog(event: React.MouseEvent<any> | React.KeyboardEvent<any>) {
+        this.setState({ isPostModalOpen: false });
     }
 
     private renderJournalEntryData(): JSX.Element {
@@ -155,7 +213,7 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
 
         if (isFetching) {
             return (
-                <p>{/* TODO: Some spinner or whatever */}Fetching...</p>
+                <p>{/* TODO: Some spinner or whatever */}Loading...</p>
             );
         }
 
