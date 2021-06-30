@@ -125,7 +125,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                             const isStartingBalanceNormal = startingBalanceType === accountNormalBalanceType;
 
                             return (
-                                <React.Fragment>
+                                <React.Fragment key={`acct-${account.accountNumber}`}>
                                     <tr>
                                         <td className="col-md-12" colSpan={5}>
                                             <strong>{`${account.accountNumber} - ${account.name}`}</strong>
@@ -141,7 +141,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                     {map(account.transactions, (transaction) => {
                                         const journalEntryViewRoute = `/journal-entry/view/${transaction.entryId}`;
                                         return (
-                                            <tr>
+                                            <tr key={`acct-${account.accountNumber}-entry-${transaction.entryId}`}>
                                                 <td className="col-md-1">
                                                     <Link className="hoverable-link" to={journalEntryViewRoute}>
                                                         {moment(transaction.postDate ?? transaction.entryDate).format('L')}
