@@ -17,6 +17,7 @@ import JournalEntryEditor from './JournalEntryEditor';
 import Mode from '../models/Mode';
 import TenantBasePage from './TenantBasePage';
 import * as JournalEntryStore from '../store/JournalEntry';
+import * as LedgerStore from '../store/Ledger';
 import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
@@ -31,6 +32,7 @@ const mapStateToProps = (state: ApplicationState) => {
 const mapDispatchToProps = {
     requestJournalEntry: JournalEntryStore.actionCreators.requestJournalEntry,
     resetDirtyEditorState: JournalEntryStore.actionCreators.resetDirtyEditorState,
+    resetLedgerReportData: LedgerStore.actionCreators.reset,
     saveNewJournalEntry: JournalEntryStore.actionCreators.saveNewJournalEntry, // TODO: Replace with action creator for Update/PUT
     showAlert: SystemNotificationsStore.actionCreators.showAlert,
 }
@@ -68,6 +70,7 @@ class EditJournalEntryPage extends React.PureComponent<EditJournalEntryPageProps
             savedEntry,
             showAlert,
             resetDirtyEditorState,
+            resetLedgerReportData,
         } = this.props;
 
         if (wasSaving &&
@@ -75,8 +78,9 @@ class EditJournalEntryPage extends React.PureComponent<EditJournalEntryPageProps
             !isNil(savedEntry)) {
             this.logger.debug('Just finished saving the journal entry.');
             this.logger.debug('Saved Entry has Entry ID:', savedEntry.entryId);
-            showAlert('success', `Successfully created Journal Entry ID ${savedEntry.entryId}`, true);
+            showAlert('success', `Successfully updated Journal Entry ID ${savedEntry.entryId}`, true);
             resetDirtyEditorState();
+            resetLedgerReportData();
             history.push('/ledger');
         }
     }

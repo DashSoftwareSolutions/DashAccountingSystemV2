@@ -17,6 +17,7 @@ import JournalEntryEditor from './JournalEntryEditor';
 import Mode from '../models/Mode';
 import TenantBasePage from './TenantBasePage';
 import * as JournalEntryStore from '../store/JournalEntry';
+import * as LedgerStore from '../store/Ledger';
 import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
@@ -30,6 +31,7 @@ const mapStateToProps = (state: ApplicationState) => {
 
 const mapDispatchToProps = {
     resetDirtyEditorState: JournalEntryStore.actionCreators.resetDirtyEditorState,
+    resetLedgerReportData: LedgerStore.actionCreators.reset,
     saveNewJournalEntry: JournalEntryStore.actionCreators.saveNewJournalEntry,
     showAlert: SystemNotificationsStore.actionCreators.showAlert,
 }
@@ -63,6 +65,7 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
             savedEntry,
             showAlert,
             resetDirtyEditorState,
+            resetLedgerReportData,
         } = this.props;
 
         if (wasSaving &&
@@ -72,6 +75,7 @@ class AddJournalEntryPage extends React.PureComponent<AddJournalEntryPageProps> 
             this.logger.debug('Saved Entry has Entry ID:', savedEntry.entryId);
             showAlert('success', `Successfully created Journal Entry ID ${savedEntry.entryId}`, true);
             resetDirtyEditorState();
+            resetLedgerReportData();
             history.push('/ledger');
         }
     }
