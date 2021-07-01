@@ -9,6 +9,7 @@ import {
 } from 'reactstrap';
 import {
     filter,
+    isEmpty,
     isNil,
     map,
     reduce,
@@ -17,12 +18,15 @@ import {
 } from 'lodash';
 import moment from 'moment-timezone';
 import { RouteComponentProps, withRouter } from 'react-router';
+import { DEFAULT_ASSET_TYPE } from '../common/Constants';
 import { ApplicationState } from '../store';
 import {
     ILogger,
     Logger,
 } from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
+import Amount from '../models/Amount';
+import AmountDisplay from './AmountDisplay';
 import AmountType from '../models/AmountType';
 import PostJournalEntryModalDialog from './PostJournalEntryModalDialog';
 import TenantBasePage from './TenantBasePage';
@@ -249,6 +253,22 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
             (sum, next) => sum + next,
             0);
 
+        const defaultAssetType = !isEmpty(journalEntry.accounts) ?
+            journalEntry.accounts[0]?.amount?.assetType ?? DEFAULT_ASSET_TYPE :
+            DEFAULT_ASSET_TYPE;
+
+        const totalDebitsAmount: Amount = {
+            amount: totalDebits,
+            amountType: AmountType.Debit,
+            assetType: defaultAssetType,
+        };
+
+        const totalCreditsAmount: Amount = {
+            amount: totalCredits,
+            amountType: AmountType.Credit,
+            assetType: defaultAssetType,
+        };
+
         return (
             <React.Fragment>
                 <ListGroup>
@@ -312,24 +332,15 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                                     accountId,
                                     accountName,
                                     accountNumber,
-                                    amount: amountObject
+                                    amount
                                 } = account;
 
-                                const {
-                                    amount,
-                                    amountType,
-                                    assetType
-                                } = amountObject ?? {};
+                                if (isNil(amount)) {
+                                    return null;
+                                }
 
-                                const assetTypeName = trim(`${assetType?.name ?? ''} ${assetType?.symbol ?? ''}`);
 
-                                const creditAmount = !isNil(amount) && amountType === AmountType.Credit ?
-                                    -1 * amount ?? 0 :
-                                    null;
-
-                                const debitAmount = !isNil(amount) && amountType === AmountType.Debit ?
-                                    amount ?? 0 :
-                                    null;
+                                const assetTypeName = trim(`${amount.assetType?.name ?? ''} ${amount.assetType?.symbol ?? ''}`);
 
                                 const safeAccountId = accountId ?? '';
 
@@ -338,12 +349,24 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                                         <td>{`${accountNumber} - ${accountName}`}</td>
                                         <td>{assetTypeName}</td>
                                         <td style={{ textAlign: 'right' }}>
-                                            {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                            {!isNil(debitAmount) ? debitAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }) : ''}
+                                            {
+                                                amount.amountType === AmountType.Debit ? (
+                                                    <AmountDisplay
+                                                        amount={amount}
+                                                        showCurrency
+                                                    />
+                                                ) : null
+                                            }
                                         </td>
                                         <td style={{ textAlign: 'right' }}>
-                                            {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                            {!isNil(creditAmount) ? creditAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }) : ''}
+                                            {
+                                               amount.amountType === AmountType.Credit ? (
+                                                    <AmountDisplay
+                                                        amount={amount}
+                                                        showCurrency
+                                                    />
+                                                ) : null
+                                            }
                                         </td>
                                     </tr>
                                 );
@@ -356,13 +379,17 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                                 <strong>TOTALS</strong>
                             </td>
                             <td className="col-md-2" />
-                            <td className="col-md-2" style={{ fontWeight: 'bold', textAlign: 'right' }}>
-                                {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                {totalDebits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                            <td className="col-md-2 font-weight-bold text-right">
+                                <AmountDisplay
+                                    amount={totalDebitsAmount}
+                                    showCurrency
+                                />
                             </td>
                             <td className="col-md-2" style={{ fontWeight: 'bold', textAlign: 'right' }}>
-                                {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                {totalCredits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                                <AmountDisplay
+                                    amount={totalCreditsAmount}
+                                    showCurrency
+                                />
                             </td>
                         </tr>
                     </tfoot>

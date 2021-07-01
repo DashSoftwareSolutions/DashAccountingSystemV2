@@ -12,20 +12,22 @@ import {
     map,
     trim,
 } from 'lodash';
+import { DEFAULT_ASSET_TYPE } from '../common/Constants';
 import {
     ILogger,
     Logger,
 } from '../common/Logging'; import Account from '../models/Account';
 import { isStringNullOrWhiteSpace } from '../common/StringUtils';
-import AssetType from '../models/AssetType';
-import Mode from '../models/Mode';
 import AccountCategoryList from '../models/AccountCategoryList';
 import AccountSelector from './AccountSelector';
 import AccountSelectOption from '../models/AccountSelectOption';
-import AssetTypeSelector from './AssetTypeSelector';
-import AmountType from '../models/AmountType';
-import JournalEntryAccount from '../models/JournalEntryAccount';
 import Amount from '../models/Amount';
+import AmountDisplay from './AmountDisplay';
+import AmountType from '../models/AmountType';
+import AssetType from '../models/AssetType';
+import AssetTypeSelector from './AssetTypeSelector';
+import JournalEntryAccount from '../models/JournalEntryAccount';
+import Mode from '../models/Mode';
 
 interface JournalEntryAccountsEditorProps {
     accounts: Account[];
@@ -162,6 +164,22 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
         } = this.state;
 
         const alreadySelectedAccountIds = map(journalEntryAccounts, acct => acct.accountId ?? '');
+
+        const defaultAssetType = !isEmpty(journalEntryAccounts) ?
+            journalEntryAccounts[0]?.amount?.assetType ?? DEFAULT_ASSET_TYPE :
+            DEFAULT_ASSET_TYPE;
+
+        const totalDebitsAmount: Amount = {
+            amount: totalDebits,
+            amountType: AmountType.Debit,
+            assetType: defaultAssetType,
+        };
+
+        const totalCreditsAmount: Amount = {
+            amount: totalCredits,
+            amountType: AmountType.Credit,
+            assetType: defaultAssetType,
+        };
 
         return (
             <div id={this.bemBlockName}>
@@ -306,10 +324,10 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                             <td className="col-md-1" style={{ textAlign: 'right' }}>
                                 <Button
                                     color="primary"
+                                    className="w-100"
                                     disabled={!canAddAccount(this.state)}
                                     id={`${this.bemBlockName}--add_account_button`}
                                     onClick={this.onAddClick}
-                                    style={{ width: '100%' }}
                                 >
                                     Add
                                 </Button>
@@ -322,13 +340,17 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                 <strong>TOTALS</strong>
                             </td>
                             <td className="col-md-2" />
-                            <td className="col-md-2" style={{ fontWeight: 'bold', textAlign: 'right' }}>
-                                {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                {totalDebits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                            <td className="col-md-2 font-wight-bold text-right">
+                                <AmountDisplay
+                                    amount={totalDebitsAmount}
+                                    showCurrency
+                                />
                             </td>
-                            <td className="col-md-2" style={{ fontWeight: 'bold', textAlign: 'right' }}>
-                                {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                {totalCredits.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                            <td className="col-md-2 font-weight-bold text-right">
+                                <AmountDisplay
+                                    amount={totalCreditsAmount}
+                                    showCurrency
+                                />
                             </td>
                             <td className="col-md-1" />
                         </tr>

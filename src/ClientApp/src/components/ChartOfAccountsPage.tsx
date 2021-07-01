@@ -6,6 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
 import Account from '../models/Account';
+import AmountDisplay from '../components/AmountDisplay';
 import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
 import * as AccountsStore from '../store/Accounts';
@@ -88,13 +89,13 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
         }
 
         return (
-            <table className='table table-striped' aria-labelledby="tabelLabel">
+            <table className="table table-hover">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th style={{ textAlign: 'right' }}>Balance</th>
+                        <th className="bg-white sticky-top sticky-border">#</th>
+                        <th className="bg-white sticky-top sticky-border">Name</th>
+                        <th className="bg-white sticky-top sticky-border">Type</th>
+                        <th className="bg-white sticky-top sticky-border text-right">Balance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,8 +105,11 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
                             <td>{account.name}</td>
                             <td>{account.accountType.name}</td>
                             <td style={{ textAlign: 'right' }}>
-                                {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                {Math.abs(account.balance.amount ?? 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2})}
+                                <AmountDisplay
+                                    amount={account.balance}
+                                    normalBalanceType={account.normalBalanceType}
+                                    showCurrency
+                                />
                             </td>
                         </tr>
                     )}

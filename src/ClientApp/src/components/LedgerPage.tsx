@@ -11,10 +11,13 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
+import Amount from '../models/Amount';
+import AmountDisplay from './AmountDisplay';
 import LedgerAccount from '../models/LedgerAccount';
 import TenantBasePage from './TenantBasePage';
 import TransactionStatus from '../models/TransactionStatus';
 import * as LedgerStore from '../store/Ledger';
+import AmountType from '../models/AmountType';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
@@ -110,19 +113,21 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                     </thead>
                     <tbody>
                         {map(accounts, (account) => {
-                            let total = reduce(
+                            const total = reduce(
                                 map(account.transactions, (tx) => tx.amount.amount ?? 0),
                                 (sum, next) => sum + next,
                                 0,
                             );
 
-                            // TODO: Adjust total for positive/negative, depending on normal balance type
+                            const totalAmountType = total === 0 ?
+                                account.normalBalanceType :
+                                (total < 0 ? AmountType.Credit : AmountType.Debit);
 
-                            // TODO: Adjust all displayed amounts for positive/negative, depending on normal balance type
-                            // We probably want a component for this! :-)
-                            const accountNormalBalanceType = account.normalBalanceType;
-                            const startingBalanceType = account.startingBalance.amountType;
-                            const isStartingBalanceNormal = startingBalanceType === accountNormalBalanceType;
+                            const totalAmount: Amount = {
+                                amount: total,
+                                amountType: totalAmountType,
+                                assetType: account.assetType,
+                            };
 
                             return (
                                 <React.Fragment key={`acct-${account.accountNumber}`}>
@@ -133,9 +138,11 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                     </tr>
                                     <tr>
                                         <td className="col-md-2" colSpan={2}>Beginning Balance</td>
-                                        <td className="col-md-10" colSpan={3} style={{ textAlign: 'right' }}>
-                                            {/* TODO/FIXME: Be aware of asset type and user locale */}
-                                            {Math.abs(account.startingBalance.amount ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                        <td className="col-md-10 text-right" colSpan={3}>
+                                            <AmountDisplay
+                                                amount={account.startingBalance}
+                                                normalBalanceType={account.normalBalanceType}
+                                            />
                                         </td>
                                     </tr>
                                     {map(account.transactions, (transaction) => {
@@ -162,31 +169,36 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                                             <span className="badge pending-badge">Pending</span>
                                                         </React.Fragment>
                                                     ): null}
-                                                    {/* TODO: Badge for Pending Transactions - sort of like Pending Comments on GitHub PRs ;-) */}
                                                 </td>
                                                 <td className="col-md-2" style={{ textAlign: 'right' }}>
                                                     <Link className="hoverable-link" to={journalEntryViewRoute}>
-                                                        {(transaction.amount.amount ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                                        <AmountDisplay
+                                                            amount={transaction.amount}
+                                                            normalBalanceType={account.normalBalanceType}
+                                                        />
                                                     </Link>
                                                 </td>
                                                 <td className="col-md-2" style={{ textAlign: 'right' }}>
                                                     <Link className="hoverable-link" to={journalEntryViewRoute}>
-                                                        {(transaction.updatedBalance.amount ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                                        <AmountDisplay
+                                                            amount={transaction.updatedBalance}
+                                                            normalBalanceType={account.normalBalanceType}
+                                                        />
                                                     </Link>
                                                 </td>
                                             </tr>
                                         );
                                     })}
                                     <tr>
-                                        <td className="col-md-8" colSpan={3}>
-                                            <strong>
-                                                {`Total for ${account.accountNumber} - ${account.name}`}
-                                            </strong>
+                                        <td className="col-md-8 font-weight-bold" colSpan={3}>
+                                            {`Total for ${account.accountNumber} - ${account.name}`}
                                         </td>
-                                        <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                            <strong>
-                                                {total.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
-                                            </strong>
+                                        <td className="col-md-2 font-weight-bold text-right">
+                                            <AmountDisplay
+                                                amount={totalAmount}
+                                                normalBalanceType={account.normalBalanceType}
+                                                showCurrency
+                                            />
                                         </td>
                                         <td className="col-md-2" />
                                     </tr>

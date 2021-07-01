@@ -1,11 +1,12 @@
 ﻿import * as React from 'react';
 import { Col, Row } from 'reactstrap';
 import { connect } from 'react-redux';
-import { isEmpty } from 'lodash';
+import { isNil } from 'lodash';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
 import Account from '../models/Account';
+import AmountDisplay from './AmountDisplay';
 import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
 
@@ -33,7 +34,7 @@ class AccountDetailsPage extends React.PureComponent<AccountDetailsPageProps> {
             selectedAccount,
         } = this.props;
 
-        if (isEmpty(selectedAccount)) {
+        if (isNil(selectedAccount)) {
             history.push('/chart-of-accounts');
         }
     }
@@ -45,7 +46,7 @@ class AccountDetailsPage extends React.PureComponent<AccountDetailsPageProps> {
             selectedTenant,
         } = this.props;
 
-        if (isEmpty(selectedAccount)) {
+        if (isNil(selectedAccount)) {
             return null;
         }
 
@@ -61,11 +62,11 @@ class AccountDetailsPage extends React.PureComponent<AccountDetailsPageProps> {
                             <h1>{`${selectedAccount?.accountNumber} - ${selectedAccount?.name}`}</h1>
                             <p className="lead">{selectedAccount?.accountType.name}</p>
                             <p className="lead">
-                                {/* TODO/FIXME:
-                                 *  1) Be aware of asset type and user locale
-                                 *  2) Consider a shared, reusable component to display formatted amounts
-                                 */}
-                                {Math.abs(selectedAccount?.balance.amount ?? 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}
+                                <AmountDisplay
+                                    amount={selectedAccount?.balance}
+                                    normalBalanceType={selectedAccount.normalBalanceType}
+                                    showCurrency
+                                />
                             </p>
                         </Col>
                     </Row>
