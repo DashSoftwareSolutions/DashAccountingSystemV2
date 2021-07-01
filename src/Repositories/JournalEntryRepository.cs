@@ -147,6 +147,7 @@ namespace DashAccountingSystemV2.Repositories
                 .OrderBy(jeAcct => jeAcct.Account.AccountTypeId)
                 .ThenBy(jeAcct => jeAcct.JournalEntry.Status != TransactionStatus.Pending ? 1 : 2)
                 .ThenBy(jeAcct => jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate)
+                .ThenBy(jeAcct => jeAcct.JournalEntry.EntryId)
                 .Include(jeAcct => jeAcct.JournalEntry.CreatedBy)
                 .Include(jeAcct => jeAcct.JournalEntry.UpdatedBy)
                 .ToListAsync();
