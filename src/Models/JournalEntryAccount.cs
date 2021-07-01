@@ -43,6 +43,11 @@ namespace DashAccountingSystemV2.Models
             JournalEntryId = journalEntryId;
         }
 
+        public JournalEntryAccount Clone()
+        {
+            return (JournalEntryAccount)MemberwiseClone();
+        }
+
         public bool Equals(JournalEntryAccount other)
         {
             if (other == null)

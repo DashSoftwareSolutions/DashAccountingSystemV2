@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -58,14 +59,27 @@ namespace DashAccountingSystemV2.Controllers
         [HttpPut("{tenantId:guid}/entry/{entryId:long:min(1):max(4294967295)}")]
         public Task<IActionResult> UpdateJournalEntry(
             [FromRoute] Guid tenantId,
-            [FromRoute] uint entryId
-            /* TODO: Add View Model for PUT Body */)
+            [FromRoute] uint entryId,
+            [FromBody] JournalEntryUpdateRequestViewModel viewModel)
         {
-            // TODO: Implement Update operation
+            if (viewModel == null)
+                return Task.FromResult(this.ErrorResponse("Invalid PUT body"));
 
-            var bizLogicResponse = _journalEntryBusinessLogic.GetJournalEntryByTenantAndEntryId(
-                tenantId,
-                entryId);
+            if (tenantId != viewModel.TenantId ||
+                entryId != viewModel.EntryId)
+                return Task.FromResult(this.ErrorResponse("Mismatch between route parameters and PUT body"));
+
+            if (!viewModel.Validate(ModelState))
+                return Task.FromResult(this.ErrorResponse(ModelState));
+
+            var inboundAccounts = viewModel.Accounts.ToList();
+
+            var contextUserId = User.GetUserId();
+            var entryWithUpdates = JournalEntryUpdateRequestViewModel.ToModel(viewModel, contextUserId);
+            
+            var bizLogicResponse = _journalEntryBusinessLogic.UpdateJournalEntry(
+                entryWithUpdates,
+                contextUserId);
 
             return this.Result(bizLogicResponse, JournalEntryResponseViewModel.FromModel);
         }

@@ -33,8 +33,8 @@ const mapDispatchToProps = {
     requestJournalEntry: JournalEntryStore.actionCreators.requestJournalEntry,
     resetDirtyEditorState: JournalEntryStore.actionCreators.resetDirtyEditorState,
     resetLedgerReportData: LedgerStore.actionCreators.reset,
-    saveNewJournalEntry: JournalEntryStore.actionCreators.saveNewJournalEntry, // TODO: Replace with action creator for Update/PUT
     showAlert: SystemNotificationsStore.actionCreators.showAlert,
+    updateJournalEntry: JournalEntryStore.actionCreators.updateJournalEntry,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -159,8 +159,8 @@ class EditJournalEntryPage extends React.PureComponent<EditJournalEntryPageProps
         this.logger.debug('Saving the journal entry...');
 
         // TODO: Replace with action creator for Update/PUT
-        const { saveNewJournalEntry } = this.props;
-        saveNewJournalEntry();
+        const { updateJournalEntry } = this.props;
+        updateJournalEntry();
     }
 }
 

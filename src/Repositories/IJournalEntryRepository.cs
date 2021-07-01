@@ -39,5 +39,11 @@ namespace DashAccountingSystemV2.Repositories
             DateTime postDate,
             Guid postedByUserId,
             string note = null);
+        
+        Task<JournalEntry> UpdateCompleteJournalEntryAsync(JournalEntry journalEntry, Guid contextUserId);
+
+        Task<JournalEntry> UpdateJournalEntryNoteOnlyAsync(JournalEntry journalEntry, Guid contextUserId);
+
+        Task<JournalEntry> UpdateJournalEntryTopLevelMetadataAsync(JournalEntry journalEntry, Guid contextUserId);
     }
 }

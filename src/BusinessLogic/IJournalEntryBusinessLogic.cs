@@ -16,5 +16,7 @@ namespace DashAccountingSystemV2.BusinessLogic
             DateTime postDate,
             Guid postedByUserId,
             string note = null);
+
+        Task<BusinessLogicResponse<JournalEntry>> UpdateJournalEntry(JournalEntry journalEntry, Guid contextUserId);
     }
 }

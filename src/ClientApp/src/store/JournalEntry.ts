@@ -348,6 +348,45 @@ export const actionCreators = {
         dispatch({ type: 'REQUEST_POST_JOURNAL_ENTRY' });
     },
 
+    updateJournalEntry: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const tenantId = appState.tenants?.selectedTenant?.id;
+        const entryToSave = appState.journalEntry?.dirtyEntry;
+
+        if (isNil(entryToSave)) {
+            logger.warn('No Journal Entry found in store state.  Bailing out.');
+            return;
+        }
+
+        const accessToken = await authService.getAccessToken();
+
+        const requestOptions = {
+            method: 'PUT',
+            body: JSON.stringify(entryToSave),
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch(`api/journal/${tenantId}/entry/${entryToSave.entryId}`, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response);
+                    return null;
+                }
+
+                return response.json() as Promise<JournalEntry>;
+            })
+            .then(savedEntry => {
+                if (!isNil(savedEntry)) {
+                    dispatch({ type: 'UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED', savedEntry });
+                }
+            });
+
+        dispatch({ type: 'REQUEST_SAVE_UPDATED_JOURNAL_ENTRY' });
+    },
+
     updateEntryDate: (entryDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: 'UPDATE_JOURNAL_ENTRY_ENTRY_DATE', entryDate });
     },

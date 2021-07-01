@@ -113,5 +113,12 @@ namespace DashAccountingSystemV2.Models
             PostedById = postedById;
             Status = postDate.HasValue ? TransactionStatus.Posted : TransactionStatus.Pending;
         }
+
+        public JournalEntry Clone()
+        {
+            var clone = (JournalEntry)MemberwiseClone();
+            clone.Accounts = Accounts?.Select(a => a.Clone())?.ToList();
+            return clone;
+        }
     }
 }

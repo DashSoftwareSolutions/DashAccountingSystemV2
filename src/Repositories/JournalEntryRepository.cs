@@ -51,8 +51,6 @@ namespace DashAccountingSystemV2.Repositories
                     throw;
                 }
             }
-
-            throw new NotImplementedException();
         }
 
         public Task<JournalEntry> GetByIdAsync(Guid journalEntryId)
@@ -185,7 +183,7 @@ namespace DashAccountingSystemV2.Repositories
 
         public async Task<JournalEntry> PostJournalEntryAsync(Guid journalEntryId, DateTime postDate, Guid postedByUserId, string note = null)
         {
-            var entry = await GetDetailedByIdAsync(journalEntryId);
+            var entry = await GetByIdAsync(journalEntryId);
 
             if (entry == null)
                 return null;
@@ -204,6 +202,83 @@ namespace DashAccountingSystemV2.Repositories
             await _db.SaveChangesAsync();
 
             return await GetDetailedByIdAsync(journalEntryId);
+        }
+
+        public async Task<JournalEntry> UpdateCompleteJournalEntryAsync(JournalEntry journalEntry, Guid contextUserId)
+        {
+            var existingEntry = await GetDetailedByIdAsync(journalEntry.Id);
+            if (existingEntry == null)
+                return null;
+
+            if (existingEntry.Status == TransactionStatus.Pending && journalEntry.PostDate.HasValue)
+                throw new InvalidOperationException("The \'Post Journal Entry\' method should be used instead to move a Journal Entry from Pending to Posted Status");
+
+            if (existingEntry.Status == TransactionStatus.Posted && !journalEntry.PostDate.HasValue)
+                throw new InvalidOperationException("It is not permitted to remove the Post Date of a Posted Journal Entry");
+
+            using (var transaction = await _db.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    existingEntry.EntryDate = journalEntry.EntryDate;
+                    existingEntry.PostDate = journalEntry.PostDate;
+                    existingEntry.Description = journalEntry.Description;
+                    existingEntry.CheckNumber = journalEntry.CheckNumber;
+                    existingEntry.Note = journalEntry.Note;
+                    existingEntry.Updated = DateTime.UtcNow;
+                    existingEntry.UpdatedById = contextUserId;
+                    existingEntry.Accounts = journalEntry.Accounts;
+
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return await GetDetailedByIdAsync(journalEntry.Id);
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+        }
+
+        public async Task<JournalEntry> UpdateJournalEntryNoteOnlyAsync(JournalEntry journalEntry, Guid contextUserId)
+        {
+            var existingEntry = await GetByIdAsync(journalEntry.Id);
+            if (existingEntry == null)
+                return null;
+
+            existingEntry.Note = journalEntry.Note;
+
+            await _db.SaveChangesAsync();
+
+            return await GetDetailedByIdAsync(journalEntry.Id);
+        }
+
+        public async Task<JournalEntry> UpdateJournalEntryTopLevelMetadataAsync(JournalEntry journalEntry, Guid contextUserId)
+        {
+            var existingEntry = await GetByIdAsync(journalEntry.Id);
+
+            if (existingEntry == null)
+                return null;
+
+            if (existingEntry.Status == TransactionStatus.Pending && journalEntry.PostDate.HasValue)
+                throw new InvalidOperationException("The \'Post Journal Entry\' method should be used instead to move a Journal Entry from Pending to Posted Status");
+
+            if (existingEntry.Status == TransactionStatus.Posted && !journalEntry.PostDate.HasValue)
+                throw new InvalidOperationException("It is not permitted to remove the Post Date of a Posted Journal Entry");
+
+            existingEntry.EntryDate = journalEntry.EntryDate;
+            existingEntry.PostDate = journalEntry.PostDate;
+            existingEntry.Description = journalEntry.Description;
+            existingEntry.CheckNumber = journalEntry.CheckNumber;
+            existingEntry.Note = journalEntry.Note;
+            existingEntry.Updated = DateTime.UtcNow;
+            existingEntry.UpdatedById = contextUserId;
+
+            await _db.SaveChangesAsync();
+
+            return await GetDetailedByIdAsync(journalEntry.Id);
         }
     }
 }

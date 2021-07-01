@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -305,6 +305,104 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 Assert.NotNull(postedJournalEntry.PostDate);
                 Assert.Equal(postDate, postedJournalEntry.PostDate);
                 Assert.Equal(TransactionStatus.Posted, postedJournalEntry.Status);
+            });
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
+        public void UpdateCompleteJournalEntryAsync_Ok()
+        {
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
+            {
+                // ARRANGE
+                //     SET UP ACCOUNTS
+                var accountRepository = await GetAccountRepository();
+                var sharedLookupRepository = await GetSharedLookupRepository();
+
+                var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
+                var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
+
+                var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
+                var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
+
+                var cashAccount = await MakeAccount(
+                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+
+                var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+
+                var revenueAccount1 = await MakeAccount(
+                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+
+                var revenueAccount2 = await MakeAccount(
+                    4020, "Revenue from Sale of Foo Widgets", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+
+                var revenueAccount3 = await MakeAccount(
+                    4030, "Revenue from Sale of Bar Widgets", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+
+                //    MAKE INITIAL PENDING JOURNAL ENTRY
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+
+                var journalEntry = new JournalEntry(
+                    _tenantId,
+                    entryDate,
+                    null,
+                    "Payment for Invoice #1001",
+                    null,
+                    _userId,
+                    null);
+
+                var transactionAmount = 10000.00m;
+
+                journalEntry.Accounts.Add(new JournalEntryAccount(
+                    cashAccount.Id, transactionAmount, assetTypeUSD.Id));
+                journalEntry.Accounts.Add(new JournalEntryAccount(
+                    revenueAccount1.Id, -transactionAmount, assetTypeUSD.Id));
+
+                var journalEntryRepository = await GetJournalEntryRepository();
+
+                var savedJournalEntry = await journalEntryRepository.CreateJournalEntryAsync(journalEntry);
+
+                Assert.NotNull(savedJournalEntry);
+                Assert.True(savedJournalEntry.Id != Guid.Empty);
+                Assert.True(savedJournalEntry.EntryId > 0);
+
+                Assert.Equal(2, savedJournalEntry.Accounts.Count());
+                Assert.All(savedJournalEntry.Accounts, jeAcct => Assert.NotNull(jeAcct?.Account));
+
+                Assert.Contains(savedJournalEntry.Accounts, jeAcct =>
+                        jeAcct.AccountId == cashAccount.Id &&
+                        jeAcct.Account.AccountNumber == cashAccount.AccountNumber &&
+                        jeAcct.Account.Name == cashAccount.Name &&
+                        jeAcct.Amount == transactionAmount);
+
+                Assert.Contains(savedJournalEntry.Accounts, jeAcct =>
+                    jeAcct.AccountId == revenueAccount1.Id &&
+                    jeAcct.Account.AccountNumber == revenueAccount1.AccountNumber &&
+                    jeAcct.Account.Name == revenueAccount1.Name &&
+                    jeAcct.Amount == -transactionAmount);
+
+                Assert.Equal(0, savedJournalEntry.Accounts.Sum(jeAcct => jeAcct.Amount));
+
+                Assert.True(savedJournalEntry.IsBalanced);
+                Assert.Equal(TransactionStatus.Pending, savedJournalEntry.Status);
+
+                // ACT - UPDATE THE ENTRY
+                var entryWithUpdates = savedJournalEntry.Clone();
+                entryWithUpdates.EntryDate = savedJournalEntry.EntryDate.AddDays(3);
+                entryWithUpdates.Description += ".  Updated description.";
+                entryWithUpdates.Note = "Modified from services rendered to sale of Foo and Bar Widgets";
+                entryWithUpdates.Accounts.Single(a => a.AccountId == cashAccount.Id).Amount = 11000.00m;
+                entryWithUpdates.Accounts.Remove(entryWithUpdates.Accounts.Single(a => a.AccountId == revenueAccount1.Id));
+                entryWithUpdates.Accounts.Add(new JournalEntryAccount(
+                    revenueAccount2.Id, -9000.00m, assetTypeUSD.Id));
+                entryWithUpdates.Accounts.Add(new JournalEntryAccount(
+                    revenueAccount3.Id, -2000.00m, assetTypeUSD.Id));
+
+                var savedUpdatedEntry = await journalEntryRepository.UpdateCompleteJournalEntryAsync(entryWithUpdates, _userId);
+
+                // ASSERT
+                Assert.NotNull(savedUpdatedEntry);
+                // TODO: More robust assertions
             });
         }
 
