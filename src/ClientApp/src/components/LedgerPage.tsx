@@ -3,6 +3,8 @@ import { ConnectedProps, connect } from 'react-redux';
 import {
     Button,
     Col,
+    Form,
+    Input,
     Row,
 } from 'reactstrap';
 import { map, reduce } from 'lodash';
@@ -22,6 +24,8 @@ import AmountType from '../models/AmountType';
 const mapStateToProps = (state: ApplicationState) => {
     return {
         accounts: state.ledger?.accounts ?? [],
+        dateRangeEnd: state?.ledger?.dateRangeEnd,
+        dateRangeStart: state?.ledger?.dateRangeStart,
         isFetching: state.ledger?.isLoading ?? false,
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
@@ -43,7 +47,11 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
 
     constructor(props: LedgerPageProps) {
         super(props);
+
         this.onClickNewJournalEntry = this.onClickNewJournalEntry.bind(this);
+        this.onClickRunReport = this.onClickRunReport.bind(this);
+        this.onDateRangeEndChanged = this.onDateRangeEndChanged.bind(this);
+        this.onDateRangeStartChanged = this.onDateRangeStartChanged.bind(this);
     }
 
     public componentDidMount() {
@@ -53,6 +61,8 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
     public render() {
         const {
             accounts,
+            dateRangeEnd,
+            dateRangeStart,
             history,
             isFetching,
             selectedTenant,
@@ -78,11 +88,48 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
+                    <Form style={{ marginBottom: 22 }}>
+                        <Row form>
+                            {/* TODO: Add preset ranges select */}
+                            <Col md={2}>
+                                <Input
+                                    id={`${this.bemBlockName}--date_range_start_input`}
+                                    name="date_range_start_input"
+                                    onChange={this.onDateRangeStartChanged}
+                                    type="date"
+                                    value={dateRangeStart ?? ''}
+                                />
+                            </Col>
+                            <Col className="align-self-center no-gutters text-center" md={1} style={{ flex: '0 1 22px' }}>
+                                to
+                            </Col>
+                            <Col md={2}>
+                                <Input
+                                    id={`${this.bemBlockName}--date_range_end_input`}
+                                    name="date_range_end_input"
+                                    onChange={this.onDateRangeEndChanged}
+                                    type="date"
+                                    value={dateRangeEnd ?? ''}
+                                />
+                            </Col>
+                            <Col md={2}>
+                                <Button
+                                    color="success"
+                                    id={`${this.bemBlockName}--run_report_button`}
+                                    onClick={this.onClickRunReport}
+                                >
+                                    Run Report
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Form>
+                    <div className={`${this.bemBlockName}--ledger_report_container`}>
                     {isFetching ? (
                         <p>Loading...</p>
                     ): 
                         this.renderLedgerReportTable(accounts)
                     }
+                    </div>
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -96,6 +143,28 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
     private onClickNewJournalEntry() {
         const { history } = this.props;
         history.push('/journal-entry/new');
+    }
+
+    private onClickRunReport(event: React.MouseEvent<HTMLElement>) {
+        event.preventDefault();
+
+        const {
+            requestLedgerReportData,
+            reset,
+        } = this.props;
+
+        reset();
+        requestLedgerReportData();
+    }
+
+    private onDateRangeEndChanged(event: React.FormEvent<HTMLInputElement>) {
+        const { updateDateRangeEnd } = this.props;
+        updateDateRangeEnd(event.currentTarget.value);
+    }
+
+    private onDateRangeStartChanged(event: React.FormEvent<HTMLInputElement>) {
+        const { updateDateRangeStart } = this.props;
+        updateDateRangeStart(event.currentTarget.value);
     }
 
     private renderLedgerReportTable(accounts: LedgerAccount[]): JSX.Element {

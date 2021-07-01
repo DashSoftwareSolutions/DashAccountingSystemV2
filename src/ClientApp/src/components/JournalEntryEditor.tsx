@@ -5,10 +5,10 @@ import { isFinite, isNil } from 'lodash';
 import {
     Col,
     Form,
-    FormGroup,
-    Label,
-    Input,
     FormFeedback,
+    FormGroup,
+    Input,
+    Label,
     Row,
 } from 'reactstrap';
 import {
