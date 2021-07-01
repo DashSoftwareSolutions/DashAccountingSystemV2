@@ -6,12 +6,11 @@ import {
 } from 'reactstrap';
 import {
     find,
-    filter,
     isEmpty,
     isFinite,
     isNil,
     map,
-    reduce,
+    trim,
 } from 'lodash';
 import {
     ILogger,
@@ -201,7 +200,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                 assetType
                             } = amountObject ?? {};
 
-                            const assetTypeName = assetType?.name ?? '';
+                            const assetTypeName = trim(`${assetType?.name ?? ''} ${assetType?.symbol ?? ''}`);
 
                             const creditAmount = !isNil(amount) && amountType === AmountType.Credit ?
                                 -1 * amount ?? 0 :

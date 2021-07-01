@@ -98,7 +98,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
     private renderLedgerReportTable(accounts: LedgerAccount[]): JSX.Element {
         return (
             <div className="table">
-                <table className="table table-sm" style={{ fontSize: '0.9em', width: '100%' }}>
+                <table className="table table-hover table-sm" style={{ fontSize: '0.9em', width: '100%' }}>
                     <thead>
                         <tr>
                             <th className="col-md-1 bg-white sticky-top sticky-border">Date</th>

@@ -30,13 +30,17 @@ class Tenants extends React.PureComponent<TenantsProps> {
     }
 
     public render() {
-        return (
-            <React.Fragment>
-                <h1 id="tabelLabel">Your Companies</h1>
-                <p>Choose which company you would like to work with.</p>
-                {this.renderTenantsTable()}
-            </React.Fragment>
-        );
+        const { isLoading } = this.props;
+
+        return isLoading ? (
+               <p>Loading...</p> 
+            ): (
+                <React.Fragment>
+                    <h1 id="tabelLabel">Your Companies</h1>
+                    <p>Choose which company you would like to work with.</p>
+                    {this.renderTenantsTable()}
+                </React.Fragment>
+            );
     }
 
     private ensureDataFetched() {

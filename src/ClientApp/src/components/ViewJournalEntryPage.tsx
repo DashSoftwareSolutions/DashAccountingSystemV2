@@ -13,6 +13,7 @@ import {
     map,
     reduce,
     sortBy,
+    trim,
 } from 'lodash';
 import moment from 'moment-timezone';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -320,7 +321,7 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                                     assetType
                                 } = amountObject ?? {};
 
-                                const assetTypeName = assetType?.name ?? '';
+                                const assetTypeName = trim(`${assetType?.name ?? ''} ${assetType?.symbol ?? ''}`);
 
                                 const creditAmount = !isNil(amount) && amountType === AmountType.Credit ?
                                     -1 * amount ?? 0 :

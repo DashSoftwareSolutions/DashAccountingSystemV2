@@ -3,6 +3,7 @@ import {
     find,
     isNil,
     map,
+    trim,
 } from 'lodash';
 import AssetType from '../models/AssetType';
 
@@ -40,7 +41,9 @@ class AssetTypeSelector extends React.PureComponent<AssetTypeProps> {
             >
                 <option value="">Select</option>
                 {map(assetTypes, (at) => ((
-                    <option key={at.id} value={at.id}>{at.name}</option>
+                    <option key={at.id} value={at.id}>
+                        {trim(`${at.name} ${at.symbol ?? ''}`)}
+                    </option>
                 )))}
             </select>
         );
