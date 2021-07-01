@@ -28,7 +28,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
 
                 var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
-                var assetTypeUSD = assetTypes.Single(at => at.Name == "USD $");
+                var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
 
 
                 var account = new Account(

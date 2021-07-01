@@ -26,10 +26,10 @@ namespace DashAccountingSystemV2.Tests.Repositories
             var repository = GetSharedLookupRepository();
             var assetTypes = repository.GetAssetTypesAsync().Result;
             Assert.NotEmpty(assetTypes);
-            Assert.Contains(assetTypes, at => at.Name == "USD $");
-            Assert.Contains(assetTypes, at => at.Name == "GBP £");
-            Assert.Contains(assetTypes, at => at.Name == "EUR €");
-            Assert.Contains(assetTypes, at => at.Name == "JPY ¥");
+            Assert.Contains(assetTypes, at => at.Name == "USD");
+            Assert.Contains(assetTypes, at => at.Name == "GBP");
+            Assert.Contains(assetTypes, at => at.Name == "EUR");
+            Assert.Contains(assetTypes, at => at.Name == "JPY");
         }
 
         private ISharedLookupRepository GetSharedLookupRepository()
