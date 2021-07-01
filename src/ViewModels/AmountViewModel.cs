@@ -10,7 +10,7 @@ namespace DashAccountingSystemV2.ViewModels
         public static readonly AmountViewModel Empty = new AmountViewModel(null, null);
 
         public decimal? Amount { get; set; }
-        public LookupValueViewModel AssetType { get; set; }
+        public AssetTypeViewModel AssetType { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public AmountType AmountType
@@ -34,13 +34,7 @@ namespace DashAccountingSystemV2.ViewModels
         public AmountViewModel(decimal? amount, AssetType assetType)
         {
             Amount = amount;
-            AssetType = assetType == null ? null : new LookupValueViewModel(assetType.Id, assetType.Name);
-        }
-
-        public AmountViewModel(decimal? amount, int assetTypeId, string assetTypeName)
-        {
-            Amount = amount;
-            AssetType = new LookupValueViewModel(assetTypeId, assetTypeName);
+            AssetType = assetType == null ? null : AssetTypeViewModel.FromModel(assetType);
         }
 
         public bool Equals(AmountViewModel other)

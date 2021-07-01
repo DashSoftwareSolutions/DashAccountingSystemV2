@@ -18,7 +18,7 @@ namespace DashAccountingSystemV2.ViewModels
 
         public LookupValueViewModel AccountType { get; set; }
 
-        public LookupValueViewModel AssetType { get; set; }
+        public AssetTypeViewModel AssetType { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public AmountType NormalBalanceType { get; set; }
@@ -47,7 +47,7 @@ namespace DashAccountingSystemV2.ViewModels
                 Name = account.Account.Name,
                 Description = account.Account.Description,
                 AccountType = new LookupValueViewModel(account.Account.AccountType.Id, account.Account.AccountType.Name),
-                AssetType = new LookupValueViewModel(account.Account.AssetType.Id, account.Account.AssetType.Name),
+                AssetType = AssetTypeViewModel.FromModel(account.Account.AssetType),
                 NormalBalanceType = account.Account.NormalBalanceType,
                 Created = account.Account.Created.AsUtc(),
                 CreatedBy = ApplicationUserLiteViewModel.FromModel(account.Account.CreatedBy),

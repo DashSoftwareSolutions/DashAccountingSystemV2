@@ -28,7 +28,7 @@ namespace DashAccountingSystemV2.Controllers
             var result = new LookupsViewModel()
             {
                 AccountTypes = accountTypes.Select(at => new LookupValueViewModel(at.Id, at.Name)),
-                AssetTypes = assetTypes.Select(at => new LookupValueViewModel(at.Id, at.Name)),
+                AssetTypes = assetTypes.Select(AssetTypeViewModel.FromModel),
             };
 
             return Json(result);

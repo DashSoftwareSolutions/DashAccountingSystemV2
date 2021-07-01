@@ -13,9 +13,19 @@ namespace DashAccountingSystemV2.Models
         [MaxLength(255)]
         public string Name { get; set; }
 
-        public AssetType(string name)
+        public char? Symbol { get; set; }
+
+        public AssetType(string name, char? symbol = null)
         {
             Name = name;
+            Symbol = symbol;
+        }
+
+        public AssetType(int id, string name, char? symbol)
+        {
+            Id = id;
+            Name = name;
+            Symbol = symbol;
         }
     }
 }
