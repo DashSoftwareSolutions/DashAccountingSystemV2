@@ -1,8 +1,12 @@
 ﻿import * as React from 'react';
 import { Alert } from 'reactstrap';
 import { ConnectedProps, connect } from 'react-redux';
-import { isNil } from 'lodash';
+import {
+    isNil,
+    isNumber,
+} from 'lodash';
 import { ApplicationState } from '../store';
+import { DEFAULT_SYSTEM_NOTIFICATION_ALERT_TIMEOUT } from '../common/Constants';
 import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => ({
@@ -36,17 +40,27 @@ class SystemNotificationsArea extends React.PureComponent<SystemNotificationsAre
 
     public componentDidUpdate(prevProps: SystemNotificationsAreaProps) {
         const { alertId: prevAlertId } = prevProps;
-        const { alertId: nextAlertId } = this.props;
 
-        console.log('[System Notifications Area] componentDidUpdate ... prevAlertId:', prevAlertId);
-        console.log('[System Notifications Area] componentDidUpdate ... nextAlertId:', nextAlertId);
+        const {
+            alertAutoDismiss,
+            alertId: nextAlertId,
+            dismissAlert,
+        } = this.props;
 
-        // TODO/FIXME: Not working for some reason :-(
-        /*if (nextAlertId !== prevAlertId &&
+        if (nextAlertId !== prevAlertId &&
             !isNil(nextAlertId)) {
             this.setState({ currentAlertId: nextAlertId });
-            // TODO: Handle auto-dismiss
-        }*/
+
+            if (!isNil(alertAutoDismiss)) {
+                const autoDismissTimeout = isNumber(alertAutoDismiss) ?
+                    alertAutoDismiss :
+                    DEFAULT_SYSTEM_NOTIFICATION_ALERT_TIMEOUT;
+
+                setTimeout(() => {
+                    dismissAlert(nextAlertId);
+                }, autoDismissTimeout);
+            }
+        }
     }
 
     public render() {
@@ -72,7 +86,7 @@ class SystemNotificationsArea extends React.PureComponent<SystemNotificationsAre
                 id="system_notifications_area"
                 style={{
                     height: 48,
-                    marginBottom: 11,
+                    marginBottom: 22,
                     marginTop: 11
                 }}
             >
@@ -82,19 +96,11 @@ class SystemNotificationsArea extends React.PureComponent<SystemNotificationsAre
     }
 
     private onDismissAlertClick() {
-        // TODO/FIXME: Not working for some reason
-        /*const { dismissAlert } = this.props;
+        const { dismissAlert } = this.props;
         const { currentAlertId } = this.state;
-        console.log('[System Notifications Area] onDismissAlertClick ... currentAlertId:', currentAlertId);
 
         if (!isNil(currentAlertId)) {
             dismissAlert(currentAlertId);
-        }*/
-
-        const { alertId, dismissAlert } = this.props;
-        if (!isNil(alertId)) {
-            dismissAlert(alertId);
-            this.setState({ currentAlertId: null });
         }
     }
 }
