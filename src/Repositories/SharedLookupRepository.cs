@@ -20,6 +20,11 @@ namespace DashAccountingSystemV2.Repositories
             return await _db.AccountType.ToListAsync();
         }
 
+        public async Task<IEnumerable<AccountSubType>> GetAccountSubTypesAsync()
+        {
+            return await _db.AccountSubType.ToListAsync();
+        }
+
         public async Task<IEnumerable<AssetType>> GetAssetTypesAsync()
         {
             return await _db.AssetType.ToListAsync();

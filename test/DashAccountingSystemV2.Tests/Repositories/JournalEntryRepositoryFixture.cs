@@ -28,16 +28,20 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
                 var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
 
+                var accountSubTypes = await sharedLookupRepository.GetAccountSubTypesAsync();
+                var accountSubTypeBankAccount = accountSubTypes.Single(ast => ast.Name == "Bank Account");
+
                 var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
                 var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
 
                 var cashAccount = await MakeAccount(
-                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+                    1010, "Operating Cash Account", accountTypeAsset, accountSubTypeBankAccount, assetTypeUSD, AmountType.Debit);
 
                 var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+                var accountSubTypeOperatingRevenue = accountSubTypes.Single(ast => ast.Name == "Operating Revenue");
 
                 var revenueAccount = await MakeAccount(
-                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+                    4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
                 var postDate = entryDate.AddDays(3);
@@ -86,16 +90,20 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
                 var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
 
+                var accountSubTypes = await sharedLookupRepository.GetAccountSubTypesAsync();
+                var accountSubTypeBankAccount = accountSubTypes.Single(ast => ast.Name == "Bank Account");
+
                 var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
                 var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
 
                 var cashAccount = await MakeAccount(
-                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+                    1010, "Operating Cash Account", accountTypeAsset, accountSubTypeBankAccount, assetTypeUSD, AmountType.Debit);
 
                 var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+                var accountSubTypeOperatingRevenue = accountSubTypes.Single(ast => ast.Name == "Operating Revenue");
 
                 var revenueAccount = await MakeAccount(
-                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+                    4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
 
@@ -160,16 +168,20 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
                 var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
 
+                var accountSubTypes = await sharedLookupRepository.GetAccountSubTypesAsync();
+                var accountSubTypeBankAccount = accountSubTypes.Single(ast => ast.Name == "Bank Account");
+
                 var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
                 var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
 
                 var cashAccount = await MakeAccount(
-                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+                    1010, "Operating Cash Account", accountTypeAsset, accountSubTypeBankAccount, assetTypeUSD, AmountType.Debit);
 
                 var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+                var accountSubTypeOperatingRevenue = accountSubTypes.Single(ast => ast.Name == "Operating Revenue");
 
                 var revenueAccount = await MakeAccount(
-                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+                    4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
                 var postDate = entryDate.AddDays(3);
@@ -236,16 +248,20 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
                 var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
 
+                var accountSubTypes = await sharedLookupRepository.GetAccountSubTypesAsync();
+                var accountSubTypeBankAccount = accountSubTypes.Single(ast => ast.Name == "Bank Account");
+
                 var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
                 var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
 
                 var cashAccount = await MakeAccount(
-                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+                    1010, "Operating Cash Account", accountTypeAsset, accountSubTypeBankAccount, assetTypeUSD, AmountType.Debit);
 
                 var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+                var accountSubTypeOperatingRevenue = accountSubTypes.Single(ast => ast.Name == "Operating Revenue");
 
                 var revenueAccount = await MakeAccount(
-                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+                    4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
 
@@ -322,22 +338,26 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
                 var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
 
+                var accountSubTypes = await sharedLookupRepository.GetAccountSubTypesAsync();
+                var accountSubTypeBankAccount = accountSubTypes.Single(ast => ast.Name == "Bank Account");
+
                 var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
                 var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
 
                 var cashAccount = await MakeAccount(
-                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+                    1010, "Operating Cash Account", accountTypeAsset, accountSubTypeBankAccount, assetTypeUSD, AmountType.Debit);
 
                 var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+                var accountSubTypeOperatingRevenue = accountSubTypes.Single(ast => ast.Name == "Operating Revenue");
 
                 var revenueAccount1 = await MakeAccount(
-                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+                    4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 var revenueAccount2 = await MakeAccount(
-                    4020, "Revenue from Sale of Foo Widgets", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+                    4020, "Revenue from Sale of Foo Widgets", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 var revenueAccount3 = await MakeAccount(
-                    4030, "Revenue from Sale of Bar Widgets", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+                    4030, "Revenue from Sale of Bar Widgets", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 //    MAKE INITIAL PENDING JOURNAL ENTRY
                 var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
@@ -419,16 +439,20 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
                 var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
 
+                var accountSubTypes = await sharedLookupRepository.GetAccountSubTypesAsync();
+                var accountSubTypeBankAccount = accountSubTypes.Single(ast => ast.Name == "Bank Account");
+
                 var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
                 var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
 
                 var cashAccount = await MakeAccount(
-                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+                    1010, "Operating Cash Account", accountTypeAsset, accountSubTypeBankAccount, assetTypeUSD, AmountType.Debit);
 
                 var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+                var accountSubTypeOperatingRevenue = accountSubTypes.Single(ast => ast.Name == "Operating Revenue");
 
                 var revenueAccount = await MakeAccount(
-                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+                    4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
 
@@ -495,6 +519,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
             ushort accountNumber,
             string name,
             AccountType accountType,
+            AccountSubType accountSubType,
             AssetType assetType,
             AmountType balanceType)
         {
@@ -504,6 +529,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 name,
                 null,
                 accountType.Id,
+                accountSubType.Id,
                 assetType.Id,
                 balanceType,
                 _userId);

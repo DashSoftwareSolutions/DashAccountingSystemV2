@@ -21,6 +21,16 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
         [Fact]
         [Trait("Category", "Requires Database")]
+        public void GetAccountSubTypes_Ok()
+        {
+            var repository = GetSharedLookupRepository();
+            var accountSubTypes = repository.GetAccountSubTypesAsync().Result;
+            Assert.NotEmpty(accountSubTypes);
+            // TODO: Assert all the things!
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
         public void GetAssetTypes_Ok()
         {
             var repository = GetSharedLookupRepository();

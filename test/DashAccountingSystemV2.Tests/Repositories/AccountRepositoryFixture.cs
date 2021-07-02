@@ -27,6 +27,9 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
                 var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
 
+                var accountSubTypes = await sharedLookupRepository.GetAccountSubTypesAsync();
+                var accountSubTypeBankAccount = accountSubTypes.Single(ast => ast.Name == "Bank Account");
+
                 var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
                 var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
 
@@ -37,6 +40,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     "Operating Cash Account",
                     "Primary business checking account.",
                     accountTypeAsset.Id,
+                    accountSubTypeBankAccount.Id,
                     assetTypeUSD.Id,
                     AmountType.Debit,
                     _userId);

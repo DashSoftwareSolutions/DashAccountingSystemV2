@@ -8,6 +8,8 @@ namespace DashAccountingSystemV2.Repositories
     {
         Task<IEnumerable<AccountType>> GetAccountTypesAsync();
 
+        Task<IEnumerable<AccountSubType>> GetAccountSubTypesAsync();
+
         Task<IEnumerable<AssetType>> GetAssetTypesAsync();
     }
 }

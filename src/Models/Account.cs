@@ -28,7 +28,8 @@ namespace DashAccountingSystemV2.Models
         public int AccountTypeId { get; private set; }
         public AccountType AccountType { get; private set; }
 
-        public int? AccountSubTypeId { get; set; }
+        [Required]
+        public int AccountSubTypeId { get; set; }
         public AccountSubType AccountSubType { get; set; }
 
         [Required]
@@ -58,6 +59,7 @@ namespace DashAccountingSystemV2.Models
             string name,
             string description,
             int accountTypeId,
+            int accountSubTypeId,
             int assetTypeId,
             AmountType normalBalanceType,
             Guid createdById)
@@ -67,6 +69,7 @@ namespace DashAccountingSystemV2.Models
             Name = name;
             Description = description;
             AccountTypeId = accountTypeId;
+            AccountSubTypeId = accountSubTypeId;
             AssetTypeId = assetTypeId;
             NormalBalanceType = normalBalanceType;
             CreatedById = createdById;
