@@ -80,7 +80,6 @@ namespace DashAccountingSystemV2.Repositories
                 .Include(je => je.CreatedBy)
                 .Include(je => je.UpdatedBy)
                 .Include(je => je.PostedBy)
-                .Include(je => je.CanceledBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
                 .Include(je => je.Accounts)
@@ -100,7 +99,6 @@ namespace DashAccountingSystemV2.Repositories
                 .Include(je => je.CreatedBy)
                 .Include(je => je.UpdatedBy)
                 .Include(je => je.PostedBy)
-                .Include(je => je.CanceledBy)
                 .Include(je => je.Accounts)
                     .ThenInclude(jeAcct => jeAcct.Account)
                 .Include(je => je.Accounts)
@@ -114,7 +112,6 @@ namespace DashAccountingSystemV2.Repositories
                 .JournalEntry
                 .Where(je =>
                     je.TenantId == tenantId &&
-                    je.Status != TransactionStatus.Canceled &&
                     (je.PostDate ?? je.EntryDate) >= dateRangeStart &&
                     (je.PostDate ?? je.EntryDate) <= dateRangeEnd
                 )
@@ -279,6 +276,20 @@ namespace DashAccountingSystemV2.Repositories
             await _db.SaveChangesAsync();
 
             return await GetDetailedByIdAsync(journalEntry.Id);
+        }
+
+        public async Task DeletePendingByTenantAndEntryIdAsync(Guid tenantId, uint entryId)
+        {
+            var entryToDelete = await GetByTenantAndEntryIdAsync(tenantId, entryId);
+
+            if (entryToDelete == null)
+                return;
+
+            if (entryToDelete.Status != TransactionStatus.Pending)
+                return;
+
+            _db.JournalEntry.Remove(entryToDelete);
+            await _db.SaveChangesAsync();
         }
     }
 }

@@ -40,9 +40,6 @@ namespace DashAccountingSystemV2.ViewModels
         [JsonConverter(typeof(JsonIsoDateTimeConverter))]
         public DateTime? Updated { get; set; }
 
-        [JsonConverter(typeof(JsonIsoDateTimeConverter))]
-        public DateTime? Canceled { get; set; }
-
         public AmountViewModel Amount { get; set; }
 
         public AmountViewModel UpdatedBalance { get; set; }
@@ -65,7 +62,6 @@ namespace DashAccountingSystemV2.ViewModels
                 CheckNumber = journalEntryAccount.JournalEntry.CheckNumber,
                 Created = journalEntryAccount.JournalEntry.Created.AsUtc(),
                 Updated = journalEntryAccount.JournalEntry.Updated.AsUtc(),
-                Canceled = journalEntryAccount.JournalEntry.CancelDate.AsUtc(),
                 Amount = new AmountViewModel(journalEntryAccount.Amount, journalEntryAccount.AssetType),
             };
         }

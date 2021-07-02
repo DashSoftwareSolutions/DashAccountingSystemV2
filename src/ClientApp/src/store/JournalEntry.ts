@@ -57,6 +57,7 @@ const DEFAULT_VALIDATION_STATE: JournalEntryValidationState = {
 export interface JournalEntryState {
     isLoading: boolean;
     isSaving: boolean;
+    isDeleting: boolean;
     existingEntry: JournalEntry | null;
     dirtyEntry: JournalEntry | null;
     totalCredits: number,
@@ -99,6 +100,14 @@ interface PostJournalEntryRequestAction {
 interface PostJournalEntryResponseAction {
     type: 'POST_JOURNAL_ENTRY_COMPLETED';
     savedEntry: JournalEntry;
+}
+
+interface DeleteJournalEntryRequestAction {
+    type: 'REQUEST_DELETE_JOURNAL_ENTRY';
+}
+
+interface DeleteJournalEntryResponseAction {
+    type: 'DELETE_JOURNAL_ENTRY_COMPLETED';
 }
 
 // TODO: Other CUD actions as needed, e.g. Delete, Cancel, etc.
@@ -174,6 +183,8 @@ type KnownAction = RequestJournalEntryAction |
     SaveUpdatedJournalEntryResponseAction |
     PostJournalEntryRequestAction |
     PostJournalEntryResponseAction |
+    DeleteJournalEntryRequestAction |
+    DeleteJournalEntryResponseAction |
     InitializeNewJournalEntryAction |
     EditJournalEntryAction |
     UpdateEntryDateAction |
@@ -387,6 +398,32 @@ export const actionCreators = {
         dispatch({ type: 'REQUEST_SAVE_UPDATED_JOURNAL_ENTRY' });
     },
 
+    deleteJournalEntry: (entryId: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const tenantId = appState.tenants?.selectedTenant?.id;
+        const accessToken = await authService.getAccessToken();
+
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch(`api/journal/${tenantId}/entry/${entryId}`, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response);
+                    return;
+                }
+
+                dispatch({ type: 'DELETE_JOURNAL_ENTRY_COMPLETED' });
+            });
+
+        dispatch({ type: 'REQUEST_DELETE_JOURNAL_ENTRY' });
+    },
+
     updateEntryDate: (entryDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: 'UPDATE_JOURNAL_ENTRY_ENTRY_DATE', entryDate });
     },
@@ -431,6 +468,7 @@ export const actionCreators = {
 const unloadedState: JournalEntryState = {
     isLoading: false,
     isSaving: false,
+    isDeleting: false,
     existingEntry: null,
     dirtyEntry: null,
     totalCredits: 0,
@@ -545,6 +583,15 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     isSaving: false,
                     existingEntry: action.savedEntry,
                 };
+
+            case 'REQUEST_DELETE_JOURNAL_ENTRY':
+                return {
+                    ...state,
+                    isDeleting: true,
+                };
+
+            case 'DELETE_JOURNAL_ENTRY_COMPLETED':
+                return unloadedState;
 
             case 'INITIALIZE_NEW_JOURNAL_ENTRY':
                 return {

@@ -38,11 +38,8 @@ namespace DashAccountingSystemV2.ViewModels
         [JsonConverter(typeof(JsonIsoDateTimeConverter))]
         public DateTime? Updated { get; set; }
 
-        [JsonConverter(typeof(JsonIsoDateTimeConverter))]
-        public DateTime? Canceled { get; set; }
-
         // TODO: Additional properties if needed
-        //       Audit User metadata (for CreatedBy / UpdatedBy / EnteredBy / PostedBy / CanceledBy )
+        //       Audit User metadata (for CreatedBy / UpdatedBy / EnteredBy / PostedBy )
 
         public IEnumerable<JournalEntryAccountResponseViewModel> Accounts { get; set; }
 
@@ -64,7 +61,6 @@ namespace DashAccountingSystemV2.ViewModels
                 CheckNumber = journalEntry.CheckNumber,
                 Created = journalEntry.Created.AsUtc(),
                 Updated = journalEntry.Updated.AsUtc(),
-                Canceled = journalEntry.CancelDate.AsUtc(),
                 Accounts = journalEntry.Accounts.Select(JournalEntryAccountResponseViewModel.FromModel),
             };
         }

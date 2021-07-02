@@ -107,5 +107,14 @@ namespace DashAccountingSystemV2.Controllers
 
             return this.Result(bizLogicResponse, JournalEntryResponseViewModel.FromModel);
         }
+
+        [HttpDelete("{tenantId:guid}/entry/{entryId:long:min(1):max(4294967295)}")]
+        public Task<IActionResult> DeletePendingJournalEntry(
+            [FromRoute] Guid tenantId,
+            [FromRoute] uint entryId)
+        {
+            var bizLogicResponse = _journalEntryBusinessLogic.DeletePendingJournalEntryByTenantAndEntryId(tenantId, entryId);
+            return this.Result(bizLogicResponse);
+        }
     }
 }

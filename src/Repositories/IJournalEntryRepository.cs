@@ -45,5 +45,7 @@ namespace DashAccountingSystemV2.Repositories
         Task<JournalEntry> UpdateJournalEntryNoteOnlyAsync(JournalEntry journalEntry, Guid contextUserId);
 
         Task<JournalEntry> UpdateJournalEntryTopLevelMetadataAsync(JournalEntry journalEntry, Guid contextUserId);
+
+        Task DeletePendingByTenantAndEntryIdAsync(Guid tenantId, uint entryId);
     }
 }

@@ -406,6 +406,73 @@ namespace DashAccountingSystemV2.Tests.Repositories
             });
         }
 
+        [Fact]
+        [Trait("Category", "Requires Database")]
+        public void DeletePendingByTenantAndEntryIdAsync_Ok()
+        {
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
+            {
+                // ARRANGE
+                var accountRepository = await GetAccountRepository();
+                var sharedLookupRepository = await GetSharedLookupRepository();
+
+                var accountTypes = await sharedLookupRepository.GetAccountTypesAsync();
+                var accountTypeAsset = accountTypes.Single(at => at.Name == "Asset");
+
+                var assetTypes = await sharedLookupRepository.GetAssetTypesAsync();
+                var assetTypeUSD = assetTypes.Single(at => at.Name == "USD");
+
+                var cashAccount = await MakeAccount(
+                    1010, "Operating Cash Account", accountTypeAsset, assetTypeUSD, AmountType.Debit);
+
+                var accountTypeRevenue = accountTypes.Single(at => at.Name == "Revenue");
+
+                var revenueAccount = await MakeAccount(
+                    4010, "Payments for Services Rendered", accountTypeRevenue, assetTypeUSD, AmountType.Credit);
+
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+
+                var journalEntry = new JournalEntry(
+                    _tenantId,
+                    entryDate,
+                    null,
+                    "Payment for Invoice #1001",
+                    null,
+                    _userId,
+                    null);
+
+                var transactionAmount = 10000.00m;
+
+                journalEntry.Accounts.Add(new JournalEntryAccount(
+                    cashAccount.Id, transactionAmount, assetTypeUSD.Id));
+                journalEntry.Accounts.Add(new JournalEntryAccount(
+                    revenueAccount.Id, -transactionAmount, assetTypeUSD.Id));
+
+                var journalEntryRepository = await GetJournalEntryRepository();
+                var savedJournalEntry = await journalEntryRepository.CreateJournalEntryAsync(journalEntry);
+                Assert.NotNull(savedJournalEntry);
+
+                // VERIFY WE CAN FETCH IT
+                var retreivedJournalEntry = await journalEntryRepository.GetByIdAsync(savedJournalEntry.Id);
+                Assert.NotNull(retreivedJournalEntry);
+
+                var savedJournalEntry_EntryId = savedJournalEntry.EntryId;
+
+                retreivedJournalEntry = await journalEntryRepository.GetByTenantAndEntryIdAsync(_tenantId, savedJournalEntry_EntryId);
+                Assert.NotNull(retreivedJournalEntry);
+
+                // ACT - Delete it
+                await journalEntryRepository.DeletePendingByTenantAndEntryIdAsync(_tenantId, savedJournalEntry_EntryId);
+
+                // ASSERT - Should not be able to fetch it now
+                retreivedJournalEntry = await journalEntryRepository.GetByIdAsync(savedJournalEntry.Id);
+                Assert.Null(retreivedJournalEntry);
+
+                retreivedJournalEntry = await journalEntryRepository.GetByTenantAndEntryIdAsync(_tenantId, savedJournalEntry_EntryId);
+                Assert.Null(retreivedJournalEntry);
+            });
+        }
+
         private async Task<IAccountRepository> GetAccountRepository()
         {
             var appDbContext = await TestUtilities.GetDatabaseContextAsync();

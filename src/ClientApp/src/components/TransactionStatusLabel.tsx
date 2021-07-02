@@ -16,9 +16,6 @@ const TransactionStatusLabel: React.FC<TransactionStatusLabelProps> = ({ status 
         case TransactionStatus.Posted:
             color = 'success';
             break;
-        case TransactionStatus.Canceled:
-            color = 'danger';
-            break;
     }
 
     return (

@@ -142,5 +142,20 @@ namespace DashAccountingSystemV2.BusinessLogic
                 return new BusinessLogicResponse<JournalEntry>(ErrorType.RuntimeException, "Runtime exception while updating Journal Entry");
             }
         }
+
+        public async Task<BusinessLogicResponse> DeletePendingJournalEntryByTenantAndEntryId(Guid tenantId, uint entryId)
+        {
+            var existingJournalEntry = await _journalEntryRepository.GetByTenantAndEntryIdAsync(tenantId, entryId);
+
+            if (existingJournalEntry == null)
+                return new BusinessLogicResponse(ErrorType.RequestedEntityNotFound);
+
+            if (existingJournalEntry.Status != TransactionStatus.Pending)
+                return new BusinessLogicResponse(ErrorType.RequestNotValid, "Only Pending Journal Entries can be deleted");
+
+            await _journalEntryRepository.DeletePendingByTenantAndEntryIdAsync(tenantId, entryId);
+
+            return new BusinessLogicResponse();
+        }
     }
 }

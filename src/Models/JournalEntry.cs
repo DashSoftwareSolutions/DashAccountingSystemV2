@@ -25,8 +25,6 @@ namespace DashAccountingSystemV2.Models
 
         public DateTime? PostDate { get; set; }
 
-        public DateTime? CancelDate { get; set; }
-
         [Required]
         public TransactionStatus Status { get; set; }
 
@@ -67,9 +65,6 @@ namespace DashAccountingSystemV2.Models
 
         public Guid? PostedById { get; set; }
         public ApplicationUser PostedBy { get; private set; }
-
-        public Guid? CanceledById { get; set; }
-        public ApplicationUser CanceledBy { get; private set; }
 
         /// <summary>
         /// Construct a Journal Entry, explicitly specifying Entry ID

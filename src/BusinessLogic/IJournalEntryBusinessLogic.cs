@@ -18,5 +18,7 @@ namespace DashAccountingSystemV2.BusinessLogic
             string note = null);
 
         Task<BusinessLogicResponse<JournalEntry>> UpdateJournalEntry(JournalEntry journalEntry, Guid contextUserId);
+
+        Task<BusinessLogicResponse> DeletePendingJournalEntryByTenantAndEntryId(Guid tenantId, uint entryId);
     }
 }

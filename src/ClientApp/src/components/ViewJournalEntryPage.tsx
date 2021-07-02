@@ -6,6 +6,10 @@ import {
     Row,
     ListGroup,
     ListGroupItem,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
 } from 'reactstrap';
 import {
     filter,
@@ -38,6 +42,7 @@ import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
+        isDeleting: state.journalEntry?.isDeleting ?? false,
         isFetching: state.journalEntry?.isLoading ?? false,
         isSaving: state.journalEntry?.isSaving ?? false,
         journalEntry: state.journalEntry?.existingEntry ?? null,
@@ -47,6 +52,7 @@ const mapStateToProps = (state: ApplicationState) => {
 
 const mapDispatchToProps = {
     editJournalEntry: JournalEntryStore.actionCreators.editJournalEntry,
+    deleteJournalEntry: JournalEntryStore.actionCreators.deleteJournalEntry,
     requestJournalEntry: JournalEntryStore.actionCreators.requestJournalEntry,
     resetDirtyEditorState: JournalEntryStore.actionCreators.resetDirtyEditorState,
     resetLedgerReportData: LedgerStore.actionCreators.reset,
@@ -61,6 +67,7 @@ type ViewJournalEntryPageProps = ViewJournalEntryPageReduxProps
     & RouteComponentProps<{ entryId: string }>;
 
 interface ViewJournalEntryPageState {
+    isDeleteEntryModalOpen: boolean;
     isPostModalOpen: boolean;
 }
 
@@ -73,12 +80,18 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
 
         this.logger = new Logger('View Journal Entry Page');
 
-        this.state = { isPostModalOpen: false };
+        this.state = {
+            isDeleteEntryModalOpen: false,
+            isPostModalOpen: false,
+        };
 
         this.onClickBack = this.onClickBack.bind(this);
         this.onClickEditJournalEntry = this.onClickEditJournalEntry.bind(this);
+        this.onClickDeleteJournalEntry = this.onClickDeleteJournalEntry.bind(this);
         this.onClickPostJournalEntry = this.onClickPostJournalEntry.bind(this);
         this.onClosePostEntryDialog = this.onClosePostEntryDialog.bind(this);
+        this.onDeleteJournalEntryConfirmed = this.onDeleteJournalEntryConfirmed.bind(this);
+        this.onDeleteJournalEntryDeclined = this.onDeleteJournalEntryDeclined.bind(this);
     }
 
     public componentDidMount() {
@@ -86,11 +99,19 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
     }
 
     public componentDidUpdate(prevProps: ViewJournalEntryPageProps) {
-        const { isSaving: wasSaving } = prevProps;
+        const {
+            isDeleting: wasDeleting,
+            isSaving: wasSaving,
+        } = prevProps;
 
         const {
+            history,
+            isDeleting,
             isSaving,
             journalEntry,
+            match: {
+                params: { entryId },
+            },
             showAlert,
             resetDirtyEditorState,
             resetLedgerReportData,
@@ -104,17 +125,30 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
             resetDirtyEditorState();
             resetLedgerReportData();
             this.setState({ isPostModalOpen: false });
+            return;
+        }
+
+        if (wasDeleting && !isDeleting) {
+            this.setState({ isDeleteEntryModalOpen: false });
+            this.logger.debug('Just finished deleting the journal entry.');
+            showAlert('success', `Successfully deleted Journal Entry ID ${entryId}`, true);
+            resetLedgerReportData();
+            history.push('/ledger');
         }
     }
 
     public render() {
         const {
             history,
+            isDeleting,
             journalEntry,
             selectedTenant,
         } = this.props;
 
-        const { isPostModalOpen } = this.state;
+        const {
+            isDeleteEntryModalOpen,
+            isPostModalOpen,
+        } = this.state;
 
         return (
             <TenantBasePage
@@ -124,35 +158,47 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <Row>
-                        <Col md={6}>
+                        <Col md={5}>
                             <h1>Journal Entry Details</h1>
                             <p className="lead">{selectedTenant?.name}</p>
                         </Col>
-                        <Col md={6} style={{ textAlign: 'right' }}>
+                        <Col className="text-right" md={7}>
                             <Button
                                 color="secondary"
                                 id={`${this.bemBlockName}--back_button`}
                                 onClick={this.onClickBack}
-                                style={{ marginRight: 22, width: 110 }}
+                                style={{ marginRight: 22, width: 120 }}
                             >
                                 Back
                             </Button>
 
-                            <Button
-                                color="success"
-                                disabled={journalEntry?.status !== TransactionStatus.Pending}
-                                id={`${this.bemBlockName}--post_entry_button`}
-                                onClick={this.onClickPostJournalEntry}
-                                style={{ marginRight: 22, width: 110 }}
-                            >
-                                Post Entry
-                            </Button>
+                            {journalEntry?.status === TransactionStatus.Pending ? (
+                                <React.Fragment>
+                                    <Button
+                                        color="danger"
+                                        id={`${this.bemBlockName}--delete_entry_button`}
+                                        onClick={this.onClickDeleteJournalEntry}
+                                        style={{ marginRight: 22, width: 120 }}
+                                    >
+                                        Delete Entry
+                                    </Button>
+
+                                    <Button
+                                        color="success"
+                                        id={`${this.bemBlockName}--post_entry_button`}
+                                        onClick={this.onClickPostJournalEntry}
+                                        style={{ marginRight: 22, width: 120 }}
+                                    >
+                                        Post Entry
+                                    </Button>
+                                </React.Fragment>
+                             ) : null}
 
                             <Button
                                 color="primary"
                                 id={`${this.bemBlockName}--edit_entry_button`}
                                 onClick={this.onClickEditJournalEntry}
-                                style={{ width: 110 }}
+                                style={{ width: 120 }}
                             >
                                 Edit Entry
                             </Button>
@@ -166,6 +212,34 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                         isOpen={isPostModalOpen}
                         onClose={this.onClosePostEntryDialog}
                     />
+
+                    <Modal
+                        id={`${this.bemBlockName}--delete_confirm_modal`}
+                        isOpen={isDeleteEntryModalOpen}
+                        toggle={this.onDeleteJournalEntryDeclined}
+                    >
+                        <ModalHeader toggle={this.onDeleteJournalEntryDeclined}>Delete Journal Entry</ModalHeader>
+                        <ModalBody>
+                            This action cannot be undone.  Are you sure?
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button
+                                color="danger"
+                                disabled={isDeleting}
+                                onClick={this.onDeleteJournalEntryConfirmed}
+                            >
+                                {isDeleting ? 'Deleting...' : 'Yes, Delete It'}
+                            </Button>
+                            {' '}
+                            <Button
+                                color="secondary"
+                                disabled={isDeleting}
+                                onClick={this.onDeleteJournalEntryDeclined}
+                            >
+                                No, Cancel
+                            </Button>
+                        </ModalFooter>
+                    </Modal>
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -188,6 +262,10 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
         history.goBack();
     }
 
+    private onClickDeleteJournalEntry() {
+        this.setState({ isDeleteEntryModalOpen: true });
+    }
+
     private onClickEditJournalEntry() {
         const {
             editJournalEntry,
@@ -208,6 +286,25 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
 
     private onClosePostEntryDialog(event: React.MouseEvent<any> | React.KeyboardEvent<any>) {
         this.setState({ isPostModalOpen: false });
+    }
+
+    private onDeleteJournalEntryConfirmed() {
+        const {
+            deleteJournalEntry,
+            journalEntry,
+        } = this.props;
+
+        const entryId = journalEntry?.entryId;
+
+        if (!isNil(entryId)) {
+            deleteJournalEntry(entryId);
+        } else {
+            this.setState({ isDeleteEntryModalOpen: false });
+        }
+    }
+
+    private onDeleteJournalEntryDeclined() {
+        this.setState({ isDeleteEntryModalOpen: false });
     }
 
     private renderJournalEntryData(): JSX.Element {
