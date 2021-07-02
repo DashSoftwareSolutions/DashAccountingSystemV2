@@ -28,6 +28,9 @@ namespace DashAccountingSystemV2.Models
         public int AccountTypeId { get; private set; }
         public AccountType AccountType { get; private set; }
 
+        public int? AccountSubTypeId { get; set; }
+        public AccountSubType AccountSubType { get; set; }
+
         [Required]
         public int AssetTypeId { get; private set; }
         public AssetType AssetType { get; private set; }

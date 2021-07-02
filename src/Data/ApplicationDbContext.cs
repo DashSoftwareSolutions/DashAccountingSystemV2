@@ -30,6 +30,11 @@ namespace DashAccountingSystemV2.Data
         public DbSet<AccountType> AccountType { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="DbSet{AccountSubType}"/>.
+        /// </summary>
+        public DbSet<AccountSubType> AccountSubType { get; set; }
+
+        /// <summary>
         /// Gets or sets the <see cref="DbSet{AssetType}"/>.
         /// </summary>
         public DbSet<AssetType> AssetType { get; set; }
@@ -84,6 +89,10 @@ namespace DashAccountingSystemV2.Data
             // Main Application Schema (Indexes and Such)
             builder.Entity<AccountType>()
                 .HasIndex(at => at.Name)
+                .IsUnique();
+
+            builder.Entity<AccountSubType>()
+                .HasIndex(ast => ast.Name)
                 .IsUnique();
 
             builder.Entity<AssetType>()
