@@ -8,7 +8,7 @@
     "connected-react-router": "^6.6.1",
     "jquery": "^3.4.1",
     "lodash": "^4.17.21",
-    "merge": "^1.2.1",
+    "merge": "^2.1.1",
     "moment-timezone": "^0.5.33",
     "oidc-client": "^1.9.1",
     "react": "^16.12.0",
