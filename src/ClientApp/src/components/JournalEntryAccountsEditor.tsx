@@ -340,7 +340,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                 <strong>TOTALS</strong>
                             </td>
                             <td className="col-md-2" />
-                            <td className="col-md-2 font-wight-bold text-right">
+                            <td className="col-md-2 font-weight-bold text-right">
                                 <AmountDisplay
                                     amount={totalDebitsAmount}
                                     showCurrency
