@@ -38,7 +38,10 @@ namespace DashAccountingSystemV2.Repositories
                 .SumAsync(jeAcct => jeAcct.Amount);
         }
 
-        public async Task<Dictionary<Guid, decimal>> GetAccountBalancesAsync(Guid tenantId, DateTime date)
+        public async Task<Dictionary<Guid, decimal>> GetAccountBalancesAsync(
+            Guid tenantId,
+            DateTime date,
+            KnownAccountType[] accountTypes = null)
         {
             using (var connection = new NpgsqlConnection(_db.Database.GetConnectionString()))
             {
@@ -48,8 +51,11 @@ WITH transactions AS (
             ,je_acct.""Amount""
         FROM ""JournalEntryAccount"" je_acct
              INNER JOIN ""JournalEntry"" je
-                   ON je_acct.""JournalEntryId"" = je.""Id""
+                     ON je_acct.""JournalEntryId"" = je.""Id""
+             INNER JOIN ""Account"" a
+                     ON je_acct.""AccountId"" = a.""Id""
        WHERE je.""TenantId"" = @tenantId
+         AND ( @accountTypes::INTEGER[] IS NULL OR a.""AccountTypeId"" = ANY ( @accountTypes ) )
          AND je.""Status"" = {(int)TransactionStatus.Posted}
          AND je.""PostDate"" <= @date
 )
@@ -59,10 +65,16 @@ WITH transactions AS (
          LEFT JOIN transactions tx
                 ON acct.""Id"" = tx.""AccountId""
    WHERE acct.""TenantId"" = @tenantId
+     AND ( @accountTypes::INTEGER[] IS NULL OR acct.""AccountTypeId"" = ANY ( @accountTypes ) )
 GROUP BY acct.""Id""
 ORDER BY acct.""AccountNumber"";
 ",
-                        new { tenantId, date }
+                        new
+                        {
+                            tenantId,
+                            date,
+                            accountTypes,
+                        }
                     );
 
                 return results.ToDictionary(x => x.AccountId, x => x.Balance);
@@ -75,6 +87,7 @@ ORDER BY acct.""AccountNumber"";
             return _db
                 .Account
                 .Include(a => a.AccountType)
+                .Include(a => a.AccountSubType)
                 .Include(a => a.AssetType)
                 .Include(a => a.Tenant)
                 .Include(a => a.CreatedBy)
@@ -88,6 +101,7 @@ ORDER BY acct.""AccountNumber"";
                 .Account
                 .Where(a => a.TenantId == tenantId)
                 .Include(a => a.AccountType)
+                .Include(a => a.AccountSubType)
                 .Include(a => a.AssetType)
                 .Include(a => a.Tenant)
                 .OrderBy(a => a.AccountTypeId)
