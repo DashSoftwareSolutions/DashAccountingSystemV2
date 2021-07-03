@@ -149,8 +149,8 @@ namespace DashAccountingSystemV2.BusinessLogic
                 NetIncome = netIncome,
                 TotalAssets = totalAssets,
                 TotalLiabilities = totalLiabilities,
-                TotalEquity = totalEquity + adjustedDiscrepency,
-                TotalLiabilitiesAndEquity = totalLiabilities + totalEquity + adjustedDiscrepency + netIncome,
+                TotalEquity = totalEquity + netIncome + adjustedDiscrepency,
+                TotalLiabilitiesAndEquity = totalLiabilities + totalEquity + netIncome + adjustedDiscrepency,
             };
 
             return new BusinessLogicResponse<BalanceSheetReportDto>(result);
