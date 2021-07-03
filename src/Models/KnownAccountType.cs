@@ -3,7 +3,7 @@ using DashAccountingSystemV2.Extensions;
 
 namespace DashAccountingSystemV2.Models
 {
-    public enum AccountSubCategory
+    public enum KnownAccountType
     {
         [Display(Name = "Assets")]
         Assets = 1,
@@ -21,11 +21,11 @@ namespace DashAccountingSystemV2.Models
         Expenses = 5
     }
 
-    public static class AccountSubCategoryExtensions
+    public static class KnownAccountTypeExtensions
     {
-        public static string GetDisplayName(this AccountSubCategory acctSubCategory)
+        public static string GetDisplayName(this KnownAccountType accountType)
         {
-            return EnumerationExtensions.GetDisplayName(acctSubCategory);
+            return EnumerationExtensions.GetDisplayName(accountType);
         }
     }
 }
