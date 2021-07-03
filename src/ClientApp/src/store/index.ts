@@ -1,4 +1,5 @@
 ﻿import * as Accounts from './Accounts';
+import * as BalanceSheet from './BalanceSheet';
 import * as JournalEntry from './JournalEntry';
 import * as Ledger from './Ledger';
 import * as LookupValues from './LookupValues';
@@ -9,6 +10,7 @@ import * as WeatherForecasts from './WeatherForecasts';  // from scaffolded exam
 // The top-level state object
 export interface ApplicationState {
     accounts: Accounts.AccountsState | undefined;
+    balanceSheet: BalanceSheet.BalanceSheetState | undefined,
     journalEntry: JournalEntry.JournalEntryState | undefined;
     ledger: Ledger.LedgerState | undefined;
     lookups: LookupValues.LookupValuesState | undefined;
@@ -22,6 +24,7 @@ export interface ApplicationState {
 // acts on the corresponding ApplicationState property type.
 export const reducers = {
     accounts: Accounts.reducer,
+    balanceSheet: BalanceSheet.reducer,
     journalEntry: JournalEntry.reducer,
     ledger: Ledger.reducer,
     lookups: LookupValues.reducer,

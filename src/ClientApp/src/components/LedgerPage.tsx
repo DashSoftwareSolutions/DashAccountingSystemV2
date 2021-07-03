@@ -14,12 +14,12 @@ import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
 import Amount from '../models/Amount';
+import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
 import LedgerAccount from '../models/LedgerAccount';
 import TenantBasePage from './TenantBasePage';
 import TransactionStatus from '../models/TransactionStatus';
 import * as LedgerStore from '../store/Ledger';
-import AmountType from '../models/AmountType';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
@@ -88,6 +88,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
+                    {/* TODO: Make the Date Range Selection Form a sharable component */}
                     <Form style={{ marginBottom: 22 }}>
                         <Row form>
                             {/* TODO: Add preset ranges select */}
@@ -169,114 +170,112 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
 
     private renderLedgerReportTable(accounts: LedgerAccount[]): JSX.Element {
         return (
-            <div className="table">
-                <table className="table table-hover table-sm" style={{ fontSize: '0.9em', width: '100%' }}>
-                    <thead>
-                        <tr>
-                            <th className="col-md-1 bg-white sticky-top sticky-border">Date</th>
-                            <th className="col-md-1 bg-white sticky-top sticky-border">Num</th>
-                            <th className="col-md-6 bg-white sticky-top sticky-border">Description</th>
-                            <th className="col-md-2 bg-white sticky-top sticky-border text-right">Amount</th>
-                            <th className="col-md-2 bg-white sticky-top sticky-border text-right">Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {map(accounts, (account) => {
-                            const total = reduce(
-                                map(account.transactions, (tx) => tx.amount.amount ?? 0),
-                                (sum, next) => sum + next,
-                                0,
-                            );
+            <table className="table table-hover table-sm" style={{ fontSize: '0.9em', width: '100%' }}>
+                <thead>
+                    <tr>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">Date</th>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">Num</th>
+                        <th className="col-md-6 bg-white sticky-top sticky-border">Description</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Amount</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {map(accounts, (account) => {
+                        const total = reduce(
+                            map(account.transactions, (tx) => tx.amount.amount ?? 0),
+                            (sum, next) => sum + next,
+                            0,
+                        );
 
-                            const totalAmountType = total === 0 ?
-                                account.normalBalanceType :
-                                (total < 0 ? AmountType.Credit : AmountType.Debit);
+                        const totalAmountType = total === 0 ?
+                            account.normalBalanceType :
+                            (total < 0 ? AmountType.Credit : AmountType.Debit);
 
-                            const totalAmount: Amount = {
-                                amount: total,
-                                amountType: totalAmountType,
-                                assetType: account.assetType,
-                            };
+                        const totalAmount: Amount = {
+                            amount: total,
+                            amountType: totalAmountType,
+                            assetType: account.assetType,
+                        };
 
-                            return (
-                                <React.Fragment key={`acct-${account.accountNumber}`}>
-                                    <tr>
-                                        <td className="col-md-12" colSpan={5}>
-                                            <strong>{`${account.accountNumber} - ${account.name}`}</strong>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="col-md-2" colSpan={2}>Beginning Balance</td>
-                                        <td className="col-md-10 text-right" colSpan={3}>
-                                            <AmountDisplay
-                                                amount={account.startingBalance}
-                                                normalBalanceType={account.normalBalanceType}
-                                            />
-                                        </td>
-                                    </tr>
-                                    {map(account.transactions, (transaction) => {
-                                        const journalEntryViewRoute = `/journal-entry/view/${transaction.entryId}`;
-                                        return (
-                                            <tr key={`acct-${account.accountNumber}-entry-${transaction.entryId}`}>
-                                                <td className="col-md-1">
-                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
-                                                        {moment(transaction.postDate ?? transaction.entryDate).format('L')}
-                                                    </Link>
-                                                </td>
-                                                <td className="col-md-1">
-                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
-                                                        {transaction.entryId}
-                                                    </Link>
-                                                </td>
-                                                <td className="col-md-6" style={{ wordWrap: 'break-word' }}>
-                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
-                                                        {transaction.description}
-                                                    </Link>
-                                                    {transaction.status === TransactionStatus.Pending ? (
-                                                        <React.Fragment>
-                                                            {'\u00a0\u00a0\u00a0'}
-                                                            <span className="badge pending-badge">Pending</span>
-                                                        </React.Fragment>
-                                                    ): null}
-                                                </td>
-                                                <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
-                                                        <AmountDisplay
-                                                            amount={transaction.amount}
-                                                            normalBalanceType={account.normalBalanceType}
-                                                        />
-                                                    </Link>
-                                                </td>
-                                                <td className="col-md-2" style={{ textAlign: 'right' }}>
-                                                    <Link className="hoverable-link" to={journalEntryViewRoute}>
-                                                        <AmountDisplay
-                                                            amount={transaction.updatedBalance}
-                                                            normalBalanceType={account.normalBalanceType}
-                                                        />
-                                                    </Link>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                    <tr>
-                                        <td className="col-md-8 font-weight-bold" colSpan={3}>
-                                            {`Total for ${account.accountNumber} - ${account.name}`}
-                                        </td>
-                                        <td className="col-md-2 font-weight-bold text-right">
-                                            <AmountDisplay
-                                                amount={totalAmount}
-                                                normalBalanceType={account.normalBalanceType}
-                                                showCurrency
-                                            />
-                                        </td>
-                                        <td className="col-md-2" />
-                                    </tr>
-                                </React.Fragment>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
+                        return (
+                            <React.Fragment key={`acct-${account.accountNumber}`}>
+                                <tr>
+                                    <td className="col-md-12" colSpan={5}>
+                                        <strong>{`${account.accountNumber} - ${account.name}`}</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="col-md-2" colSpan={2}>Beginning Balance</td>
+                                    <td className="col-md-10 text-right" colSpan={3}>
+                                        <AmountDisplay
+                                            amount={account.startingBalance}
+                                            normalBalanceType={account.normalBalanceType}
+                                        />
+                                    </td>
+                                </tr>
+                                {map(account.transactions, (transaction) => {
+                                    const journalEntryViewRoute = `/journal-entry/view/${transaction.entryId}`;
+                                    return (
+                                        <tr key={`acct-${account.accountNumber}-entry-${transaction.entryId}`}>
+                                            <td className="col-md-1">
+                                                <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                    {moment(transaction.postDate ?? transaction.entryDate).format('L')}
+                                                </Link>
+                                            </td>
+                                            <td className="col-md-1">
+                                                <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                    {transaction.entryId}
+                                                </Link>
+                                            </td>
+                                            <td className="col-md-6" style={{ wordWrap: 'break-word' }}>
+                                                <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                    {transaction.description}
+                                                </Link>
+                                                {transaction.status === TransactionStatus.Pending ? (
+                                                    <React.Fragment>
+                                                        {'\u00a0\u00a0\u00a0'}
+                                                        <span className="badge pending-badge">Pending</span>
+                                                    </React.Fragment>
+                                                ): null}
+                                            </td>
+                                            <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                                <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                    <AmountDisplay
+                                                        amount={transaction.amount}
+                                                        normalBalanceType={account.normalBalanceType}
+                                                    />
+                                                </Link>
+                                            </td>
+                                            <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                                <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                    <AmountDisplay
+                                                        amount={transaction.updatedBalance}
+                                                        normalBalanceType={account.normalBalanceType}
+                                                    />
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                <tr>
+                                    <td className="col-md-8 font-weight-bold" colSpan={3}>
+                                        {`Total for ${account.accountNumber} - ${account.name}`}
+                                    </td>
+                                    <td className="col-md-2 font-weight-bold text-right">
+                                        <AmountDisplay
+                                            amount={totalAmount}
+                                            normalBalanceType={account.normalBalanceType}
+                                            showCurrency
+                                        />
+                                    </td>
+                                    <td className="col-md-2" />
+                                </tr>
+                            </React.Fragment>
+                        );
+                    })}
+                </tbody>
+            </table>
         );
     }
 }

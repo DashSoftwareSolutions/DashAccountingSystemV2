@@ -7,7 +7,7 @@ import { NavigationSection } from './TenantSubNavigation';
 import Tenant from '../models/Tenant';
 import TenantBasePage from './TenantBasePage';
 
-interface ReportsPageReduxProps {
+interface ProfitAndLossPageReduxProps {
     selectedTenant: Tenant | null;
 };
 
@@ -15,11 +15,11 @@ const mapStateToProps = (state: ApplicationState) => {
     return { selectedTenant: state.tenants?.selectedTenant };
 }
 
-type ReportsPageProps = ReportsPageReduxProps
+type ProfitAndLossPageProps = ProfitAndLossPageReduxProps
     & RouteComponentProps;
 
-class ReportsPage extends React.PureComponent<ReportsPageProps> {
-    private bemBlockName: string = 'reports_page';
+class ProfitAndLossPage extends React.PureComponent<ProfitAndLossPageProps> {
+    private bemBlockName: string = 'profit_and_loss_page';
 
     public render() {
         const {
@@ -30,13 +30,13 @@ class ReportsPage extends React.PureComponent<ReportsPageProps> {
         return (
             <TenantBasePage
                 history={history}
-                section={NavigationSection.Reports}
+                section={NavigationSection.ProfitAndLoss}
                 selectedTenant={selectedTenant}
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <Row>
                         <Col>
-                            <h1>Reports</h1>
+                            <h1>Profit &amp; Loss</h1>
                             <p className="lead">{selectedTenant?.name}</p>
                         </Col>
                     </Row>
@@ -52,5 +52,5 @@ class ReportsPage extends React.PureComponent<ReportsPageProps> {
 export default withRouter(
     connect(
         mapStateToProps,
-    )(ReportsPage as any),
+    )(ProfitAndLossPage as any),
 );
