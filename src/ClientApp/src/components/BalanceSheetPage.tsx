@@ -7,7 +7,10 @@ import {
     Row,
 } from 'reactstrap';
 import { ConnectedProps, connect } from 'react-redux';
-import { isNil } from 'lodash';
+import {
+    isNil,
+    map,
+} from 'lodash';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
@@ -173,42 +176,111 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Total Assets</td>
-                        <td className="text-right">
+                        <td className="font-weight-bold" colSpan={2}>ASSETS</td>
+                    </tr>
+                    {map(balanceSheet.assets, (assetAccount) => ((
+                        <tr key={assetAccount.id}>
+                            <td style={{ paddingLeft: 22 }}>
+                                {`${assetAccount.accountNumber} - ${assetAccount.name}`}
+                            </td>
+                            <td className="text-right">
+                                <AmountDisplay
+                                    amount={assetAccount.balance}
+                                    normalBalanceType={AmountType.Debit}
+                                />
+                            </td>
+                        </tr>
+                    )))}
+                    <tr>
+                        <td className="font-weight-bold" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
+                            TOTAL ASSETS
+                        </td>
+                        <td className="font-weight-bold text-right" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
                             <AmountDisplay
                                 amount={balanceSheet.totalAssets}
                                 normalBalanceType={AmountType.Debit}
+                                showCurrency
                             />
                         </td>
                     </tr>
                     <tr>
-                        <td>Total Liabilities</td>
-                        <td className="text-right">
+                        <td className="font-weight-bold" colSpan={2} style={{ borderTop: 'none', paddingTop: 11 }}>LIABILITIES</td>
+                    </tr>
+                    {map(balanceSheet.liabilities, (liabilityAccount) => ((
+                        <tr key={liabilityAccount.id}>
+                            <td style={{ paddingLeft: 22 }}>
+                                {`${liabilityAccount.accountNumber} - ${liabilityAccount.name}`}
+                            </td>
+                            <td className="text-right">
+                                <AmountDisplay
+                                    amount={liabilityAccount.balance}
+                                    normalBalanceType={AmountType.Credit}
+                                />
+                            </td>
+                        </tr>
+                    )))}
+                    <tr>
+                        <td className="font-weight-bold" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
+                            TOTAL LIABILITIES
+                        </td>
+                        <td className="font-weight-bold text-right" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
                             <AmountDisplay
                                 amount={balanceSheet.totalLiabilities}
                                 normalBalanceType={AmountType.Credit}
+                                showCurrency
                             />
                         </td>
                     </tr>
                     <tr>
-                        <td>Total Equity</td>
+                        <td className="font-weight-bold" colSpan={2} style={{ borderTop: 'none', paddingTop: 11 }}>EQUITY</td>
+                    </tr>
+                    {map(balanceSheet.equity, (equityAccount) => ((
+                        <tr key={equityAccount.id}>
+                            <td style={{ paddingLeft: 22 }}>
+                                {`${equityAccount.accountNumber} - ${equityAccount.name}`}
+                            </td>
+                            <td className="text-right">
+                                <AmountDisplay
+                                    amount={equityAccount.balance}
+                                    normalBalanceType={AmountType.Credit}
+                                />
+                            </td>
+                        </tr>
+                    )))}
+                    <tr>
+                        <td style={{ paddingLeft: 22 }}>Net Income</td>
                         <td className="text-right">
+                            <AmountDisplay
+                                amount={balanceSheet.netIncome}
+                                normalBalanceType={AmountType.Credit}
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className="font-weight-bold" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
+                            TOTAL EQUITY
+                        </td>
+                        <td className="font-weight-bold text-right" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
                             <AmountDisplay
                                 amount={balanceSheet.totalEquity}
                                 normalBalanceType={AmountType.Credit}
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Total Liabilities &amp; Equity</td>
-                        <td className="text-right">
-                            <AmountDisplay
-                                amount={balanceSheet.totalLiabilitiesAndEquity}
-                                normalBalanceType={AmountType.Credit}
+                                showCurrency
                             />
                         </td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td className="font-weight-bold" style={{ borderBottom: '3px double #212529', paddingTop: 22 }}>TOTAL LIABILITIES &amp; EQUITY</td>
+                        <td className="font-weight-bold text-right" style={{ borderBottom: '3px double #212529', paddingTop: 22 }}>
+                            <AmountDisplay
+                                amount={balanceSheet.totalLiabilitiesAndEquity}
+                                normalBalanceType={AmountType.Credit}
+                                showCurrency
+                            />
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         );
     }
