@@ -5,6 +5,9 @@ namespace DashAccountingSystemV2.Models
 {
     public enum KnownAccountType
     {
+        [Display(Name = "Unknown")]
+        Unknown = 0,
+
         [Display(Name = "Assets")]
         Assets = 1,
 

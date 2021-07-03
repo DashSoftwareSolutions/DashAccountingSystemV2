@@ -23,11 +23,13 @@ namespace DashAccountingSystemV2.Controllers
         public async Task<IActionResult> GetLookups()
         {
             var accountTypes = await _sharedLookupRepository.GetAccountTypesAsync();
+            var accountSubTypes = await _sharedLookupRepository.GetAccountSubTypesAsync();
             var assetTypes = await _sharedLookupRepository.GetAssetTypesAsync();
 
             var result = new LookupsViewModel()
             {
                 AccountTypes = accountTypes.Select(at => new LookupValueViewModel(at.Id, at.Name)),
+                AccountSubTypes = accountSubTypes.Select(AccountSubTypeViewModel.FromModel),
                 AssetTypes = assetTypes.Select(AssetTypeViewModel.FromModel),
             };
 

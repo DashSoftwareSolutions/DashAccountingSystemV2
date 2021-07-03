@@ -1,4 +1,5 @@
-﻿import AccountType from './AccountType';
+﻿import AccountSubType from './AccountSubType';
+import AccountType from './AccountType';
 import Amount from './Amount';
 import AmountType from './AmountType';
 import AssetType from './AssetType';
@@ -10,6 +11,7 @@ export default interface Account {
     name: string;
     description: string;
     accountType: AccountType;
+    accountSubType: AccountSubType;
     assetType: AssetType;
     normalBalanceType: AmountType; // "Debit" or "Credit"
     created: string; // UTC Date/Time

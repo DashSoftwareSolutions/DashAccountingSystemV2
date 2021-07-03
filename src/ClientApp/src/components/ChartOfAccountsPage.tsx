@@ -95,6 +95,7 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
                         <th className="bg-white sticky-top sticky-border">#</th>
                         <th className="bg-white sticky-top sticky-border">Name</th>
                         <th className="bg-white sticky-top sticky-border">Type</th>
+                        <th className="bg-white sticky-top sticky-border">Detailed Type</th>
                         <th className="bg-white sticky-top sticky-border text-right">Balance</th>
                     </tr>
                 </thead>
@@ -104,6 +105,7 @@ class ChartOfAccountsPage extends React.PureComponent<ChartOfAccountsPageProps> 
                             <td>{account.accountNumber}</td>
                             <td>{account.name}</td>
                             <td>{account.accountType.name}</td>
+                            <td>{account.accountSubType.name}</td>
                             <td style={{ textAlign: 'right' }}>
                                 <AmountDisplay
                                     amount={account.balance}
