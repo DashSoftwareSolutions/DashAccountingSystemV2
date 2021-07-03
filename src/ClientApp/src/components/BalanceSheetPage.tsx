@@ -167,7 +167,7 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
         }
 
         return (
-            <table className="table table-hover table-sm" style={{ fontSize: '0.9em', width: '100%' }}>
+            <table className="table table-hover table-sm report-table">
                 <thead>
                     <tr>
                         <th className="col-md-10 bg-white sticky-top sticky-border" />
@@ -180,7 +180,7 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                     </tr>
                     {map(balanceSheet.assets, (assetAccount) => ((
                         <tr key={assetAccount.id}>
-                            <td style={{ paddingLeft: 22 }}>
+                            <td className="account-name">
                                 {`${assetAccount.accountNumber} - ${assetAccount.name}`}
                             </td>
                             <td className="text-right">
@@ -191,11 +191,9 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                             </td>
                         </tr>
                     )))}
-                    <tr>
-                        <td className="font-weight-bold" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
-                            TOTAL ASSETS
-                        </td>
-                        <td className="font-weight-bold text-right" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
+                    <tr className="report-total-row">
+                        <td>TOTAL ASSETS</td>
+                        <td className="text-right">
                             <AmountDisplay
                                 amount={balanceSheet.totalAssets}
                                 normalBalanceType={AmountType.Debit}
@@ -203,12 +201,12 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                             />
                         </td>
                     </tr>
-                    <tr>
-                        <td className="font-weight-bold" colSpan={2} style={{ borderTop: 'none', paddingTop: 11 }}>LIABILITIES</td>
+                    <tr className="report-section-header">
+                        <td>LIABILITIES</td>
                     </tr>
                     {map(balanceSheet.liabilities, (liabilityAccount) => ((
                         <tr key={liabilityAccount.id}>
-                            <td style={{ paddingLeft: 22 }}>
+                            <td className="account-name">
                                 {`${liabilityAccount.accountNumber} - ${liabilityAccount.name}`}
                             </td>
                             <td className="text-right">
@@ -219,11 +217,9 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                             </td>
                         </tr>
                     )))}
-                    <tr>
-                        <td className="font-weight-bold" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
-                            TOTAL LIABILITIES
-                        </td>
-                        <td className="font-weight-bold text-right" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
+                    <tr className="report-total-row">
+                        <td>TOTAL LIABILITIES</td>
+                        <td className="text-right">
                             <AmountDisplay
                                 amount={balanceSheet.totalLiabilities}
                                 normalBalanceType={AmountType.Credit}
@@ -231,12 +227,12 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                             />
                         </td>
                     </tr>
-                    <tr>
-                        <td className="font-weight-bold" colSpan={2} style={{ borderTop: 'none', paddingTop: 11 }}>EQUITY</td>
+                    <tr className="report-section-header">
+                        <td colSpan={2}>EQUITY</td>
                     </tr>
                     {map(balanceSheet.equity, (equityAccount) => ((
                         <tr key={equityAccount.id}>
-                            <td style={{ paddingLeft: 22 }}>
+                            <td className="account-name">
                                 {`${equityAccount.accountNumber} - ${equityAccount.name}`}
                             </td>
                             <td className="text-right">
@@ -248,7 +244,7 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                         </tr>
                     )))}
                     <tr>
-                        <td style={{ paddingLeft: 22 }}>Net Income</td>
+                        <td className="account-name">Net Income</td>
                         <td className="text-right">
                             <AmountDisplay
                                 amount={balanceSheet.netIncome}
@@ -256,11 +252,9 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                             />
                         </td>
                     </tr>
-                    <tr>
-                        <td className="font-weight-bold" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
-                            TOTAL EQUITY
-                        </td>
-                        <td className="font-weight-bold text-right" style={{ borderTopWidth: 2, borderTopColor: '#212529', borderBottomStyle: 'double' }}>
+                    <tr className="report-total-row">
+                        <td>TOTAL EQUITY</td>
+                        <td className="text-right">
                             <AmountDisplay
                                 amount={balanceSheet.totalEquity}
                                 normalBalanceType={AmountType.Credit}
@@ -270,9 +264,9 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                     </tr>
                 </tbody>
                 <tfoot>
-                    <tr>
-                        <td className="font-weight-bold" style={{ borderBottom: '3px double #212529', paddingTop: 22 }}>TOTAL LIABILITIES &amp; EQUITY</td>
-                        <td className="font-weight-bold text-right" style={{ borderBottom: '3px double #212529', paddingTop: 22 }}>
+                    <tr className="report-grand-total-row">
+                        <td>TOTAL LIABILITIES &amp; EQUITY</td>
+                        <td className="text-right">
                             <AmountDisplay
                                 amount={balanceSheet.totalLiabilitiesAndEquity}
                                 normalBalanceType={AmountType.Credit}

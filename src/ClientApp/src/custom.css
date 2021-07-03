@@ -54,6 +54,35 @@ th.sticky-border:after {
     border-bottom: 2px solid #dee2e6;
 }
 
+/* Report Table Styling */
+.report-table {
+    font-size: 0.9em;
+    width: 100%;
+}
+
+.report-section-header td {
+    border-top: none;
+    font-weight: bold;
+    padding-top: 11px;
+}
+
+.report-total-row td {
+    border-top-color: #212529;
+    border-top-width: 2px;
+    border-bottom-style: double;
+    font-weight: bold;
+}
+
+.report-grand-total-row td {
+    border-bottom: 3px double #212529;
+    font-weight: bold;
+    padding-top: 22px;
+}
+
+.report-table td.account-name {
+    padding-left: 22px;
+}
+
 /* Badge for Pending Transactions (not Posted Yet) */
 .pending-badge {
     background-color: #fff3cd;

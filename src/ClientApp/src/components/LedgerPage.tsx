@@ -170,7 +170,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
 
     private renderLedgerReportTable(accounts: LedgerAccount[]): JSX.Element {
         return (
-            <table className="table table-hover table-sm" style={{ fontSize: '0.9em', width: '100%' }}>
+            <table className="table table-hover table-sm report-table">
                 <thead>
                     <tr>
                         <th className="col-md-1 bg-white sticky-top sticky-border">Date</th>
@@ -239,7 +239,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                                     </React.Fragment>
                                                 ): null}
                                             </td>
-                                            <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                            <td className="col-md-2 text-right">
                                                 <Link className="hoverable-link" to={journalEntryViewRoute}>
                                                     <AmountDisplay
                                                         amount={transaction.amount}
@@ -247,7 +247,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                                     />
                                                 </Link>
                                             </td>
-                                            <td className="col-md-2" style={{ textAlign: 'right' }}>
+                                            <td className="col-md-2 text-right">
                                                 <Link className="hoverable-link" to={journalEntryViewRoute}>
                                                     <AmountDisplay
                                                         amount={transaction.updatedBalance}
