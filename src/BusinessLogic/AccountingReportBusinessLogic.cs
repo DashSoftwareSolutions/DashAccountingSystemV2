@@ -117,6 +117,7 @@ namespace DashAccountingSystemV2.BusinessLogic
             // Invert the sign, as the amount should be relative to Credit
             // * If we have a positive discrepency (i.e. Debit / more Assets), we need to _increase_ the Retained Earnings amount by adding an additional negative (Credit) amount
             // * If we have a negative discrepency (i.e. Credit / more Liabilities and Equities), we need to _decrease_ the Retained Earnings amount by adding an additional positive (Debit) amount
+            // TODO: After checking again, I noticed QuickBooks seems to consider Retained Earnings to be updated yearly.  Need to see if I can mimic that.
             var adjustedDiscrepency = discrepency * -1;
             var computedRetainedEarnings = retainedEarningsAccount.CurrentBalance + adjustedDiscrepency;
 
