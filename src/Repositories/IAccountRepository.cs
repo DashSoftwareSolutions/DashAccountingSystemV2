@@ -9,7 +9,9 @@ namespace DashAccountingSystemV2.Repositories
     {
         Task<Account> CreateAccountAsync(Account account);
         
-        Task<IEnumerable<Account>> GetAccountsByTenantAsync(Guid tenantId);
+        Task<IEnumerable<Account>> GetAccountsByTenantAsync(
+            Guid tenantId,
+            KnownAccountType[] accountTypes = null);
         
         Task<Account> GetAccountByIdAsync(Guid accountId);
 

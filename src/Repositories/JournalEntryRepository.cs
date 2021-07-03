@@ -148,6 +148,34 @@ namespace DashAccountingSystemV2.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<JournalEntryAccount>> GetPostedJournalEntryAccountsAsync(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd,
+            params KnownAccountType[] accountTypes)
+        {
+            var accountTypeIds = accountTypes == null ? null : accountTypes.Cast<int>().ToArray();
+
+            return await _db
+                .JournalEntryAccount
+                .Include(jeAcct => jeAcct.JournalEntry)
+                .Include(jeAcct => jeAcct.Account)
+                .Where(jeAcct =>
+                    jeAcct.JournalEntry.TenantId == tenantId &&
+                    (accountTypes == null || accountTypeIds.Contains(jeAcct.Account.AccountTypeId)) && 
+                    jeAcct.JournalEntry.Status == TransactionStatus.Posted &&
+                    jeAcct.JournalEntry.PostDate.HasValue &&
+                    jeAcct.JournalEntry.PostDate >= dateRangeStart &&
+                    jeAcct.JournalEntry.PostDate <= dateRangeEnd)
+                .OrderBy(jeAcct => jeAcct.Account.AccountTypeId)
+                .ThenBy(jeAcct => jeAcct.JournalEntry.Status != TransactionStatus.Pending ? 1 : 2)
+                .ThenBy(jeAcct => jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate)
+                .ThenBy(jeAcct => jeAcct.JournalEntry.EntryId)
+                .Include(jeAcct => jeAcct.JournalEntry.CreatedBy)
+                .Include(jeAcct => jeAcct.JournalEntry.UpdatedBy)
+                .ToListAsync();
+        }
+
         public async Task<uint> GetNextEntryIdAsync(Guid tenantId)
         {
             var maxCurrentEntryId = await _db

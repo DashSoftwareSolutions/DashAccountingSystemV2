@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DashAccountingSystemV2.Models
 {
-    public class AssetType
+    public class AssetType : IEquatable<AssetType>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,6 +27,29 @@ namespace DashAccountingSystemV2.Models
             Id = id;
             Name = name;
             Symbol = symbol;
+        }
+
+        public bool Equals(AssetType other)
+        {
+            if (other == null)
+                return false;
+
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is AssetType other)
+            {
+                return Equals(other);
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
 }

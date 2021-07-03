@@ -14,13 +14,16 @@ namespace DashAccountingSystemV2.Controllers
     public class LedgerController : Controller
     {
         private readonly IAccountBusinessLogic _accountBusinessLogic = null;
+        private readonly IAccountingReportBusinessLogic _accountingReportBusinessLogic = null;
         private readonly ILedgerBusinessLogic _ledgerBusinessLogic = null;
 
         public LedgerController(
             IAccountBusinessLogic accountBusinessLogic,
+            IAccountingReportBusinessLogic accountingReportBusinessLogic,
             ILedgerBusinessLogic ledgerBusinessLogic)
         {
             _accountBusinessLogic = accountBusinessLogic;
+            _accountingReportBusinessLogic = accountingReportBusinessLogic;
             _ledgerBusinessLogic = ledgerBusinessLogic;
         }
 
@@ -54,6 +57,30 @@ namespace DashAccountingSystemV2.Controllers
             var bizLogicResponse = _ledgerBusinessLogic.GetLedgerReport(tenantId, parsedDateRangeStart.Value, parsedDateRangeEnd.Value);
 
             return this.Result(bizLogicResponse, LedgerAccountResponseViewModel.FromModel);
+        }
+
+        [HttpGet("{tenantId:guid}/balance-sheet")]
+        public Task<IActionResult> GetBalanceSheetReport(
+             [FromRoute] Guid tenantId,
+            [FromQuery] string dateRangeStart,
+            [FromQuery] string dateRangeEnd)
+        {
+            var parsedDateRangeStart = dateRangeStart.TryParseAsDateTime();
+
+            if (!parsedDateRangeStart.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeStart was not a valid date/time value"));
+
+            var parsedDateRangeEnd = dateRangeEnd.TryParseAsDateTime();
+
+            if (!parsedDateRangeEnd.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeEnd was not a valid date/time value"));
+
+            var balanceSheetReportBizLogicResponse = _accountingReportBusinessLogic.GetBalanceSheetReport(
+                tenantId,
+                parsedDateRangeStart.Value,
+                parsedDateRangeEnd.Value);
+
+            return this.Result(balanceSheetReportBizLogicResponse, BalanceSheetReportResponseViewModel.FromModel);
         }
     }
 }

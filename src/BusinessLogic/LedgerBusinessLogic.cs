@@ -37,7 +37,6 @@ namespace DashAccountingSystemV2.BusinessLogic
                 Account = a,
                 StartingBalance = accountStartingBalances[a.Id],
                 Transactions = journalEntryAccounts.Where(jeAcct => jeAcct.AccountId == a.Id),
-
             });
 
             return new BusinessLogicResponse<IEnumerable<LedgerReportAccountDto>>(results);

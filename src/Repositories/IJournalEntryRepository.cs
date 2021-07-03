@@ -28,6 +28,12 @@ namespace DashAccountingSystemV2.Repositories
             DateTime dateRangeStart,
             DateTime dateRangeEnd);
 
+        Task<IEnumerable<JournalEntryAccount>> GetPostedJournalEntryAccountsAsync(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd,
+            params KnownAccountType[] accountTypes);
+
         Task<uint> GetNextEntryIdAsync(Guid tenantId);
 
         Task<PagedResult<JournalEntry>> GetPendingJournalEntriesAsync(

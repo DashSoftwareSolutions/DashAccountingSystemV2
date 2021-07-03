@@ -73,7 +73,7 @@ ORDER BY acct.""AccountNumber"";
                         {
                             tenantId,
                             date,
-                            accountTypes,
+                            accountTypes = accountTypes == null ? null : accountTypes.Cast<int>().ToArray(),
                         }
                     );
 
@@ -95,8 +95,12 @@ ORDER BY acct.""AccountNumber"";
                 .FirstOrDefaultAsync(a => a.Id == accountId);
         }
 
-        public async Task<IEnumerable<Account>> GetAccountsByTenantAsync(Guid tenantId)
+        public async Task<IEnumerable<Account>> GetAccountsByTenantAsync(
+            Guid tenantId,
+            KnownAccountType[] accountTypes = null)
         {
+            var accountTypeIds = accountTypes == null ? null : accountTypes.Cast<int>().ToArray();
+
             return await _db
                 .Account
                 .Where(a => a.TenantId == tenantId)
@@ -104,6 +108,7 @@ ORDER BY acct.""AccountNumber"";
                 .Include(a => a.AccountSubType)
                 .Include(a => a.AssetType)
                 .Include(a => a.Tenant)
+                .Where(a => accountTypes == null || accountTypeIds.Contains(a.AccountTypeId))
                 .OrderBy(a => a.AccountTypeId)
                 .ThenBy(a => a.AccountNumber)
                 .ToListAsync();
