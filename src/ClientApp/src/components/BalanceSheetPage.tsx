@@ -1,9 +1,6 @@
 ﻿import * as React from 'react';
 import {
-    Button,
     Col,
-    Form,
-    Input,
     Row,
 } from 'reactstrap';
 import { ConnectedProps, connect } from 'react-redux';
@@ -17,6 +14,7 @@ import { NavigationSection } from './TenantSubNavigation';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
 import BalanceSheetReport from '../models/BalanceSheetReport';
+import ReportDateRangeSelector from './ReportDateRangeSelector';
 import TenantBasePage from './TenantBasePage';
 import * as BalanceSheetStore from '../store/BalanceSheet';
 
@@ -47,11 +45,10 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
     constructor(props: BalanceSheetPageProps) {
         super(props);
 
-        this.onClickRunReport = this.onClickRunReport.bind(this);
         this.onDateRangeEndChanged = this.onDateRangeEndChanged.bind(this);
         this.onDateRangeStartChanged = this.onDateRangeStartChanged.bind(this);
+        this.onRunReport = this.onRunReport.bind(this);
     }
-
 
     public componentDidMount() {
         this.ensureDataFetched();
@@ -82,42 +79,14 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    {/* TODO: Make the Date Range Selection Form a sharable component */}
-                    <Form style={{ marginBottom: 22 }}>
-                        <Row form>
-                            {/* TODO: Add preset ranges select */}
-                            <Col md={2}>
-                                <Input
-                                    id={`${this.bemBlockName}--date_range_start_input`}
-                                    name="date_range_start_input"
-                                    onChange={this.onDateRangeStartChanged}
-                                    type="date"
-                                    value={dateRangeStart ?? ''}
-                                />
-                            </Col>
-                            <Col className="align-self-center no-gutters text-center" md={1} style={{ flex: '0 1 22px' }}>
-                                to
-                            </Col>
-                            <Col md={2}>
-                                <Input
-                                    id={`${this.bemBlockName}--date_range_end_input`}
-                                    name="date_range_end_input"
-                                    onChange={this.onDateRangeEndChanged}
-                                    type="date"
-                                    value={dateRangeEnd ?? ''}
-                                />
-                            </Col>
-                            <Col md={2}>
-                                <Button
-                                    color="success"
-                                    id={`${this.bemBlockName}--run_report_button`}
-                                    onClick={this.onClickRunReport}
-                                >
-                                    Run Report
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Form>
+                    <ReportDateRangeSelector
+                        bemBlockName={this.bemBlockName}
+                        dateRangeEnd={dateRangeEnd ?? null}
+                        dateRangeStart={dateRangeStart ?? null}
+                        onDateRangeEndChanged={this.onDateRangeEndChanged}
+                        onDateRangeStartChanged={this.onDateRangeStartChanged}
+                        onRunReport={this.onRunReport}
+                    />
                     <div className={`${this.bemBlockName}--balance_sheet_report_container`}>
                         {isFetching ? (
                             <p>Loading...</p>
@@ -135,9 +104,17 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
         requestBalanceSheetReportData();
     }
 
-    private onClickRunReport(event: React.MouseEvent<HTMLElement>) {
-        event.preventDefault();
+    private onDateRangeEndChanged(newEndDate: string) {
+        const { updateDateRangeEnd } = this.props;
+        updateDateRangeEnd(newEndDate);
+    }
 
+    private onDateRangeStartChanged(newStartDate: string) {
+        const { updateDateRangeStart } = this.props;
+        updateDateRangeStart(newStartDate);
+    }
+
+    private onRunReport() {
         const {
             requestBalanceSheetReportData,
             reset,
@@ -145,16 +122,6 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
 
         reset();
         requestBalanceSheetReportData();
-    }
-
-    private onDateRangeEndChanged(event: React.FormEvent<HTMLInputElement>) {
-        const { updateDateRangeEnd } = this.props;
-        updateDateRangeEnd(event.currentTarget.value);
-    }
-
-    private onDateRangeStartChanged(event: React.FormEvent<HTMLInputElement>) {
-        const { updateDateRangeStart } = this.props;
-        updateDateRangeStart(event.currentTarget.value);
     }
 
     private renderLedgerReportTable(balanceSheet: BalanceSheetReport | null): JSX.Element {
