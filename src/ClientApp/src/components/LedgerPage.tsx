@@ -95,7 +95,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                         onDateRangeStartChanged={this.onDateRangeStartChanged}
                         onRunReport={this.onRunReport}
                     />
-                    <div className={`${this.bemBlockName}--ledger_report_container`}>
+                    <div className={`${this.bemBlockName}--report_container`}>
                     {isFetching ? (
                         <p>Loading...</p>
                     ): 

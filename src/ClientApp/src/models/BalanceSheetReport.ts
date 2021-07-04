@@ -1,5 +1,5 @@
 ﻿import Amount from './Amount';
-import BalanceSheetReportAccount from './BalanceSheetReportAccount';
+import ReportAccount from './ReportAccount';
 
 export default interface BalanceSheetReport {
     totalAssets: Amount;
@@ -8,7 +8,7 @@ export default interface BalanceSheetReport {
     netIncome: Amount;
     totalLiabilitiesAndEquity: Amount;
     discrepancy?: Amount;
-    assets: BalanceSheetReportAccount[];
-    liabilities: BalanceSheetReportAccount[];
-    equity: BalanceSheetReportAccount[];
+    assets: ReportAccount[];
+    liabilities: ReportAccount[];
+    equity: ReportAccount[];
 }

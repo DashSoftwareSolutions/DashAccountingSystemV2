@@ -87,11 +87,11 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                         onDateRangeStartChanged={this.onDateRangeStartChanged}
                         onRunReport={this.onRunReport}
                     />
-                    <div className={`${this.bemBlockName}--balance_sheet_report_container`}>
+                    <div className={`${this.bemBlockName}--report_container`}>
                         {isFetching ? (
                             <p>Loading...</p>
                         ) :
-                            this.renderLedgerReportTable(balanceSheet)
+                            this.renderBalanceSheetReportTable(balanceSheet)
                         }
                     </div>
                 </TenantBasePage.Content>
@@ -124,7 +124,7 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
         requestBalanceSheetReportData();
     }
 
-    private renderLedgerReportTable(balanceSheet: BalanceSheetReport | null): JSX.Element {
+    private renderBalanceSheetReportTable(balanceSheet: BalanceSheetReport | null): JSX.Element {
         if (isNil(balanceSheet)) {
             return (
                 <p>No data</p>

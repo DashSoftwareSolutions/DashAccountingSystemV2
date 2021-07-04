@@ -7,60 +7,60 @@ import moment from 'moment-timezone';
 import { Logger } from '../common/Logging';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
-import BalanceSheetReport from '../models/BalanceSheetReport';
+import ProfitAndLossReport from '../models/ProfitAndLossReport';
 
-export interface BalanceSheetState {
-    reportData: BalanceSheetReport | null;
+export interface ProfitAndLossState {
+    reportData: ProfitAndLossReport | null;
     isLoading: boolean;
     dateRangeStart: string;
     dateRangeEnd: string;
 }
 
-interface RequestBalanceSheetReportDataAction {
-    type: 'REQUEST_BALANCE_SHEET_REPORT_DATA';
+interface RequestProfitAndLossReportDataAction {
+    type: 'REQUEST_PROFIT_AND_LOSS_REPORT_DATA';
 }
 
-interface ReceiveBalanceSheetReportDataAction {
-    type: 'RECEIVE_BALANCE_SHEET_REPORT_DATA';
-    report: BalanceSheetReport;
+interface ReceiveProfitAndLossReportDataAction {
+    type: 'RECEIVE_PROFIT_AND_LOSS_REPORT_DATA';
+    report: ProfitAndLossReport;
 }
 
-interface UpdateBalanceSheetReportDateRangeStartAction {
-    type: 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START';
+interface UpdateProfitAndLossReportDateRangeStartAction {
+    type: 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START';
     dateRangeStart: string;
 }
 
-interface UpdateBalanceSheetReportDateRangeEndAction {
-    type: 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END';
+interface UpdateProfitAndLossReportDateRangeEndAction {
+    type: 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END';
     dateRangeEnd: string;
 }
 
-interface ResetBalanceSheetReportDataAction {
-    type: 'RESET_BALANCE_SHEET_REPORT_DATA';
+interface ResetProfitAndLossReportDataAction {
+    type: 'RESET_PROFIT_AND_LOSS_REPORT_DATA';
 }
 
-type KnownAction = RequestBalanceSheetReportDataAction |
-    ReceiveBalanceSheetReportDataAction |
-    UpdateBalanceSheetReportDateRangeStartAction |
-    UpdateBalanceSheetReportDateRangeEndAction |
-    ResetBalanceSheetReportDataAction;
+type KnownAction = RequestProfitAndLossReportDataAction |
+    ReceiveProfitAndLossReportDataAction |
+    UpdateProfitAndLossReportDateRangeStartAction |
+    UpdateProfitAndLossReportDateRangeEndAction |
+    ResetProfitAndLossReportDataAction;
 
-const logger = new Logger('Balance Sheet Store');
+const logger = new Logger('Profit And Loss Store');
 
 export const actionCreators = {
-    requestBalanceSheetReportData: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+    requestProfitAndLossReportData: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
 
-        if (!isNil(appState?.balanceSheet) &&
+        if (!isNil(appState?.profitAndLoss) &&
             !isNil(appState?.tenants?.selectedTenant) &&
-            !appState.balanceSheet.isLoading &&
-            isNil(appState.balanceSheet.reportData)) {
+            !appState.profitAndLoss.isLoading &&
+            isNil(appState.profitAndLoss.reportData)) {
             const accessToken = await authService.getAccessToken();
             const tenantId = appState?.tenants?.selectedTenant?.id;
-            const dateRangeStart = appState.balanceSheet.dateRangeStart;
-            const dateRangeEnd = appState.balanceSheet.dateRangeEnd;
+            const dateRangeStart = appState.profitAndLoss.dateRangeStart;
+            const dateRangeEnd = appState.profitAndLoss.dateRangeEnd;
 
-            fetch(`api/ledger/${tenantId}/balance-sheet?dateRangeStart=${dateRangeStart}&dateRangeEnd=${dateRangeEnd}`, {
+            fetch(`api/ledger/${tenantId}/profit-and-loss?dateRangeStart=${dateRangeStart}&dateRangeEnd=${dateRangeEnd}`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -71,32 +71,32 @@ export const actionCreators = {
                         return null;
                     }
 
-                    return response.json() as Promise<BalanceSheetReport>
+                    return response.json() as Promise<ProfitAndLossReport>
                 })
                 .then((report) => {
                     if (!isNil(report)) {
-                        dispatch({ type: 'RECEIVE_BALANCE_SHEET_REPORT_DATA', report });
+                        dispatch({ type: 'RECEIVE_PROFIT_AND_LOSS_REPORT_DATA', report });
                     }
                 });
 
-            dispatch({ type: 'REQUEST_BALANCE_SHEET_REPORT_DATA' });
+            dispatch({ type: 'REQUEST_PROFIT_AND_LOSS_REPORT_DATA' });
         }
     },
 
     updateDateRangeStart: (dateRangeStart: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START', dateRangeStart });
+        dispatch({ type: 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START', dateRangeStart });
     },
 
     updateDateRangeEnd: (dateRangeEnd: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END', dateRangeEnd });
+        dispatch({ type: 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END', dateRangeEnd });
     },
 
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'RESET_BALANCE_SHEET_REPORT_DATA' });
+        dispatch({ type: 'RESET_PROFIT_AND_LOSS_REPORT_DATA' });
     },
 };
 
-const unloadedState: BalanceSheetState = {
+const unloadedState: ProfitAndLossState = {
     isLoading: false,
     // TODO: update default date range logic (e.g. current quarter to date, etc.)
     dateRangeStart: '2018-01-01',
@@ -104,7 +104,7 @@ const unloadedState: BalanceSheetState = {
     reportData: null,
 };
 
-export const reducer: Reducer<BalanceSheetState> = (state: BalanceSheetState | undefined, incomingAction: Action): BalanceSheetState => {
+export const reducer: Reducer<ProfitAndLossState> = (state: ProfitAndLossState | undefined, incomingAction: Action): ProfitAndLossState => {
     if (state === undefined) {
         return unloadedState;
     }
@@ -113,32 +113,32 @@ export const reducer: Reducer<BalanceSheetState> = (state: BalanceSheetState | u
 
     if (!isNil(action)) {
         switch (action.type) {
-            case 'REQUEST_BALANCE_SHEET_REPORT_DATA':
+            case 'REQUEST_PROFIT_AND_LOSS_REPORT_DATA':
                 return {
                     ...state,
                     isLoading: true,
                 };
 
-            case 'RECEIVE_BALANCE_SHEET_REPORT_DATA':
+            case 'RECEIVE_PROFIT_AND_LOSS_REPORT_DATA':
                 return {
                     ...state,
                     isLoading: false,
                     reportData: action.report,
                 };
 
-            case 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START':
+            case 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START':
                 return {
                     ...state,
                     dateRangeStart: action.dateRangeStart,
                 };
 
-            case 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END':
+            case 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END':
                 return {
                     ...state,
                     dateRangeEnd: action.dateRangeEnd,
                 };
 
-            case 'RESET_BALANCE_SHEET_REPORT_DATA':
+            case 'RESET_PROFIT_AND_LOSS_REPORT_DATA':
                 return {
                     ...state,
                     isLoading: false,

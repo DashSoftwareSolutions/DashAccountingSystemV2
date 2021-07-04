@@ -4,7 +4,7 @@ import Amount from './Amount';
 import AmountType from './AmountType';
 import AssetType from './AssetType';
 
-export default interface BalanceSheetReportAccount {
+export default interface ReportAccount {
     id: string; // GUID
     accountNumber: number; // unsigned short
     name: string;
