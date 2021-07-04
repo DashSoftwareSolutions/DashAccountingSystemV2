@@ -53,14 +53,14 @@ export const actionCreators = {
     requestBalanceSheetReportData: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
 
-        if (!isNil(appState?.ledger) &&
+        if (!isNil(appState?.balanceSheet) &&
             !isNil(appState?.tenants?.selectedTenant) &&
-            !appState.ledger.isLoading &&
-            isEmpty(appState.ledger.accounts)) {
+            !appState.balanceSheet.isLoading &&
+            isNil(appState.balanceSheet.reportData)) {
             const accessToken = await authService.getAccessToken();
             const tenantId = appState?.tenants?.selectedTenant?.id;
-            const dateRangeStart = appState.ledger.dateRangeStart;
-            const dateRangeEnd = appState.ledger.dateRangeEnd;
+            const dateRangeStart = appState.balanceSheet.dateRangeStart;
+            const dateRangeEnd = appState.balanceSheet.dateRangeEnd;
 
             fetch(`api/ledger/${tenantId}/balance-sheet?dateRangeStart=${dateRangeStart}&dateRangeEnd=${dateRangeEnd}`, {
                 headers: {
