@@ -1,0 +1,267 @@
+{
+	"info": {
+		"_postman_id": "ff5ae690-4269-4bf8-b44b-2c857b499934",
+		"name": "Dash Accounting System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "api/journal/{tenantId}/entry/{entryId}",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/journal/{{tenantId}}/entry/3",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"journal",
+						"{{tenantId}}",
+						"entry",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/journal/entry",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenantId\": \"{{tenantId}}\",\r\n    \"entryDate\": \"2018-07-07\",\r\n    \"postDate\": \"2018-07-07\",\r\n    \"description\": \"Purchase of Home Office Coffee Supplies from Ralphs\",\r\n    \"note\": \"Entry 39 in Quickbooks\",\r\n    \"accounts\": [\r\n        {\r\n            \"accountId\": \"00663e8e-edfd-4ffa-a3b3-9faa290d951d\",\r\n            \"amount\": {\r\n                \"amount\": 129.72,\r\n                \"assetType\": {\r\n                    \"id\": 1,\r\n                    \"name\": \"USD $\"\r\n                }\r\n            }\r\n        },\r\n        {\r\n            \"accountId\": \"50482705-6011-4b65-b5aa-ea2c761f80f3\",\r\n            \"amount\": {\r\n                \"amount\": -129.72,\r\n                \"assetType\": {\r\n                    \"id\": 1,\r\n                    \"name\": \"USD $\"\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUril}}/api/journal/entry",
+					"host": [
+						"{{baseUril}}"
+					],
+					"path": [
+						"api",
+						"journal",
+						"entry"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/ledger/{tenantId}/report",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/ledger/{{tenantId}}/report?dateRangeStart={{dateRangeStart}}&dateRangeEnd={{dateRangeEnd}}",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"ledger",
+						"{{tenantId}}",
+						"report"
+					],
+					"query": [
+						{
+							"key": "dateRangeStart",
+							"value": "{{dateRangeStart}}"
+						},
+						{
+							"key": "dateRangeEnd",
+							"value": "{{dateRangeEnd}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/lookups",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/lookups",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"lookups"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/journal/{tenantId}/entry/{entryId}/post-date",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"postDate\": \"2018-08-17\",\r\n    \"note\": \"This is a test note\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{tenantId}}/api/journal/{{tenantId}}/entry/52/post-date",
+					"host": [
+						"{{tenantId}}"
+					],
+					"path": [
+						"api",
+						"journal",
+						"{{tenantId}}",
+						"entry",
+						"52",
+						"post-date"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/ledger/{tenantId}/balance-sheet",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/ledger/{{tenantId}}/balance-sheet?dateRangeStart={{dateRangeStart}}&dateRangeEnd={{dateRangeEnd}}",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"ledger",
+						"{{tenantId}}",
+						"balance-sheet"
+					],
+					"query": [
+						{
+							"key": "dateRangeStart",
+							"value": "{{dateRangeStart}}"
+						},
+						{
+							"key": "dateRangeEnd",
+							"value": "{{dateRangeEnd}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/ledger/{tenantId}/profit-and-loss",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/ledger/{{tenantId}}/profit-and-loss?dateRangeStart={{dateRangeStart}}&dateRangeEnd={{dateRangeEnd}}",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"ledger",
+						"{{tenantId}}",
+						"profit-and-loss"
+					],
+					"query": [
+						{
+							"key": "dateRangeStart",
+							"value": "{{dateRangeStart}}"
+						},
+						{
+							"key": "dateRangeEnd",
+							"value": "{{dateRangeEnd}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
