@@ -5,7 +5,7 @@ using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.ViewModels
 {
-    public class BalanceSheetAccountResponseViewModel
+    public class ReportAccountResponseViewModel
     {
         public Guid Id { get; set; }
 
@@ -26,12 +26,12 @@ namespace DashAccountingSystemV2.ViewModels
 
         public AmountViewModel Balance { get; set; }
 
-        public static BalanceSheetAccountResponseViewModel FromModel(AccountWithBalanceDto accountWithBalance)
+        public static ReportAccountResponseViewModel FromModel(AccountWithBalanceDto accountWithBalance)
         {
             if (accountWithBalance == null)
                 return null;
 
-            return new BalanceSheetAccountResponseViewModel()
+            return new ReportAccountResponseViewModel()
             {
                 Id = accountWithBalance.Account.Id,
                 AccountNumber = accountWithBalance.Account.AccountNumber,

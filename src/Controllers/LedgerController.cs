@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystemV2.BusinessLogic;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.ViewModels;
+using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.Controllers
 {
@@ -80,7 +81,59 @@ namespace DashAccountingSystemV2.Controllers
                 parsedDateRangeStart.Value,
                 parsedDateRangeEnd.Value);
 
-            return this.Result(balanceSheetReportBizLogicResponse, BalanceSheetReportResponseViewModel.FromModel);
+            return this.Result(
+                balanceSheetReportBizLogicResponse,
+                (BalanceSheetReportDto reportData) =>
+                {
+                    var viewModel = BalanceSheetReportResponseViewModel.FromModel(reportData);
+                    
+                    if (viewModel != null)
+                    {
+                        viewModel.ReportDates = new ReportDatesResponseViewModel(
+                            parsedDateRangeStart.Value,
+                            parsedDateRangeEnd.Value);
+                    }
+
+                    return viewModel;
+                });
+        }
+
+        [HttpGet("{tenantId:guid}/profit-and-loss")]
+        public Task<IActionResult> GetProfitAndLossReport(
+            [FromRoute] Guid tenantId,
+            [FromQuery] string dateRangeStart,
+            [FromQuery] string dateRangeEnd)
+        {
+            var parsedDateRangeStart = dateRangeStart.TryParseAsDateTime();
+
+            if (!parsedDateRangeStart.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeStart was not a valid date/time value"));
+
+            var parsedDateRangeEnd = dateRangeEnd.TryParseAsDateTime();
+
+            if (!parsedDateRangeEnd.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeEnd was not a valid date/time value"));
+
+            var profitAndLossReportBizLogicResponse = _accountingReportBusinessLogic.GetProfitAndLossReport(
+                tenantId,
+                parsedDateRangeStart.Value,
+                parsedDateRangeEnd.Value);
+
+            return this.Result(
+                profitAndLossReportBizLogicResponse,
+                (ProfitAndLossReportDto reportData) =>
+                {
+                    var viewModel = ProfitAndLossReportResponseViewModel.FromModel(reportData);
+
+                    if (viewModel != null)
+                    {
+                        viewModel.ReportDates = new ReportDatesResponseViewModel(
+                            parsedDateRangeStart.Value,
+                            parsedDateRangeEnd.Value);
+                    }
+
+                    return viewModel;
+                });
         }
     }
 }

@@ -156,6 +156,62 @@ namespace DashAccountingSystemV2.BusinessLogic
             return new BusinessLogicResponse<BalanceSheetReportDto>(result);
         }
 
+        public async Task<BusinessLogicResponse<ProfitAndLossReportDto>> GetProfitAndLossReport(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd)
+        {
+            _logger.LogDebug("Compiling data for Profit and Loss Report for date range from {0:d} to {1:d}", dateRangeStart, dateRangeEnd);
+            _logger.LogDebug("Getting final balances for all Revenue and Expense accounts...");
+
+            var profitAndLossAccountsReponse = await GetAccounts(
+                tenantId,
+                dateRangeEnd,
+                KnownAccountType.Revenue,
+                KnownAccountType.Expenses);
+
+            if (!profitAndLossAccountsReponse.IsSuccessful)
+                return new BusinessLogicResponse<ProfitAndLossReportDto>(profitAndLossAccountsReponse);
+
+            var profitAndLossAccounts = profitAndLossAccountsReponse.Data;
+
+            // TODO/FIXME: Need to refactor so we don't have to worry about Asset Type!
+            var assetType = profitAndLossAccounts.Select(a => a.Account.AssetType).First();
+
+            var revenueAccounts = profitAndLossAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Revenue);
+            var expenseAccounts = profitAndLossAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Expenses);
+            var operatingRevenue = revenueAccounts.Where(a => a.Account.AccountSubTypeId == (int)KnownAccountSubType.OperatingRevenue);
+            var otherIncome = revenueAccounts.Where(a => a.Account.AccountSubTypeId == (int)KnownAccountSubType.OtherIncome);
+            var operatingExpenses = expenseAccounts.Where(a => a.Account.AccountSubTypeId != (int)KnownAccountSubType.OtherExpense);
+            var otherExpenses = expenseAccounts.Where(a => a.Account.AccountSubTypeId == (int)KnownAccountSubType.OtherExpense);
+
+            var grossProfit = operatingRevenue.Sum(a => a.CurrentBalance);
+            var totalOperatingExpenses = operatingExpenses.Sum(a => a.CurrentBalance);
+            var netOperatingIncome = grossProfit + totalOperatingExpenses;
+            var totalOtherIncome = otherIncome.Sum(a => a.CurrentBalance);
+            var totalOtherExpenses = otherExpenses.Sum(a => a.CurrentBalance);
+            var netOtherIncome = totalOtherIncome + totalOtherExpenses;
+            var netIncome = netOperatingIncome + netOtherIncome;
+
+            var result = new ProfitAndLossReportDto()
+            {
+                AssetType = assetType,
+                GrossProfit = grossProfit,
+                TotalOperatingExpenses = totalOperatingExpenses,
+                NetOperatingIncome = netOperatingIncome,
+                TotalOtherIncome = totalOtherIncome,
+                TotalOtherExpenses = totalOtherExpenses,
+                NetOtherIncome = netOtherIncome,
+                NetIncome = netIncome,
+                OperatingIncome = operatingRevenue,
+                OperatingExpenses = operatingExpenses,
+                OtherIncome = otherIncome,
+                OtherExpenses = otherExpenses,
+            };
+
+            return new BusinessLogicResponse<ProfitAndLossReportDto>(result);
+        }
+
         private async Task<BusinessLogicResponse<IEnumerable<AccountWithBalanceDto>>> GetAccounts(
             Guid tenantId,
             DateTime dateForAccountBalances,

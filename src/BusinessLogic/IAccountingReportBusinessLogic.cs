@@ -10,5 +10,10 @@ namespace DashAccountingSystemV2.BusinessLogic
             Guid tenantId,
             DateTime dateRangeStart,
             DateTime dateRangeEnd);
+
+        Task<BusinessLogicResponse<ProfitAndLossReportDto>> GetProfitAndLossReport(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd);
     }
 }

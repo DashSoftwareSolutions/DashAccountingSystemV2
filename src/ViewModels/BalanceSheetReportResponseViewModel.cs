@@ -7,6 +7,8 @@ namespace DashAccountingSystemV2.ViewModels
 {
     public class BalanceSheetReportResponseViewModel
     {
+        public ReportDatesResponseViewModel ReportDates { get; set; }
+
         public AmountViewModel TotalAssets { get; set; }
 
         public AmountViewModel TotalLiabilities { get; set; }
@@ -20,11 +22,11 @@ namespace DashAccountingSystemV2.ViewModels
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public AmountViewModel Discrepency { get; set; }
 
-        public IEnumerable<BalanceSheetAccountResponseViewModel> Assets { get; set; }
+        public IEnumerable<ReportAccountResponseViewModel> Assets { get; set; }
 
-        public IEnumerable<BalanceSheetAccountResponseViewModel> Liabilities { get; set; }
+        public IEnumerable<ReportAccountResponseViewModel> Liabilities { get; set; }
 
-        public IEnumerable<BalanceSheetAccountResponseViewModel> Equity { get; set; }
+        public IEnumerable<ReportAccountResponseViewModel> Equity { get; set; }
 
         public static BalanceSheetReportResponseViewModel FromModel(BalanceSheetReportDto balanceSheetReportData)
         {
@@ -43,9 +45,9 @@ namespace DashAccountingSystemV2.ViewModels
                     new AmountViewModel(balanceSheetReportData.Discrepency.Value, balanceSheetReportData.AssetType) :
                     null,
 
-                Assets = balanceSheetReportData.Assets.Select(BalanceSheetAccountResponseViewModel.FromModel),
-                Liabilities = balanceSheetReportData.Liabilities.Select(BalanceSheetAccountResponseViewModel.FromModel),
-                Equity = balanceSheetReportData.Equity.Select(BalanceSheetAccountResponseViewModel.FromModel),
+                Assets = balanceSheetReportData.Assets.Select(ReportAccountResponseViewModel.FromModel),
+                Liabilities = balanceSheetReportData.Liabilities.Select(ReportAccountResponseViewModel.FromModel),
+                Equity = balanceSheetReportData.Equity.Select(ReportAccountResponseViewModel.FromModel),
             };
         }
     }
