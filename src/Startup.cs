@@ -12,13 +12,13 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Serilog;
 using DashAccountingSystemV2.BusinessLogic;
-using DashAccountingSystemV2.Caching;
 using DashAccountingSystemV2.Data;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Repositories;
 using DashAccountingSystemV2.Security.Authentication;
 using DashAccountingSystemV2.Security.Authorization;
+using DashAccountingSystemV2.Services.Caching;
 
 namespace DashAccountingSystemV2
 {

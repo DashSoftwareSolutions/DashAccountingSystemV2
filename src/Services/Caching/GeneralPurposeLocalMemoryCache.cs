@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using DashAccountingSystemV2.Configuration;
 
-namespace DashAccountingSystemV2.Caching
+namespace DashAccountingSystemV2.Services.Caching
 {
     public class GeneralPurposeLocalMemoryCache : IExtendedDistributedCache
     {
@@ -135,6 +135,16 @@ namespace DashAccountingSystemV2.Caching
             {
                 _logger.LogWarning(ex, "Failed setting data in cache for key \'{0}\'", key);
             }
+        }
+
+        public Task SetAsync(
+            string key,
+            byte[] value,
+            TimeSpan expiration,
+            bool isSlidingExpiration = false)
+        {
+            var options = GetCacheEntryOptions(expiration, isSlidingExpiration);
+            return SetAsync(key, value, options);
         }
 
         public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default)

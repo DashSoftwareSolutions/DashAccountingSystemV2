@@ -42,6 +42,28 @@ namespace DashAccountingSystemV2.Extensions
             return d.AddSeconds(l);
         }
 
+        /// <summary>
+        /// This method will not do a converstion for you, and d.Kind must be DateTimeKind.Utc or it will throw ArgumentException.
+        /// </summary>
+        public static long ToUnixTimestamp(this DateTime d, bool milliseconds = false)
+        {
+            if (d.Kind != DateTimeKind.Utc)
+                throw new ArgumentException("We don't serve your kind here!");
+
+            var elapsedSinceEpoch = d - Constants.UnixEpochUtc;
+            return (long)(milliseconds ? elapsedSinceEpoch.TotalMilliseconds : elapsedSinceEpoch.TotalSeconds);
+        }
+
+        /// <summary>
+        /// This method will not do a converstion for you, and d.Kind must be DateTimeKind.Utc or it will throw ArgumentException.
+        /// </summary>
+        public static long? ToUnixTimestamp(this DateTime? d, bool milliseconds = false)
+        {
+            if (d.HasValue) return d.Value.ToUnixTimestamp(milliseconds);
+
+            return null;
+        }
+
         public static DateTime WithTimeZone(this DateTime utcDateTime, string tzdbTimeZoneId)
         {
             if (utcDateTime.Kind != DateTimeKind.Utc)

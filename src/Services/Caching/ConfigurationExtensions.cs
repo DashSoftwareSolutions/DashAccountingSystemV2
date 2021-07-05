@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace DashAccountingSystemV2.Caching
+namespace DashAccountingSystemV2.Services.Caching
 {
     public static class ConfigurationExtensions
     {

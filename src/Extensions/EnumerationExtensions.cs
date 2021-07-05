@@ -36,6 +36,18 @@ namespace DashAccountingSystemV2.Extensions
             return GetEnum<TEnum, short>(enumIntValue);
         }
 
+        /// <summary>
+        /// Converts nullable unsigned short integer to a nullable enum type, only if the integer matches one of the defined enum values
+        /// </summary>
+        /// <typeparam name="TEnum">Must be a type of enum</typeparam>
+        /// <param name="enumIntValue">nullable unsigned short integer</param>
+        /// <returns>nullable enum value: will be not null if the unsigned short integer argument is not null and corresponds to a valid enum value</returns>
+        public static TEnum? GetEnum<TEnum>(ushort? enumIntValue)
+            where TEnum : struct, IComparable, IFormattable, IConvertible
+        {
+            return GetEnum<TEnum, ushort>(enumIntValue);
+        }
+
         private static TEnum? GetEnum<TEnum, TUnderlyingInteger>(TUnderlyingInteger? enumIntValue)
             where TEnum : struct, IComparable, IFormattable, IConvertible
             where TUnderlyingInteger : struct
