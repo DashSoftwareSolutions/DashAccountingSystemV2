@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using IdentityServer4.EntityFramework.Options;
+using Moq;
 using Npgsql;
 using DashAccountingSystemV2.Data;
 using DashAccountingSystemV2.Tests.Repositories;
@@ -64,6 +68,24 @@ namespace DashAccountingSystemV2.Tests
             await appDbContext.Database.MigrateAsync();
             
             return appDbContext;
+        }
+
+        internal static ILoggerFactory GetLoggerFactory()
+        {
+            var options = new ConsoleLoggerOptions();
+
+            var mockOptionsMonitor = new Mock<IOptionsMonitor<ConsoleLoggerOptions>>();
+            mockOptionsMonitor
+                .SetupGet(mom => mom.CurrentValue)
+                .Returns(options);
+
+            var providers = new List<ILoggerProvider>()
+            {
+                new ConsoleLoggerProvider(mockOptionsMonitor.Object)
+            };
+
+            var loggerFactory = new LoggerFactory(providers);
+            return loggerFactory;
         }
 
         private static void RunFunc(Func<Task> func)
@@ -167,6 +189,11 @@ namespace DashAccountingSystemV2.Tests
                     }
                 }
             }
+        }
+
+        public static void RunTestAsync(Func<Task> testAction)
+        {
+            RunTestAsync(() => Task.CompletedTask, () => Task.CompletedTask, testAction);
         }
     }
 }

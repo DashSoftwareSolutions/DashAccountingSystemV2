@@ -3,17 +3,16 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+// using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Npgsql;
 using Serilog;
 using DashAccountingSystemV2.BusinessLogic;
+using DashAccountingSystemV2.Caching;
 using DashAccountingSystemV2.Data;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
@@ -82,6 +81,7 @@ namespace DashAccountingSystemV2
 
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
+            services.AddCaching();
             services.AddRepositories();
             services.AddBusinessLogic();
 

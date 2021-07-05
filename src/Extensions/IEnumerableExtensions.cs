@@ -7,6 +7,17 @@ namespace DashAccountingSystemV2.Extensions
     public static class IEnumerableExtensions
     {
         /// <summary>
+        /// Creates enumerable from parameters
+        /// </summary>
+        /// <typeparam name="T">Item type</typeparam>
+        /// <param name="items">items</param>
+        /// <returns>IEnumerable of items</returns>
+        public static IEnumerable<T> CreateEnumerable<T>(params T[] items)
+        {
+            return items ?? Enumerable.Empty<T>();
+        }
+
+        /// <summary>
         /// Safe alternative to IEnumerable&lt;T&gt;.Any() method that includes a null check, providing some syntactic sugar.
         /// </summary>
         /// <typeparam name="T">the type of thing in the collection</typeparam>
