@@ -262,6 +262,44 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "api/ledger/export-balance-sheet",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenantId\": \"{{tenantId}}\",\r\n    \"exportType\": \"BalanceSheetReport\",\r\n    \"exportFormat\": \"XLSX\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUri}}/api/ledger/export-balance-sheet",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"ledger",
+						"export-balance-sheet"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
