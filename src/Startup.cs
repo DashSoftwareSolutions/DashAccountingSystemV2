@@ -18,7 +18,10 @@ using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Repositories;
 using DashAccountingSystemV2.Security.Authentication;
 using DashAccountingSystemV2.Security.Authorization;
+using DashAccountingSystemV2.Security.ExportDownloads;
 using DashAccountingSystemV2.Services.Caching;
+using DashAccountingSystemV2.Services.Time;
+using static DashAccountingSystemV2.Security.Constants;
 
 namespace DashAccountingSystemV2
 {
@@ -82,14 +85,28 @@ namespace DashAccountingSystemV2
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
             services.AddCaching();
+            services.AddTimeProvider();
             services.AddRepositories();
             services.AddBusinessLogic();
+
+            services.AddExportDownloadSecurityTokenService();
 
             services.AddIdentityServer()
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
             services.AddAuthentication()
-                .AddIdentityServerJwt();
+                .AddIdentityServerJwt()
+                .AddExportDownloadToken();
+
+            // Add Authorization Policy for Export Download Token authentication
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(ExportDownloadAuthorizationPolicy, policy =>
+                {
+                    policy.AuthenticationSchemes.Add(ExportDownloadAuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                });
+            });
 
             services
                 .AddControllersWithViews()
