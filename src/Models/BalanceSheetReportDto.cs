@@ -4,6 +4,8 @@ namespace DashAccountingSystemV2.Models
 {
     public class BalanceSheetReportDto
     {
+        public Tenant Tenant { get; set; }
+
         public AssetType AssetType { get; set; }
 
         public IEnumerable<AccountWithBalanceDto> Assets { get; set; }

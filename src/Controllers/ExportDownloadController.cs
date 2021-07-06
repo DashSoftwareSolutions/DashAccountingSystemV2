@@ -4,7 +4,7 @@ using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ClosedXML.Excel;
+using ClosedXML.Report;
 using DashAccountingSystemV2.BusinessLogic;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.ViewModels;
@@ -22,15 +22,16 @@ namespace DashAccountingSystemV2.Controllers
     {
         public async Task<IActionResult> DownloadExport([FromQuery] ExportDescriptorRequestAndResponseViewModel viewModel)
         {
-            using (var wb = new XLWorkbook())
+            using (var template = new XLTemplate(@$"{AppContext.BaseDirectory}\ExcelTemplates\BalanceSheetReport.xlsx"))
             {
-                IXLWorksheet ws = wb.Worksheets.Add("Sample Sheet");
-
-                ws.Cell(1, 1).Value = "Hello World!";
+                template.AddVariable("tenant", new Tenant("Dash Software Solutions, Inc."));
+                template.AddVariable("reportDates", new { DateRangeEnd = new DateTime(2018, 9, 30).ToString("D") });
+                template.Generate();
 
                 using (var ms = new MemoryStream())
                 {
-                    wb.SaveAs(ms);
+                    template.SaveAs(ms);
+                    ms.Position = 0;
                     this.AppendContentDispositionResponseHeader("foo.xlsx");
                     return new FileContentResult(ms.ToArray(), EXCEL_MIME_TYPE);
                 }

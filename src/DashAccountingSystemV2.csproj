@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
+  <PropertyGroup Label="Package">
+    <PackageId>DashAccountingSystemV2</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Geoffrey Roberts</Authors>
+    <Company>Dash Software Solutions, Inc.</Company>
+    <Copyright>Copyright (C) 2021 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Build">
     <TargetFramework>net5.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
@@ -10,7 +18,7 @@
     <UserSecretsId>338122a3-0812-4421-ba78-e20c312529da</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Package References">
     <PackageReference Include="ClosedXML.Report" Version="0.2.1" />
     <PackageReference Include="Dapper" Version="2.0.90" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.7" />
@@ -47,14 +55,21 @@
   <ItemGroup>
     <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
+
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
+
   <ItemGroup>
+    <Folder Include="Services\Export\ExcelTemplates\" />
     <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
+  <ItemGroup Label="Excel Templates Include">
+    <ExcelTemplates Include="Services\Export\ExcelTemplates\*.xlsx" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
@@ -81,6 +96,14 @@
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </ResolvedFileToPublish>
     </ItemGroup>
+  </Target>
+
+  <Target Name="CopyExcelTemplates" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(ExcelTemplates)" DestinationFolder="$(OutDir)\ExcelTemplates" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyExcelTemplatesOnPublish" AfterTargets="Publish">
+    <Copy SourceFiles="@(ExcelTemplates)" DestinationFolder="$(PublishDir)\ExcelTemplates" SkipUnchangedFiles="true" />
   </Target>
 
 </Project>
