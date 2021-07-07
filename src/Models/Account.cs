@@ -22,6 +22,8 @@ namespace DashAccountingSystemV2.Models
         [MaxLength(255)]
         public string Name { get; private set; }
 
+        public string DisplayName => $"{AccountNumber} - {Name}";
+
         public string Description { get; set; }
 
         [Required]
