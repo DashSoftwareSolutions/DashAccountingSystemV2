@@ -7,7 +7,6 @@ using DashAccountingSystemV2.BusinessLogic;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.ViewModels;
 using DashAccountingSystemV2.Models;
-using DashAccountingSystemV2.Security.ExportDownloads;
 using DashAccountingSystemV2.Services.Export;
 
 namespace DashAccountingSystemV2.Controllers
@@ -20,18 +19,18 @@ namespace DashAccountingSystemV2.Controllers
         private readonly IAccountBusinessLogic _accountBusinessLogic = null;
         private readonly IAccountingReportBusinessLogic _accountingReportBusinessLogic = null;
         private readonly ILedgerBusinessLogic _ledgerBusinessLogic = null;
-        private readonly IExportDownloadSecurityTokenService _exportDownloadSecurityTokenService = null;
+        private readonly IExportService _exportService = null;
 
         public LedgerController(
             IAccountBusinessLogic accountBusinessLogic,
             IAccountingReportBusinessLogic accountingReportBusinessLogic,
             ILedgerBusinessLogic ledgerBusinessLogic,
-            IExportDownloadSecurityTokenService exportDownloadSecurityTokenService)
+            IExportService exportService)
         {
             _accountBusinessLogic = accountBusinessLogic;
             _accountingReportBusinessLogic = accountingReportBusinessLogic;
             _ledgerBusinessLogic = ledgerBusinessLogic;
-            _exportDownloadSecurityTokenService = exportDownloadSecurityTokenService;
+            _exportService = exportService;
         }
 
         [HttpGet("{tenantId:guid}/accounts")]
@@ -143,7 +142,7 @@ namespace DashAccountingSystemV2.Controllers
         }
 
         [HttpPost("export-balance-sheet")]
-        public async Task<IActionResult> RequestBalanceSheetExport([FromBody] ExportRequestViewModel viewModel)
+        public async Task<IActionResult> RequestBalanceSheetExport([FromBody] ExportRequestWithDateRangeViewModel viewModel)
         {
             if (viewModel == null)
                 return this.ErrorResponse("Invalid POST body");
@@ -157,20 +156,45 @@ namespace DashAccountingSystemV2.Controllers
             if (viewModel.TenantId == default(Guid))
                 return this.ErrorResponse("Tenant ID was not valid");
 
+            var parsedDateRangeStart = viewModel.DateRangeStart.TryParseAsDateTime();
+
+            if (!parsedDateRangeStart.HasValue)
+                return this.ErrorResponse("dateRangeStart was not a valid date/time value");
+
+            var parsedDateRangeEnd = viewModel.DateRangeEnd.TryParseAsDateTime();
+
+            if (!parsedDateRangeEnd.HasValue)
+                return this.ErrorResponse("dateRangeEnd was not a valid date/time value");
+
             // TODO: Validate Tenant exists and User has access
 
-            var exportDownloadToken = await _exportDownloadSecurityTokenService.RequestExportDownloadToken(
+            // TODO: Consider caching this data and then checking cache first before requesting fresh data from BLL/DAL
+            var balanceSheetReportBizLogicResponse = await _accountingReportBusinessLogic.GetBalanceSheetReport(
                 viewModel.TenantId,
-                User.GetUserId(),
-                viewModel.ExportType);
+                parsedDateRangeStart.Value,
+                parsedDateRangeEnd.Value);
 
-            if (exportDownloadToken == null)
-                return this.ErrorResponse("Unable to procure access token for export download", StatusCodes.Status500InternalServerError);
+            if (!balanceSheetReportBizLogicResponse.IsSuccessful)
+                return this.ErrorResponse(balanceSheetReportBizLogicResponse);
+
+            var exportRequestParams = new ExportRequestParameters()
+            {
+                ExportFormat = viewModel.ExportFormat,
+                ExportType = viewModel.ExportType,
+                RequestingUserId = User.GetUserId(),
+                TenantId = viewModel.TenantId,
+            };
+
+            var exportServiceResponse = await _exportService.GetDataExport(exportRequestParams, balanceSheetReportBizLogicResponse.Data);
+
+            if (!exportServiceResponse.IsSuccessful)
+                return this.ErrorResponse(exportServiceResponse.Error);
 
             var result = new ExportDescriptorRequestAndResponseViewModel()
             {
-                FileName = "foo-bar-baz-quux",
-                Token = exportDownloadToken,
+                Format = exportServiceResponse.ExportFormat, 
+                FileName = exportServiceResponse.FileName,
+                Token = exportServiceResponse.Token,
             };
 
             return Json(result);

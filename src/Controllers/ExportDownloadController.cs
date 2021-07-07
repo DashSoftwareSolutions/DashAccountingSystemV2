@@ -1,15 +1,12 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ClosedXML.Report;
-using DashAccountingSystemV2.BusinessLogic;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.ViewModels;
-using DashAccountingSystemV2.Models;
-using DashAccountingSystemV2.Security.ExportDownloads;
+using DashAccountingSystemV2.Services.Caching;
 using DashAccountingSystemV2.Services.Export;
 using static DashAccountingSystemV2.Security.Constants;
 
@@ -20,22 +17,40 @@ namespace DashAccountingSystemV2.Controllers
     [Route("api/export-download")]
     public class ExportDownloadController : Controller
     {
+        private readonly IExtendedDistributedCache _cache = null;
+
+        public ExportDownloadController(IExtendedDistributedCache cache)
+        {
+            _cache = cache;
+        }
+
         public async Task<IActionResult> DownloadExport([FromQuery] ExportDescriptorRequestAndResponseViewModel viewModel)
         {
-            using (var template = new XLTemplate(@$"{AppContext.BaseDirectory}\ExcelTemplates\BalanceSheetReport.xlsx"))
-            {
-                template.AddVariable("tenant", new Tenant("Dash Software Solutions, Inc."));
-                template.AddVariable("reportDates", new { DateRangeEnd = new DateTime(2018, 9, 30).ToString("D") });
-                template.Generate();
+            if (viewModel == null)
+                return this.ErrorResponse("Invalid download request");
 
-                using (var ms = new MemoryStream())
-                {
-                    template.SaveAs(ms);
-                    ms.Position = 0;
-                    this.AppendContentDispositionResponseHeader("foo.xlsx");
-                    return new FileContentResult(ms.ToArray(), EXCEL_MIME_TYPE);
-                }
-            }
+            var tenantId = User.FindFirstValue(DashClaimTypes.TenantId);
+            var cacheKey = $"{tenantId}/{viewModel.FileName}";
+
+            var exportContent = await _cache.GetAsync(cacheKey);
+
+            if (exportContent == null)
+                return this.ErrorResponse("Requested data export not found", StatusCodes.Status404NotFound);
+
+            var fileNameWithExtension = AppendExtensionToFileName(viewModel.FileName, viewModel.Format);
+            var mimeType = GetMimeTypeFromFormat(viewModel.Format);
+
+            this.AppendContentDispositionResponseHeader(fileNameWithExtension);
+            return new FileContentResult(exportContent, mimeType);
+        }
+
+        private string AppendExtensionToFileName(string baseFileName, ExportFormat format)
+        {
+            var extension = format == ExportFormat.Unknown ?
+                string.Empty :
+                $".{format.ToString().ToLower()}";
+
+            return $"{baseFileName}{extension}";
         }
 
         private string GetMimeTypeFromFormat(ExportFormat format)

@@ -20,6 +20,7 @@ using DashAccountingSystemV2.Security.Authentication;
 using DashAccountingSystemV2.Security.Authorization;
 using DashAccountingSystemV2.Security.ExportDownloads;
 using DashAccountingSystemV2.Services.Caching;
+using DashAccountingSystemV2.Services.Export;
 using DashAccountingSystemV2.Services.Time;
 using static DashAccountingSystemV2.Security.Constants;
 
@@ -90,6 +91,7 @@ namespace DashAccountingSystemV2
             services.AddBusinessLogic();
 
             services.AddExportDownloadSecurityTokenService();
+            services.AddExportService();
 
             services.AddIdentityServer()
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();

@@ -2,9 +2,11 @@
 
 namespace DashAccountingSystemV2.Services.Export
 {
-    public abstract class BaseExportRequestParameters
+    public class ExportRequestParameters
     {
         public Guid TenantId { get; set; }
+
+        public Guid RequestingUserId { get; set; }
 
         public ExportFormat ExportFormat { get; set; }
 

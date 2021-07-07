@@ -5,7 +5,7 @@ using DashAccountingSystemV2.Services.Export;
 
 namespace DashAccountingSystemV2.ViewModels
 {
-    public class ExportRequestViewModel
+    public class BaseExportRequestViewModel
     {
         public Guid TenantId { get; set; }
 

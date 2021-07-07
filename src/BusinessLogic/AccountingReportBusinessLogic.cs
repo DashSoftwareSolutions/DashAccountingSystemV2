@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Repositories;
 
@@ -12,15 +13,18 @@ namespace DashAccountingSystemV2.BusinessLogic
     {
         private readonly IAccountRepository _accountRepository = null;
         private readonly IJournalEntryRepository _journalEntryRepository = null;
+        private readonly ITenantRepository _tenantRepository = null;
         private readonly ILogger _logger = null;
 
         public AccountingReportBusinessLogic(
             IAccountRepository accountRepository,
             IJournalEntryRepository journalEntryRepository,
+            ITenantRepository tenantRepository,
             ILogger<AccountingReportBusinessLogic> logger)
         {
             _accountRepository = accountRepository;
             _journalEntryRepository = journalEntryRepository;
+            _tenantRepository = tenantRepository;
             _logger = logger;
         }
 
@@ -28,6 +32,15 @@ namespace DashAccountingSystemV2.BusinessLogic
         {
             _logger.LogDebug("Compiling data for Balance Sheet Report for date range from {0:d} to {1:d}", dateRangeStart, dateRangeEnd);
             _logger.LogDebug("Getting final balances for all Assets, Liabilities and Equities accounts...");
+
+            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
+            
+            if (tenant == null)
+            {
+                return new BusinessLogicResponse<BalanceSheetReportDto>(ErrorType.RequestedEntityNotFound, "Tenant not found");
+            }
+
+            // TODO: Check that user has access to this tenant and permission for balance sheet data
 
             var balanceSheetAccountsResponse = await GetAccounts(
                 tenantId,
@@ -41,7 +54,7 @@ namespace DashAccountingSystemV2.BusinessLogic
 
             var balanaceSheetAccounts = balanceSheetAccountsResponse.Data;
 
-            // TODO/FIXME: Need to refactor so we don't have to worry about Asset Type!
+            // TODO/FIXME: Need to refactor to get this from the Tenant
             var assetType = balanaceSheetAccounts.Select(a => a.Account.AssetType).First();
 
             var assetAccounts = balanaceSheetAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Assets);
@@ -100,6 +113,8 @@ namespace DashAccountingSystemV2.BusinessLogic
                 return new BusinessLogicResponse<BalanceSheetReportDto>(
                     new BalanceSheetReportDto()
                     {
+                        Tenant = tenant,
+                        DateRange = new DateRange(dateRangeStart, dateRangeEnd),
                         AssetType = assetType,
                         Assets = assetAccounts,
                         Liabilities = liabilityAccounts,
@@ -118,13 +133,15 @@ namespace DashAccountingSystemV2.BusinessLogic
             // * If we have a positive discrepency (i.e. Debit / more Assets), we need to _increase_ the Retained Earnings amount by adding an additional negative (Credit) amount
             // * If we have a negative discrepency (i.e. Credit / more Liabilities and Equities), we need to _decrease_ the Retained Earnings amount by adding an additional positive (Debit) amount
             // TODO: After checking again, I noticed QuickBooks seems to consider Retained Earnings to be updated yearly.  Need to see if I can mimic that.
-            var adjustedDiscrepency = discrepency * -1;
+            var adjustedDiscrepency = discrepency.WithNormalBalanceType(AmountType.Credit);
             var computedRetainedEarnings = retainedEarningsAccount.CurrentBalance + adjustedDiscrepency;
 
             _logger.LogDebug("Computed Retained Earnings Balance: {0:N2}", computedRetainedEarnings);
 
             var result = new BalanceSheetReportDto()
             {
+                Tenant = tenant,
+                DateRange = new DateRange(dateRangeStart, dateRangeEnd),
                 AssetType = assetType,
 
                 Assets = assetAccounts,

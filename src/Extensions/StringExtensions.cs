@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DashAccountingSystemV2.Extensions
@@ -89,6 +92,286 @@ namespace DashAccountingSystemV2.Extensions
 
         private static readonly Regex s_passwordClausePattern =
             new Regex("password\\s*=\\s*([^,;]*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+
+        /// <summary>
+        /// Performs Unicode Normalization
+        /// </summary>
+        /// <remarks>
+        /// The commented out live implementation can be problematic, especially in cross-platform sceanrios (or at least it was as of a few years ago).
+        /// For now, <see cref="ReplaceKnownUnicodeLigatures(string)"/> is doing all the work for a Poor Man's version.
+        /// </remarks>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string RemoveDiacritics(this string input)
+        {
+            if (input == null) return null;
+
+            var replaced = input.ReplaceKnownUnicodeLigatures();
+            return replaced; // short-circuit actual normalization for now, due to all the trouble it is causing
+
+            // Another poor man's attempt found on Stack Overflow.  Probably not quite the right thing to do in all scenarios.
+            //byte[] bytes = Encoding.GetEncoding("Cyrillic").GetBytes(replaced);
+            //return Encoding.ASCII.GetString(bytes);
+
+            // "Real" code that tries to do the "right thing" using the .NET APIs designed for this
+            // but was having issues, especially in cross-platform scenarios, but even with inconsistent behavior
+            // between debugging via Visual Studio versus running on command line via `dotnet run`
+            //var normalizedString = replaced.Normalize(NormalizationForm.FormD);
+            //var stringBuilder = new StringBuilder(replaced.Length);
+
+            //foreach (var c in normalizedString)
+            //{
+            //    var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            //    if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            //    {
+            //        stringBuilder.Append(c);
+            //    }
+            //}
+
+            //return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        /// <summary>
+        /// Returns a new string in which all occurrences of a specified string in the current instance are replaced with another 
+        /// specified string according the type of search to use for the specified string.
+        /// </summary>
+        /// <remarks>
+        /// Borrowed from https://stackoverflow.com/questions/6275980/string-replace-ignoring-case
+        /// </remarks>
+        /// <param name="str">The string performing the replace method.</param>
+        /// <param name="oldValue">The string to be replaced.</param>
+        /// <param name="newValue">The string replace all occurrences of <paramref name="oldValue"/>. 
+        /// If value is equal to <c>null</c>, than all occurrences of <paramref name="oldValue"/> will be removed from the <paramref name="str"/>.</param>
+        /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
+        /// <returns>A string that is equivalent to the current string except that all instances of <paramref name="oldValue"/> are replaced with <paramref name="newValue"/>. 
+        /// If <paramref name="oldValue"/> is not found in the current instance, the method returns the current instance unchanged.</returns>
+        [DebuggerStepThrough]
+        public static string Replace(this string str,
+            string oldValue, string @newValue,
+            StringComparison comparisonType)
+        {
+
+            // Check inputs.
+            if (str == null)
+            {
+                // Same as original .NET C# string.Replace behavior.
+                throw new ArgumentNullException(nameof(str));
+            }
+            if (str.Length == 0)
+            {
+                // Same as original .NET C# string.Replace behavior.
+                return str;
+            }
+            if (oldValue == null)
+            {
+                // Same as original .NET C# string.Replace behavior.
+                throw new ArgumentNullException(nameof(oldValue));
+            }
+            if (oldValue.Length == 0)
+            {
+                // Same as original .NET C# string.Replace behavior.
+                throw new ArgumentException("String cannot be of zero length.");
+            }
+
+            // Prepare string builder for storing the processed string.
+            // Note: StringBuilder has a better performance than String by 30-40%.
+            StringBuilder resultStringBuilder = new StringBuilder(str.Length);
+
+            // Analyze the replacement: replace or remove.
+            bool isReplacementNullOrEmpty = string.IsNullOrEmpty(@newValue);
+
+            // Replace all values.
+            const int valueNotFound = -1;
+            int foundAt;
+            int startSearchFromIndex = 0;
+            while ((foundAt = str.IndexOf(oldValue, startSearchFromIndex, comparisonType)) != valueNotFound)
+            {
+                // Append all characters until the found replacement.
+                int @charsUntilReplacment = foundAt - startSearchFromIndex;
+                bool isNothingToAppend = @charsUntilReplacment == 0;
+                if (!isNothingToAppend)
+                {
+                    resultStringBuilder.Append(str, startSearchFromIndex, @charsUntilReplacment);
+                }
+
+
+                // Process the replacement.
+                if (!isReplacementNullOrEmpty)
+                {
+                    resultStringBuilder.Append(@newValue);
+                }
+
+                // Prepare start index for the next search.
+                // This needed to prevent infinite loop, otherwise method always start search 
+                // from the start of the string. For example: if an oldValue == "EXAMPLE", newValue == "example"
+                // and comparisonType == "any ignore case" will conquer to replacing:
+                // "EXAMPLE" to "example" to "example" to "example" … infinite loop.
+                startSearchFromIndex = foundAt + oldValue.Length;
+                if (startSearchFromIndex == str.Length)
+                {
+                    // It is end of the input string: no more space for the next search.
+                    // The input string ends with a value that has already been replaced. 
+                    // Therefore, the string builder with the result is complete and no further action is required.
+                    return resultStringBuilder.ToString();
+                }
+            }
+
+            // Append the last part to the result.
+            int @charsUntilStringEnd = str.Length - startSearchFromIndex;
+            resultStringBuilder.Append(str, startSearchFromIndex, @charsUntilStringEnd);
+
+            return resultStringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Poor Man's handling of certain Unicode ligatures and diacritics that have multi-letter replacements,
+        /// e.g. German vowels with umlauts, etc.
+        /// Not 100% fool-proof ... it does not seem to be the case that all such characters have one unambigous replacement!
+        /// Seems to depend on the particular word and the target locale (language and culture):
+        /// https://en.wikipedia.org/wiki/List_of_words_that_may_be_spelled_with_a_ligature
+        /// 
+        /// This was originally built up from:
+        /// https://stackoverflow.com/questions/1271567/how-do-i-replace-accents-german-in-net
+        /// (which was designed for German, so hopefully it'll should be AWESOME for Saddleback Berlin!)
+        /// I'm sure all of my wonderful Unicode normalization stuff is going to FAIL MISERABLY for Chinese
+        /// if used at Saddleback Hong Kong...
+        /// 
+        /// So ... standard disclaimer on the lack of an express or implied warrant of merchantability for any...
+        /// yadda yadda yadda ... you get the idea! Caveat emptor! =)
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string ReplaceKnownUnicodeLigatures(this string input)
+        {
+            if (input == null) return null;
+
+            return input.Aggregate(
+              new StringBuilder(),
+              (sb, c) =>
+              {
+                  string r;
+                  if (_ligatureReplacements.TryGetValue(c, out r))
+                      return sb.Append(r);
+                  else
+                      return sb.Append(c);
+              }).ToString();
+        }
+
+        // Feel free to add to this as needed.
+        // Beware!  These seem to be language and culture (i.e. locale) dependent. 
+        // The "correct" replacement can vary, depending on the specific word and context.
+        private static Dictionary<char, string> _ligatureReplacements = new Dictionary<char, string>()
+        {
+            // original list of replacements
+            { 'ä', "ae" },
+            { 'Æ', "Ae" },
+            { 'æ', "ae" },
+            { 'ö', "oe" },
+            { 'ü', "ue" },
+            { 'Ä', "Ae" },
+            { 'Ö', "Oe" },
+            { 'Ü', "Ue" },
+            { 'ß', "ss" },
+            // hard-coded replacements to work around normalization issue
+            // replacements might or might not be linguistically correct... Geoffrey did best he could...
+            { 'À', "A" },
+            { 'Á', "A" },
+            { 'Â', "A" },
+            { 'Ã', "A" },
+            { 'Å', "A" },
+            { 'Ç', "C" },
+            { 'È', "E" },
+            { 'É', "E" },
+            { 'Ê', "E" },
+            { 'Ì', "I" },
+            { 'Í', "I" },
+            { 'Î', "I" },
+            { 'Ï', "I" },
+            { 'Ð', "Th" }, // Latin Eth (capital)
+            { 'Ñ', "N" },
+            { 'Ò', "O" },
+            { 'Ó', "O" },
+            { 'Ô', "O" },
+            { 'Õ', "O" },
+            { 'Ø', "O" },
+            { 'Ù', "U" },
+            { 'Ú', "U" },
+            { 'Û', "U" },
+            { 'Ý', "Y" },
+            { 'Þ', "Th" }, // Latin Thorn (capital)
+            { 'à', "a" },
+            { 'á', "a" },
+            { 'â', "a" },
+            { 'ã', "a" },
+            { 'å', "a" },
+            { 'ç', "c" },
+            { 'è', "e" },
+            { 'é', "e" },
+            { 'ê', "e" },
+            { 'ë', "e" },
+            { 'ì', "i" },
+            { 'í', "i" },
+            { 'î', "i" },
+            { 'ï', "i" },
+            { 'ð', "th" }, // Latin Eth (lowercase)
+            { 'ñ', "n" },
+            { 'ò', "o" },
+            { 'ó', "o" },
+            { 'ô', "o" },
+            { 'õ', "o" },
+            { 'ø', "o" },
+            { 'ù', "u" },
+            { 'ú', "u" },
+            { 'û', "u" },
+            { 'ý', "y" },
+            { 'þ', "th" }, // Latin Thorn (lowercase)
+            { 'ÿ', "y" },
+        };
+
+        /// <summary>
+        /// Converts a string into a URL "slug" or other programatically valid identifier
+        /// e.g.
+        ///     Dash Software Solutions, Inc. => dash-software-solutions-inc
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="delimiter"></param>
+        /// <returns></returns>
+        public static string Slugify(
+            this string input,
+            bool forceLowercase = true,
+            string delimiter = "-")
+        {
+            if (input == null) return null;
+
+            var escapedDelimiter = Regex.Escape(delimiter);
+
+            var s = RemoveDiacritics(input);
+
+            if (forceLowercase)
+                s = s.ToLower();
+
+            // replace ampersands with "and"
+            s = s.Replace("&", " and ");
+
+            // replace forward slash with delimiter
+            s = s.Replace("/", delimiter);
+
+            // strip invalid chars
+            var pattern = $"[^A-Za-z0-9\\s{escapedDelimiter}]";
+            s = Regex.Replace(s, pattern, string.Empty);
+
+            // reduce multiple spaces into one space
+            s = Regex.Replace(s, @"[\s]+", " ").Trim();
+
+            // replace multiple delimiters with a space
+            s = Regex.Replace(s, $"{escapedDelimiter}+", " ").Trim();
+
+            // replace any remaining whitespace with delimiters
+            s = Regex.Replace(s, @"\s+", delimiter);
+
+            return s;
+        }
 
         public static DateTime? TryParseAsDateTime(this string viewModelDateTime, bool isUtc = false)
         {

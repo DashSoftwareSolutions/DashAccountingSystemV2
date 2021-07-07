@@ -280,7 +280,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"tenantId\": \"{{tenantId}}\",\r\n    \"exportType\": \"BalanceSheetReport\",\r\n    \"exportFormat\": \"XLSX\"\r\n}",
+					"raw": "{\r\n    \"tenantId\": \"{{tenantId}}\",\r\n    \"exportType\": \"BalanceSheetReport\",\r\n    \"exportFormat\": \"XLSX\",\r\n    \"dateRangeStart\": \"{{dateRangeStart}}\",\r\n    \"dateRangeEnd\": \"{{dateRangeEnd}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
