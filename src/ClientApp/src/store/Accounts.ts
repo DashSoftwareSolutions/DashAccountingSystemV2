@@ -11,6 +11,8 @@ import authService from '../components/api-authorization/AuthorizeService';
 import Account from '../models/Account';
 import AccountCategoryList from '../models/AccountCategoryList';
 import AccountSelectOption from '../models/AccountSelectOption';
+import ActionType from './ActionType';
+import IAction from './IAction';
 
 export interface AccountsState {
     isLoading: boolean;
@@ -19,17 +21,17 @@ export interface AccountsState {
     selectedAccount: Account | null,
 }
 
-interface RequestAccountsAction {
-    type: 'REQUEST_ACCOUNTS';
+interface RequestAccountsAction extends IAction {
+    type: ActionType.REQUEST_ACCOUNTS;
 }
 
-interface ReceiveAccountsAction {
-    type: 'RECEIVE_ACCOUNTS';
+interface ReceiveAccountsAction extends IAction {
+    type: ActionType.RECEIVE_ACCOUNTS;
     accounts: Account[];
 }
 
-interface SelectAccountAction {
-    type: 'SELECT_ACCOUNT';
+interface SelectAccountAction extends IAction {
+    type: ActionType.SELECT_ACCOUNT;
     account: Account;
 }
 
@@ -61,17 +63,16 @@ export const actionCreators = {
                 })
                 .then(data => {
                     if (!isNil(data)) {
-                        dispatch({ type: 'RECEIVE_ACCOUNTS', accounts: data });
+                        dispatch({ type: ActionType.RECEIVE_ACCOUNTS, accounts: data });
                     }
                 });
 
-            dispatch({ type: 'REQUEST_ACCOUNTS' });
+            dispatch({ type: ActionType.REQUEST_ACCOUNTS });
         }
     },
 
     selectAccount: (account: Account): AppThunkAction<KnownAction> => (dispatch) => {
-        console.log('Selected account:', account);
-        dispatch({ type: 'SELECT_ACCOUNT', account });
+        dispatch({ type: ActionType.SELECT_ACCOUNT, account });
     }
 };
 
@@ -91,13 +92,13 @@ export const reducer: Reducer<AccountsState> = (state: AccountsState | undefined
 
     if (!isNil(action)) {
         switch (action.type) {
-            case 'REQUEST_ACCOUNTS':
+            case ActionType.REQUEST_ACCOUNTS:
                 return {
                     ...state,
                     isLoading: true
                 };
 
-            case 'RECEIVE_ACCOUNTS':
+            case ActionType.RECEIVE_ACCOUNTS:
             {
                 const accountSelectOptions = map(
                     groupBy(
@@ -121,7 +122,7 @@ export const reducer: Reducer<AccountsState> = (state: AccountsState | undefined
                 };
             }
 
-            case 'SELECT_ACCOUNT':
+            case ActionType.SELECT_ACCOUNT:
                 return {
                     ...state,
                     selectedAccount: action.account,

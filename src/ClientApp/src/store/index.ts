@@ -1,5 +1,6 @@
 ﻿import * as Accounts from './Accounts';
 import * as BalanceSheet from './BalanceSheet';
+import * as ExportDownload from './Export';
 import * as JournalEntry from './JournalEntry';
 import * as Ledger from './Ledger';
 import * as LookupValues from './LookupValues';
@@ -12,6 +13,7 @@ import * as WeatherForecasts from './WeatherForecasts';  // from scaffolded exam
 export interface ApplicationState {
     accounts: Accounts.AccountsState | undefined;
     balanceSheet: BalanceSheet.BalanceSheetState | undefined,
+    exportDownload: ExportDownload.ExportState | undefined,
     journalEntry: JournalEntry.JournalEntryState | undefined;
     ledger: Ledger.LedgerState | undefined;
     lookups: LookupValues.LookupValuesState | undefined;
@@ -27,6 +29,7 @@ export interface ApplicationState {
 export const reducers = {
     accounts: Accounts.reducer,
     balanceSheet: BalanceSheet.reducer,
+    exportDownload: ExportDownload.reducer,
     journalEntry: JournalEntry.reducer,
     ledger: Ledger.reducer,
     lookups: LookupValues.reducer,

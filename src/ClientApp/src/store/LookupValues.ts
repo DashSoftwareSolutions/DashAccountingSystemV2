@@ -3,9 +3,11 @@ import { isEmpty, isNil } from 'lodash';
 import { AppThunkAction } from './';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
+import ActionType from './ActionType';
 import AccountSubType from '../models/AccountSubType';
 import AccountType from '../models/AccountType';
 import AssetType from '../models/AssetType';
+import IAction from './IAction';
 
 export interface LookupValuesState {
     isLoading: boolean;
@@ -14,12 +16,12 @@ export interface LookupValuesState {
     assetTypes: AssetType[];
 }
 
-interface RequestLookupValuesAction {
-    type: 'REQUEST_LOOKUPS';
+interface RequestLookupValuesAction extends IAction {
+    type: ActionType.REQUEST_LOOKUPS;
 }
 
-interface ReceiveLookupValuesAction {
-    type: 'RECEIVE_LOOKUPS';
+interface ReceiveLookupValuesAction extends IAction {
+    type: ActionType.RECEIVE_LOOKUPS;
     accountTypes: AccountType[];
     accountSubTypes: AccountSubType[];
     assetTypes: AssetType[];
@@ -64,7 +66,7 @@ export const actionCreators = {
                         } = data;
 
                         dispatch({
-                            type: 'RECEIVE_LOOKUPS',
+                            type: ActionType.RECEIVE_LOOKUPS,
                             accountTypes,
                             accountSubTypes,
                             assetTypes,
@@ -72,7 +74,7 @@ export const actionCreators = {
                     }
                 });
 
-            dispatch({ type: 'REQUEST_LOOKUPS' });
+            dispatch({ type: ActionType.REQUEST_LOOKUPS });
         }
     },
 }
@@ -93,13 +95,13 @@ export const reducer: Reducer<LookupValuesState> = (state: LookupValuesState | u
 
     if (!isNil(action)) {
         switch (action.type) {
-            case 'REQUEST_LOOKUPS':
+            case ActionType.REQUEST_LOOKUPS:
                 return {
                     ...state,
                     isLoading: true
                 };
 
-            case 'RECEIVE_LOOKUPS':
+            case ActionType.RECEIVE_LOOKUPS:
                 return {
                     ...state,
                     accountTypes: action.accountTypes,

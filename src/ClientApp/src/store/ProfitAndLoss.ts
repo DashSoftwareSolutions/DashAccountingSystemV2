@@ -7,6 +7,8 @@ import moment from 'moment-timezone';
 import { Logger } from '../common/Logging';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
+import ActionType from './ActionType';
+import IAction from './IAction';
 import ProfitAndLossReport from '../models/ProfitAndLossReport';
 
 export interface ProfitAndLossState {
@@ -16,27 +18,27 @@ export interface ProfitAndLossState {
     dateRangeEnd: string;
 }
 
-interface RequestProfitAndLossReportDataAction {
-    type: 'REQUEST_PROFIT_AND_LOSS_REPORT_DATA';
+interface RequestProfitAndLossReportDataAction extends IAction {
+    type: ActionType.REQUEST_PROFIT_AND_LOSS_REPORT_DATA;
 }
 
-interface ReceiveProfitAndLossReportDataAction {
-    type: 'RECEIVE_PROFIT_AND_LOSS_REPORT_DATA';
+interface ReceiveProfitAndLossReportDataAction extends IAction {
+    type: ActionType.RECEIVE_PROFIT_AND_LOSS_REPORT_DATA;
     report: ProfitAndLossReport;
 }
 
-interface UpdateProfitAndLossReportDateRangeStartAction {
-    type: 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START';
+interface UpdateProfitAndLossReportDateRangeStartAction extends IAction {
+    type: ActionType.UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START;
     dateRangeStart: string;
 }
 
-interface UpdateProfitAndLossReportDateRangeEndAction {
-    type: 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END';
+interface UpdateProfitAndLossReportDateRangeEndAction extends IAction {
+    type: ActionType.UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END;
     dateRangeEnd: string;
 }
 
-interface ResetProfitAndLossReportDataAction {
-    type: 'RESET_PROFIT_AND_LOSS_REPORT_DATA';
+interface ResetProfitAndLossReportDataAction extends IAction {
+    type: ActionType.RESET_PROFIT_AND_LOSS_REPORT_DATA;
 }
 
 type KnownAction = RequestProfitAndLossReportDataAction |
@@ -45,6 +47,8 @@ type KnownAction = RequestProfitAndLossReportDataAction |
     UpdateProfitAndLossReportDateRangeEndAction |
     ResetProfitAndLossReportDataAction;
 
+// Always have a logger in case we need to use it for debuggin'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger = new Logger('Profit And Loss Store');
 
 export const actionCreators = {
@@ -75,24 +79,24 @@ export const actionCreators = {
                 })
                 .then((report) => {
                     if (!isNil(report)) {
-                        dispatch({ type: 'RECEIVE_PROFIT_AND_LOSS_REPORT_DATA', report });
+                        dispatch({ type: ActionType.RECEIVE_PROFIT_AND_LOSS_REPORT_DATA, report });
                     }
                 });
 
-            dispatch({ type: 'REQUEST_PROFIT_AND_LOSS_REPORT_DATA' });
+            dispatch({ type: ActionType.REQUEST_PROFIT_AND_LOSS_REPORT_DATA });
         }
     },
 
     updateDateRangeStart: (dateRangeStart: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START', dateRangeStart });
+        dispatch({ type: ActionType.UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START, dateRangeStart });
     },
 
     updateDateRangeEnd: (dateRangeEnd: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END', dateRangeEnd });
+        dispatch({ type: ActionType.UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END, dateRangeEnd });
     },
 
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'RESET_PROFIT_AND_LOSS_REPORT_DATA' });
+        dispatch({ type: ActionType.RESET_PROFIT_AND_LOSS_REPORT_DATA });
     },
 };
 
@@ -113,32 +117,32 @@ export const reducer: Reducer<ProfitAndLossState> = (state: ProfitAndLossState |
 
     if (!isNil(action)) {
         switch (action.type) {
-            case 'REQUEST_PROFIT_AND_LOSS_REPORT_DATA':
+            case ActionType.REQUEST_PROFIT_AND_LOSS_REPORT_DATA:
                 return {
                     ...state,
                     isLoading: true,
                 };
 
-            case 'RECEIVE_PROFIT_AND_LOSS_REPORT_DATA':
+            case ActionType.RECEIVE_PROFIT_AND_LOSS_REPORT_DATA:
                 return {
                     ...state,
                     isLoading: false,
                     reportData: action.report,
                 };
 
-            case 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START':
+            case ActionType.UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_START:
                 return {
                     ...state,
                     dateRangeStart: action.dateRangeStart,
                 };
 
-            case 'UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END':
+            case ActionType.UPDATE_PROFIT_AND_LOSS_REPORT_DATE_RANGE_END:
                 return {
                     ...state,
                     dateRangeEnd: action.dateRangeEnd,
                 };
 
-            case 'RESET_PROFIT_AND_LOSS_REPORT_DATA':
+            case ActionType.RESET_PROFIT_AND_LOSS_REPORT_DATA:
                 return {
                     ...state,
                     isLoading: false,

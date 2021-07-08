@@ -14,7 +14,9 @@ import { isStringNullOrWhiteSpace } from '../common/StringUtils';
 import { Logger } from '../common/Logging';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
+import ActionType from './ActionType';
 import AmountType from '../models/AmountType';
+import IAction from './IAction';
 import JournalEntry from '../models/JournalEntry';
 import JournalEntryAccount from '../models/JournalEntryAccount';
 
@@ -66,113 +68,112 @@ export interface JournalEntryState {
 }
 
 /* BEGIN: REST API Actions */
-interface RequestJournalEntryAction {
-    type: 'REQUEST_JOURNAL_ENTRY';
+interface RequestJournalEntryAction extends IAction {
+    type: ActionType.REQUEST_JOURNAL_ENTRY;
 };
 
-interface ReceiveJournalEntryAction {
-    type: 'RECEIVE_JOURNAL_ENTRY';
+interface ReceiveJournalEntryAction extends IAction {
+    type: ActionType.RECEIVE_JOURNAL_ENTRY;
     entry: JournalEntry;
 }
 
-interface SaveNewJournalEntryRequestAction {
-    type: 'REQUEST_SAVE_NEW_JOURNAL_ENTRY';
+interface SaveNewJournalEntryRequestAction extends IAction {
+    type: ActionType.REQUEST_SAVE_NEW_JOURNAL_ENTRY;
 }
 
-interface SaveNewJournalEntryResponseAction {
-    type: 'NEW_JOURNAL_ENTRY_SAVE_COMPLETED';
+interface SaveNewJournalEntryResponseAction extends IAction {
+    type: ActionType.NEW_JOURNAL_ENTRY_SAVE_COMPLETED;
     savedEntry: JournalEntry;
 }
 
-interface SaveUpdatedJournalEntryRequestAction {
-    type: 'REQUEST_SAVE_UPDATED_JOURNAL_ENTRY';
+interface SaveUpdatedJournalEntryRequestAction extends IAction {
+    type: ActionType.REQUEST_SAVE_UPDATED_JOURNAL_ENTRY;
 }
 
-interface SaveUpdatedJournalEntryResponseAction {
-    type: 'UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED';
+interface SaveUpdatedJournalEntryResponseAction extends IAction {
+    type: ActionType.UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED;
     savedEntry: JournalEntry;
 }
 
-interface PostJournalEntryRequestAction {
-    type: 'REQUEST_POST_JOURNAL_ENTRY';
+interface PostJournalEntryRequestAction extends IAction {
+    type: ActionType.REQUEST_POST_JOURNAL_ENTRY;
 }
 
-interface PostJournalEntryResponseAction {
-    type: 'POST_JOURNAL_ENTRY_COMPLETED';
+interface PostJournalEntryResponseAction extends IAction {
+    type: ActionType.POST_JOURNAL_ENTRY_COMPLETED;
     savedEntry: JournalEntry;
 }
 
-interface DeleteJournalEntryRequestAction {
-    type: 'REQUEST_DELETE_JOURNAL_ENTRY';
+interface DeleteJournalEntryRequestAction extends IAction {
+    type: ActionType.REQUEST_DELETE_JOURNAL_ENTRY;
 }
 
-interface DeleteJournalEntryResponseAction {
-    type: 'DELETE_JOURNAL_ENTRY_COMPLETED';
+interface DeleteJournalEntryResponseAction extends IAction {
+    type: ActionType.DELETE_JOURNAL_ENTRY_COMPLETED;
 }
 
-// TODO: Other CUD actions as needed, e.g. Delete, Cancel, etc.
 // TODO: API Error Handling
 
 /* END: REST API Actions */
 
 /* BEGIN: UI Gesture Actions */
-interface InitializeNewJournalEntryAction {
-    type: 'INITIALIZE_NEW_JOURNAL_ENTRY';
+interface InitializeNewJournalEntryAction extends IAction {
+    type: ActionType.INITIALIZE_NEW_JOURNAL_ENTRY;
     tenantId: string; // GUID
 }
 
-interface EditJournalEntryAction {
-    type: 'EDIT_JOURNAL_ENTRY';
+interface EditJournalEntryAction extends IAction {
+    type: ActionType.EDIT_JOURNAL_ENTRY;
 }
 
-interface UpdateEntryDateAction {
-    type: 'UPDATE_JOURNAL_ENTRY_ENTRY_DATE';
+interface UpdateEntryDateAction extends IAction {
+    type: ActionType.UPDATE_JOURNAL_ENTRY_ENTRY_DATE;
     entryDate: string | null; // Date as YYYY-MM-DD / `null` to clear out an existing value
 }
 
-interface UpdatePostDateAction {
-    type: 'UPDATE_JOURNAL_ENTRY_POST_DATE';
+interface UpdatePostDateAction extends IAction {
+    type: ActionType.UPDATE_JOURNAL_ENTRY_POST_DATE;
     postDate: string | null; // Date as YYYY-MM-DD / `null` to clear out an existing value
 }
 
-interface UpdateDescriptionAction {
-    type: 'UPDATE_JOURNAL_ENTRY_DESCRIPTION';
+interface UpdateDescriptionAction extends IAction {
+    type: ActionType.UPDATE_JOURNAL_ENTRY_DESCRIPTION;
     description: string | null; // `null` can clean out an existing value
 }
 
-interface UpdateNoteAction {
-    type: 'UPDATE_JOURNAL_ENTRY_NOTE';
+interface UpdateNoteAction extends IAction {
+    type: ActionType.UPDATE_JOURNAL_ENTRY_NOTE;
     note: string | null; // `null` can clean out an existing value
 }
 
-interface UpdateCheckNumberAction {
-    type: 'UPDATE_JOURNAL_ENTRY_CHECK_NUMBER';
+interface UpdateCheckNumberAction extends IAction {
+    type: ActionType.UPDATE_JOURNAL_ENTRY_CHECK_NUMBER;
     checkNumber: number | null; // unsigned integer / `null` can clean out an existing value
 }
 
-interface AddAccountAction {
-    type: 'ADD_JOURNAL_ENTRY_ACCOUNT';
+interface AddAccountAction extends IAction {
+    type: ActionType.ADD_JOURNAL_ENTRY_ACCOUNT;
     account: JournalEntryAccount;
 }
 
-interface RemoveAccountAction {
-    type: 'REMOVE_JOURNAL_ENTRY_ACCOUNT';
+interface RemoveAccountAction extends IAction {
+    type: ActionType.REMOVE_JOURNAL_ENTRY_ACCOUNT;
     accountId: string; // GUID / Account ID to remove
 }
 
-interface UpdateAccountAmountAction {
-    type: 'UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT';
+interface UpdateAccountAmountAction extends IAction {
+    type: ActionType.UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT;
     accountId: string; // GUID / Account ID to update
     amount: number | null; // New Account Amount (positive for Debit; negative for Credit) / `null` to clear existing value
 }
 /* END: UI Gesture Actions */
 
-interface ResetDirtyEntryAction {
-    type: 'RESET_DIRTY_JOURNAL_ENTRY';
+interface ResetDirtyEntryAction extends IAction {
+    type: ActionType.RESET_DIRTY_JOURNAL_ENTRY;
 }
 
-interface ResetStateAction {
-    type: 'RESET_JOURNAL_ENTRY_STORE_STATE';
+interface ResetStateAction extends IAction {
+    type: ActionType.RESET_JOURNAL_ENTRY_STORE_STATE;
 };
 
 type KnownAction = RequestJournalEntryAction |
@@ -229,11 +230,11 @@ export const actionCreators = {
             return;
         }
 
-        dispatch({ type: 'INITIALIZE_NEW_JOURNAL_ENTRY', tenantId });
+        dispatch({ type: ActionType.INITIALIZE_NEW_JOURNAL_ENTRY, tenantId });
     },
 
     editJournalEntry: (): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'EDIT_JOURNAL_ENTRY' });
+        dispatch({ type: ActionType.EDIT_JOURNAL_ENTRY });
     },
 
     requestJournalEntry: (entryId: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
@@ -266,11 +267,11 @@ export const actionCreators = {
                 })
                 .then(entry => {
                     if (!isNil(entry)) {
-                        dispatch({ type: 'RECEIVE_JOURNAL_ENTRY', entry });
+                        dispatch({ type: ActionType.RECEIVE_JOURNAL_ENTRY, entry });
                     }
                 });
 
-            dispatch({ type: 'REQUEST_JOURNAL_ENTRY' });
+            dispatch({ type: ActionType.REQUEST_JOURNAL_ENTRY });
             return;
         }
 
@@ -308,11 +309,11 @@ export const actionCreators = {
             })
             .then(savedEntry => {
                 if (!isNil(savedEntry)) {
-                    dispatch({ type: 'NEW_JOURNAL_ENTRY_SAVE_COMPLETED', savedEntry });
+                    dispatch({ type: ActionType.NEW_JOURNAL_ENTRY_SAVE_COMPLETED, savedEntry });
                 }
             });
 
-        dispatch({ type: 'REQUEST_SAVE_NEW_JOURNAL_ENTRY' });
+        dispatch({ type: ActionType.REQUEST_SAVE_NEW_JOURNAL_ENTRY });
     },
 
     postJournalEntry: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
@@ -352,11 +353,11 @@ export const actionCreators = {
             })
             .then(savedEntry => {
                 if (!isNil(savedEntry)) {
-                    dispatch({ type: 'POST_JOURNAL_ENTRY_COMPLETED', savedEntry });
+                    dispatch({ type: ActionType.POST_JOURNAL_ENTRY_COMPLETED, savedEntry });
                 }
             });
 
-        dispatch({ type: 'REQUEST_POST_JOURNAL_ENTRY' });
+        dispatch({ type: ActionType.REQUEST_POST_JOURNAL_ENTRY });
     },
 
     updateJournalEntry: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
@@ -391,11 +392,11 @@ export const actionCreators = {
             })
             .then(savedEntry => {
                 if (!isNil(savedEntry)) {
-                    dispatch({ type: 'UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED', savedEntry });
+                    dispatch({ type: ActionType.UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED, savedEntry });
                 }
             });
 
-        dispatch({ type: 'REQUEST_SAVE_UPDATED_JOURNAL_ENTRY' });
+        dispatch({ type: ActionType.REQUEST_SAVE_UPDATED_JOURNAL_ENTRY });
     },
 
     deleteJournalEntry: (entryId: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
@@ -418,50 +419,50 @@ export const actionCreators = {
                     return;
                 }
 
-                dispatch({ type: 'DELETE_JOURNAL_ENTRY_COMPLETED' });
+                dispatch({ type: ActionType.DELETE_JOURNAL_ENTRY_COMPLETED });
             });
 
-        dispatch({ type: 'REQUEST_DELETE_JOURNAL_ENTRY' });
+        dispatch({ type: ActionType.REQUEST_DELETE_JOURNAL_ENTRY });
     },
 
     updateEntryDate: (entryDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_JOURNAL_ENTRY_ENTRY_DATE', entryDate });
+        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_ENTRY_DATE, entryDate });
     },
 
     updatePostDate: (postDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_JOURNAL_ENTRY_POST_DATE', postDate });
+        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_POST_DATE, postDate });
     },
 
     updateDescription: (description: string | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_JOURNAL_ENTRY_DESCRIPTION', description });
+        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_DESCRIPTION, description });
     },
 
     updateNote: (note: string | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_JOURNAL_ENTRY_NOTE', note });
+        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_NOTE, note });
     },
 
     updateCheckNumber: (checkNumber: number | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_JOURNAL_ENTRY_CHECK_NUMBER', checkNumber });
+        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_CHECK_NUMBER, checkNumber });
     },
 
     addAccount: (account: JournalEntryAccount): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'ADD_JOURNAL_ENTRY_ACCOUNT', account });
+        dispatch({ type: ActionType.ADD_JOURNAL_ENTRY_ACCOUNT, account });
     },
 
     removeAccount: (accountId: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'REMOVE_JOURNAL_ENTRY_ACCOUNT', accountId });
+        dispatch({ type: ActionType.REMOVE_JOURNAL_ENTRY_ACCOUNT, accountId });
     },
 
     updateAccountAmount: (accountId: string, amount: number | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT', accountId, amount });
+        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT, accountId, amount });
     },
 
     resetDirtyEditorState: (): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'RESET_DIRTY_JOURNAL_ENTRY' });
+        dispatch({ type: ActionType.RESET_DIRTY_JOURNAL_ENTRY });
     },
 
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'RESET_JOURNAL_ENTRY_STORE_STATE' });
+        dispatch({ type: ActionType.RESET_JOURNAL_ENTRY_STORE_STATE });
     },
 };
 
@@ -554,46 +555,46 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
 
     if (!isNil(action)) {
         switch (action.type) {
-            case 'REQUEST_JOURNAL_ENTRY':
+            case ActionType.REQUEST_JOURNAL_ENTRY:
                 return {
                     ...state,
                     isLoading: true,
                 };
 
-            case 'RECEIVE_JOURNAL_ENTRY':
+            case ActionType.RECEIVE_JOURNAL_ENTRY:
                 return {
                     ...state,
                     isLoading: false,
                     existingEntry: action.entry,
                 };
 
-            case 'REQUEST_POST_JOURNAL_ENTRY':
-            case 'REQUEST_SAVE_NEW_JOURNAL_ENTRY':
-            case 'REQUEST_SAVE_UPDATED_JOURNAL_ENTRY':
+            case ActionType.REQUEST_POST_JOURNAL_ENTRY:
+            case ActionType.REQUEST_SAVE_NEW_JOURNAL_ENTRY:
+            case ActionType.REQUEST_SAVE_UPDATED_JOURNAL_ENTRY:
                 return {
                     ...state,
                     isSaving: true,
                 };
 
-            case 'NEW_JOURNAL_ENTRY_SAVE_COMPLETED':
-            case 'UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED':
-            case 'POST_JOURNAL_ENTRY_COMPLETED':
+            case ActionType.NEW_JOURNAL_ENTRY_SAVE_COMPLETED:
+            case ActionType.UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED:
+            case ActionType.POST_JOURNAL_ENTRY_COMPLETED:
                 return {
                     ...state,
                     isSaving: false,
                     existingEntry: action.savedEntry,
                 };
 
-            case 'REQUEST_DELETE_JOURNAL_ENTRY':
+            case ActionType.REQUEST_DELETE_JOURNAL_ENTRY:
                 return {
                     ...state,
                     isDeleting: true,
                 };
 
-            case 'DELETE_JOURNAL_ENTRY_COMPLETED':
+            case ActionType.DELETE_JOURNAL_ENTRY_COMPLETED:
                 return unloadedState;
 
-            case 'INITIALIZE_NEW_JOURNAL_ENTRY':
+            case ActionType.INITIALIZE_NEW_JOURNAL_ENTRY:
                 return {
                     ...state,
                     dirtyEntry: {
@@ -611,7 +612,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     validation: { ...DEFAULT_VALIDATION_STATE },
                 };
 
-            case 'EDIT_JOURNAL_ENTRY': {
+            case ActionType.EDIT_JOURNAL_ENTRY: {
                 const { existingEntry } = state;
 
                 if (isNil(existingEntry)) {
@@ -623,7 +624,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                 return updateStateAfterAccountChange(state, dirtyEntry);
             }
 
-            case 'UPDATE_JOURNAL_ENTRY_ENTRY_DATE':
+            case ActionType.UPDATE_JOURNAL_ENTRY_ENTRY_DATE:
                 return {
                     ...state,
                     dirtyEntry: {
@@ -632,7 +633,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     },
                 };
 
-            case 'UPDATE_JOURNAL_ENTRY_POST_DATE':
+            case ActionType.UPDATE_JOURNAL_ENTRY_POST_DATE:
                 return {
                     ...state,
                     dirtyEntry: {
@@ -641,7 +642,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     },
                 };
 
-            case 'UPDATE_JOURNAL_ENTRY_DESCRIPTION':
+            case ActionType.UPDATE_JOURNAL_ENTRY_DESCRIPTION:
                 return {
                     ...state,
                     dirtyEntry: {
@@ -650,7 +651,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     },
                 };
 
-            case 'UPDATE_JOURNAL_ENTRY_NOTE':
+            case ActionType.UPDATE_JOURNAL_ENTRY_NOTE:
                 return {
                     ...state,
                     dirtyEntry: {
@@ -659,7 +660,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     },
                 };
 
-            case 'UPDATE_JOURNAL_ENTRY_CHECK_NUMBER':
+            case ActionType.UPDATE_JOURNAL_ENTRY_CHECK_NUMBER:
                 return {
                     ...state,
                     dirtyEntry: {
@@ -668,7 +669,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     },
                 };
 
-            case 'ADD_JOURNAL_ENTRY_ACCOUNT': {
+            case ActionType.ADD_JOURNAL_ENTRY_ACCOUNT: {
                 const updatedJournalEntry: JournalEntry = {
                     ...state.dirtyEntry as Pick<JournalEntry, keyof JournalEntry>,
                     accounts: [
@@ -680,7 +681,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                 return updateStateAfterAccountChange(state, updatedJournalEntry);
             }
 
-            case 'REMOVE_JOURNAL_ENTRY_ACCOUNT': {
+            case ActionType.REMOVE_JOURNAL_ENTRY_ACCOUNT: {
                 const updatedJournalEntry: JournalEntry = {
                     ...state.dirtyEntry as Pick<JournalEntry, keyof JournalEntry>,
                     accounts: filter(
@@ -692,7 +693,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                 return updateStateAfterAccountChange(state, updatedJournalEntry);
             }
 
-            case 'UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT': {
+            case ActionType.UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT: {
                 const updatedDirtyEntry: JournalEntry = { ...(state.dirtyEntry ?? DEFAULT_JOURNAL_ENTRY) };
                 const existingAccounts = updatedDirtyEntry.accounts ?? [];
 
@@ -732,7 +733,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                 return updateStateAfterAccountChange(state, updatedDirtyEntry);
             }
 
-            case 'RESET_DIRTY_JOURNAL_ENTRY':
+            case ActionType.RESET_DIRTY_JOURNAL_ENTRY:
                 return {
                     ...state,
                     dirtyEntry: null,
@@ -741,7 +742,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     validation: { ...DEFAULT_VALIDATION_STATE },
                 };
 
-            case 'RESET_JOURNAL_ENTRY_STORE_STATE':
+            case ActionType.RESET_JOURNAL_ENTRY_STORE_STATE:
                 return unloadedState;
         }
     }

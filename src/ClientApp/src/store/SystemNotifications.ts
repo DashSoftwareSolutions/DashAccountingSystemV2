@@ -5,6 +5,8 @@ import {
     uniqueId,
 } from 'lodash';
 import { Logger } from '../common/Logging';
+import ActionType from './ActionType';
+import IAction from './IAction';
 
 export interface SystemNotificationsState {
     alertAutoDismiss: number | boolean; // number means auto-dismiss after specified timeout / boolean true means atuo-dismiss after default timeout; boolean false means don't auto-dismiss
@@ -14,26 +16,28 @@ export interface SystemNotificationsState {
     alertIsVisible: boolean;
 }
 
-interface ShowAlertAction {
-    type: 'SHOW_ALERT';
+interface ShowAlertAction extends IAction {
+    type: ActionType.SHOW_ALERT;
     autoDismiss: number | boolean; // number means auto-dismiss after specified timeout / boolean true means atuo-dismiss after default timeout; boolean false means don't auto-dismiss
     color: string;
     content: any; // should be a simple string or JSX
 }
 
-interface DismissAlertAction {
-    type: 'DISMISS_ALERT';
+interface DismissAlertAction extends IAction {
+    type: ActionType.DISMISS_ALERT;
     alertId: string;
 }
 
 type KnownAction = ShowAlertAction | DismissAlertAction;
 
+// Always have a logger in case we need to use it for debuggin'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger = new Logger('System Notifications Store');
 
 export const actionCreators = {
     showAlert: (color: string, content: any, autoDismiss: number | boolean): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({
-            type: 'SHOW_ALERT',
+            type: ActionType.SHOW_ALERT,
             autoDismiss,
             color,
             content,
@@ -41,7 +45,7 @@ export const actionCreators = {
     },
 
     dismissAlert: (alertId: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'DISMISS_ALERT', alertId });
+        dispatch({ type: ActionType.DISMISS_ALERT, alertId });
     },
 };
 
@@ -62,7 +66,7 @@ export const reducer: Reducer<SystemNotificationsState> = (state: SystemNotifica
 
     if (!isNil(action)) {
         switch (action.type) {
-            case 'SHOW_ALERT':
+            case ActionType.SHOW_ALERT:
                 return {
                     alertAutoDismiss: action.autoDismiss,
                     alertColor: action.color,
@@ -71,9 +75,7 @@ export const reducer: Reducer<SystemNotificationsState> = (state: SystemNotifica
                     alertIsVisible: true,
                 };
 
-            case 'DISMISS_ALERT': {
-                logger.debug('Dismissing alert ID:', action.alertId);
-                logger.debug('Current state alert ID:', state.alertId);
+            case ActionType.DISMISS_ALERT: {
                 if (action.alertId === state.alertId) {
                     return {
                         ...state,

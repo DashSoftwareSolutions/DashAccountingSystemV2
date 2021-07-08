@@ -3,6 +3,8 @@ import { isEmpty, isNil } from 'lodash';
 import { AppThunkAction } from './';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
+import ActionType from './ActionType';
+import IAction from './IAction';
 import Tenant from '../models/Tenant';
 
 export interface TenantsState {
@@ -11,17 +13,17 @@ export interface TenantsState {
     selectedTenant: Tenant | null,
 }
 
-interface RequestTenantsAction {
-    type: 'REQUEST_TENANTS';
+interface RequestTenantsAction extends IAction {
+    type: ActionType.REQUEST_TENANTS;
 }
 
-interface ReceiveTenantsAction {
-    type: 'RECEIVE_TENANTS';
+interface ReceiveTenantsAction extends IAction {
+    type: ActionType.RECEIVE_TENANTS;
     tenants: Tenant[];
 }
 
-interface SelectTenantAction {
-    type: 'SELECT_TENANT';
+interface SelectTenantAction extends IAction {
+    type: ActionType.SELECT_TENANT;
     tenant: Tenant;
 }
 
@@ -49,23 +51,22 @@ export const actionCreators = {
 
                     return response.json() as Promise<Tenant[]>;
                 })
-                .then((data) => {
-                    if (!isNil(data)) {
-                        dispatch({ type: 'RECEIVE_TENANTS', tenants: data });
+                .then((tenants) => {
+                    if (!isNil(tenants)) {
+                        dispatch({ type: ActionType.RECEIVE_TENANTS, tenants });
 
-                        if (!isEmpty(data) && data.length === 1) {
-                            const tenant = data[0];
-                            dispatch({ type: 'SELECT_TENANT', tenant });
+                        if (!isEmpty(tenants) && tenants.length === 1) {
+                            dispatch({ type: ActionType.SELECT_TENANT, tenant: tenants[0] });
                         }
                     }
                 });
 
-            dispatch({ type: 'REQUEST_TENANTS' });
+            dispatch({ type: ActionType.REQUEST_TENANTS });
         }
     },
 
     selectTenant: (tenant: Tenant): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'SELECT_TENANT', tenant });
+        dispatch({ type: ActionType.SELECT_TENANT, tenant });
     }
 };
 
@@ -80,20 +81,20 @@ export const reducer: Reducer<TenantsState> = (state: TenantsState | undefined, 
 
     if (!isNil(action)) {
         switch (action.type) {
-            case 'REQUEST_TENANTS':
+            case ActionType.REQUEST_TENANTS:
                 return {
                     ...state,
                     isLoading: true
                 };
 
-            case 'RECEIVE_TENANTS':
+            case ActionType.RECEIVE_TENANTS:
                 return {
                     ...state,
                     tenants: action.tenants,
                     isLoading: false
                 };
 
-            case 'SELECT_TENANT':
+            case ActionType.SELECT_TENANT:
                 return {
                     ...state,
                     selectedTenant: action.tenant,

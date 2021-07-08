@@ -5,9 +5,19 @@ import {
 } from 'lodash';
 import moment from 'moment-timezone';
 import { Logger } from '../common/Logging';
+import {
+    RequestDownloadAction,
+    ReceiveDownloadErrorAction,
+    ReceiveDownloadInfoAction,
+} from './Export';
+import ActionType from './ActionType';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import BalanceSheetReport from '../models/BalanceSheetReport';
+import ExportFormat from '../models/ExportFormat';
+import IAction from './IAction';
+import ApiErrorResponse from '../models/ApiErrorResponse';
+import ExportDownloadInfo from '../models/ExportDownloadInfo';
 
 export interface BalanceSheetState {
     reportData: BalanceSheetReport | null;
@@ -16,35 +26,40 @@ export interface BalanceSheetState {
     dateRangeEnd: string;
 }
 
-interface RequestBalanceSheetReportDataAction {
-    type: 'REQUEST_BALANCE_SHEET_REPORT_DATA';
+interface RequestBalanceSheetReportDataAction extends IAction {
+    type: ActionType.REQUEST_BALANCE_SHEET_REPORT_DATA;
 }
 
-interface ReceiveBalanceSheetReportDataAction {
-    type: 'RECEIVE_BALANCE_SHEET_REPORT_DATA';
+interface ReceiveBalanceSheetReportDataAction extends IAction {
+    type: ActionType.RECEIVE_BALANCE_SHEET_REPORT_DATA;
     report: BalanceSheetReport;
 }
 
-interface UpdateBalanceSheetReportDateRangeStartAction {
-    type: 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START';
+interface UpdateBalanceSheetReportDateRangeStartAction extends IAction {
+    type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START;
     dateRangeStart: string;
 }
 
-interface UpdateBalanceSheetReportDateRangeEndAction {
-    type: 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END';
+interface UpdateBalanceSheetReportDateRangeEndAction extends IAction {
+    type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END;
     dateRangeEnd: string;
 }
 
-interface ResetBalanceSheetReportDataAction {
-    type: 'RESET_BALANCE_SHEET_REPORT_DATA';
+interface ResetBalanceSheetReportDataAction extends IAction {
+    type: ActionType.RESET_BALANCE_SHEET_REPORT_DATA;
 }
 
 type KnownAction = RequestBalanceSheetReportDataAction |
     ReceiveBalanceSheetReportDataAction |
     UpdateBalanceSheetReportDateRangeStartAction |
     UpdateBalanceSheetReportDateRangeEndAction |
-    ResetBalanceSheetReportDataAction;
+    ResetBalanceSheetReportDataAction |
+    RequestDownloadAction |
+    ReceiveDownloadErrorAction |
+    ReceiveDownloadInfoAction;
 
+// Always have a logger in case we need to use it for debuggin'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger = new Logger('Balance Sheet Store');
 
 export const actionCreators = {
@@ -75,24 +90,82 @@ export const actionCreators = {
                 })
                 .then((report) => {
                     if (!isNil(report)) {
-                        dispatch({ type: 'RECEIVE_BALANCE_SHEET_REPORT_DATA', report });
+                        dispatch({ type: ActionType.RECEIVE_BALANCE_SHEET_REPORT_DATA, report });
                     }
                 });
 
-            dispatch({ type: 'REQUEST_BALANCE_SHEET_REPORT_DATA' });
+            dispatch({ type: ActionType.REQUEST_BALANCE_SHEET_REPORT_DATA });
+        }
+    },
+
+    requestBalanceSheetReportExcelExport: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+
+        if (!isNil(appState?.balanceSheet) &&
+            !isNil(appState?.exportDownload) &&
+            !isNil(appState?.tenants?.selectedTenant) &&
+            !appState.exportDownload.isLoading) {
+            const tenantId = appState?.tenants?.selectedTenant?.id;
+            const dateRangeStart = appState.balanceSheet.dateRangeStart;
+            const dateRangeEnd = appState.balanceSheet.dateRangeEnd;
+
+            const exportRequestParameters = {
+                tenantId,
+                dateRangeStart,
+                dateRangeEnd,
+                exportType: 'BalanceSheetReport',
+                exportFormat: ExportFormat.XLSX,
+            };
+
+            const accessToken = await authService.getAccessToken();
+
+            const requestOptions = {
+                method: 'POST',
+                body: JSON.stringify(exportRequestParameters),
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+            };
+
+            fetch(`api/ledger/export-balance-sheet`, requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        try {
+                            response
+                                .json()
+                                .then((apiErrorResponse: ApiErrorResponse) => {
+                                    dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_ERROR, error: apiErrorResponse.error })
+                                });
+                        } catch (error) {
+                            logger.error('Secondary error parsing error response from Balance Sheet Export request:', error);
+                        }
+
+                        return null;
+                    }
+
+                    return response.json() as Promise<ExportDownloadInfo>
+                })
+                .then((downloadInfo) => {
+                    if (!isNil(downloadInfo)) {
+                        dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_INFO, downloadInfo });
+                    }
+                });
+
+            dispatch({ type: ActionType.REQUEST_EXPORT_DOWNLOAD });
         }
     },
 
     updateDateRangeStart: (dateRangeStart: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START', dateRangeStart });
+        dispatch({ type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START, dateRangeStart });
     },
 
     updateDateRangeEnd: (dateRangeEnd: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END', dateRangeEnd });
+        dispatch({ type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END, dateRangeEnd });
     },
 
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: 'RESET_BALANCE_SHEET_REPORT_DATA' });
+        dispatch({ type: ActionType.RESET_BALANCE_SHEET_REPORT_DATA });
     },
 };
 
@@ -113,37 +186,40 @@ export const reducer: Reducer<BalanceSheetState> = (state: BalanceSheetState | u
 
     if (!isNil(action)) {
         switch (action.type) {
-            case 'REQUEST_BALANCE_SHEET_REPORT_DATA':
+            case ActionType.REQUEST_BALANCE_SHEET_REPORT_DATA:
                 return {
                     ...state,
                     isLoading: true,
                 };
 
-            case 'RECEIVE_BALANCE_SHEET_REPORT_DATA':
+            case ActionType.RECEIVE_BALANCE_SHEET_REPORT_DATA:
                 return {
                     ...state,
                     isLoading: false,
                     reportData: action.report,
                 };
 
-            case 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START':
+            case ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START:
                 return {
                     ...state,
                     dateRangeStart: action.dateRangeStart,
                 };
 
-            case 'UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END':
+            case ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END:
                 return {
                     ...state,
                     dateRangeEnd: action.dateRangeEnd,
                 };
 
-            case 'RESET_BALANCE_SHEET_REPORT_DATA':
+            case ActionType.RESET_BALANCE_SHEET_REPORT_DATA:
                 return {
                     ...state,
                     isLoading: false,
                     reportData: null,
                 };
+
+            default:
+                return state;
         }
     }
 
