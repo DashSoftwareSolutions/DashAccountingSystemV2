@@ -15,7 +15,7 @@ import Amount from '../models/Amount';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
 import LedgerAccount from '../models/LedgerAccount';
-import ReportDateRangeSelector from './ReportDateRangeSelector';
+import ReportParametersAndControls from './ReportParametersAndControls';
 import TenantBasePage from './TenantBasePage';
 import TransactionStatus from '../models/TransactionStatus';
 import * as LedgerStore from '../store/Ledger';
@@ -87,7 +87,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    <ReportDateRangeSelector
+                    <ReportParametersAndControls
                         bemBlockName={this.bemBlockName}
                         dateRangeEnd={dateRangeEnd ?? null}
                         dateRangeStart={dateRangeStart ?? null}

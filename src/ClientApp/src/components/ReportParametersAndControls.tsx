@@ -6,30 +6,46 @@ import {
     Input,
     Row,
 } from 'reactstrap';
+import { noop } from 'lodash';
 
-interface ReportDateRangeSelectorProps {
+interface ReportParametersAndControlsProps {
     bemBlockName: string;
     dateRangeEnd: string | null; // Date in YYYY-MM-DD
     dateRangeStart: string | null; // Date in YYYY-MM-DD
+    isRequestingExcelDownload?: boolean;
     onDateRangeEndChanged: Function;
     onDateRangeStartChanged: Function;
+    onDownloadExcel?: Function;
     onRunReport: Function;
+    showDownloadExcelButton?: boolean;
 }
 
-const ReportDateRangeSelector: React.FC<ReportDateRangeSelectorProps> = ({
+const ReportParametersAndControls: React.FC<ReportParametersAndControlsProps> = ({
     bemBlockName,
     dateRangeEnd,
     dateRangeStart,
+    isRequestingExcelDownload,
     onDateRangeEndChanged,
     onDateRangeStartChanged,
+    onDownloadExcel,
     onRunReport,
+    showDownloadExcelButton,
 }) => {
+    const onDownloadExcelSafe = onDownloadExcel ?? noop;
+    const showDownloadExcelButtonSafe = showDownloadExcelButton ?? false;
+    const isRequestingExcelDownloadSafe = isRequestingExcelDownload ?? false;
+
     const onDateRangeEndInputChanged = (event: React.FormEvent<HTMLInputElement>) => {
         onDateRangeEndChanged(event.currentTarget.value);
     }
 
     const onDateRangeStartInputChanged = (event: React.FormEvent<HTMLInputElement>) => {
         onDateRangeStartChanged(event.currentTarget.value);
+    }
+
+    const onDownloadExcelButtonClicked = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+        onDownloadExcelSafe();
     }
 
     const onRunReportButtonClicked = (event: React.MouseEvent<HTMLElement>) => {
@@ -62,18 +78,30 @@ const ReportDateRangeSelector: React.FC<ReportDateRangeSelectorProps> = ({
                         value={dateRangeEnd ?? ''}
                     />
                 </Col>
-                <Col md={2}>
+                <Col md={4}>
                     <Button
                         color="success"
                         id={`${bemBlockName}--run_report_button`}
                         onClick={onRunReportButtonClicked}
+                        style={showDownloadExcelButtonSafe ? { marginRight: 11, width: 140 } : { width: 140 }}
                     >
                         Run Report
                     </Button>
+                    {showDownloadExcelButtonSafe ? (
+                        <Button
+                            color="primary"
+                            disabled={isRequestingExcelDownloadSafe}
+                            id={`${bemBlockName}--download_excel_button`}
+                            onClick={onDownloadExcelButtonClicked}
+                            style={{ width: 140 }}
+                        >
+                            {isRequestingExcelDownloadSafe ? 'Downloading...' : 'Download Excel'}
+                        </Button>
+                    ) : null}
                 </Col>
             </Row>
         </Form>
     );
 }
 
-export default ReportDateRangeSelector
+export default ReportParametersAndControls;

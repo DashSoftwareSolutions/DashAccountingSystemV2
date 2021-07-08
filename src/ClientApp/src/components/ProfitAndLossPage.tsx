@@ -11,7 +11,7 @@ import { NavigationSection } from './TenantSubNavigation';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
 import ProfitAndLossReport from '../models/ProfitAndLossReport';
-import ReportDateRangeSelector from './ReportDateRangeSelector';
+import ReportParametersAndControls from './ReportParametersAndControls';
 import TenantBasePage from './TenantBasePage';
 import * as ProfitAndLossStore from '../store/ProfitAndLoss';
 
@@ -76,7 +76,7 @@ class ProfitAndLossPage extends React.PureComponent<ProfitAndLossPageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    <ReportDateRangeSelector
+                    <ReportParametersAndControls
                         bemBlockName={this.bemBlockName}
                         dateRangeEnd={dateRangeEnd ?? null}
                         dateRangeStart={dateRangeStart ?? null}

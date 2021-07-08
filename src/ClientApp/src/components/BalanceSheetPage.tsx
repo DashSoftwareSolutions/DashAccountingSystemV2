@@ -14,15 +14,19 @@ import { NavigationSection } from './TenantSubNavigation';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
 import BalanceSheetReport from '../models/BalanceSheetReport';
-import ReportDateRangeSelector from './ReportDateRangeSelector';
+import ReportParametersAndControls from './ReportParametersAndControls';
 import TenantBasePage from './TenantBasePage';
 import * as BalanceSheetStore from '../store/BalanceSheet';
+import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
         balanceSheet: state.balanceSheet?.reportData ?? null,
         dateRangeEnd: state?.balanceSheet?.dateRangeEnd,
         dateRangeStart: state?.balanceSheet?.dateRangeStart,
+        excelDownloadError: state?.exportDownload?.error ?? null,
+        excelDownloadInfo: state?.exportDownload?.downloadInfo ?? null,
+        isDownloading: state?.exportDownload?.isLoading ?? false,
         isFetching: state.balanceSheet?.isLoading ?? false,
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
@@ -30,6 +34,7 @@ const mapStateToProps = (state: ApplicationState) => {
 
 const mapDispatchToProps = {
     ...BalanceSheetStore.actionCreators,
+    showAlert: SystemNotificationsStore.actionCreators.showAlert,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -39,19 +44,47 @@ type BalanceSheetPageReduxProps = ConnectedProps<typeof connector>;
 type BalanceSheetPageProps = BalanceSheetPageReduxProps
     & RouteComponentProps;
 
-class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
+interface BalanceSheetPageState {
+    isDownloadInProgress: boolean;
+}
+
+class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps, BalanceSheetPageState> {
     private bemBlockName: string = 'balance_sheet_page';
 
     constructor(props: BalanceSheetPageProps) {
         super(props);
 
+        this.state = { isDownloadInProgress: false };
+
         this.onDateRangeEndChanged = this.onDateRangeEndChanged.bind(this);
         this.onDateRangeStartChanged = this.onDateRangeStartChanged.bind(this);
+        this.onDownloadExcel = this.onDownloadExcel.bind(this);
         this.onRunReport = this.onRunReport.bind(this);
     }
 
     public componentDidMount() {
         this.ensureDataFetched();
+    }
+
+    public componentDidUpdate(prevProps: BalanceSheetPageProps) {
+        const { isDownloading: wasDownloading } = prevProps;
+
+        const {
+            excelDownloadError,
+            excelDownloadInfo,
+            isDownloading,
+            showAlert,
+        } = this.props;
+
+        if (wasDownloading && !isDownloading) {
+            if (!isNil(excelDownloadError)) {
+                showAlert('danger', 'Error exporting Balance Sheet Report to Excel', true);
+            } else if (!isNil(excelDownloadInfo)) {
+                window.location.href = `${window.location.origin}/api/export-download?filename=${excelDownloadInfo.fileName}&format=${excelDownloadInfo.format}&token=${excelDownloadInfo.token}`;
+            }
+
+            setTimeout(() => { this.setState({ isDownloadInProgress: false }); }, 500); // delay clearing `isDownloadInProgress` flag until save download window pops open
+        }
     }
 
     public render() {
@@ -60,9 +93,16 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
             dateRangeEnd,
             dateRangeStart,
             history,
+            isDownloading,
             isFetching,
             selectedTenant,
         } = this.props;
+
+        const {
+            isDownloadInProgress,
+        } = this.state;
+
+        const isDownloadingAuthoritative = isDownloading || isDownloadInProgress;
 
         return (
             <TenantBasePage
@@ -79,13 +119,16 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    <ReportDateRangeSelector
+                    <ReportParametersAndControls
                         bemBlockName={this.bemBlockName}
                         dateRangeEnd={dateRangeEnd ?? null}
                         dateRangeStart={dateRangeStart ?? null}
+                        isRequestingExcelDownload={isDownloadingAuthoritative}
                         onDateRangeEndChanged={this.onDateRangeEndChanged}
                         onDateRangeStartChanged={this.onDateRangeStartChanged}
+                        onDownloadExcel={this.onDownloadExcel}
                         onRunReport={this.onRunReport}
+                        showDownloadExcelButton
                     />
                     <div className={`${this.bemBlockName}--report_container`}>
                         {isFetching ? (
@@ -122,6 +165,12 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps> {
 
         reset();
         requestBalanceSheetReportData();
+    }
+
+    private onDownloadExcel() {
+        const { requestBalanceSheetReportExcelExport } = this.props;
+        requestBalanceSheetReportExcelExport();
+        this.setState({ isDownloadInProgress: true });
     }
 
     private renderBalanceSheetReportTable(balanceSheet: BalanceSheetReport | null): JSX.Element {
