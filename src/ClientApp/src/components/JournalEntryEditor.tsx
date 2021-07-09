@@ -246,9 +246,9 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps> {
         addAccount(account);
     }
 
-    private onAccountAmountChanged(accountId: string, amount: number | null) {
+    private onAccountAmountChanged(accountId: string, amountAsString: string | null, amount: number | null) {
         const { updateAccountAmount } = this.props;
-        updateAccountAmount(accountId, amount);
+        updateAccountAmount(accountId, amountAsString, amount);
     }
 
     private onAccountRemoved(accountId: string) {

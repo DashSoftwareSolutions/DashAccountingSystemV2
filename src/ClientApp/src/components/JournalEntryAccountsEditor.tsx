@@ -49,7 +49,9 @@ interface JournalEntryAccountsEditorState {
     addAccountNumber: number | null; // Acct # of selected Account
     addAssetType: AssetType | null;
     addCredit: number | null;
+    addCreditAsString: string | null;
     addDebit: number | null;
+    addDebitAsString: string | null;
 }
 
 const canAddAccount = (state: JournalEntryAccountsEditorState): boolean => {
@@ -76,22 +78,28 @@ const getNewAccount = (state: JournalEntryAccountsEditorState): JournalEntryAcco
         addAccountNumber,
         addAssetType,
         addCredit,
+        addCreditAsString,
         addDebit,
+        addDebitAsString,
     } = state;
 
     let amount: number = 0;
+    let amountAsString: string | null = null;
     let amountType: AmountType = AmountType.Debit;
 
     if (!isNil(addDebit) && addDebit > 0) {
         amount = addDebit;
+        amountAsString = addDebitAsString;
     } else if (!isNil(addCredit) && addCredit > 0) {
         amount = addCredit * -1;
+        amountAsString = addCreditAsString;
         amountType = AmountType.Credit;
     }
 
     const newAccountAmount: Amount = {
         assetType: addAssetType,
         amount,
+        amountAsString,
         amountType,
     };
 
@@ -121,7 +129,9 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
             addAccountNumber: null,
             addAssetType: defaultAssetType,
             addCredit: null,
+            addCreditAsString: null,
             addDebit: null,
+            addDebitAsString: null,
         };
 
         this.onAccountSelected = this.onAccountSelected.bind(this);
@@ -159,8 +169,8 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
         const {
             addAccountId,
             addAssetType,
-            addCredit,
-            addDebit,
+            addCreditAsString,
+            addDebitAsString,
         } = this.state;
 
         const alreadySelectedAccountIds = map(journalEntryAccounts, acct => acct.accountId ?? '');
@@ -213,20 +223,12 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                             } = account;
 
                             const {
-                                amount,
+                                amountAsString,
                                 amountType,
-                                assetType
+                                assetType,
                             } = amountObject ?? {};
 
                             const assetTypeName = trim(`${assetType?.name ?? ''} ${assetType?.symbol ?? ''}`);
-
-                            const creditAmount = !isNil(amount) && amountType === AmountType.Credit ?
-                                -1 * amount ?? 0 :
-                                null;
-
-                            const debitAmount = !isNil(amount) && amountType === AmountType.Debit ?
-                                amount ?? 0 :
-                                null;
 
                             const safeAccountId = accountId ?? '';
 
@@ -255,7 +257,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                             step="any"
                                             style={{ textAlign: 'right' }}
                                             type="number"
-                                            value={debitAmount?.toString() ?? ''}
+                                            value={amountType === AmountType.Debit ? amountAsString ?? '' : ''}
                                         />
                                     </td>
                                     <td className="col-md-2">
@@ -266,7 +268,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                             step="any"
                                             style={{ textAlign: 'right' }}
                                             type="number"
-                                            value={creditAmount?.toString() ?? ''}
+                                            value={amountType === AmountType.Credit ? amountAsString ?? '' : ''}
                                         />
                                     </td>
                                     <td className="col-md-1" style={{ textAlign: 'right' }}>
@@ -308,7 +310,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                     step="any"
                                     style={{ textAlign: 'right' }}
                                     type="number"
-                                    value={addDebit?.toString() ?? ''}
+                                    value={addDebitAsString ?? ''}
                                 />
                             </td>
                             <td className="col-md-2">
@@ -318,7 +320,7 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                     step="any"
                                     style={{ textAlign: 'right' }}
                                     type="number"
-                                    value={addCredit?.toString() ?? ''}
+                                    value={addCreditAsString ?? ''}
                                 />
                             </td>
                             <td className="col-md-1" style={{ textAlign: 'right' }}>
@@ -397,31 +399,41 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                 addAccountName: null,
                 addAccountNumber: null,
                 addCredit: null,
+                addCreditAsString: null,
                 addDebit: null,
+                addDebitAsString: null,
             })
         } else {
             this.logger.debug('Not enough information to add new account');
         }
     }
 
-    onAddCreditAmountChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        const parsedAmount = parseFloat(event.currentTarget.value);
+    private onAddCreditAmountChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        const amountAsString = event.currentTarget.value;
+        const parsedAmount = parseFloat(amountAsString);
 
         const safeValueForUpdate = isFinite(parsedAmount) ?
             parsedAmount :
             null;
 
-        this.setState({ addCredit: safeValueForUpdate });
+        this.setState({
+            addCredit: safeValueForUpdate,
+            addCreditAsString: amountAsString,
+        });
     }
 
-    onAddDebitAmountChanged(event: React.ChangeEvent<HTMLInputElement>) {
-        const parsedAmount = parseFloat(event.currentTarget.value);
+    private onAddDebitAmountChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        const amountAsString = event.currentTarget.value;
+        const parsedAmount = parseFloat(amountAsString);
 
         const safeValueForUpdate = isFinite(parsedAmount) ?
             parsedAmount :
             null;
 
-        this.setState({ addDebit: safeValueForUpdate });
+        this.setState({
+            addDebit: safeValueForUpdate,
+            addDebitAsString: amountAsString,
+        });
     }
 
     private onAssetTypeSelected(selectedAssetType: AssetType | null) {
@@ -432,19 +444,31 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
         }
     }
 
-    onEditCreditAmountChanged(event: React.ChangeEvent<HTMLInputElement>, accountId: string) {
-        const parsedAmount = parseFloat(event.currentTarget.value);
+    private onEditCreditAmountChanged(event: React.ChangeEvent<HTMLInputElement>, accountId: string) {
+        const amountAsString = event.currentTarget.value;
+        const parsedAmount = parseFloat(amountAsString);
         const { onAccountAmountChanged } = this.props;
-        onAccountAmountChanged(accountId, isFinite(parsedAmount) ? -1 * parsedAmount : null);
+
+        onAccountAmountChanged(
+            accountId,
+            amountAsString,
+            isFinite(parsedAmount) ? -1 * parsedAmount : null,
+        );
     }
 
-    onEditDebitAmountChanged(event: React.ChangeEvent<HTMLInputElement>, accountId: string) {
-        const parsedAmount = parseFloat(event.currentTarget.value);
+    private onEditDebitAmountChanged(event: React.ChangeEvent<HTMLInputElement>, accountId: string) {
+        const amountAsString = event.currentTarget.value;
+        const parsedAmount = parseFloat(amountAsString);
         const { onAccountAmountChanged } = this.props;
-        onAccountAmountChanged(accountId, isFinite(parsedAmount) ? parsedAmount : null);
+
+        onAccountAmountChanged(
+            accountId,
+            amountAsString,
+            isFinite(parsedAmount) ? parsedAmount : null,
+        );
     }
 
-    onRemoveAccountClick(event: React.MouseEvent<HTMLElement>, accountId: string) {
+    private onRemoveAccountClick(event: React.MouseEvent<HTMLElement>, accountId: string) {
         event.stopPropagation();
         const { onAccountRemoved } = this.props;
         onAccountRemoved(accountId);

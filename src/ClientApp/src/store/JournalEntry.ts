@@ -15,6 +15,7 @@ import { Logger } from '../common/Logging';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
+import Amount from '../models/Amount';
 import AmountType from '../models/AmountType';
 import IAction from './IAction';
 import JournalEntry from '../models/JournalEntry';
@@ -165,6 +166,7 @@ interface UpdateAccountAmountAction extends IAction {
     type: ActionType.UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT;
     accountId: string; // GUID / Account ID to update
     amount: number | null; // New Account Amount (positive for Debit; negative for Credit) / `null` to clear existing value
+    amountAsString: string | null; // New Account Amount as originally entered
 }
 /* END: UI Gesture Actions */
 
@@ -214,8 +216,9 @@ const DEFAULT_JOURNAL_ENTRY: JournalEntry = {
     accounts: [],
 };
 
-const DEFAULT_ACCOUNT_AMOUNT = {
+const DEFAULT_ACCOUNT_AMOUNT: Amount = {
     amount: null,
+    amountAsString: null,
     assetType: null,
     amountType: null,
 };
@@ -453,8 +456,13 @@ export const actionCreators = {
         dispatch({ type: ActionType.REMOVE_JOURNAL_ENTRY_ACCOUNT, accountId });
     },
 
-    updateAccountAmount: (accountId: string, amount: number | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT, accountId, amount });
+    updateAccountAmount: (accountId: string, amountAsString: string | null, amount: number | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({
+            type: ActionType.UPDATE_JOURNAL_ENTRY_ACCOUNT_AMOUNT,
+            accountId,
+            amountAsString,
+            amount,
+        });
     },
 
     resetDirtyEditorState: (): AppThunkAction<KnownAction> => (dispatch) => {
@@ -621,6 +629,15 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                 }
 
                 const dirtyEntry = cloneDeep(state.existingEntry) ?? { ...DEFAULT_JOURNAL_ENTRY };
+
+                dirtyEntry.accounts = map(dirtyEntry.accounts, (acct) => ({
+                    ...acct,
+                    amount: {
+                        ...acct.amount as Pick<Amount, keyof Amount>,
+                        amountAsString: ((acct?.amount?.amountType === AmountType.Credit ? (acct?.amount?.amount ?? 0) * -1 : acct?.amount?.amount) ?? 0).toString(),
+                    },
+                }));
+
                 return updateStateAfterAccountChange(state, dirtyEntry);
             }
 
@@ -714,6 +731,7 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
 
                 const existingAccount = existingAccounts[indexOfSpecifiedAccount];
                 const updatedAccountAmount = existingAccount.amount ?? { ...DEFAULT_ACCOUNT_AMOUNT };
+                updatedAccountAmount.amountAsString = action.amountAsString;
                 updatedAccountAmount.amount = action.amount;
                 updatedAccountAmount.amountType = !isNil(action.amount) ?
                     (action.amount >= 0 ? AmountType.Debit : AmountType.Credit) :
