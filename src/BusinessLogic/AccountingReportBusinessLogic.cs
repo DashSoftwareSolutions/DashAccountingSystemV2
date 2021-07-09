@@ -54,9 +54,6 @@ namespace DashAccountingSystemV2.BusinessLogic
 
             var balanaceSheetAccounts = balanceSheetAccountsResponse.Data;
 
-            // TODO/FIXME: Need to refactor to get this from the Tenant
-            var assetType = balanaceSheetAccounts.Select(a => a.Account.AssetType).First();
-
             var assetAccounts = balanaceSheetAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Assets);
             var liabilityAccounts = balanaceSheetAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Liabilities);
             var equityAccounts = balanaceSheetAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.OwnersEquity);
@@ -115,7 +112,6 @@ namespace DashAccountingSystemV2.BusinessLogic
                     {
                         Tenant = tenant,
                         DateRange = new DateRange(dateRangeStart, dateRangeEnd),
-                        AssetType = assetType,
                         Assets = assetAccounts,
                         Liabilities = liabilityAccounts,
                         Equity = equityAccounts,
@@ -142,7 +138,6 @@ namespace DashAccountingSystemV2.BusinessLogic
             {
                 Tenant = tenant,
                 DateRange = new DateRange(dateRangeStart, dateRangeEnd),
-                AssetType = assetType,
 
                 Assets = assetAccounts,
                 
@@ -200,10 +195,6 @@ namespace DashAccountingSystemV2.BusinessLogic
                 return new BusinessLogicResponse<ProfitAndLossReportDto>(profitAndLossAccountsReponse);
 
             var profitAndLossAccounts = profitAndLossAccountsReponse.Data;
-
-            // TODO/FIXME: Need to refactor so we don't have to worry about Asset Type!
-            var assetType = profitAndLossAccounts.Select(a => a.Account.AssetType).First();
-
             var revenueAccounts = profitAndLossAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Revenue);
             var expenseAccounts = profitAndLossAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Expenses);
             var operatingRevenue = revenueAccounts.Where(a => a.Account.AccountSubTypeId == (int)KnownAccountSubType.OperatingRevenue);
@@ -222,7 +213,6 @@ namespace DashAccountingSystemV2.BusinessLogic
             var result = new ProfitAndLossReportDto()
             {
                 Tenant = tenant,
-                AssetType = assetType,
                 DateRange = new DateRange(dateRangeStart, dateRangeEnd),
                 GrossProfit = grossProfit,
                 TotalOperatingExpenses = totalOperatingExpenses,

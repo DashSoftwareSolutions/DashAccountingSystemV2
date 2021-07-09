@@ -77,6 +77,7 @@ namespace DashAccountingSystemV2.Repositories
                 .JournalEntry
                 .Where(je => je.Id == journalEntryId)
                 .Include(je => je.Tenant)
+                .Include(je => je.Tenant.DefaultAssetType)
                 .Include(je => je.CreatedBy)
                 .Include(je => je.UpdatedBy)
                 .Include(je => je.PostedBy)
@@ -96,6 +97,7 @@ namespace DashAccountingSystemV2.Repositories
                     je.EntryId == entryId
                 )
                 .Include(je => je.Tenant)
+                .Include(je => je.Tenant.DefaultAssetType)
                 .Include(je => je.CreatedBy)
                 .Include(je => je.UpdatedBy)
                 .Include(je => je.PostedBy)

@@ -62,18 +62,22 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_type_row_type') THEN
         CREATE TYPE asset_type_row_type AS (
             "Name" VARCHAR(255),
-            "Symbol" CHAR(1)
+            "Description" VARCHAR(1024),
+            "Symbol" VARCHAR(4)
         );
     END IF;
 
     -- Asset Types
-    INSERT INTO "AssetType" ( "Name", "Symbol" )
-    SELECT "Name", "Symbol"
+    INSERT INTO "AssetType" ( "Name", "Description", "Symbol" )
+    SELECT "Name", "Description", "Symbol"
     FROM UNNEST ( ARRAY [
-         ( 'USD', '$' )
-        ,( 'GBP', '£' )
-        ,( 'EUR', '€' )
-        ,( 'JPY', '¥' )
+         ( 'USD', 'United States Dollars', '$' )
+        ,( 'GBP', 'British Pounds Sterling', '£' )
+        ,( 'EUR', 'Euros', '€' )
+        ,( 'JPY', 'Japanese Yen', '¥' )
+        ,( 'CAD', 'Canadian Dollars', '$' )
+        ,( 'NIO', 'Nicaraguan Córdobas', 'C$' )
+        ,( 'BTC', 'Bitcoin', '₿' )
     ]::asset_type_row_type[] ) the_new_asset_type
     WHERE NOT EXISTS ( SELECT 1 FROM "AssetType" WHERE LOWER("Name") = LOWER(the_new_asset_type."Name") );
 

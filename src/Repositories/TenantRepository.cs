@@ -21,6 +21,7 @@ namespace DashAccountingSystemV2.Repositories
         {
             return await _db
                 .Tenant
+                .Include(t => t.DefaultAssetType)
                 .FirstOrDefaultAsync(t => t.Id == tenantId);
         }
 
@@ -28,6 +29,7 @@ namespace DashAccountingSystemV2.Repositories
         {
             return await _db
                 .Tenant
+                .Include(t => t.DefaultAssetType)
                 .FirstOrDefaultAsync(t => t.Name.ToLower() == tenantName.ToLower());
         }
 
@@ -35,6 +37,7 @@ namespace DashAccountingSystemV2.Repositories
         {
             return await _db
                 .Tenant
+                .Include(t => t.DefaultAssetType)
                 .OrderBy(t => t.Name)
                 .ToListAsync();
         }

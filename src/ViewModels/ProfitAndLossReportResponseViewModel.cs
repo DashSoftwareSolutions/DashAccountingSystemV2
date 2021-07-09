@@ -37,13 +37,13 @@ namespace DashAccountingSystemV2.ViewModels
 
             return new ProfitAndLossReportResponseViewModel()
             {
-                GrossProfit = new AmountViewModel(profitAndLossReportData.GrossProfit, profitAndLossReportData.AssetType),
-                TotalOperatingExpenses = new AmountViewModel(profitAndLossReportData.TotalOperatingExpenses, profitAndLossReportData.AssetType),
-                NetOperatingIncome = new AmountViewModel(profitAndLossReportData.NetOperatingIncome, profitAndLossReportData.AssetType),
-                TotalOtherIncome = new AmountViewModel(profitAndLossReportData.TotalOtherIncome, profitAndLossReportData.AssetType),
-                TotalOtherExpenses = new AmountViewModel(profitAndLossReportData.TotalOtherExpenses, profitAndLossReportData.AssetType),
-                NetOtherIncome = new AmountViewModel(profitAndLossReportData.NetOtherIncome, profitAndLossReportData.AssetType),
-                NetIncome = new AmountViewModel(profitAndLossReportData.NetIncome, profitAndLossReportData.AssetType),
+                GrossProfit = new AmountViewModel(profitAndLossReportData.GrossProfit, profitAndLossReportData.Tenant.DefaultAssetType),
+                TotalOperatingExpenses = new AmountViewModel(profitAndLossReportData.TotalOperatingExpenses, profitAndLossReportData.Tenant.DefaultAssetType),
+                NetOperatingIncome = new AmountViewModel(profitAndLossReportData.NetOperatingIncome, profitAndLossReportData.Tenant.DefaultAssetType),
+                TotalOtherIncome = new AmountViewModel(profitAndLossReportData.TotalOtherIncome, profitAndLossReportData.Tenant.DefaultAssetType),
+                TotalOtherExpenses = new AmountViewModel(profitAndLossReportData.TotalOtherExpenses, profitAndLossReportData.Tenant.DefaultAssetType),
+                NetOtherIncome = new AmountViewModel(profitAndLossReportData.NetOtherIncome, profitAndLossReportData.Tenant.DefaultAssetType),
+                NetIncome = new AmountViewModel(profitAndLossReportData.NetIncome, profitAndLossReportData.Tenant.DefaultAssetType),
                 OperatingIncome = profitAndLossReportData.OperatingIncome.Select(ReportAccountResponseViewModel.FromModel),
                 OperatingExpenses = profitAndLossReportData.OperatingExpenses.Select(ReportAccountResponseViewModel.FromModel),
                 OtherIncome = profitAndLossReportData.OtherIncome.Select(ReportAccountResponseViewModel.FromModel),

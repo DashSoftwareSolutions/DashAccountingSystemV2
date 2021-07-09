@@ -14,19 +14,24 @@ namespace DashAccountingSystemV2.Models
         [MaxLength(255)]
         public string Name { get; set; }
 
-        public char? Symbol { get; set; }
+        [MaxLength(1024)]
+        public string Description { get; set; }
 
-        public AssetType(string name, char? symbol = null)
+        [MaxLength(4)]
+        public string Symbol { get; set; }
+
+        public AssetType() { }
+
+        public AssetType(string name, string symbol = null)
         {
             Name = name;
             Symbol = symbol;
         }
 
-        public AssetType(int id, string name, char? symbol)
+        public AssetType(int id, string name, string symbol)
+            : this(name, symbol)
         {
             Id = id;
-            Name = name;
-            Symbol = symbol;
         }
 
         public bool Equals(AssetType other)

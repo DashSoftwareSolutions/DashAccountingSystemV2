@@ -38,39 +38,44 @@ namespace DashAccountingSystemV2.ViewModels
         public bool Validate(ModelStateDictionary modelState)
         {
             if (Accounts.IsEmpty())
+            {
                 modelState.AddModelError("Accounts", "Journal Entry does not have any accounts");
+                return false;
+            }
+
+            if (Accounts.Count() < 2)
+            {
+                modelState.AddModelError("Accounts", "Journal Entry has fewer than two account entries");
+                return false;
+            }
 
             if (Accounts.Any(acct => !acct.Amount.HasValue))
+            {
                 modelState.AddModelError("Accounts", "Journal Entry has one or more accounts with invalid amounts or asset types");
+                return false;
+            }
 
             var accountsGroupedByAssetType = Accounts
                 .GroupBy(acct => new { AssetTypeId = acct.Amount.AssetType.Id, AssetTypeName = acct.Amount.AssetType.Name })
                 .ToDictionary(grp => grp.Key, grp => grp.Select(a => a));
 
-            var deficientAssetTypeGroups = accountsGroupedByAssetType
-                .Where(assetTypeGroup => assetTypeGroup.Value.Count() < 2);
-
-            if (deficientAssetTypeGroups.Any())
-                foreach (var assetTypeGroup in deficientAssetTypeGroups)
-                {
-                    modelState.AddModelError(
-                        "Accounts",
-                        $"Journal Entry has fewer than two account entries of asset type '{assetTypeGroup.Key.AssetTypeName}'");
-                }
-
-            var unbalancedAssetTypeGroups = accountsGroupedByAssetType
-                .Where(assetTypeGroup =>
-                    Math.Abs(assetTypeGroup.Value.Where(a => a.Amount.AmountType == AmountType.Debit).Sum(a => a.Amount.Amount.Value)) !=
-                    Math.Abs(assetTypeGroup.Value.Where(a => a.Amount.AmountType == AmountType.Credit).Sum(a => a.Amount.Amount.Value)));
-
-            if (unbalancedAssetTypeGroups.Any())
+            if (accountsGroupedByAssetType.Count > 1)
             {
-                foreach (var assetTypeGroup in unbalancedAssetTypeGroups)
-                {
-                    modelState.AddModelError(
-                        "Accounts",
-                        $"Journal Entry accounts do not balance for asset type '{assetTypeGroup.Key.AssetTypeName}'");
-                }
+                modelState.AddModelError(
+                    "Accounts",
+                    $"Journal Entry has accounts with multiple asset types: {string.Join(" ", accountsGroupedByAssetType.Keys.Select(x => x.AssetTypeName))}.  All accounts must be of the same asset type and must match the default asset type for this company.");
+
+                return false;
+            }
+
+            var totalDebits = Accounts.Where(a => a.Amount.AmountType == AmountType.Debit).Sum(a => a.Amount.Amount.Value);
+            var totalCredits = Accounts.Where(a => a.Amount.AmountType == AmountType.Credit).Sum(a => a.Amount.Amount.Value);
+
+            if (Math.Abs(totalDebits) != Math.Abs(totalCredits))
+            {
+                modelState.AddModelError(
+                    "Accounts",
+                    $"Journal Entry accounts is not balanced.  Debits: {totalDebits.ToString("N2")}  Credits: {totalCredits.ToString("N2")}");
             }
 
             return modelState.IsValid;

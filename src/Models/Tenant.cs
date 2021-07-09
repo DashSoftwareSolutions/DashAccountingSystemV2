@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,6 +15,10 @@ namespace DashAccountingSystemV2.Models
         [Required(AllowEmptyStrings = false)]
         [MaxLength(255)]
         public string Name { get; private set; }
+
+        [Required]
+        public int DefaultAssetTypeId { get; set; }
+        public AssetType DefaultAssetType { get; set; }
 
         // Navigation Properties
         public ICollection<Account> Accounts { get; } = new List<Account>();

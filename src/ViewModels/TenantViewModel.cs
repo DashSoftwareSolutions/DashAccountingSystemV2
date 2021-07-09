@@ -8,6 +8,8 @@ namespace DashAccountingSystemV2.ViewModels
         public Guid Id { get; set; }
         public string Name { get; set; }
 
+        public AssetTypeViewModel DefaultAssetType { get; set; }
+
         public static TenantViewModel FromModel(Tenant tenant)
         {
             if (tenant == null)
@@ -17,6 +19,7 @@ namespace DashAccountingSystemV2.ViewModels
             {
                 Id = tenant.Id,
                 Name = tenant.Name,
+                DefaultAssetType = AssetTypeViewModel.FromModel(tenant.DefaultAssetType),
             };
         }
     }

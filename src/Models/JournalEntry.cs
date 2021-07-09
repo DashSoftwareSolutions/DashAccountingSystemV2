@@ -45,7 +45,6 @@ namespace DashAccountingSystemV2.Models
                 if (Accounts.IsEmpty())
                     return true;
 
-                // TODO/FIXME: If multiple asset types are involved, sums of each asset type should equal zero
                 return Accounts.Aggregate(0.0m, (sum, nextAcct) => sum += nextAcct.Amount) == 0.0m;
             }
         }

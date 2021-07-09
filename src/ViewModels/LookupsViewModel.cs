@@ -6,6 +6,6 @@ namespace DashAccountingSystemV2.ViewModels
     {
         public IEnumerable<LookupValueViewModel> AccountTypes { get; set; }
         public IEnumerable<LookupValueViewModel> AccountSubTypes { get; set; }
-        public IEnumerable<AssetTypeViewModel> AssetTypes { get; set; }
+        public IEnumerable<ExtendedAssetTypeViewModel> AssetTypes { get; set; }
     }
 }

@@ -6,9 +6,6 @@ namespace DashAccountingSystemV2.Models
     {
         public Tenant Tenant { get; set; }
 
-        // TODO/FIXME: This might go away once Tenant model has a default Asset Type
-        public AssetType AssetType { get; set; }
-
         public DateRange DateRange { get; set; }
 
         public decimal GrossProfit { get; set; }

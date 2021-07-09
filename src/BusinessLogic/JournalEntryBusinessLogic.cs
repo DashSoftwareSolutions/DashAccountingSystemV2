@@ -10,19 +10,24 @@ namespace DashAccountingSystemV2.BusinessLogic
     public class JournalEntryBusinessLogic : IJournalEntryBusinessLogic
     {
         private readonly IJournalEntryRepository _journalEntryRepository = null;
+        private readonly ITenantRepository _tenantRepository = null;
         private readonly ILogger _logger = null;
 
         public JournalEntryBusinessLogic(
             IJournalEntryRepository journalEntryRepository,
+            ITenantRepository tenantRepository,
             ILogger<JournalEntryBusinessLogic> logger)
         {
             _journalEntryRepository = journalEntryRepository;
+            _tenantRepository = tenantRepository;
             _logger = logger;
         }
 
         public async Task<BusinessLogicResponse<JournalEntry>> CreateJournalEntry(JournalEntry journalEntry)
         {
-            // TODO: Permissions/Authorization checks
+            var tenant = await _tenantRepository.GetTenantAsync(journalEntry.TenantId);
+
+            // TODO: Verify user has access to this tenant and permission to create journal entries
 
             if (journalEntry == null)
                 throw new ArgumentNullException(nameof(journalEntry));
@@ -31,6 +36,14 @@ namespace DashAccountingSystemV2.BusinessLogic
                 return new BusinessLogicResponse<JournalEntry>(
                     ErrorType.RequestNotValid,
                     "Journal Entry is not balanced!  It cannot be persisted in this state.");
+
+            // TODO: For now, all transactions must be in the tenant's default asset type (currency) ... period.
+            //       In a future phase, we will add support for foreign currency transactions, where we can also store foreign currency equivalent amounts and the conversion rate used.
+            //       See https://github.com/DashSoftwareSolutions/DashAccountingSystemV2/issues/32
+            if (journalEntry.Accounts.Any(a => a.AssetTypeId != tenant.DefaultAssetTypeId))
+                return new BusinessLogicResponse<JournalEntry>(
+                    ErrorType.RequestNotValid,
+                    $"Journal Entry contains accounts with asset type ID {journalEntry.Accounts.First().AssetTypeId}.  This company only allows transactions with asset type ID {tenant.DefaultAssetTypeId} - {tenant.DefaultAssetType.Description} ({tenant.DefaultAssetType.Symbol}).");
 
             try
             {
@@ -105,6 +118,19 @@ namespace DashAccountingSystemV2.BusinessLogic
                 }
                 else
                 {
+                    if (!journalEntry.IsBalanced)
+                        return new BusinessLogicResponse<JournalEntry>(
+                            ErrorType.RequestNotValid,
+                            "Journal Entry is not balanced!  It cannot be persisted in this state.");
+
+                    // TODO: For now, all transactions must be in the tenant's default asset type (currency) ... period.
+                    //       In a future phase, we will add support for foreign currency transactions, where we can also store foreign currency equivalent amounts and the conversion rate used.
+                    //       See https://github.com/DashSoftwareSolutions/DashAccountingSystemV2/issues/32
+                    if (journalEntry.Accounts.Any(a => a.AssetTypeId != existingJournalEntry.Tenant.DefaultAssetTypeId))
+                        return new BusinessLogicResponse<JournalEntry>(
+                            ErrorType.RequestNotValid,
+                            $"Journal Entry contains accounts with asset type ID {journalEntry.Accounts.First().AssetTypeId}.  This company only allows transactions with asset type ID {existingJournalEntry.Tenant.DefaultAssetTypeId} - {existingJournalEntry.Tenant.DefaultAssetType.Description} ({existingJournalEntry.Tenant.DefaultAssetType.Symbol}).");
+
                     var entryWithUpdates = existingJournalEntry.Clone();
                     entryWithUpdates.EntryDate = journalEntry.EntryDate;
                     entryWithUpdates.PostDate = journalEntry.PostDate;

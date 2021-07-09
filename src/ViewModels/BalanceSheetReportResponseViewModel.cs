@@ -35,14 +35,14 @@ namespace DashAccountingSystemV2.ViewModels
 
             return new BalanceSheetReportResponseViewModel()
             {
-                TotalAssets = new AmountViewModel(balanceSheetReportData.TotalAssets, balanceSheetReportData.AssetType),
-                TotalLiabilities = new AmountViewModel(balanceSheetReportData.TotalLiabilities, balanceSheetReportData.AssetType),
-                TotalEquity = new AmountViewModel(balanceSheetReportData.TotalEquity, balanceSheetReportData.AssetType),
-                NetIncome = new AmountViewModel(balanceSheetReportData.NetIncome, balanceSheetReportData.AssetType),
-                TotalLiabilitiesAndEquity = new AmountViewModel(balanceSheetReportData.TotalLiabilitiesAndEquity, balanceSheetReportData.AssetType),
+                TotalAssets = new AmountViewModel(balanceSheetReportData.TotalAssets, balanceSheetReportData.Tenant.DefaultAssetType),
+                TotalLiabilities = new AmountViewModel(balanceSheetReportData.TotalLiabilities, balanceSheetReportData.Tenant.DefaultAssetType),
+                TotalEquity = new AmountViewModel(balanceSheetReportData.TotalEquity, balanceSheetReportData.Tenant.DefaultAssetType),
+                NetIncome = new AmountViewModel(balanceSheetReportData.NetIncome, balanceSheetReportData.Tenant.DefaultAssetType),
+                TotalLiabilitiesAndEquity = new AmountViewModel(balanceSheetReportData.TotalLiabilitiesAndEquity, balanceSheetReportData.Tenant.DefaultAssetType),
 
                 Discrepency = balanceSheetReportData.Discrepency.HasValue ?
-                    new AmountViewModel(balanceSheetReportData.Discrepency.Value, balanceSheetReportData.AssetType) :
+                    new AmountViewModel(balanceSheetReportData.Discrepency.Value, balanceSheetReportData.Tenant.DefaultAssetType) :
                     null,
 
                 Assets = balanceSheetReportData.Assets.Select(ReportAccountResponseViewModel.FromModel),

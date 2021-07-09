@@ -2,4 +2,5 @@
 
 export default interface AssetType extends LookupValue {
     symbol: string | null;
+    description?: string;
 }

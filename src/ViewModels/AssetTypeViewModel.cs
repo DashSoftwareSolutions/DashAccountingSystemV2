@@ -4,11 +4,11 @@ namespace DashAccountingSystemV2.ViewModels
 {
     public class AssetTypeViewModel : LookupValueViewModel
     {
-        public char? Symbol { get; set; }
+        public string Symbol { get; set; }
 
         public AssetTypeViewModel() { }
 
-        public AssetTypeViewModel(int id, string name, char? symbol = null)
+        public AssetTypeViewModel(int id, string name, string symbol = null)
             : base(id, name)
         {
             Symbol = symbol;
