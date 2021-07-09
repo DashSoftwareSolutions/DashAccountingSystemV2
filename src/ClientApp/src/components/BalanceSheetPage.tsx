@@ -83,7 +83,7 @@ class BalanceSheetPage extends React.PureComponent<BalanceSheetPageProps, Balanc
                 window.location.href = `${window.location.origin}/api/export-download?filename=${excelDownloadInfo.fileName}&format=${excelDownloadInfo.format}&token=${excelDownloadInfo.token}`;
             }
 
-            setTimeout(() => { this.setState({ isDownloadInProgress: false }); }, 500); // delay clearing `isDownloadInProgress` flag until save download window pops open
+            setTimeout(() => { this.setState({ isDownloadInProgress: false }); }, 750); // delay clearing `isDownloadInProgress` flag until save download window pops open
         }
     }
 

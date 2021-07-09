@@ -142,7 +142,21 @@ namespace DashAccountingSystemV2.Controllers
         }
 
         [HttpPost("export-balance-sheet")]
-        public async Task<IActionResult> RequestBalanceSheetExport([FromBody] ExportRequestWithDateRangeViewModel viewModel)
+        public Task<IActionResult> RequestBalanceSheetExport([FromBody] ExportRequestWithDateRangeViewModel viewModel)
+        {
+            return RequestReportExport(viewModel, _accountingReportBusinessLogic.GetBalanceSheetReport);
+        }
+
+        [HttpPost("export-profit-and-loss")]
+        public Task<IActionResult> RequestProfitAndLossReportExport([FromBody] ExportRequestWithDateRangeViewModel viewModel)
+        {
+            return RequestReportExport(viewModel, _accountingReportBusinessLogic.GetProfitAndLossReport);
+        }
+
+        private async Task<IActionResult> RequestReportExport<TUnderlyingData>(
+            ExportRequestWithDateRangeViewModel viewModel,
+            Func<Guid, DateTime, DateTime, Task<BusinessLogicResponse<TUnderlyingData>>> getReportData)
+            where TUnderlyingData : class
         {
             if (viewModel == null)
                 return this.ErrorResponse("Invalid POST body");
@@ -166,16 +180,10 @@ namespace DashAccountingSystemV2.Controllers
             if (!parsedDateRangeEnd.HasValue)
                 return this.ErrorResponse("dateRangeEnd was not a valid date/time value");
 
-            // TODO: Validate Tenant exists and User has access
+            var reportDataBizLogicResponse = await getReportData(viewModel.TenantId, parsedDateRangeStart.Value, parsedDateRangeEnd.Value);
 
-            // TODO: Consider caching this data and then checking cache first before requesting fresh data from BLL/DAL
-            var balanceSheetReportBizLogicResponse = await _accountingReportBusinessLogic.GetBalanceSheetReport(
-                viewModel.TenantId,
-                parsedDateRangeStart.Value,
-                parsedDateRangeEnd.Value);
-
-            if (!balanceSheetReportBizLogicResponse.IsSuccessful)
-                return this.ErrorResponse(balanceSheetReportBizLogicResponse);
+            if (!reportDataBizLogicResponse.IsSuccessful)
+                return this.ErrorResponse(reportDataBizLogicResponse);
 
             var exportRequestParams = new ExportRequestParameters()
             {
@@ -185,14 +193,14 @@ namespace DashAccountingSystemV2.Controllers
                 TenantId = viewModel.TenantId,
             };
 
-            var exportServiceResponse = await _exportService.GetDataExport(exportRequestParams, balanceSheetReportBizLogicResponse.Data);
+            var exportServiceResponse = await _exportService.GetDataExport(exportRequestParams, reportDataBizLogicResponse.Data);
 
             if (!exportServiceResponse.IsSuccessful)
                 return this.ErrorResponse(exportServiceResponse.Error);
 
             var result = new ExportDescriptorRequestAndResponseViewModel()
             {
-                Format = exportServiceResponse.ExportFormat, 
+                Format = exportServiceResponse.ExportFormat,
                 FileName = exportServiceResponse.FileName,
                 Token = exportServiceResponse.Token,
             };

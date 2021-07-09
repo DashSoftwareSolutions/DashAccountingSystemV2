@@ -14,11 +14,15 @@ import ProfitAndLossReport from '../models/ProfitAndLossReport';
 import ReportParametersAndControls from './ReportParametersAndControls';
 import TenantBasePage from './TenantBasePage';
 import * as ProfitAndLossStore from '../store/ProfitAndLoss';
+import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
         dateRangeEnd: state?.profitAndLoss?.dateRangeEnd,
         dateRangeStart: state?.profitAndLoss?.dateRangeStart,
+        excelDownloadError: state?.exportDownload?.error ?? null,
+        excelDownloadInfo: state?.exportDownload?.downloadInfo ?? null,
+        isDownloading: state?.exportDownload?.isLoading ?? false,
         isFetching: state.profitAndLoss?.isLoading ?? false,
         profitAndLossData: state.profitAndLoss?.reportData ?? null,
         selectedTenant: state.tenants?.selectedTenant ?? null,
@@ -27,6 +31,7 @@ const mapStateToProps = (state: ApplicationState) => {
 
 const mapDispatchToProps = {
     ...ProfitAndLossStore.actionCreators,
+    showAlert: SystemNotificationsStore.actionCreators.showAlert,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -36,14 +41,21 @@ type ProfitAndLossPageReduxProps = ConnectedProps<typeof connector>;
 type ProfitAndLossPageProps = ProfitAndLossPageReduxProps
     & RouteComponentProps;
 
-class ProfitAndLossPage extends React.PureComponent<ProfitAndLossPageProps> {
+interface ProfitAndLossPageState {
+    isDownloadInProgress: boolean;
+}
+
+class ProfitAndLossPage extends React.PureComponent<ProfitAndLossPageProps, ProfitAndLossPageState> {
     private bemBlockName: string = 'profit_and_loss_page';
 
     constructor(props: ProfitAndLossPageProps) {
         super(props);
 
+        this.state = { isDownloadInProgress: false };
+
         this.onDateRangeEndChanged = this.onDateRangeEndChanged.bind(this);
         this.onDateRangeStartChanged = this.onDateRangeStartChanged.bind(this);
+        this.onDownloadExcel = this.onDownloadExcel.bind(this);
         this.onRunReport = this.onRunReport.bind(this);
     }
 
@@ -51,15 +63,43 @@ class ProfitAndLossPage extends React.PureComponent<ProfitAndLossPageProps> {
         this.ensureDataFetched();
     }
 
+    public componentDidUpdate(prevProps: ProfitAndLossPageProps) {
+        const { isDownloading: wasDownloading } = prevProps;
+
+        const {
+            excelDownloadError,
+            excelDownloadInfo,
+            isDownloading,
+            showAlert,
+        } = this.props;
+
+        if (wasDownloading && !isDownloading) {
+            if (!isNil(excelDownloadError)) {
+                showAlert('danger', 'Error exporting Balance Sheet Report to Excel', true);
+            } else if (!isNil(excelDownloadInfo)) {
+                window.location.href = `${window.location.origin}/api/export-download?filename=${excelDownloadInfo.fileName}&format=${excelDownloadInfo.format}&token=${excelDownloadInfo.token}`;
+            }
+
+            setTimeout(() => { this.setState({ isDownloadInProgress: false }); }, 750); // delay clearing `isDownloadInProgress` flag until save download window pops open
+        }
+    }
+
     public render() {
         const {
             dateRangeEnd,
             dateRangeStart,
             history,
+            isDownloading,
             isFetching,
             profitAndLossData,
             selectedTenant,
         } = this.props;
+
+        const {
+            isDownloadInProgress,
+        } = this.state;
+
+        const isDownloadingAuthoritative = isDownloading || isDownloadInProgress;
 
         return (
             <TenantBasePage
@@ -80,9 +120,12 @@ class ProfitAndLossPage extends React.PureComponent<ProfitAndLossPageProps> {
                         bemBlockName={this.bemBlockName}
                         dateRangeEnd={dateRangeEnd ?? null}
                         dateRangeStart={dateRangeStart ?? null}
+                        isRequestingExcelDownload={isDownloadingAuthoritative}
                         onDateRangeEndChanged={this.onDateRangeEndChanged}
                         onDateRangeStartChanged={this.onDateRangeStartChanged}
+                        onDownloadExcel={this.onDownloadExcel}
                         onRunReport={this.onRunReport}
+                        showDownloadExcelButton
                     />
                     <div className={`${this.bemBlockName}--report_container`}>
                         {isFetching ? (
@@ -109,6 +152,12 @@ class ProfitAndLossPage extends React.PureComponent<ProfitAndLossPageProps> {
     private onDateRangeStartChanged(newStartDate: string) {
         const { updateDateRangeStart } = this.props;
         updateDateRangeStart(newStartDate);
+    }
+
+    private onDownloadExcel() {
+        const { requestProfitAndLossReportExcelExport } = this.props;
+        requestProfitAndLossReportExcelExport();
+        this.setState({ isDownloadInProgress: true });
     }
 
     private onRunReport() {

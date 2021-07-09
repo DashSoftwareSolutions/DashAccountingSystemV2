@@ -181,6 +181,15 @@ namespace DashAccountingSystemV2.BusinessLogic
             _logger.LogDebug("Compiling data for Profit and Loss Report for date range from {0:d} to {1:d}", dateRangeStart, dateRangeEnd);
             _logger.LogDebug("Getting final balances for all Revenue and Expense accounts...");
 
+            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
+
+            if (tenant == null)
+            {
+                return new BusinessLogicResponse<ProfitAndLossReportDto>(ErrorType.RequestedEntityNotFound, "Tenant not found");
+            }
+
+            // TODO: Check that user has access to this tenant and permission for profit & loss data
+
             var profitAndLossAccountsReponse = await GetAccounts(
                 tenantId,
                 dateRangeEnd,
@@ -212,7 +221,9 @@ namespace DashAccountingSystemV2.BusinessLogic
 
             var result = new ProfitAndLossReportDto()
             {
+                Tenant = tenant,
                 AssetType = assetType,
+                DateRange = new DateRange(dateRangeStart, dateRangeEnd),
                 GrossProfit = grossProfit,
                 TotalOperatingExpenses = totalOperatingExpenses,
                 NetOperatingIncome = netOperatingIncome,

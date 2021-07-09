@@ -5,9 +5,17 @@ import {
 } from 'lodash';
 import moment from 'moment-timezone';
 import { Logger } from '../common/Logging';
+import {
+    RequestDownloadAction,
+    ReceiveDownloadErrorAction,
+    ReceiveDownloadInfoAction,
+} from './Export';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
+import ApiErrorResponse from '../models/ApiErrorResponse';
+import ExportDownloadInfo from '../models/ExportDownloadInfo';
+import ExportFormat from '../models/ExportFormat';
 import IAction from './IAction';
 import ProfitAndLossReport from '../models/ProfitAndLossReport';
 
@@ -45,7 +53,10 @@ type KnownAction = RequestProfitAndLossReportDataAction |
     ReceiveProfitAndLossReportDataAction |
     UpdateProfitAndLossReportDateRangeStartAction |
     UpdateProfitAndLossReportDateRangeEndAction |
-    ResetProfitAndLossReportDataAction;
+    ResetProfitAndLossReportDataAction |
+    RequestDownloadAction |
+    ReceiveDownloadErrorAction |
+    ReceiveDownloadInfoAction;
 
 // Always have a logger in case we need to use it for debuggin'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -84,6 +95,64 @@ export const actionCreators = {
                 });
 
             dispatch({ type: ActionType.REQUEST_PROFIT_AND_LOSS_REPORT_DATA });
+        }
+    },
+
+    requestProfitAndLossReportExcelExport: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+
+        if (!isNil(appState?.balanceSheet) &&
+            !isNil(appState?.exportDownload) &&
+            !isNil(appState?.tenants?.selectedTenant) &&
+            !appState.exportDownload.isLoading) {
+            const tenantId = appState?.tenants?.selectedTenant?.id;
+            const dateRangeStart = appState.balanceSheet.dateRangeStart;
+            const dateRangeEnd = appState.balanceSheet.dateRangeEnd;
+
+            const exportRequestParameters = {
+                tenantId,
+                dateRangeStart,
+                dateRangeEnd,
+                exportType: 'ProfitAndLossReport',
+                exportFormat: ExportFormat.XLSX,
+            };
+
+            const accessToken = await authService.getAccessToken();
+
+            const requestOptions = {
+                method: 'POST',
+                body: JSON.stringify(exportRequestParameters),
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+            };
+
+            fetch('api/ledger/export-profit-and-loss', requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        try {
+                            response
+                                .json()
+                                .then((apiErrorResponse: ApiErrorResponse) => {
+                                    dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_ERROR, error: apiErrorResponse.error })
+                                });
+                        } catch (error) {
+                            logger.error('Secondary error parsing error response from Profit & Loss Export request:', error);
+                        }
+
+                        return null;
+                    }
+
+                    return response.json() as Promise<ExportDownloadInfo>
+                })
+                .then((downloadInfo) => {
+                    if (!isNil(downloadInfo)) {
+                        dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_INFO, downloadInfo });
+                    }
+                });
+
+            dispatch({ type: ActionType.REQUEST_EXPORT_DOWNLOAD });
         }
     },
 

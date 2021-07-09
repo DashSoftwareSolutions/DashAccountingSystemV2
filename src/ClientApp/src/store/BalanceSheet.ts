@@ -15,9 +15,9 @@ import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import BalanceSheetReport from '../models/BalanceSheetReport';
 import ExportFormat from '../models/ExportFormat';
-import IAction from './IAction';
 import ApiErrorResponse from '../models/ApiErrorResponse';
 import ExportDownloadInfo from '../models/ExportDownloadInfo';
+import IAction from './IAction';
 
 export interface BalanceSheetState {
     reportData: BalanceSheetReport | null;
@@ -128,7 +128,7 @@ export const actionCreators = {
                 },
             };
 
-            fetch(`api/ledger/export-balance-sheet`, requestOptions)
+            fetch('api/ledger/export-balance-sheet', requestOptions)
                 .then((response) => {
                     if (!response.ok) {
                         try {

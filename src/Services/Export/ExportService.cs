@@ -79,6 +79,19 @@ namespace DashAccountingSystemV2.Services.Export
 
                     return new BalanceSheetReportExcelExporter(_loggerFactory.CreateLogger<BalanceSheetReportExcelExporter>()) as IDataExporter<TUnderlyingData>;
 
+                case ExportType.ProfitAndLossReport:
+                    if (typeof(TUnderlyingData) != typeof(ProfitAndLossReportDto))
+                    {
+                        throw new ArgumentException("Unexpected kind of data transfer object supplied to Profit & Loss Report Export request");
+                    }
+
+                    if (parameters.ExportFormat != ExportFormat.XLSX)
+                    {
+                        throw new NotImplementedException($"No support for exporting Profit & Loss Report to format {parameters.ExportFormat}");
+                    }
+
+                    return new ProfitAndLossReportExcelExporter(_loggerFactory.CreateLogger<ProfitAndLossReportExcelExporter>()) as IDataExporter<TUnderlyingData>;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(parameters.ExportType), $"No support for export type {parameters.ExportType}");
             }
