@@ -1,4 +1,8 @@
-﻿import { Action, Reducer } from 'redux';
+﻿import {
+    Action,
+    Dispatch,
+    Reducer,
+} from 'redux';
 import {
     cloneDeep,
     filter,
@@ -113,7 +117,10 @@ interface DeleteJournalEntryResponseAction extends IAction {
     type: ActionType.DELETE_JOURNAL_ENTRY_COMPLETED;
 }
 
-// TODO: API Error Handling
+// API Error Handling
+interface SaveJournalEntryErrorAction extends IAction {
+    type: ActionType.SAVE_JOURNAL_ENTRY_ERROR,
+}
 
 /* END: REST API Actions */
 
@@ -188,6 +195,7 @@ type KnownAction = RequestJournalEntryAction |
     PostJournalEntryResponseAction |
     DeleteJournalEntryRequestAction |
     DeleteJournalEntryResponseAction |
+    SaveJournalEntryErrorAction |
     InitializeNewJournalEntryAction |
     EditJournalEntryAction |
     UpdateEntryDateAction |
@@ -262,7 +270,7 @@ export const actionCreators = {
             })
                 .then(response => {
                     if (!response.ok) {
-                        apiErrorHandler.handleError(response);
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
                         return null;
                     }
 
@@ -304,7 +312,10 @@ export const actionCreators = {
         fetch('api/journal/entry', requestOptions)
             .then(response => {
                 if (!response.ok) {
-                    apiErrorHandler.handleError(response);
+                    apiErrorHandler
+                        .handleError(response, dispatch as Dispatch<IAction>)
+                        .then(() => { dispatch({ type: ActionType.SAVE_JOURNAL_ENTRY_ERROR }); });
+
                     return null;
                 }
 
@@ -348,7 +359,7 @@ export const actionCreators = {
         fetch(`api/journal/${tenantId}/entry/${entryToSave.entryId}/post-date`, requestOptions)
             .then(response => {
                 if (!response.ok) {
-                    apiErrorHandler.handleError(response);
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
                     return null;
                 }
 
@@ -387,7 +398,7 @@ export const actionCreators = {
         fetch(`api/journal/${tenantId}/entry/${entryToSave.entryId}`, requestOptions)
             .then(response => {
                 if (!response.ok) {
-                    apiErrorHandler.handleError(response);
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
                     return null;
                 }
 
@@ -418,7 +429,7 @@ export const actionCreators = {
         fetch(`api/journal/${tenantId}/entry/${entryId}`, requestOptions)
             .then((response) => {
                 if (!response.ok) {
-                    apiErrorHandler.handleError(response);
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
                     return;
                 }
 
@@ -591,6 +602,12 @@ export const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | u
                     ...state,
                     isSaving: false,
                     existingEntry: action.savedEntry,
+                };
+
+            case ActionType.SAVE_JOURNAL_ENTRY_ERROR:
+                return {
+                    ...state,
+                    isSaving: false,
                 };
 
             case ActionType.REQUEST_DELETE_JOURNAL_ENTRY:

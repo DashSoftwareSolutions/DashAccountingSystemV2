@@ -1,4 +1,8 @@
-﻿import { Action, Reducer } from 'redux';
+﻿import {
+    Action,
+    Dispatch,
+    Reducer,
+} from 'redux';
 import {
     groupBy,
     isEmpty,
@@ -55,7 +59,7 @@ export const actionCreators = {
             })
                 .then(response => {
                     if (!response.ok) {
-                        apiErrorHandler.handleError(response);
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
                         return null;
                     }
 

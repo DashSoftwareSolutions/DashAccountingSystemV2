@@ -51,7 +51,7 @@ class SystemNotificationsArea extends React.PureComponent<SystemNotificationsAre
             !isNil(nextAlertId)) {
             this.setState({ currentAlertId: nextAlertId });
 
-            if (!isNil(alertAutoDismiss)) {
+            if (!isNil(alertAutoDismiss) && !!alertAutoDismiss) {
                 const autoDismissTimeout = isNumber(alertAutoDismiss) ?
                     alertAutoDismiss :
                     DEFAULT_SYSTEM_NOTIFICATION_ALERT_TIMEOUT;

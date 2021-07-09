@@ -36,6 +36,7 @@ const logger = new Logger('System Notifications Store');
 
 export const actionCreators = {
     showAlert: (color: string, content: any, autoDismiss: number | boolean): AppThunkAction<KnownAction> => (dispatch) => {
+        logger.debug('Trying to show alert (action creator)...')
         dispatch({
             type: ActionType.SHOW_ALERT,
             autoDismiss,
@@ -67,6 +68,7 @@ export const reducer: Reducer<SystemNotificationsState> = (state: SystemNotifica
     if (!isNil(action)) {
         switch (action.type) {
             case ActionType.SHOW_ALERT:
+                logger.debug('Received show alert action');
                 return {
                     alertAutoDismiss: action.autoDismiss,
                     alertColor: action.color,

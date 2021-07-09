@@ -1,3 +1,3 @@
 ﻿export default interface ApiErrorResponse {
-    error: string;
+    message: string;
 }

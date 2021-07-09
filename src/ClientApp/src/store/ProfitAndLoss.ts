@@ -1,4 +1,8 @@
-﻿import { Action, Reducer } from 'redux';
+﻿import {
+    Action,
+    Dispatch,
+    Reducer,
+} from 'redux';
 import { AppThunkAction } from './';
 import {
     isNil,
@@ -13,7 +17,7 @@ import {
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
-import ApiErrorResponse from '../models/ApiErrorResponse';
+import ApiExportDownloadErrorResponse from '../models/ApiExportDownloadErrorResponse';
 import ExportDownloadInfo from '../models/ExportDownloadInfo';
 import ExportFormat from '../models/ExportFormat';
 import IAction from './IAction';
@@ -82,7 +86,7 @@ export const actionCreators = {
             })
                 .then((response) => {
                     if (!response.ok) {
-                        apiErrorHandler.handleError(response);
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
                         return null;
                     }
 
@@ -134,7 +138,7 @@ export const actionCreators = {
                         try {
                             response
                                 .json()
-                                .then((apiErrorResponse: ApiErrorResponse) => {
+                                .then((apiErrorResponse: ApiExportDownloadErrorResponse) => {
                                     dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_ERROR, error: apiErrorResponse.error })
                                 });
                         } catch (error) {
