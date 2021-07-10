@@ -194,7 +194,10 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
         };
 
         const hasProblem = entryHasMixedAssetTypes || entryIsUnbalanced;
-        const problemDescription = entryIsUnbalanced ? 'Entry is not balanced' : 'Entry has mixed asset types';
+
+        const problemDescription = entryIsUnbalanced ?
+            'Entry is not balanced' :
+            entryHasMixedAssetTypes ? 'Entry has mixed asset types' : null;
 
         return (
             <div id={this.bemBlockName}>
