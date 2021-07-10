@@ -7,8 +7,10 @@ import {
     cloneDeep,
     filter,
     findIndex,
+    groupBy,
     isEmpty,
     isNil,
+    keys,
     map,
     reduce,
     trim,
@@ -24,9 +26,11 @@ import AmountType from '../models/AmountType';
 import IAction from './IAction';
 import JournalEntry from '../models/JournalEntry';
 import JournalEntryAccount from '../models/JournalEntryAccount';
+import AssetType from '../models/AssetType';
 
 export interface JournalEntryAccountsValidationState {
     error: string;
+    hasMixedAssetTypes: boolean;
     hasSufficientAccounts: boolean;
     isBalanced: boolean;
 }
@@ -49,8 +53,15 @@ interface JournalEntryValidationState {
     canSave: boolean;
 }
 
+const DEFAULT_ACCOUNT_VALIDATION_STATE: JournalEntryAccountsValidationState = {
+    error: '',
+    hasMixedAssetTypes: false,
+    hasSufficientAccounts: false,
+    isBalanced: true,
+};
+
 const DEFAULT_VALIDATION_STATE: JournalEntryValidationState = {
-    accounts: { error: '', hasSufficientAccounts: false, isBalanced: true },
+    accounts: { ...DEFAULT_ACCOUNT_VALIDATION_STATE },
     attributes: new Map([
         ['entryDate', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
         ['postDate', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
@@ -527,17 +538,18 @@ const sumDebits = (accounts: JournalEntryAccount[]): number => {
         0);
 };
 
+// Helper function for checking two numbers for equality
+// 'cause ... you know ... floating point number issues! ;-)
+// Adapted from: https://stackoverflow.com/a/49261488
+const defaultPrecision = 0.001;
+const numbersAreEqualWithPrecision = (n1: number, n2: number, precision: number = defaultPrecision): boolean => {
+    return Math.abs(n1 - n2) <= precision;
+}
+
 const updateStateAfterAccountChange = (state: JournalEntryState, updatedJournalEntry: JournalEntry): JournalEntryState => {
-    let accountValidation: JournalEntryAccountsValidationState = { hasSufficientAccounts: false, isBalanced: true, error: '' };
+    let accountValidation: JournalEntryAccountsValidationState = { ...DEFAULT_ACCOUNT_VALIDATION_STATE };
 
-    // TODO: Right now, we are assuming all amounts are using same asset type (e.g. USD $, etc.)
-    //       If entry were to have mixed asset types, each group of amounts by asset type must balance.
-    //       Honestly, though, we might want to hide Asset Type and assume that all transactions against an account must be of same asset type.
-    //       Definitely no Asset Type exposed for every Journal Entry in QuickBooks; it is likely some global setting somewhere.
-
-    const totalDebits = sumDebits(updatedJournalEntry.accounts);
-    const totalCredits = sumCredits(updatedJournalEntry.accounts);
-
+    // Validate that we have at least two accounts in the journal entry/transaction
     accountValidation.hasSufficientAccounts = updatedJournalEntry.accounts.length >= 2;
 
     if (!accountValidation.hasSufficientAccounts) {
@@ -546,12 +558,41 @@ const updateStateAfterAccountChange = (state: JournalEntryState, updatedJournalE
             'Journal Entry must have at least two accounts';
     }
 
-    accountValidation.isBalanced = accountValidation.hasSufficientAccounts && totalDebits === totalCredits;
+    // Assuming we have a sufficient number of accounts, let's verify that the amounts are all of the same asset type (currency)
+    if (accountValidation.hasSufficientAccounts) {
+        const groupedByAssetType = groupBy(updatedJournalEntry.accounts, (acct): number | null => acct.amount?.assetType?.id ?? null);
+        accountValidation.hasMixedAssetTypes = keys(groupedByAssetType).length > 1;
+
+        if (accountValidation.hasMixedAssetTypes) {
+            accountValidation.error = 'Journal Entry has mixed asset types';
+        }
+    }
+
+    // TODO: Foreign currency transactions! (see https://github.com/DashSoftwareSolutions/DashAccountingSystemV2/issues/32)
+    //       Need to detect if the asset type of the transaction is not the same as the tenant's default asset type.
+    //       Then pop some modal open to show user what is happening, fetch the appropriate conversion rate,
+    //       and convert the foreign currency amounts into amounts denominated in tenant's default currency.
+
+    //       Note that the model for a "JournalEntryAccount" will change to be able to persist the foreign currency amount
+    //       and the conversion rate used; the normal amount property will _always_ be in the tenant's default currency.
+
+    //       This is because it is _ABSOLUTELY NECESSARY_ that all transactions are in same currency
+    //       in order to produce statements like the Balance Sheet and Profit & Loss -- everything has to be properly additive!
+
+    // Sum the Debits and Credits
+    const totalDebits = sumDebits(updatedJournalEntry.accounts);
+    const totalCredits = sumCredits(updatedJournalEntry.accounts);
+
+    // Check if the entry is balanced
+    accountValidation.isBalanced = accountValidation.hasSufficientAccounts &&
+        !accountValidation.hasMixedAssetTypes &&
+        numbersAreEqualWithPrecision(totalDebits, totalCredits); // cannot use totalDebits === totalCredits due to floating point precision issues
 
     if (!accountValidation.isBalanced) {
         accountValidation.error = 'Journal Entry is not balanced';
     }
 
+    // Return the updated state
     return {
         ...state,
         dirtyEntry: updatedJournalEntry,

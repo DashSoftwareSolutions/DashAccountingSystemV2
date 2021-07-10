@@ -110,9 +110,11 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps> {
         } = validation ?? {};
 
         const {
+            hasMixedAssetTypes,
             hasSufficientAccounts,
             isBalanced,
         } = accountsValidation ?? {
+            hasMixedAssetTypes: false,
             hasSufficientAccounts: false,
             isBalanced: true,
         };
@@ -215,7 +217,8 @@ class JournalEntryEditor extends React.PureComponent<JournalEntryEditorProps> {
                                 accounts={accounts ?? []}
                                 accountSelectOptions={accountSelectOptions ?? []}
                                 assetTypes={assetTypes ?? []}
-                                isEntryUnbalanced={hasSufficientAccounts && !isBalanced}
+                                entryHasMixedAssetTypes={hasMixedAssetTypes}
+                                entryIsUnbalanced={hasSufficientAccounts && !isBalanced}
                                 journalEntryAccounts={dirtyEntry.accounts ?? []}
                                 mode={mode}
                                 onAccountAdded={this.onAccountAdded}

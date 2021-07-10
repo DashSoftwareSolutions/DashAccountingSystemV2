@@ -33,7 +33,8 @@ interface JournalEntryAccountsEditorProps {
     accounts: Account[];
     accountSelectOptions: AccountCategoryList[];
     assetTypes: AssetType[];
-    isEntryUnbalanced: boolean;
+    entryHasMixedAssetTypes: boolean;
+    entryIsUnbalanced: boolean;
     journalEntryAccounts: JournalEntryAccount[];
     mode: Mode;
     onAccountAdded: Function;
@@ -160,7 +161,8 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
         const {
             accountSelectOptions,
             assetTypes,
-            isEntryUnbalanced,
+            entryHasMixedAssetTypes,
+            entryIsUnbalanced,
             journalEntryAccounts,
             totalCredits,
             totalDebits,
@@ -191,6 +193,9 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
             assetType: defaultAssetType,
         };
 
+        const hasProblem = entryHasMixedAssetTypes || entryIsUnbalanced;
+        const problemDescription = entryIsUnbalanced ? 'Entry is not balanced' : 'Entry has mixed asset types';
+
         return (
             <div id={this.bemBlockName}>
                 <div className="row" style={{ minHeight: '66px' }}>
@@ -198,8 +203,8 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                         <h4>Journal Entry Account Details</h4>
                     </div>
                     <div className="col-md-6">
-                        <Alert color="warning" isOpen={isEntryUnbalanced}>
-                            Entry is not balanced
+                        <Alert color="warning" isOpen={hasProblem}>
+                            {problemDescription}
                         </Alert>
                     </div>
                 </div>
