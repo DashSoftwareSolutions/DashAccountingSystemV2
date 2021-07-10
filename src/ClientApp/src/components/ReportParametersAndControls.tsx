@@ -7,6 +7,9 @@ import {
     Row,
 } from 'reactstrap';
 import { noop } from 'lodash';
+import DateRange from '../models/DateRange';
+import DateRangeMacroType from '../models/DateRangeMacroType';
+import DateRangeMacroSelector from './DateRangeMacroSelector';
 
 interface ReportParametersAndControlsProps {
     bemBlockName: string;
@@ -35,12 +38,22 @@ const ReportParametersAndControls: React.FC<ReportParametersAndControlsProps> = 
     const showDownloadExcelButtonSafe = showDownloadExcelButton ?? false;
     const isRequestingExcelDownloadSafe = isRequestingExcelDownload ?? false;
 
+    const [selectedDateRangeMacro, setSelectedDateRangeMacro] = React.useState(DateRangeMacroType.Custom);
+
     const onDateRangeEndInputChanged = (event: React.FormEvent<HTMLInputElement>) => {
         onDateRangeEndChanged(event.currentTarget.value);
+
+        if (selectedDateRangeMacro !== DateRangeMacroType.Custom) {
+            setSelectedDateRangeMacro(DateRangeMacroType.Custom);
+        }
     }
 
     const onDateRangeStartInputChanged = (event: React.FormEvent<HTMLInputElement>) => {
         onDateRangeStartChanged(event.currentTarget.value);
+
+        if (selectedDateRangeMacro !== DateRangeMacroType.Custom) {
+            setSelectedDateRangeMacro(DateRangeMacroType.Custom);
+        }
     }
 
     const onDownloadExcelButtonClicked = (event: React.MouseEvent<HTMLElement>) => {
@@ -53,10 +66,22 @@ const ReportParametersAndControls: React.FC<ReportParametersAndControlsProps> = 
         onRunReport();
     }
 
+    const onDateRangeMacroSelectionChanged = (selectedMacro: DateRangeMacroType, dateRange: DateRange) => {
+        setSelectedDateRangeMacro(selectedMacro);
+        onDateRangeStartChanged(dateRange.dateRangeStart);
+        onDateRangeEndChanged(dateRange.dateRangeEnd);
+    };
+
     return (
         <Form style={{ marginBottom: 22 }}>
             <Row form>
-                {/* TODO: Add preset ranges select */}
+                <Col md={3}>
+                    <DateRangeMacroSelector
+                        id={`${bemBlockName}--date_range_macro_select`}
+                        onChange={onDateRangeMacroSelectionChanged}
+                        value={selectedDateRangeMacro}
+                    />
+                </Col>
                 <Col md={2}>
                     <Input
                         id={`${bemBlockName}--date_range_start_input`}
