@@ -24,6 +24,7 @@ namespace DashAccountingSystemV2.Data
         }
 
         #region Main Application Schema
+        #region Accounting
         /// <summary>
         /// Gets or sets the <see cref="DbSet{AccountType}"/>.
         /// </summary>
@@ -63,6 +64,13 @@ namespace DashAccountingSystemV2.Data
         /// Gets or sets the <see cref="DbSet{ReconciliationReport}"/>.
         /// </summary>
         public DbSet<ReconciliationReport> ReconciliationReport { get; set; }
+        #endregion Accounting
+
+        #region Address Lookups
+        public DbSet<Country> Country { get; set; }
+
+        public DbSet<Region> Region { get; set; }
+        #endregion Address Lookups
         #endregion Main Application Schema
 
         #region Persisted Grants for Identity Server
@@ -87,6 +95,7 @@ namespace DashAccountingSystemV2.Data
             builder.ConfigurePersistedGrantContext(_operationalStoreOptions.Value);
 
             // Main Application Schema (Indexes and Such)
+            #region Accounting
             builder.Entity<AccountType>()
                 .HasIndex(at => at.Name)
                 .IsUnique();
@@ -174,6 +183,24 @@ namespace DashAccountingSystemV2.Data
 
             builder.Entity<ReconciliationReport>()
                 .HasIndex(rr => rr.AccountId);
+            #endregion Accounting
+
+            #region Address Lookups
+            builder.Entity<Country>()
+                .HasIndex(c => c.TwoLetterCode)
+                .IsUnique();
+
+            builder.Entity<Country>()
+                .HasIndex(c => c.ThreeLetterCode)
+                .IsUnique();
+
+            builder.Entity<Region>()
+                .HasIndex(r => r.CountryId);
+
+            builder.Entity<Region>()
+                .HasIndex(r => new { r.CountryId, r.Code })
+                .IsUnique();
+            #endregion Address Lookups
         }
 
         private const string GENERATE_GUID = "uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13) placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)";
