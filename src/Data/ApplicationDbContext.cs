@@ -71,6 +71,15 @@ namespace DashAccountingSystemV2.Data
 
         public DbSet<Region> Region { get; set; }
         #endregion Address Lookups
+
+        #region Employee Time Tracking / Sales & Invoicing
+        public DbSet<Entity> Entity { get; set; }
+
+        public DbSet<Address> Address { get; set; }
+
+        public DbSet<Employee> Employee { get; set; }
+        #endregion Employee Time Tracking / Sales & Invoicing
+
         #endregion Main Application Schema
 
         #region Persisted Grants for Identity Server
@@ -201,6 +210,41 @@ namespace DashAccountingSystemV2.Data
                 .HasIndex(r => new { r.CountryId, r.Code })
                 .IsUnique();
             #endregion Address Lookups
+
+            #region Employee Time Tracking / Sales & Invoicing
+            builder.Entity<Entity>()
+                .HasIndex(e => e.TenantId);
+
+            builder.Entity<Entity>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Entity>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Address>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Address>()
+                .Property(a => a.AddressType)
+                .HasMaxLength(32)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<AddressType>(v));
+
+            builder.Entity<Employee>()
+                .HasIndex(e => e.EntityId)
+                .IsUnique();
+
+            #endregion Employee Time Tracking / Sales & Invoicing
         }
 
         private const string GENERATE_GUID = "uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13) placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)";

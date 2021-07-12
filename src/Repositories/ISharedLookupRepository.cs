@@ -11,5 +11,13 @@ namespace DashAccountingSystemV2.Repositories
         Task<IEnumerable<AccountSubType>> GetAccountSubTypesAsync();
 
         Task<IEnumerable<AssetType>> GetAssetTypesAsync();
+
+        Task<IEnumerable<Country>> GetCountriesAsync();
+
+        Task<IEnumerable<Region>> GetRegionsByCountryAsync(int countryId);
+
+        Task<IEnumerable<Region>> GetRegionsByCountryAlpha2CodeAsync(string countryAlpha2Code);
+
+        Task<IEnumerable<Region>> GetRegionsByCountryAlpha3CodeAsync(string countryAlpha3Code);
     }
 }
