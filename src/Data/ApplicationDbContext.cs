@@ -78,6 +78,8 @@ namespace DashAccountingSystemV2.Data
         public DbSet<Address> Address { get; set; }
 
         public DbSet<Employee> Employee { get; set; }
+
+        public DbSet<Customer> Customer { get; set; }
         #endregion Employee Time Tracking / Sales & Invoicing
 
         #endregion Main Application Schema
@@ -242,6 +244,22 @@ namespace DashAccountingSystemV2.Data
 
             builder.Entity<Employee>()
                 .HasIndex(e => e.EntityId)
+                .IsUnique();
+
+            builder.Entity<Employee>()
+                .HasIndex(e => new { e.TenantId, e.EmployeeNumber })
+                .IsUnique();
+
+            builder.Entity<Customer>()
+                .HasIndex(c => c.EntityId)
+                .IsUnique();
+
+            builder.Entity<Customer>()
+                .HasIndex(c => new { c.TenantId, c.NormalizedCustomerNumber })
+                .IsUnique();
+
+            builder.Entity<Customer>()
+                .HasIndex(c => new { c.TenantId, c.NormalizedCompanyName })
                 .IsUnique();
 
             #endregion Employee Time Tracking / Sales & Invoicing

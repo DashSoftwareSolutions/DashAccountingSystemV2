@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DashAccountingSystemV2.Data;
-using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.Repositories
@@ -82,16 +81,31 @@ namespace DashAccountingSystemV2.Repositories
         {
             return await _db.Employee
                 .Include(e => e.Entity)
-                .Where(e => e.Entity.TenantId == tenantId)
+                .Where(e =>
+                    e.TenantId == tenantId &&
+                    (!onlyActive || e.Entity.IsActive)) // TODO: Does "ReleaseDate" factor into this...?
                 .Include(e => e.User)
                 .OrderBy(e => e.LastName)
                 .ThenBy(e => e.FirstName)
                 .ToListAsync();
         }
 
-        public Task<Employee> GetByUserIdAsync(Guid userId)
+        public async Task<Employee> GetByUserIdAsync(Guid tenantId, Guid userId)
         {
-            throw new NotImplementedException();
+            return await _db.Employee
+                .Where(e =>
+                    e.TenantId == tenantId &&
+                    e.UserId == userId)
+                .Include(e => e.Entity)
+                    .ThenInclude(e => e.CreatedBy)
+                .Include(e => e.Entity)
+                    .ThenInclude(e => e.UpdatedBy)
+                .Include(e => e.MailingAddress)
+                    .ThenInclude(ma => ma.Country)
+                .Include(e => e.MailingAddress)
+                    .ThenInclude(ma => ma.Region)
+                .Include(e => e.User)
+                .FirstOrDefaultAsync();
         }
 
         public Task<Employee> UpdateAsync(Employee employee)

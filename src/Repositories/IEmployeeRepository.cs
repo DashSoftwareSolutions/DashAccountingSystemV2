@@ -11,7 +11,7 @@ namespace DashAccountingSystemV2.Repositories
 
         Task<Employee> GetByEntityIdAsync(Guid entityId);
 
-        Task<Employee> GetByUserIdAsync(Guid userId);
+        Task<Employee> GetByUserIdAsync(Guid tenantId, Guid userId);
 
         Task<Employee> InsertAsync(Employee employee);
 

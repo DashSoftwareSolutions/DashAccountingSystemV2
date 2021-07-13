@@ -28,5 +28,12 @@ namespace DashAccountingSystemV2.Models
 
         public Guid? UpdatedById { get; set; }
         public ApplicationUser UpdatedBy { get; private set; }
+
+        public DateTime? Inactivated { get; set; }
+
+        public Guid? InactivatedById { get; set; }
+        public ApplicationUser InactivatedBy { get; private set; }
+
+        public bool IsActive => !Inactivated.HasValue;
     }
 }

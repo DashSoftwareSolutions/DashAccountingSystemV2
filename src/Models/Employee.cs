@@ -98,6 +98,8 @@ namespace DashAccountingSystemV2.Models
         public decimal? HourlyBillingRate { get; set; }
 
         public bool IsBillableByDefault { get; set; }
+
+        public string Notes { get; set; }
         #endregion Employee Properties
     }
 }
