@@ -80,6 +80,10 @@ namespace DashAccountingSystemV2.Data
         public DbSet<Employee> Employee { get; set; }
 
         public DbSet<Customer> Customer { get; set; }
+
+        public DbSet<ProductCategory> ProductCategory { get; set; }
+
+        public DbSet<Product> Product { get; set; }
         #endregion Employee Time Tracking / Sales & Invoicing
 
         #endregion Main Application Schema
@@ -261,6 +265,42 @@ namespace DashAccountingSystemV2.Data
             builder.Entity<Customer>()
                 .HasIndex(c => new { c.TenantId, c.NormalizedCompanyName })
                 .IsUnique();
+
+            builder.Entity<ProductCategory>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<ProductCategory>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<ProductCategory>()
+                .HasIndex(pc => new { pc.TenantId, pc.NormalizedName })
+                .IsUnique();
+
+            builder.Entity<Product>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Product>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Product>()
+               .HasIndex(p => new { p.TenantId, p.NormalizedName })
+               .IsUnique();
+
+            builder.Entity<Product>()
+               .HasIndex(p => new { p.TenantId, p.NormalizedSKU })
+               .IsUnique();
 
             #endregion Employee Time Tracking / Sales & Invoicing
         }
