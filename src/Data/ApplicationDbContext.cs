@@ -83,6 +83,8 @@ namespace DashAccountingSystemV2.Data
 
         public DbSet<ProductCategory> ProductCategory { get; set; }
 
+        public DbSet<TimeActivity> TimeActivity { get; set; }
+
         public DbSet<Product> Product { get; set; }
         #endregion Employee Time Tracking / Sales & Invoicing
 
@@ -301,6 +303,36 @@ namespace DashAccountingSystemV2.Data
             builder.Entity<Product>()
                .HasIndex(p => new { p.TenantId, p.NormalizedSKU })
                .IsUnique();
+
+            builder.Entity<TimeActivity>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<TimeActivity>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<TimeActivity>()
+                .HasIndex(t => new { t.TenantId, t.EmployeeId });
+
+            builder.Entity<TimeActivity>()
+                .HasIndex(t => new { t.TenantId, t.EmployeeId, t.Date });
+
+            builder.Entity<TimeActivity>()
+                .HasIndex(t => new { t.TenantId, t.CustomerId });
+
+            builder.Entity<TimeActivity>()
+                .HasIndex(t => new { t.TenantId, t.CustomerId, t.Date });
+
+            builder.Entity<TimeActivity>()
+                .HasIndex(t => new { t.TenantId, t.CustomerId, t.Date });
+
+            builder.Entity<TimeActivity>()
+                .HasIndex(t => new { t.TenantId, t.EmployeeId, t.CustomerId, t.Date });
 
             #endregion Employee Time Tracking / Sales & Invoicing
         }
