@@ -44,7 +44,7 @@ BEGIN
     RAISE NOTICE 'Journal Entry / Transaction # %', entry_number;
 
     transaction_timestamp := (now() AT TIME ZONE 'UTC');
-    
+
     -- Insert Journal Entry
     INSERT INTO "JournalEntry"
     (
@@ -75,7 +75,7 @@ BEGIN
         ,user_id
     )
     RETURNING "Id" INTO STRICT journal_entry_id;
-    
+
     -- For Each Account
     FOREACH current_account IN ARRAY accounts LOOP
         -- Resolve Account Name and Account Number
@@ -83,12 +83,12 @@ BEGIN
         FROM "Account"
         WHERE "Id" = current_account.account_id
         INTO STRICT account_number, account_name;
-    
+
         RAISE NOTICE 'Account ID % / % - %'
             ,current_account.account_id
             ,account_number
             ,account_name;
-        
+
         -- Insert into JournalEntryAccount table
         INSERT INTO "JournalEntryAccount"
         (
@@ -104,7 +104,7 @@ BEGIN
             ,current_account.asset_type_id
             ,current_account.amount
         );
-        
+
     END LOOP;
 
     RETURN journal_entry_id;
