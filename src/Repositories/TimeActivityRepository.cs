@@ -36,6 +36,7 @@ namespace DashAccountingSystemV2.Repositories
                 .Include(ta => ta.Customer)
                 .Include(ta => ta.Employee)
                 .Include(ta => ta.ProductOrService)
+                    .ThenInclude(p => p.Category)
                 .Include(ta => ta.CreatedBy)
                 .Include(ta => ta.UpdatedBy)
                 .FirstOrDefaultAsync();

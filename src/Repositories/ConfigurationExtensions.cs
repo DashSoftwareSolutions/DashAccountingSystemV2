@@ -10,7 +10,11 @@ namespace DashAccountingSystemV2.Repositories
                 .AddScoped<IAccountRepository, AccountRepository>()
                 .AddScoped<IJournalEntryRepository, JournalEntryRepository>()
                 .AddScoped<ISharedLookupRepository, SharedLookupRepository>()
-                .AddScoped<ITenantRepository, TenantRepository>();
+                .AddScoped<ITenantRepository, TenantRepository>()
+                .AddScoped<ICustomerRepository, CustomerRepository>()
+                .AddScoped<IEmployeeRepository, EmployeeRepository>()
+                .AddScoped<IProductRepository, ProductRepository>()
+                .AddScoped<ITimeActivityRepository, TimeActivityRepository>();
 
             return services;
         }

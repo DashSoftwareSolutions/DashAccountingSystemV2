@@ -61,9 +61,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUril}}/api/journal/entry",
+					"raw": "{{baseUri}}/api/journal/entry",
 					"host": [
-						"{{baseUril}}"
+						"{{baseUri}}"
 					],
 					"path": [
 						"api",
@@ -296,6 +296,82 @@
 						"api",
 						"ledger",
 						"export-balance-sheet"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/ledger/export-profit-and-loss",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenantId\": \"{{tenantId}}\",\r\n    \"exportType\": \"ProfitAndLossReport\",\r\n    \"exportFormat\": \"XLSX\",\r\n    \"dateRangeStart\": \"{{dateRangeStart}}\",\r\n    \"dateRangeEnd\": \"{{dateRangeEnd}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUri}}/api/ledger/export-profit-and-loss",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"ledger",
+						"export-profit-and-loss"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/time-tracking/time-activity",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenantId\": \"{{tenantId}}\",\r\n    \"employeeId\": \"{{employeeId}}\",\r\n    \"customerId\": \"{{customerId}}\",\r\n    \"productId\": \"{{productId}}\",\r\n    \"isBillable\": true,\r\n    \"hourlyBillingRate\": {{hourlyBillingRate}},\r\n    \"date\": \"{{timeActivityDate}}\",\r\n    \"timeZone\": \"{{defaultTimeZone}}\",\r\n    \"startTime\": \"{{timeActivityStartTime}}\",\r\n    \"endTime\": \"{{timeActivityEndTime}}\",\r\n    \"description\": \"{{timeActivityDescription}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUri}}/api/time-tracking/time-activity",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"time-tracking",
+						"time-activity"
 					]
 				}
 			},
