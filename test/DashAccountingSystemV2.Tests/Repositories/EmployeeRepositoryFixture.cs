@@ -70,6 +70,149 @@ namespace DashAccountingSystemV2.Tests.Repositories
             });
         }
 
+        [Fact]
+        [Trait("Category", "Requires Database")]
+        public void GetByTenantIdAsync_Ok()
+        {
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
+            {
+                await InitializeManyEmployees();
+
+                var repository = await GetEmployeeRepository();
+
+                var results1 = await repository.GetByTenantIdAsync(_tenantId);
+                Assert.Equal(3, results1.Count());
+
+                var results2 = await repository.GetByTenantIdAsync(_tenantId, new uint[] { 1024, 2048 });
+                Assert.Equal(2, results2.Count());
+                Assert.Contains(results2, e => e.EmployeeNumber == 1024);
+                Assert.Contains(results2, e => e.EmployeeNumber == 2048);
+
+                // TODO: Test and Assert that filtering by Active ones works
+            });
+        }
+
+        private async Task InitializeManyEmployees()
+        {
+            var sharedLookupsRepository = await GetSharedLookupRepository();
+
+            var unitedStates = (await sharedLookupsRepository.GetCountriesAsync())
+                .FirstOrDefault(c => c.ThreeLetterCode == "USA");
+
+            var usStatesAndTerritories = await sharedLookupsRepository.GetRegionsByCountryAlpha3CodeAsync("USA");
+
+            var california = usStatesAndTerritories.FirstOrDefault(r => r.Code == "CA");
+            var newYork = usStatesAndTerritories.FirstOrDefault(r => r.Code == "NY");
+
+            var employeeRepository = await GetEmployeeRepository();
+
+            var employee1 = new Employee()
+            {
+                Entity = new Entity()
+                {
+                    TenantId = _tenantId,
+                    EntityType = EntityType.Person | EntityType.Employee,
+                    CreatedById = _userId,
+                },
+                TenantId = _tenantId,
+                Title = "Mr.",
+                FirstName = "Geoffrey",
+                LastName = "Roberts",
+                DisplayName = "Geoffrey Roberts",
+                Gender = Gender.Male,
+                Email = "geoffrey.roberts@example.com",
+                MobilePhoneNumber = "+17145553333",
+                MailingAddress = new Address()
+                {
+                    TenantId = _tenantId,
+                    AddressType = AddressType.Home,
+                    StreetAddress1 = "123 Some St",
+                    City = "Fullerton",
+                    RegionId = california.Id,
+                    CountryId = unitedStates.Id,
+                    PostalCode = "92832",
+                },
+                EmployeeNumber = 101,
+                JobTitle = "Software Dude",
+                HourlyBillingRate = 60,
+                IsBillableByDefault = true,
+                HireDate = new DateTime(2018, 3, 1),
+                UserId = _userId,
+            };
+
+            var savedEmployee1 = await employeeRepository.InsertAsync(employee1);
+
+            var employee2 = new Employee()
+            {
+                Entity = new Entity()
+                {
+                    TenantId = _tenantId,
+                    EntityType = EntityType.Person | EntityType.Employee,
+                    CreatedById = _userId,
+                },
+                TenantId = _tenantId,
+                Title = "Miss",
+                FirstName = "Julia",
+                LastName = "Wicker",
+                DisplayName = "Julia Wicker",
+                Gender = Gender.Male,
+                Email = "julia.wicker@example.com",
+                MobilePhoneNumber = "+13475554567",
+                MailingAddress = new Address()
+                {
+                    TenantId = _tenantId,
+                    AddressType = AddressType.Home,
+                    StreetAddress1 = "1283 Pride Avenue",
+                    City = "Brooklyn",
+                    RegionId = newYork.Id,
+                    CountryId = unitedStates.Id,
+                    PostalCode = "11235",
+                },
+                EmployeeNumber = 1024,
+                JobTitle = "Magician",
+                HourlyBillingRate = 70,
+                IsBillableByDefault = true,
+                HireDate = new DateTime(2018, 4, 1),
+            };
+
+            var savedEmployee2 = await employeeRepository.InsertAsync(employee2);
+
+            var employee3 = new Employee()
+            {
+                Entity = new Entity()
+                {
+                    TenantId = _tenantId,
+                    EntityType = EntityType.Person | EntityType.Employee,
+                    CreatedById = _userId,
+                },
+                TenantId = _tenantId,
+                Title = "Miss",
+                FirstName = "Kady",
+                LastName = "Orloff-Diaz",
+                DisplayName = "Kady Orloff-Diaz",
+                Gender = Gender.Male,
+                Email = "kady.orloff-diaz@example.com",
+                MobilePhoneNumber = "+17185556789",
+                MailingAddress = new Address()
+                {
+                    TenantId = _tenantId,
+                    AddressType = AddressType.Home,
+                    StreetAddress1 = "3229 Church Street",
+                    City = "Brooklyn",
+                    RegionId = newYork.Id,
+                    CountryId = unitedStates.Id,
+                    PostalCode = "11227",
+                },
+                EmployeeNumber = 2048,
+                JobTitle = "Magician",
+                HourlyBillingRate = 68,
+                IsBillableByDefault = true,
+                HireDate = new DateTime(2018, 5, 1),
+            };
+
+            var savedEmployee3 = await employeeRepository.InsertAsync(employee3);
+        }
+
         private async Task<IEmployeeRepository> GetEmployeeRepository()
         {
             var appDbContext = await TestUtilities.GetDatabaseContextAsync();

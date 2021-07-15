@@ -82,6 +82,8 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 var results2 = await repository.GetByTenantIdAsync(_tenantId, new string[] { "SVCC", "ELCLH" });
                 Assert.Equal(2, results2.Count());
+                Assert.Contains(results2, c => c.CustomerNumber == "SVCC");
+                Assert.Contains(results2, c => c.CustomerNumber == "ELCLH");
 
                 // TODO: Test and Assert that filtering by Active ones works
             });
