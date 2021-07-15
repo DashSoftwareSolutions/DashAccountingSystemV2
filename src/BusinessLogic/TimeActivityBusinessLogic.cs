@@ -11,18 +11,71 @@ namespace DashAccountingSystemV2.BusinessLogic
 {
     public class TimeActivityBusinessLogic : ITimeActivityBusinessLogic
     {
+        private readonly ICustomerRepository _customerRepository = null;
+        private readonly IEmployeeRepository _employeeRepository = null;
         private readonly ITenantRepository _tenantRepository = null;
         private readonly ITimeActivityRepository _timeActivityRespository = null;
         private readonly ILogger _logger = null;
 
         public TimeActivityBusinessLogic(
+            ICustomerRepository customerRepository,
+            IEmployeeRepository employeeRepository,
             ITenantRepository tenantRepository,
             ITimeActivityRepository timeActivityRepository,
             ILogger<TimeActivityBusinessLogic> logger)
         {
+            _customerRepository = customerRepository;
+            _employeeRepository = employeeRepository;
             _tenantRepository = tenantRepository;
             _timeActivityRespository = timeActivityRepository;
             _logger = logger;
+        }
+
+        public async Task<BusinessLogicResponse<TimeActivityDetailsReportDto>> GetTimeActivitiesDetailReportData(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd,
+            IEnumerable<string> includeCustomers = null,
+            IEnumerable<uint> includeEmployees = null)
+        {
+            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
+
+            if (tenant == null)
+            {
+                return new BusinessLogicResponse<TimeActivityDetailsReportDto>(ErrorType.RequestedEntityNotFound, "Tenant not found");
+            }
+
+            // TODO: Check that user has access to this tenant and permission for the requested time activities data
+
+            IEnumerable<Guid> parsedIncludedCustomerIds = null;
+            IEnumerable<Guid> parsedIncludedEmployeeIds = null;
+
+            if (includeCustomers.HasAny())
+            {
+                var customers = await _customerRepository.GetByTenantIdAsync(tenantId, includeCustomers);
+                parsedIncludedCustomerIds = customers?.Select(c => c.EntityId);
+            }
+
+            if (includeEmployees.HasAny())
+            {
+                var employees = await _employeeRepository.GetByTenantIdAsync(tenantId, includeEmployees);
+                parsedIncludedEmployeeIds = employees?.Select(e => e.EntityId);
+            }
+
+            var timeActivities = await _timeActivityRespository.GetFiltered(
+                tenantId,
+                dateRangeStart,
+                dateRangeEnd,
+                parsedIncludedCustomerIds,
+                parsedIncludedEmployeeIds);
+
+            return new BusinessLogicResponse<TimeActivityDetailsReportDto>(
+                new TimeActivityDetailsReportDto()
+                {
+                    Tenant = tenant,
+                    DateRange = new DateRange(dateRangeStart, dateRangeEnd),
+                    TimeActivities = timeActivities
+                });
         }
 
         public async Task<BusinessLogicResponse<TimeActivity>> CreateTimeActivity(TimeActivity timeActivity)

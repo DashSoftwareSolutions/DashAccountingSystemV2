@@ -20,15 +20,15 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         public Guid EmployeeId { get; set; }
-        public Employee Employee { get; private set; }
+        public Employee Employee { get; set; }
 
         [Required]
         public Guid CustomerId { get; set; }
-        public Customer Customer { get; private set; }
+        public Customer Customer { get; set; }
 
         [Required]
         public Guid ProductId { get; set; }
-        public Product ProductOrService { get; private set; }
+        public Product ProductOrService { get; set; }
 
         public bool IsBillable { get; set; }
 
@@ -118,11 +118,11 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         public Guid CreatedById { get; set; }
-        public ApplicationUser CreatedBy { get; private set; }
+        public ApplicationUser CreatedBy { get; set; }
 
         public DateTime? Updated { get; set; }
 
         public Guid? UpdatedById { get; set; }
-        public ApplicationUser UpdatedBy { get; private set; }
+        public ApplicationUser UpdatedBy { get; set; }
     }
 }

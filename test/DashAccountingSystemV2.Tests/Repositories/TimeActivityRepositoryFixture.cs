@@ -145,6 +145,16 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 Assert.Equal(TimeSpan.FromHours(5), savedTimeActivity.TotalTime); // 7 hours - 2 hour break
                 Assert.Equal(5 * savedTimeActivity.HourlyBillingRate, savedTimeActivity.TotalBillableAmount);
                 // Assert all the other things!
+
+                // Also quick test for GetFiltered()
+                // TODO: A more robust test where we make lots of time entries and exercise the filter options
+                var retrived = await subjectUnderTest.GetFiltered(
+                    _tenantId,
+                    new DateTime(2021, 7, 14),
+                    new DateTime(2021, 7, 14));
+
+                Assert.NotEmpty(retrived);
+                Assert.Contains(retrived, ta => ta.Id == savedTimeActivity.Id);
             });
         }
 

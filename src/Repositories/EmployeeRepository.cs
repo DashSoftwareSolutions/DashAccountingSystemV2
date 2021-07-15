@@ -109,7 +109,7 @@ namespace DashAccountingSystemV2.Repositories
                  ON emp.""UserId"" = app_user.""Id""
    WHERE emp.""TenantId"" = @tenantId
      AND ( NOT @onlyActive OR entity.""Inactivated"" IS NULL ) -- TODO: Does emp.""ReleaseDate"" factor into this...?
-     AND ( @employeeNumbers::INTEGER[] IS NULL OR emp.""EmployeeNumber"" = ANY ( @employeeNumbers ) )
+     AND ( @employeeNumbers::BIGINT[] IS NULL OR emp.""EmployeeNumber"" = ANY ( @employeeNumbers ) )
 ORDER BY emp.""LastName""
         ,emp.""FirstName"";
 ";
