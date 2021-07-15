@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Dapper;
+using Npgsql;
 using DashAccountingSystemV2.Data;
 using DashAccountingSystemV2.Models;
 
@@ -36,15 +38,50 @@ namespace DashAccountingSystemV2.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Customer>> GetByTenantIdAsync(Guid tenantId, bool onlyActive = true)
+        public async Task<IEnumerable<Customer>> GetByTenantIdAsync(
+            Guid tenantId,
+            IEnumerable<string> customerNumbers = null,
+            bool onlyActive = true)
         {
-            return await _db.Customer
-                .Include(c => c.Entity)
-                .Where(c =>
-                    c.TenantId == tenantId &&
-                    (!onlyActive || c.Entity.IsActive))
-                .OrderBy(c => c.DisplayName)
-                .ToListAsync();
+            // Not working so well :-(
+            //return await _db.Customer
+            //    .Include(c => c.Entity)
+            //    .Where(c =>
+            //        c.TenantId == tenantId &&
+            //        (customNumbers == null || customNumbers.Contains(c.CustomerNumber)) &&
+            //        (!onlyActive || c.Entity.IsActive))
+            //    .OrderBy(c => c.DisplayName)
+            //    .ToListAsync();
+
+            const string sql = @"
+  SELECT c.""EntityId"" as entity_id
+        ,c.*
+        ,e.""Id"" as id
+        ,e.*
+    FROM ""Customer"" c
+         INNER JOIN ""Entity"" e
+                 ON c.""EntityId"" = e.""Id""
+   WHERE c.""TenantId"" = @tenantId
+     AND ( NOT @onlyActive OR e.""Inactivated"" IS NULL )
+     AND ( @customerNumbers::VARCHAR[] IS NULL OR c.""CustomerNumber"" = ANY ( @customerNumbers ) )
+ORDER BY c.""DisplayName"";
+";
+            using (var connection = new NpgsqlConnection(_db.Database.GetConnectionString()))
+            {
+                return await connection.QueryAsync<Customer, Entity, Customer>(
+                    sql,
+                    (customer, entity) =>
+                    {
+                        if (customer != null)
+                        {
+                            customer.Entity = entity;
+                        }
+
+                        return customer;
+                    },
+                    param: new { tenantId, customerNumbers = customerNumbers.AsList(), onlyActive },
+                    splitOn: "entity_id,id");
+            }
         }
 
         public async Task<Customer> InsertAsync(Customer customer)

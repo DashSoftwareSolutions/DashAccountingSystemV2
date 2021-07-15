@@ -67,6 +67,134 @@ namespace DashAccountingSystemV2.Tests.Repositories
             });
         }
 
+        [Fact]
+        [Trait("Category", "Requires Database")]
+        public void GetByTenantIdAsync_Ok()
+        {
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
+            {
+                await InitializeManyCustomers();
+
+                var repository = await GetCustomerRepository();
+
+                var results1 = await repository.GetByTenantIdAsync(_tenantId);
+                Assert.Equal(3, results1.Count());
+
+                var results2 = await repository.GetByTenantIdAsync(_tenantId, new string[] { "SVCC", "ELCLH" });
+                Assert.Equal(2, results2.Count());
+
+                // TODO: Test and Assert that filtering by Active ones works
+            });
+        }
+
+        private async Task InitializeManyCustomers()
+        {
+            var repository = await GetCustomerRepository();
+            var sharedLookupsRepository = await GetSharedLookupRepository();
+
+            var unitedStates = (await sharedLookupsRepository.GetCountriesAsync())
+                .FirstOrDefault(c => c.ThreeLetterCode == "USA");
+
+            var california = (await sharedLookupsRepository.GetRegionsByCountryAlpha3CodeAsync("USA"))
+                .FirstOrDefault(r => r.Code == "CA");
+
+            var customer1 = new Customer()
+            {
+                Entity = new Entity()
+                {
+                    TenantId = _tenantId,
+                    EntityType = EntityType.Organization | EntityType.Customer,
+                    CreatedById = _userId,
+                },
+                TenantId = _tenantId,
+                CompanyName = "Saddleback Valley Community Church",
+                CustomerNumber = "SVCC",
+                DisplayName = "Saddleback Church",
+                ContactPersonTitle = "Mr.",
+                ContactPersonFirstName = "Church",
+                ContactPersonLastName = "Saddleback",
+                BillingAddress = new Address()
+                {
+                    TenantId = _tenantId,
+                    AddressType = AddressType.Billing,
+                    StreetAddress1 = "1 Saddleback Parkway",
+                    City = "Lake Forest",
+                    RegionId = california.Id,
+                    CountryId = unitedStates.Id,
+                    PostalCode = "92630",
+                },
+                WorkPhoneNumber = "+19496098000",
+                Email = "chuck@saddleback.com",
+                Website = "https://saddleback.com",
+            };
+
+            var savedCustomer1 = await repository.InsertAsync(customer1);
+
+            var customer2 = new Customer()
+            {
+                Entity = new Entity()
+                {
+                    TenantId = _tenantId,
+                    EntityType = EntityType.Organization | EntityType.Customer,
+                    CreatedById = _userId,
+                },
+                TenantId = _tenantId,
+                CompanyName = "Emanuel Lutheran Church",
+                CustomerNumber = "ELCLH",
+                DisplayName = "Emanuel Lutheran Church",
+                ContactPersonTitle = "Mrs.",
+                ContactPersonFirstName = "Jane",
+                ContactPersonLastName = "Doe",
+                BillingAddress = new Address()
+                {
+                    TenantId = _tenantId,
+                    AddressType = AddressType.Billing,
+                    StreetAddress1 = "150 N. Palm Street",
+                    City = "La Habra",
+                    RegionId = california.Id,
+                    CountryId = unitedStates.Id,
+                    PostalCode = "90631",
+                },
+                WorkPhoneNumber = "+15626910656",
+                Email = "churchinfo@elclh.org",
+                Website = "http://elclh.org/",
+            };
+
+            var savedCustomer2 = await repository.InsertAsync(customer2);
+
+            var customer3 = new Customer()
+            {
+                Entity = new Entity()
+                {
+                    TenantId = _tenantId,
+                    EntityType = EntityType.Organization | EntityType.Customer,
+                    CreatedById = _userId,
+                },
+                TenantId = _tenantId,
+                CompanyName = "Chocolate Milk Corporation",
+                CustomerNumber = "CMC1234",
+                DisplayName = "Chocolate Milk Corporation",
+                ContactPersonTitle = "Mr.",
+                ContactPersonFirstName = "John",
+                ContactPersonLastName = "Smith",
+                BillingAddress = new Address()
+                {
+                    TenantId = _tenantId,
+                    AddressType = AddressType.Billing,
+                    StreetAddress1 = "5 Chrysler",
+                    City = "Irvine",
+                    RegionId = california.Id,
+                    CountryId = unitedStates.Id,
+                    PostalCode = "92618",
+                },
+                WorkPhoneNumber = "+19495556789",
+                Email = "chocolatemilk@example.com",
+                Website = "https://chocolate.example.com/",
+            };
+
+            var savedCustomer3 = await repository.InsertAsync(customer3);
+        }
+
         private async Task<ICustomerRepository> GetCustomerRepository()
         {
             var appDbContext = await TestUtilities.GetDatabaseContextAsync();

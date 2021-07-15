@@ -7,7 +7,10 @@ namespace DashAccountingSystemV2.Repositories
 {
     public interface ICustomerRepository
     {
-        Task<IEnumerable<Customer>> GetByTenantIdAsync(Guid tenantId, bool onlyActive = true);
+        Task<IEnumerable<Customer>> GetByTenantIdAsync(
+            Guid tenantId,
+            IEnumerable<string> customerNumbers = null,
+            bool onlyActive = true);
 
         Task<Customer> GetByEntityIdAsync(Guid entityId);
 
