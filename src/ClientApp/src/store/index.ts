@@ -7,7 +7,6 @@ import * as LookupValues from './LookupValues';
 import * as ProfitAndLoss from './ProfitAndLoss';
 import * as SystemNotifications from './SystemNotifications';
 import * as Tenants from './Tenants';
-import * as WeatherForecasts from './WeatherForecasts';  // from scaffolded examples; TODO: remove
 
 // The top-level state object
 export interface ApplicationState {
@@ -20,7 +19,6 @@ export interface ApplicationState {
     profitAndLoss: ProfitAndLoss.ProfitAndLossState | undefined;
     systemNotifications: SystemNotifications.SystemNotificationsState | undefined;
     tenants: Tenants.TenantsState | undefined;
-    weatherForecasts: WeatherForecasts.WeatherForecastsState | undefined; // from scaffolded examples; TODO: remove
 }
 
 // Whenever an action is dispatched, Redux will update each top-level application state property using
@@ -36,7 +34,6 @@ export const reducers = {
     profitAndLoss: ProfitAndLoss.reducer,
     systemNotifications: SystemNotifications.reducer,
     tenants: Tenants.reducer,
-    weatherForecasts: WeatherForecasts.reducer, // from scaffolded examples; TODO: remove
 };
 
 // This type can be used as a hint on action creators so that its 'dispatch' and 'getState' params are

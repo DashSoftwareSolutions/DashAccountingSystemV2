@@ -8,7 +8,6 @@ import BalanceSheetPage from './components/BalanceSheetPage';
 import ChartOfAccountsPage from './components/ChartOfAccountsPage';
 import DashboardPage from './components/DashboardPage';
 import EditJournalEntryPage from './components/EditJournalEntryPage';
-import FetchData from './components/FetchData';
 import LedgerPage from './components/LedgerPage';
 import ProfitAndLossPage from './components/ProfitAndLossPage';
 import SelectTenant from './components/SelectTenant';
@@ -32,7 +31,6 @@ export default () => (
         <AuthorizeRoute path='/journal-entry/edit/:entryId' component={EditJournalEntryPage} />
         <AuthorizeRoute path='/ledger' component={LedgerPage} />
         <AuthorizeRoute path='/profit-and-loss' component={ProfitAndLossPage} />
-        <AuthorizeRoute path='/fetch-data/:startDateIndex?' component={FetchData} />
         <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes} />
     </Layout>
 );
