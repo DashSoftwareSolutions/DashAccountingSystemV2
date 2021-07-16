@@ -416,6 +416,36 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "api/workforce/{tenantId}/employees",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/workforce/{{tenantId}}/employees",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"workforce",
+						"{{tenantId}}",
+						"employees"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
