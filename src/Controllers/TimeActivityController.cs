@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystemV2.BusinessLogic;
@@ -34,6 +35,37 @@ namespace DashAccountingSystemV2.Controllers
             var createTimeActivityBizLogicResponse = _timeActivityBusinessLogic.CreateTimeActivity(timeActivityToCreate);
 
             return this.Result(createTimeActivityBizLogicResponse, TimeActivityResponseViewModel.FromModel);
+        }
+
+        [HttpGet("{tenantId:guid}/time-activities-report")]
+        public Task<IActionResult> GetTimeActivitiesDetailReport(
+            [FromRoute] Guid tenantId,
+            [FromQuery] string dateRangeStart,
+            [FromQuery] string dateRangeEnd,
+            [FromQuery] string customers = null,
+            [FromQuery] string employees = null)
+        {
+            var parsedDateRangeStart = dateRangeStart.TryParseAsDateTime();
+
+            if (!parsedDateRangeStart.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeStart was not a valid date/time value"));
+
+            var parsedDateRangeEnd = dateRangeEnd.TryParseAsDateTime();
+
+            if (!parsedDateRangeEnd.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeEnd was not a valid date/time value"));
+
+            var parsedCustomerIds = customers.ParseCommaSeparatedValues();
+            var parsedEmployeeIds = employees.ParseCommaSeparatedIds();
+
+            var bizLogicResponse = _timeActivityBusinessLogic.GetTimeActivitiesDetailReportData(
+                tenantId,
+                dateRangeStart: parsedDateRangeStart.Value,
+                dateRangeEnd: parsedDateRangeEnd.Value,
+                includeCustomers: !parsedCustomerIds.HasAny() ? null : parsedCustomerIds,
+                includeEmployees: !parsedEmployeeIds.HasAny() ? null : parsedEmployeeIds);
+
+            return this.Result(bizLogicResponse, TimeActivitiesReportResponseViewModel.FromModel);
         }
     }
 }

@@ -376,6 +376,46 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "api/time-tracking/{tenantId}/time-activities-report",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/time-tracking/{{tenantId}}/time-activities-report?dateRangeStart={{dateRangeStart}}&dateRangeEnd={{dateRangeEnd}}",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"time-tracking",
+						"{{tenantId}}",
+						"time-activities-report"
+					],
+					"query": [
+						{
+							"key": "dateRangeStart",
+							"value": "{{dateRangeStart}}"
+						},
+						{
+							"key": "dateRangeEnd",
+							"value": "{{dateRangeEnd}}"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

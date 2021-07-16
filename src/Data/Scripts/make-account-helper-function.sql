@@ -8,7 +8,7 @@ DROP FUNCTION IF EXISTS make_account(
     ,SMALLINT
     ,UUID);
 
-﻿CREATE OR REPLACE FUNCTION make_account (
+CREATE OR REPLACE FUNCTION make_account (
      IN the_tenant_id UUID
     ,IN the_account_number INTEGER
     ,IN the_account_name VARCHAR(255)

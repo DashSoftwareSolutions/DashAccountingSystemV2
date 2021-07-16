@@ -93,6 +93,52 @@ namespace DashAccountingSystemV2.Extensions
         private static readonly Regex s_passwordClausePattern =
             new Regex("password\\s*=\\s*([^,;]*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        public static IEnumerable<TEnum> ParseCommaSeparatedEnumValues<TEnum>(this string str) where TEnum : struct
+        {
+            if (string.IsNullOrWhiteSpace(str)) return Enumerable.Empty<TEnum>();
+
+            return str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                      .Select(s =>
+                      {
+                          if (Enum.TryParse<TEnum>(s, out var res))
+                              return (parsed: true, value: res);
+                          return (parsed: false, value: res);
+                      })
+                      .Where(s => s.parsed)
+                      .Select(s => s.value)
+                      .ToList();
+        }
+
+        public static IEnumerable<uint> ParseCommaSeparatedIds(this string str)
+        {
+            if (string.IsNullOrWhiteSpace(str)) return Enumerable.Empty<uint>();
+
+            return str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                      .Select(s =>
+                      {
+                          return uint.TryParse(s, out uint parsed) ? parsed : (uint?)null;
+                      })
+                      .Where(id => id.HasValue)
+                      .Select(id => id.Value)
+                      .ToList();
+        }
+
+        public static IEnumerable<uint> ParseCommaSeparatedIds(this IEnumerable<string> commaSeparatedIdList)
+        {
+            return string.Join(",", commaSeparatedIdList ?? Enumerable.Empty<string>()).ParseCommaSeparatedIds();
+        }
+
+        /// <summary>
+        /// Returns string Enumerable from CSV string parameter 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> ParseCommaSeparatedValues(this string str)
+        {
+            return string.IsNullOrWhiteSpace(str)
+                ? Enumerable.Empty<string>()
+                : str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        }
 
         /// <summary>
         /// Performs Unicode Normalization

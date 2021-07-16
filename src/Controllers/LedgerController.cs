@@ -68,8 +68,8 @@ namespace DashAccountingSystemV2.Controllers
         [HttpGet("{tenantId:guid}/balance-sheet")]
         public Task<IActionResult> GetBalanceSheetReport(
              [FromRoute] Guid tenantId,
-            [FromQuery] string dateRangeStart,
-            [FromQuery] string dateRangeEnd)
+             [FromQuery] string dateRangeStart,
+             [FromQuery] string dateRangeEnd)
         {
             var parsedDateRangeStart = dateRangeStart.TryParseAsDateTime();
 
