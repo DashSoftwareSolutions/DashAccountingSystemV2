@@ -340,6 +340,66 @@
 			"response": []
 		},
 		{
+			"name": "api/sales/{tenantId}/customers",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/sales/{{tenantId}}/customers",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"sales",
+						"{{tenantId}}",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/sales/{tenantId}/products",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/sales/{{tenantId}}/products",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"sales",
+						"{{tenantId}}",
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "api/time-tracking/time-activity",
 			"request": {
 				"auth": {
@@ -442,36 +502,6 @@
 						"workforce",
 						"{{tenantId}}",
 						"employees"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "api/sales/{tenantId}/customers",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{accessToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUri}}/api/sales/{{tenantId}}/customers",
-					"host": [
-						"{{baseUri}}"
-					],
-					"path": [
-						"api",
-						"sales",
-						"{{tenantId}}",
-						"customers"
 					]
 				}
 			},

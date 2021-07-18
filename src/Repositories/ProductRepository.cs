@@ -29,6 +29,7 @@ namespace DashAccountingSystemV2.Repositories
         {
             return await _db.Product
                 .Where(p => p.TenantId == tenantId)
+                .Include(p => p.Category)
                 .OrderBy(p => p.Name)
                 .ToListAsync();
         }

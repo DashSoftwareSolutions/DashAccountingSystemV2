@@ -28,7 +28,7 @@ namespace DashAccountingSystemV2.BusinessLogic
                 return new BusinessLogicResponse<IEnumerable<Employee>>(ErrorType.RequestedEntityNotFound, "Tenant not found");
             }
 
-            // TODO: Verify access to tenant and permission for listing customers
+            // TODO: Verify access to tenant and permission for listing employees
 
             var employees = await _employeeRepository.GetByTenantIdAsync(tenantId, employeeNumbers, onlyActive);
 
