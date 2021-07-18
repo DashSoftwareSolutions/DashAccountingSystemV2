@@ -9,6 +9,7 @@ using DashAccountingSystemV2.ViewModels;
 using DashAccountingSystemV2.Services.Caching;
 using DashAccountingSystemV2.Services.Export;
 using static DashAccountingSystemV2.Security.Constants;
+using static DashAccountingSystemV2.Services.Caching.Constants;
 
 namespace DashAccountingSystemV2.Controllers
 {
@@ -30,7 +31,7 @@ namespace DashAccountingSystemV2.Controllers
                 return this.ErrorResponse("Invalid download request");
 
             var tenantId = User.FindFirstValue(DashClaimTypes.TenantId);
-            var cacheKey = $"{tenantId}/{viewModel.FileName}";
+            var cacheKey = $"{ApplicationCacheKeyPrefix}/{tenantId}/{viewModel.FileName}";
 
             var exportContent = await _cache.GetAsync(cacheKey);
 

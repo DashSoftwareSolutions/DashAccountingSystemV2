@@ -11,6 +11,7 @@ namespace DashAccountingSystemV2.Repositories
                 .AddScoped<IJournalEntryRepository, JournalEntryRepository>()
                 .AddScoped<ISharedLookupRepository, SharedLookupRepository>()
                 .AddScoped<ITenantRepository, TenantRepository>()
+                .AddScoped<ITimeZoneRepository, TimeZoneRepository>()
                 .AddScoped<ICustomerRepository, CustomerRepository>()
                 .AddScoped<IEmployeeRepository, EmployeeRepository>()
                 .AddScoped<IProductRepository, ProductRepository>()

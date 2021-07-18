@@ -5,6 +5,7 @@ using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Security.ExportDownloads;
 using DashAccountingSystemV2.Services.Caching;
 using DashAccountingSystemV2.Services.Export.DataExporters;
+using static DashAccountingSystemV2.Services.Caching.Constants;
 
 namespace DashAccountingSystemV2.Services.Export
 {
@@ -37,7 +38,7 @@ namespace DashAccountingSystemV2.Services.Export
 
                 if (exportedData != null)
                 {
-                    var cacheKey = $"{parameters.TenantId}/{exportedData.FileName}";
+                    var cacheKey = $"{ApplicationCacheKeyPrefix}/{parameters.TenantId}/{exportedData.FileName}";
                     await _cache.SetAsync(cacheKey, exportedData.Content, TimeSpan.FromMinutes(5));
 
                     var downloadAccessToken = await _securityTokenService.RequestExportDownloadToken(

@@ -43,6 +43,23 @@ namespace DashAccountingSystemV2.Extensions
         }
 
         /// <summary>
+        /// Converts a <see cref="TimeSpan"/> to [+/-]HH:mm format
+        /// </summary>
+        /// <remarks>
+        /// * Always includes sign (+ or -)
+        /// * Always includes leading 0 for single digit hours
+        /// </remarks>
+        /// <param name="timespan"></param>
+        /// <returns></returns>
+        public static string ToHMString(this TimeSpan timespan)
+        {
+            var isNegative = timespan.Ticks < 0;
+            var sign = isNegative ? "-" : "+";
+            var actualTimeSpan = isNegative ? timespan.Negate() : timespan;
+            return $"{sign}{actualTimeSpan.Hours.ToString("00")}:{actualTimeSpan.Minutes.ToString("00")}";
+        }
+
+        /// <summary>
         /// This method will not do a converstion for you, and d.Kind must be DateTimeKind.Utc or it will throw ArgumentException.
         /// </summary>
         public static long ToUnixTimestamp(this DateTime d, bool milliseconds = false)

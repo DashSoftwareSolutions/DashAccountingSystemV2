@@ -478,6 +478,34 @@
 			"response": []
 		},
 		{
+			"name": "api/time-zones",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/time-zones",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"time-zones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "api/workforce/{tenantId}/employees",
 			"request": {
 				"auth": {

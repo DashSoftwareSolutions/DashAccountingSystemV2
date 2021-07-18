@@ -10,7 +10,7 @@ namespace DashAccountingSystemV2.Controllers
     [Authorize]
     [ApiController]
     [Route("api/lookups")]
-    public class LookupsController  : Controller
+    public class LookupsController : Controller
     {
         private readonly ISharedLookupRepository _sharedLookupRepository = null;
 
