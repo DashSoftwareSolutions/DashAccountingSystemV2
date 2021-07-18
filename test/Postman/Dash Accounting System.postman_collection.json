@@ -446,6 +446,36 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "api/sales/{tenantId}/customers",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUri}}/api/sales/{{tenantId}}/customers",
+					"host": [
+						"{{baseUri}}"
+					],
+					"path": [
+						"api",
+						"sales",
+						"{{tenantId}}",
+						"customers"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

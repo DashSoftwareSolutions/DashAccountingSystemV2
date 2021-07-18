@@ -5,11 +5,11 @@ using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.BusinessLogic
 {
-    public interface IEmployeeBusinessLogic : IBusinessLogic
+    public interface ICustomerBusinessLogic : IBusinessLogic
     {
-        Task<BusinessLogicResponse<IEnumerable<Employee>>> GetByTenant(
+        Task<BusinessLogicResponse<IEnumerable<Customer>>> GetByTenant(
             Guid tenantId,
-            IEnumerable<uint> employeeNumbers = null,
+            IEnumerable<string> customerNumbers = null,
             bool onlyActive = true);
 
         // TODO: Add GetDetaildById() and CUD methods as needed
