@@ -12,12 +12,14 @@ import AccountSubType from '../models/AccountSubType';
 import AccountType from '../models/AccountType';
 import AssetType from '../models/AssetType';
 import IAction from './IAction';
+import TimeZone from '../models/TimeZone';
 
 export interface LookupValuesState {
     isLoading: boolean;
     accountTypes: AccountType[];
     accountSubTypes: AccountSubType[];
     assetTypes: AssetType[];
+    timeZones: TimeZone[];
 }
 
 interface RequestLookupValuesAction extends IAction {
@@ -29,12 +31,14 @@ interface ReceiveLookupValuesAction extends IAction {
     accountTypes: AccountType[];
     accountSubTypes: AccountSubType[];
     assetTypes: AssetType[];
+    timeZones: TimeZone[];
 }
 
 interface LookupsApiResponse {
     accountTypes: AccountType[];
     accountSubTypes: AccountSubType[];
     assetTypes: AssetType[];
+    timeZones: TimeZone[];
 }
 
 type KnownAction = RequestLookupValuesAction | ReceiveLookupValuesAction;
@@ -63,17 +67,9 @@ export const actionCreators = {
                 })
                 .then(data => {
                     if (!isNil(data)) {
-                        const {
-                            accountTypes,
-                            accountSubTypes,
-                            assetTypes,
-                        } = data;
-
                         dispatch({
                             type: ActionType.RECEIVE_LOOKUPS,
-                            accountTypes,
-                            accountSubTypes,
-                            assetTypes,
+                            ...data,
                         });
                     }
                 });
@@ -88,6 +84,7 @@ const unloadedState: LookupValuesState = {
     accountTypes: [],
     accountSubTypes: [],
     assetTypes: [],
+    timeZones: [],
 };
 
 export const reducer: Reducer<LookupValuesState> = (state: LookupValuesState | undefined, incomingAction: Action): LookupValuesState => {
@@ -108,10 +105,11 @@ export const reducer: Reducer<LookupValuesState> = (state: LookupValuesState | u
             case ActionType.RECEIVE_LOOKUPS:
                 return {
                     ...state,
+                    isLoading: false,
                     accountTypes: action.accountTypes,
                     accountSubTypes: action.accountSubTypes,
                     assetTypes: action.assetTypes,
-                    isLoading: false
+                    timeZones: action.timeZones,
                 };
         }
     }
