@@ -35,7 +35,7 @@ const AmountDisplay: React.FC<AmountDisplayProps> = ({ amount, className, id, lo
                     .toLocaleString(
                         locale,
                         {
-                            style: 'currency',
+                            style: showCurrency ? 'currency' : undefined,
                             currency: showCurrency ? amount.assetType?.name : undefined,
                             minimumFractionDigits: 2,
                         })}

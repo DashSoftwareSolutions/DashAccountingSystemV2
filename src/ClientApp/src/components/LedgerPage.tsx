@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { ConnectedProps, connect } from 'react-redux';
 import {
     Button,
