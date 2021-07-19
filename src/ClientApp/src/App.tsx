@@ -11,6 +11,7 @@ import EditJournalEntryPage from './components/EditJournalEntryPage';
 import LedgerPage from './components/LedgerPage';
 import ProfitAndLossPage from './components/ProfitAndLossPage';
 import SelectTenant from './components/SelectTenant';
+import TimeActivityReportDetailsPage from './components/TimeActivityDetailsReportPage';
 import ViewJournalEntryPage from './components/ViewJournalEntryPage';
 import AuthorizeRoute from './components/api-authorization/AuthorizeRoute';
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
@@ -31,6 +32,7 @@ export default () => (
         <AuthorizeRoute path='/journal-entry/edit/:entryId' component={EditJournalEntryPage} />
         <AuthorizeRoute path='/ledger' component={LedgerPage} />
         <AuthorizeRoute path='/profit-and-loss' component={ProfitAndLossPage} />
+        <AuthorizeRoute path='/time-tracking' component={TimeActivityReportDetailsPage} />
         <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes} />
     </Layout>
 );

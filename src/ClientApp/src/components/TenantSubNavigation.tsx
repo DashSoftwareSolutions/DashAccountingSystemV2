@@ -6,9 +6,9 @@ export enum NavigationSection {
     ChartOfAccounts,
     Dashboard,
     Ledger,
-    Reports, // retire this???
     BalanceSheet,
     ProfitAndLoss,
+    TimeTracking,
 };
 
 interface TenantSubNavigationProps {
@@ -31,6 +31,9 @@ const TenantSubNavigation: React.FC<TenantSubNavigationProps> = ({ activeSection
         </NavItem>
         <NavItem>
             <NavLink active={activeSection === NavigationSection.ProfitAndLoss} tag={Link} to="/profit-and-loss">Profit &amp; Loss</NavLink>
+        </NavItem>
+        <NavItem>
+            <NavLink active={activeSection === NavigationSection.TimeTracking} tag={Link} to="/time-tracking">Time Tracking</NavLink>
         </NavItem>
     </Nav>
 );
