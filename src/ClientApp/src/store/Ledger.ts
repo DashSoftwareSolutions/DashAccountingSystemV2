@@ -3,11 +3,11 @@
     Dispatch,
     Reducer,
 } from 'redux';
-import { AppThunkAction } from './';
 import {
     isEmpty,
     isNil,
 } from 'lodash';
+import { AppThunkAction } from './';
 import moment from 'moment-timezone';
 import { Logger } from '../common/Logging';
 import apiErrorHandler from '../common/ApiErrorHandler';

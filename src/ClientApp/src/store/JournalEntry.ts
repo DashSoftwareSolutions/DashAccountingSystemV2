@@ -26,7 +26,6 @@ import AmountType from '../models/AmountType';
 import IAction from './IAction';
 import JournalEntry from '../models/JournalEntry';
 import JournalEntryAccount from '../models/JournalEntryAccount';
-import AssetType from '../models/AssetType';
 
 export interface JournalEntryAccountsValidationState {
     error: string;
