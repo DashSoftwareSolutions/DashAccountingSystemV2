@@ -25,6 +25,7 @@ import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
 import * as CustomerStore from '../store/Customer';
 import * as EmployeeStore from '../store/Employee';
+import * as ProductStore from '../store/Product';
 import * as TimeActivityStore from '../store/TimeActivity';
 
 const mapStateToProps = (state: ApplicationState) => {
@@ -36,7 +37,9 @@ const mapStateToProps = (state: ApplicationState) => {
         dateRangeStart: state?.timeActivity?.dateRangeStart,
         isFetchingCustomers: state.customers?.isLoading ?? false,
         isFetchingEmployees: state.employees?.isLoading ?? false,
+        isFectingProducts: state.products?.isLoading ?? false,
         isFetchingTimeActivityData: state.timeActivity?.isLoading ?? false,
+        products: state.products?.products ?? [],
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
 }
@@ -44,6 +47,7 @@ const mapStateToProps = (state: ApplicationState) => {
 const mapDispatchToProps = {
     ...CustomerStore.actionCreators,
     ...EmployeeStore.actionCreators,
+    ...ProductStore.actionCreators,
     ...TimeActivityStore.actionCreators,
 };
 
@@ -79,18 +83,15 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
             history,
             isFetchingCustomers,
             isFetchingEmployees,
+            isFectingProducts,
             isFetchingTimeActivityData,
             selectedTenant,
         } = this.props;
 
         const isFetching = isFetchingCustomers ||
             isFetchingEmployees ||
+            isFectingProducts ||
             isFetchingTimeActivityData;
-
-        console.log('isFetchingCustomers:', isFetchingCustomers);
-        console.log('isFetchingEmployees:', isFetchingEmployees);
-        console.log('isFetchingTimeActivityReportData:', isFetchingTimeActivityData);
-        console.log('isFetching [anything]:', isFetching);
 
         return (
             <TenantBasePage
@@ -137,11 +138,13 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
         const {
             requestCustomers,
             requestEmployees,
+            requestProducts,
             requestTimeActivityDetailsReportData,
         } = this.props;
 
         requestCustomers();
         requestEmployees();
+        requestProducts();
         requestTimeActivityDetailsReportData();
     }
 
