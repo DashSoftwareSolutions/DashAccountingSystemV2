@@ -19,10 +19,12 @@ import { NavigationSection } from './TenantSubNavigation';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
 import LinkButton from './LinkButton';
+import Mode from '../models/Mode';
 import ReportParametersAndControls from './ReportParametersAndControls'; // TODO: Use this initially but neeed one w/ Empliyee and Customer filters
 import TenantBasePage from './TenantBasePage';
 import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
+import TimeActivityEntryModalDialog from './TimeActivityEntryModalDialog';
 import * as CustomerStore from '../store/Customer';
 import * as EmployeeStore from '../store/Employee';
 import * as ProductStore from '../store/Product';
@@ -39,7 +41,6 @@ const mapStateToProps = (state: ApplicationState) => {
         isFetchingEmployees: state.employees?.isLoading ?? false,
         isFectingProducts: state.products?.isLoading ?? false,
         isFetchingTimeActivityData: state.timeActivity?.isLoading ?? false,
-        products: state.products?.products ?? [],
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
 }
@@ -58,14 +59,25 @@ type TimeActivityDetailsReportPageReduxProps = ConnectedProps<typeof connector>;
 type TimeActivityDetailsReportPageProps = TimeActivityDetailsReportPageReduxProps
     & RouteComponentProps;
 
-class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDetailsReportPageProps> {
+interface TimeActivityDetailsReportPageState {
+    isTimeActivityEntryModalOpen: boolean;
+    timeActivityEntryModalMode: Mode | null;
+}
+
+class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDetailsReportPageProps, TimeActivityDetailsReportPageState> {
     private bemBlockName: string = 'time_activities_detail_report_page';
 
     constructor(props: TimeActivityDetailsReportPageProps) {
         super(props);
 
+        this.state = {
+            isTimeActivityEntryModalOpen: false,
+            timeActivityEntryModalMode: null,
+        };
+
         this.onClickExistingTimeActivity = this.onClickExistingTimeActivity.bind(this);
         this.onClickNewTimeActivity = this.onClickNewTimeActivity.bind(this);
+        this.onCloseTimeActivityEntryModal = this.onCloseTimeActivityEntryModal.bind(this);
         this.onDateRangeEndChanged = this.onDateRangeEndChanged.bind(this);
         this.onDateRangeStartChanged = this.onDateRangeStartChanged.bind(this);
         this.onRunReport = this.onRunReport.bind(this);
@@ -87,6 +99,11 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
             isFetchingTimeActivityData,
             selectedTenant,
         } = this.props;
+
+        const {
+            isTimeActivityEntryModalOpen,
+            timeActivityEntryModalMode,
+        } = this.state;
 
         const isFetching = isFetchingCustomers ||
             isFetchingEmployees ||
@@ -121,6 +138,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                         onDateRangeStartChanged={this.onDateRangeStartChanged}
                         onRunReport={this.onRunReport}
                     />
+
                     <div className={`${this.bemBlockName}--report_container`}>
                         {isFetching ? (
                             <p>Loading...</p>
@@ -128,6 +146,12 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                             this.renderTimeAcitivityReport(reportData)
                         }
                     </div>
+
+                    <TimeActivityEntryModalDialog
+                        isOpen={isTimeActivityEntryModalOpen}
+                        mode={timeActivityEntryModalMode}
+                        onClose={this.onCloseTimeActivityEntryModal}
+                    />
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -152,10 +176,27 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
         const { selectTimeActivity } = this.props;
         selectTimeActivity(timeActivity);
         console.log('Open Modal to start editing the selected Time Activity...');
+        this.setState({
+            isTimeActivityEntryModalOpen: true,
+            timeActivityEntryModalMode: Mode.Edit,
+        });
     }
 
     private onClickNewTimeActivity() {
         console.log('Open Modal to start making a new Time Activity...');
+        const { initializeNewTimeActivity } = this.props;
+        initializeNewTimeActivity();
+        this.setState({
+            isTimeActivityEntryModalOpen: true,
+            timeActivityEntryModalMode: Mode.Add,
+        });
+    }
+
+    private onCloseTimeActivityEntryModal() {
+        this.setState({
+            isTimeActivityEntryModalOpen: false,
+            timeActivityEntryModalMode: null,
+        });
     }
 
     private onDateRangeEndChanged(newEndDate: string) {

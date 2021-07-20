@@ -140,6 +140,11 @@ interface UpdateTimeActivityDescriptionAction extends IAction {
     description: string | null;
 }
 
+interface InitializeNewTimeActivityAction extends IAction {
+    type: ActionType.INITIALIZE_NEW_TIME_ACTIVITY;
+    tenantId: string; // GUID
+}
+
 interface SelectExistingTimeActivityAction extends IAction {
     type: ActionType.SELECT_EXISTING_TIME_ACTIVITY;
     selectedTimeActivity: TimeActivity;
@@ -182,6 +187,7 @@ type KnownAction = RequestTimeActivityDetailsReportDataAction |
     UpdateTimeActivityProductAction |
     UpdateTimeActivityStartTimeAction |
     UpdateTimeActivityTimeZoneAction |
+    InitializeNewTimeActivityAction |
     SelectExistingTimeActivityAction |
     ResetDirtyTimeActivtyAction |
     ResetTimeActivityDetailsReportData |
@@ -240,6 +246,18 @@ export const actionCreators = {
 
             dispatch({ type: ActionType.REQUEST_TIME_ACTIVITY_DETAILS_REPORT });
         }
+    },
+
+    initializeNewTimeActivity: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+        const tenantId = appState?.tenants?.selectedTenant?.id;
+
+        if (isNil(tenantId)) {
+            logger.warn('No selected Tenant.  Cannot create new Time Activity.');
+            return;
+        }
+
+        dispatch({ type: ActionType.INITIALIZE_NEW_TIME_ACTIVITY, tenantId });
     },
 
     selectTimeActivity: (selectedTimeActivity: TimeActivity): AppThunkAction<KnownAction> => (dispatch) => {
@@ -320,6 +338,26 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                     ...state,
                     isLoading: false,
                     detailsReportData: null,
+                };
+
+            case ActionType.INITIALIZE_NEW_TIME_ACTIVITY:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        tenantId: action.tenantId,
+                        customerId: null,
+                        employeeId: null,
+                        productId: null,
+                        isBillable: false,
+                        hourlyBillingRate: null,
+                        date: null,
+                        timeZone: null,
+                        startTime: null,
+                        endTime: null,
+                        break: null,
+                        description: null,
+                    },
+                    // TODO: Validation state
                 };
         }
     }

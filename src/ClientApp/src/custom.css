@@ -105,4 +105,8 @@ th.sticky-border:after {
     vertical-align: text-top;
 }
 
+/* Time Activity Entry Modal Dialog */
+.time_activity_entry_modal--modal_header .modal-title {
+    width: 100%;
+}
 
