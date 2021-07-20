@@ -1,6 +1,7 @@
 ﻿import * as Accounts from './Accounts';
 import * as BalanceSheet from './BalanceSheet';
 import * as Customer from './Customer';
+import * as Employee from './Employee';
 import * as ExportDownload from './Export';
 import * as JournalEntry from './JournalEntry';
 import * as Ledger from './Ledger';
@@ -13,8 +14,9 @@ import * as TimeActivity from './TimeActivity';
 // The top-level state object
 export interface ApplicationState {
     accounts: Accounts.AccountsState | undefined;
-    customers: Customer.CustomerStoreState | undefined;
     balanceSheet: BalanceSheet.BalanceSheetState | undefined,
+    customers: Customer.CustomerStoreState | undefined;
+    employees: Employee.EmployeeStoreState | undefined;
     exportDownload: ExportDownload.ExportState | undefined,
     journalEntry: JournalEntry.JournalEntryState | undefined;
     ledger: Ledger.LedgerState | undefined;
@@ -30,8 +32,9 @@ export interface ApplicationState {
 // acts on the corresponding ApplicationState property type.
 export const reducers = {
     accounts: Accounts.reducer,
-    customers: Customer.reducer,
     balanceSheet: BalanceSheet.reducer,
+    customers: Customer.reducer,
+    employees: Employee.reducer,
     exportDownload: ExportDownload.reducer,
     journalEntry: JournalEntry.reducer,
     ledger: Ledger.reducer,

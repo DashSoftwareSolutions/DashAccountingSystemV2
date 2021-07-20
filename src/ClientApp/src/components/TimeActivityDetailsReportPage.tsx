@@ -24,23 +24,26 @@ import TenantBasePage from './TenantBasePage';
 import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
 import * as CustomerStore from '../store/Customer';
+import * as EmployeeStore from '../store/Employee';
 import * as TimeActivityStore from '../store/TimeActivity';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
         reportData: state?.timeActivity?.detailsReportData ?? null,
         customers: state?.customers?.customers ?? [],
+        employees: state?.employees?.employees ?? [],
         dateRangeEnd: state?.timeActivity?.dateRangeEnd,
         dateRangeStart: state?.timeActivity?.dateRangeStart,
-        // TODO: Customer and Employee Filters
-        isFetchingTimeActivityData: state.timeActivity?.isLoading ?? false,
         isFetchingCustomers: state.customers?.isLoading ?? false,
+        isFetchingEmployees: state.employees?.isLoading ?? false,
+        isFetchingTimeActivityData: state.timeActivity?.isLoading ?? false,
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
 }
 
 const mapDispatchToProps = {
     ...CustomerStore.actionCreators,
+    ...EmployeeStore.actionCreators,
     ...TimeActivityStore.actionCreators,
 };
 
@@ -75,11 +78,19 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
             dateRangeStart,
             history,
             isFetchingCustomers,
+            isFetchingEmployees,
             isFetchingTimeActivityData,
             selectedTenant,
         } = this.props;
 
-        const isFetching = isFetchingCustomers || isFetchingTimeActivityData;
+        const isFetching = isFetchingCustomers ||
+            isFetchingEmployees ||
+            isFetchingTimeActivityData;
+
+        console.log('isFetchingCustomers:', isFetchingCustomers);
+        console.log('isFetchingEmployees:', isFetchingEmployees);
+        console.log('isFetchingTimeActivityReportData:', isFetchingTimeActivityData);
+        console.log('isFetching [anything]:', isFetching);
 
         return (
             <TenantBasePage
@@ -122,13 +133,15 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
     }
 
     private ensureDataFetched() {
-        // TODO: Also fetch Employees, and Products
+        // TODO: Also fetch Products
         const {
             requestCustomers,
+            requestEmployees,
             requestTimeActivityDetailsReportData,
         } = this.props;
 
         requestCustomers();
+        requestEmployees();
         requestTimeActivityDetailsReportData();
     }
 
