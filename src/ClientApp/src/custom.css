@@ -35,6 +35,18 @@ a.hoverable-link:hover {
     vertical-align: unset;
 }
 
+    .btn.btn-link.btn-link-report-item {
+        color: #212529;
+        font-size: 0.9em;
+        line-height: 1.5;
+        padding: 0;
+        text-align: left;
+    }
+
+        .btn.btn-link.btn-link-report-item:hover {
+            color: #0366d6;
+        }
+
 /* Sticky Table Header Borders */
 th.sticky-border:after,
 th.sticky-border:before {

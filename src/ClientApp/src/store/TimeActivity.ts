@@ -139,6 +139,11 @@ interface UpdateTimeActivityDescriptionAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_DESCRIPTION;
     description: string | null;
 }
+
+interface SelectExistingTimeActivityAction extends IAction {
+    type: ActionType.SELECT_EXISTING_TIME_ACTIVITY;
+    selectedTimeActivity: TimeActivity;
+}
 /* END: UI Gesture Actions */
 
 /* BEGIN: Resets */
@@ -177,6 +182,7 @@ type KnownAction = RequestTimeActivityDetailsReportDataAction |
     UpdateTimeActivityProductAction |
     UpdateTimeActivityStartTimeAction |
     UpdateTimeActivityTimeZoneAction |
+    SelectExistingTimeActivityAction |
     ResetDirtyTimeActivtyAction |
     ResetTimeActivityDetailsReportData |
     ResetTimeActivityStoreAction;
@@ -234,6 +240,10 @@ export const actionCreators = {
 
             dispatch({ type: ActionType.REQUEST_TIME_ACTIVITY_DETAILS_REPORT });
         }
+    },
+
+    selectTimeActivity: (selectedTimeActivity: TimeActivity): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.SELECT_EXISTING_TIME_ACTIVITY, selectedTimeActivity });
     },
 
     updateDateRangeStart: (dateRangeStart: string): AppThunkAction<KnownAction> => (dispatch) => {

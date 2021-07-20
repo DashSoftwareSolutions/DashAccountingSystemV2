@@ -8,22 +8,22 @@ import {
 import {
     groupBy,
     head,
+    isEmpty,
     isNil,
     map,
 } from 'lodash';
-import { Link } from 'react-router-dom';
 import { RouteComponentProps, withRouter } from 'react-router';
 import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import { NavigationSection } from './TenantSubNavigation';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
+import LinkButton from './LinkButton';
 import ReportParametersAndControls from './ReportParametersAndControls'; // TODO: Use this initially but neeed one w/ Empliyee and Customer filters
 import TenantBasePage from './TenantBasePage';
 import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
 import * as TimeActivityStore from '../store/TimeActivity';
-import AssetType from '../models/AssetType';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
@@ -53,6 +53,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
     constructor(props: TimeActivityDetailsReportPageProps) {
         super(props);
 
+        this.onClickExistingTimeActivity = this.onClickExistingTimeActivity.bind(this);
         this.onClickNewTimeActivity = this.onClickNewTimeActivity.bind(this);
         this.onDateRangeEndChanged = this.onDateRangeEndChanged.bind(this);
         this.onDateRangeStartChanged = this.onDateRangeStartChanged.bind(this);
@@ -76,7 +77,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
         return (
             <TenantBasePage
                 history={history}
-                section={NavigationSection.Ledger}
+                section={NavigationSection.TimeTracking}
                 selectedTenant={selectedTenant}
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
@@ -119,6 +120,12 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
         requestTimeActivityDetailsReportData();
     }
 
+    private onClickExistingTimeActivity(timeActivity: TimeActivity) {
+        const { selectTimeActivity } = this.props;
+        selectTimeActivity(timeActivity);
+        console.log('Open Modal to start editing the selected Time Activity...');
+    }
+
     private onClickNewTimeActivity() {
         console.log('Open Modal to start making a new Time Activity...');
     }
@@ -143,10 +150,28 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
         requestTimeActivityDetailsReportData();
     }
 
+    private displayHhMm(input: any): string {
+        if (!moment.isDuration(input)) {
+            return '';
+        }
+
+        return `${this.pad(input.hours(), 2)}:${this.pad(input.minutes(), 2)}`;
+    }
+
+    private pad(num: number, size: number): string  {
+        let result = num.toString();
+
+        while (result.length < size) {
+            result = `0${result}`;
+        }
+
+        return result;
+    }
+
     private renderTimeAcitivityReport(reportData: TimeActivityDetailsReport | null): JSX.Element {
-        if (isNil(reportData)) {
+        if (isNil(reportData) || isEmpty(reportData.timeActivities)) {
             return (
-                <p>No data</p>
+                <p>This report does not contain any data.</p>
             );
         }
 
@@ -167,10 +192,6 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
             },
         );
 
-        console.log('groupedData:', groupedByCustomer);
-
-        // TODO: Handle no data
-
         return (
             <table className="table table-hover table-sm report-table">
                 <thead>
@@ -184,6 +205,9 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                 <tbody>
                     {map(groupedByCustomer, (customerGroup) => {
 
+                        const totalDuration = moment.duration();
+                        let totalBillableAmount = 0;
+
                         return (
                             <React.Fragment key={`cust-${customerGroup.customerNumber}`}>
                                 <tr>
@@ -191,30 +215,84 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                                         <strong>{customerGroup.customerDisplayName}</strong>
                                     </td>
                                 </tr>
-                                {map(customerGroup.timeActivities, (timeActivity) => ((
-                                    <tr key={timeActivity.id}>
-                                        <td className="col-md-2">{moment(timeActivity.date).format('L')}</td>
-                                        <td
-                                            className="col-md-6"
-                                            dangerouslySetInnerHTML={{ __html: timeActivity?.description?.replace('\r\n', '<br />') ?? '' }}
-                                            style={{ wordWrap: 'break-word' }}
+
+                                {map(customerGroup.timeActivities, (timeActivity) => {
+                                    totalDuration.add(moment.duration(timeActivity.totalTime));
+                                    totalBillableAmount += timeActivity.totalBillableAmount ?? 0;
+
+                                    return (
+                                        <tr key = { timeActivity.id }>
+                                            <td className="col-md-2">
+                                                <LinkButton
+                                                    className="btn-link-report-item"
+                                                    onClick={() => this.onClickExistingTimeActivity(timeActivity)}
+                                                >
+                                                    {moment(timeActivity.date).format('L')}
+                                                </LinkButton>
+                                            </td>
+                                            <td className="col-md-6">
+                                                <LinkButton
+                                                    className="btn-link-report-item"
+                                                    onClick={() => this.onClickExistingTimeActivity(timeActivity)}
+                                                >
+                                                    <span
+                                                        dangerouslySetInnerHTML={{ __html: timeActivity?.description?.replace('\r\n', '<br />') ?? '' }}
+                                                            style={{ wordWrap: 'break-word' }}
+                                                    />
+                                                </LinkButton>
+                                            </td>
+                                            <td className="col-md-2 text-right">
+                                                <LinkButton
+                                                    className="btn-link-report-item"
+                                                    onClick={() => this.onClickExistingTimeActivity(timeActivity)}
+                                                    style={{ textAlign: 'right' }}
+                                                >
+                                                    {this.displayHhMm(moment.duration(timeActivity.totalTime))}
+                                                </LinkButton>
+                                            </td>
+                                            <td className="col-md-2 text-right">
+                                                <LinkButton
+                                                    className="btn-link-report-item"
+                                                    onClick={() => this.onClickExistingTimeActivity(timeActivity)}
+                                                    style={{ textAlign: 'right' }}
+                                                >
+                                                    {timeActivity.isBillable && !isNil(timeActivity.totalBillableAmount) ? (
+                                                        <AmountDisplay
+                                                            amount={{
+                                                                amount: timeActivity.totalBillableAmount,
+                                                                amountType: AmountType.Debit,
+                                                                assetType: reportData.defaultAssetType,
+                                                            }}
+                                                            showCurrency={false}
+                                                        />
+                                                    ) : (
+                                                        <span>N/A</span>
+                                                    )}
+                                                </LinkButton>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+
+                                <tr className="report-total-row">
+                                    <td colSpan={2}>
+                                        {`Total for ${customerGroup.customerDisplayName}`}
+                                    </td>
+                                    <td className="text-right">
+                                        {this.displayHhMm(totalDuration)}
+                                    </td>
+                                    <td className="text-right">
+                                        <AmountDisplay
+                                            amount={{
+                                                amount: totalBillableAmount,
+                                                amountType: AmountType.Debit,
+                                                assetType: reportData.defaultAssetType,
+                                            }}
+                                            showCurrency
                                         />
-                                        <td className="col-md-2 text-right">
-                                            {timeActivity.totalTime}
-                                        </td>
-                                        <td className="col-md-2 text-right">
-                                            <AmountDisplay
-                                                amount={{
-                                                    amount: timeActivity.totalBillableAmount,
-                                                    amountType: AmountType.Debit,
-                                                    assetType: reportData.defaultAssetType,
-                                                }}
-                                                showCurrency={false}
-                                            />
-                                            
-                                        </td>
-                                    </tr>
-                                )))}
+                                    </td>
+                                </tr>
+
                             </React.Fragment>
                         );
                     })}
