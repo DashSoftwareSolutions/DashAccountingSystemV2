@@ -23,20 +23,24 @@ import ReportParametersAndControls from './ReportParametersAndControls'; // TODO
 import TenantBasePage from './TenantBasePage';
 import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
+import * as CustomerStore from '../store/Customer';
 import * as TimeActivityStore from '../store/TimeActivity';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
         reportData: state?.timeActivity?.detailsReportData ?? null,
+        customers: state?.customers?.customers ?? [],
         dateRangeEnd: state?.timeActivity?.dateRangeEnd,
         dateRangeStart: state?.timeActivity?.dateRangeStart,
         // TODO: Customer and Employee Filters
-        isFetching: state.timeActivity?.isLoading ?? false,
+        isFetchingTimeActivityData: state.timeActivity?.isLoading ?? false,
+        isFetchingCustomers: state.customers?.isLoading ?? false,
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
 }
 
 const mapDispatchToProps = {
+    ...CustomerStore.actionCreators,
     ...TimeActivityStore.actionCreators,
 };
 
@@ -70,9 +74,12 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
             dateRangeEnd,
             dateRangeStart,
             history,
-            isFetching,
+            isFetchingCustomers,
+            isFetchingTimeActivityData,
             selectedTenant,
         } = this.props;
+
+        const isFetching = isFetchingCustomers || isFetchingTimeActivityData;
 
         return (
             <TenantBasePage
@@ -115,8 +122,13 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
     }
 
     private ensureDataFetched() {
-        // TODO: Also fetch Customers, Employees, and Products
-        const { requestTimeActivityDetailsReportData } = this.props;
+        // TODO: Also fetch Employees, and Products
+        const {
+            requestCustomers,
+            requestTimeActivityDetailsReportData,
+        } = this.props;
+
+        requestCustomers();
         requestTimeActivityDetailsReportData();
     }
 
