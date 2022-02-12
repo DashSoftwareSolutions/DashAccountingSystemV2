@@ -558,18 +558,12 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                 };
 
             case ActionType.SELECT_EXISTING_TIME_ACTIVITY: {
-                const { existingTimeActivity } = state;
-
-                if (isNil(existingTimeActivity)) {
-                    logger.warn('Existing Time Activity was null');
-                    return state;
-                }
-
-                const dirtyTimeActivity = cloneDeep(existingTimeActivity);
+                const dirtyTimeActivity = cloneDeep(action.selectedTimeActivity);
 
                 return {
                     ...state,
                     dirtyTimeActivity,
+                    existingTimeActivity: action.selectedTimeActivity,
                     // TODO: Validation state
                 };
             }
