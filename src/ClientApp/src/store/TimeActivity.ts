@@ -4,6 +4,7 @@
     Reducer,
 } from 'redux';
 import {
+    cloneDeep,
     isEmpty,
     isNil,
 } from 'lodash';
@@ -15,6 +16,7 @@ import ActionType from './ActionType';
 import IAction from './IAction';
 import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
+import { Key } from 'react';
 
 // TODO: May need to track validation state for ceating/updating a Time Activity
 
@@ -46,7 +48,7 @@ interface SaveNewTimeActivityRequestActionAction extends IAction {
 }
 
 interface SaveNewTimeActivityResponseAction extends IAction {
-    type: ActionType.SAVE_NEW_TIME_ACTIVITY_COMPLETED;
+    type: ActionType.NEW_TIME_ACTIVITY_SAVE_COMPLETED;
     savedTimeActivity: TimeActivity;
 }
 
@@ -55,8 +57,12 @@ interface SaveUpdatedTimeActivityRequestAction extends IAction {
 }
 
 interface SaveUpdatedTimeActivityResponseAction extends IAction {
-    type: ActionType.SAVE_UPDATED_TIME_ACTIVITY_COMPLETED;
+    type: ActionType.UPDATED_TIME_ACTIVITY_SAVE_COMPLETED;
     savedTimeActivity: TimeActivity;
+}
+
+interface SaveTimeActivityErrorAction extends IAction {
+    type: ActionType.SAVE_TIME_ACTIVITY_ERROR;
 }
 
 interface DeleteTimeActivityRequestAction extends IAction {
@@ -65,6 +71,10 @@ interface DeleteTimeActivityRequestAction extends IAction {
 
 interface DeleteTimeActivityReponseAction extends IAction {
     type: ActionType.DELETE_TIME_ACTIVITY_COMPLETED;
+}
+
+interface DeleteTimeActivityErrorAction extends IAction {
+    type: ActionType.DELETE_TIME_ACTIVITY_ERROR;
 }
 /* END: REST API Actions */
 
@@ -91,17 +101,17 @@ interface UpdateTimeActivityReportEmployeeFilterAction extends IAction {
 
 interface UpdateTimeActivityCustomerAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_CUSTOMER;
-    customerId: string | null;
+    customerId: string | null; // GUID (required to create)
 }
 
 interface UpdateTimeActivityEmployeeAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_EMPLOYEE;
-    employeeId: string | null;
+    employeeId: string | null; // GUID (required to create)
 }
 
 interface UpdateTimeActivityProductAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_PRODUCT;
-    productId: string | null;
+    productId: string | null; // GUID (required to create)
 }
 
 interface UpdateTimeActivityIsBillableAction extends IAction {
@@ -112,27 +122,32 @@ interface UpdateTimeActivityIsBillableAction extends IAction {
 interface UpdateTimeActivityHourlyRateAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_HOURLY_RATE;
     hourlyRate: number | null;
-    hourRateAsString: string | null;
+    hourlyRateAsString: string | null;
 }
 
 interface UpdateTimeActivityTimeZoneAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_TIME_ZONE;
-    timeZoneId: string | null;
+    timeZoneId: string | null; // IANA/Olson/TZDB Time Zone ID (required to create)
 }
 
 interface UpdateTimeActivityStartTimeAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_START_TIME;
-    startTime: string | null;
+    startTime: string | null; // Time of day string in hh:mm:ss format (required to create)
 }
 
 interface UpdateTimeActivityEndTimeAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_END_TIME;
-    endTime: string | null;
+    endTime: string | null; // Time of day string in hh:mm:ss format (required to create)
 }
 
 interface UpdateTimeActivityBreakTimeAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_BREAK_TIME;
-    breakTime: string | null;
+    breakTime: string | null; // Duration in hh:mm:ss format (optional)
+}
+
+interface UpdateTimeActivityDateAction extends IAction {
+    type: ActionType.UPDATE_TIME_ACTIVITY_DATE;
+    date: string | null; // Date in YYYY-MM-DD format (required to create)
 }
 
 interface UpdateTimeActivityDescriptionAction extends IAction {
@@ -171,14 +186,17 @@ type KnownAction = RequestTimeActivityDetailsReportDataAction |
     SaveNewTimeActivityResponseAction |
     SaveUpdatedTimeActivityRequestAction |
     SaveUpdatedTimeActivityResponseAction |
+    SaveTimeActivityErrorAction |
     DeleteTimeActivityRequestAction |
     DeleteTimeActivityReponseAction |
+    DeleteTimeActivityErrorAction |
     UpdateTimeActivityReportDateRangeStartAction |
     UpdateTimeActivityReportDateRangeEndAction |
     UpdateTimeActivityReportCustomerFilterAction |
     UpdateTimeActivityReportEmployeeFilterAction |
     UpdateTimeActivityBreakTimeAction |
     UpdateTimeActivityCustomerAction |
+    UpdateTimeActivityDateAction |
     UpdateTimeActivityDescriptionAction |
     UpdateTimeActivityEmployeeAction |
     UpdateTimeActivityEndTimeAction |
@@ -198,6 +216,7 @@ type KnownAction = RequestTimeActivityDetailsReportDataAction |
 const logger = new Logger('Time Activity Store');
 
 export const actionCreators = {
+    /* BEGIN: REST API Actions */
     requestTimeActivityDetailsReportData: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
 
@@ -248,6 +267,57 @@ export const actionCreators = {
         }
     },
 
+    saveNewTimeActivity: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const timeActivityToSave = appState.timeActivity?.dirtyTimeActivity;
+
+        if (isNil(timeActivityToSave)) {
+            logger.warn('No Journal Entry found in store state.  Bailing out.');
+            return;
+        }
+
+        const accessToken = await authService.getAccessToken();
+
+        const requestOptions = {
+            method: 'POST',
+            body: JSON.stringify(timeActivityToSave),
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch('api/time-tracking/time-activity', requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler
+                        .handleError(response, dispatch as Dispatch<IAction>)
+                        .then(() => { dispatch({ type: ActionType.SAVE_TIME_ACTIVITY_ERROR }); });
+
+                    return null;
+                }
+
+                return response.json() as Promise<TimeActivity>;
+            })
+            .then((savedTimeActivity) => {
+                if (!isNil(savedTimeActivity)) {
+                    dispatch({ type: ActionType.NEW_TIME_ACTIVITY_SAVE_COMPLETED, savedTimeActivity });
+                }
+            });
+
+        dispatch({ type: ActionType.REQUEST_SAVE_NEW_TIME_ACTIVITY });
+    },
+
+    updateTimeActivity: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        // TODO: Implement me
+    },
+
+    deleteTimeActivity: (timeActivityId: string): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        // TODO: Implement me
+    },
+    /* END: REST API Actions */
+
+    /* BEGIN: Initialize New/Select Existing Time Activity to View/Manage */
     initializeNewTimeActivity: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
         const tenantId = appState?.tenants?.selectedTenant?.id;
@@ -263,7 +333,9 @@ export const actionCreators = {
     selectTimeActivity: (selectedTimeActivity: TimeActivity): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.SELECT_EXISTING_TIME_ACTIVITY, selectedTimeActivity });
     },
+    /* END: Initialize New/Select Existing Time Activity to View/Manage */
 
+    /* BEGIN: UI Gesture Actions for Time Activity Details Report/Listing Page */
     updateDateRangeStart: (dateRangeStart: string): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE_START, dateRangeStart });
     },
@@ -283,6 +355,63 @@ export const actionCreators = {
     resetTimeActivityDetailsReportData: (): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.RESET_TIME_ACTIVITY_DETAILS_REPORT_DATA });
     },
+    /* END: UI Gesture Actions for Time Activity Details Report/Listing Page */
+
+    /* BEGIN: UI Gesture Actions for single Time Activity Entry Modal Dialog */
+    updateBreakTime: (breakTime: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_BREAK_TIME, breakTime });
+    },
+
+    updateCustomer: (customerId: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_CUSTOMER, customerId });
+    },
+
+    updateDate: (date: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_DATE, date });
+    },
+
+    updateDescription: (description: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_DESCRIPTION, description });
+    },
+
+    updateEmployee: (employeeId: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_EMPLOYEE, employeeId });
+    },
+
+    updateEndTime: (endTime: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_END_TIME, endTime });
+    },
+
+    updateHourlyRate: (hourlyRate: number | null, hourlyRateAsString: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_HOURLY_RATE, hourlyRate, hourlyRateAsString });
+    },
+
+    updateIsBillable: (isBillable: boolean): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_IS_BILLABLE, isBillable });
+    },
+
+    updateProduct: (productId: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_PRODUCT, productId });
+    },
+
+    updateStartTime: (startTime: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_START_TIME, startTime });
+    },
+
+    updateTimeZone: (timeZoneId: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_TIME_ACTIVITY_TIME_ZONE, timeZoneId });
+    },
+    /* END: UI Gesture Actions for single Time Activity Entry Modal Dialog */
+
+    /* BEGIN: Resets */
+    reset: (): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.RESET_TIME_ACTIVITY_STORE_STATE });
+    },
+
+    resetDirtyTimeActivity: (): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.RESET_DIRTY_TIME_ACTIVITY });
+    },
+    /* END: Resets */
 };
 
 const unloadedState: TimeActivityStoreState = {
@@ -308,6 +437,7 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
 
     if (!isNil(action)) {
         switch (action.type) {
+            /* BEGIN: REST API Actions */
             case ActionType.REQUEST_TIME_ACTIVITY_DETAILS_REPORT:
                 return {
                     ...state,
@@ -321,10 +451,60 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                     detailsReportData: action.data,
                 };
 
+            case ActionType.REQUEST_SAVE_NEW_TIME_ACTIVITY:
+            case ActionType.REQUEST_SAVE_UPDATED_TIME_ACTIVITY:
+                return {
+                    ...state,
+                    isSaving: true,
+                };
+
+            case ActionType.NEW_TIME_ACTIVITY_SAVE_COMPLETED:
+            case ActionType.UPDATED_TIME_ACTIVITY_SAVE_COMPLETED:
+                return {
+                    ...state,
+                    isSaving: false,
+                    existingTimeActivity: action.savedTimeActivity,
+                };
+
+            case ActionType.SAVE_TIME_ACTIVITY_ERROR:
+                return {
+                    ...state,
+                    isSaving: false,
+                };
+
+            case ActionType.REQUEST_DELETE_TIME_ACTIVITY:
+                return {
+                    ...state,
+                    isDeleting: true,
+                };
+
+            case ActionType.DELETE_TIME_ACTIVITY_COMPLETED:
+                return unloadedState;
+
+            case ActionType.DELETE_TIME_ACTIVITY_ERROR:
+                return {
+                    ...state,
+                    isDeleting: false,
+                };
+            /* END: REST API Actions */
+
+            /* BEGIN: UI Gesture Actions for Time Activity Details Report/Listing Page */
             case ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_CUSTOMER_FILTER:
                 return {
                     ...state,
                     filterByCustomerNumber: action.customerNumber,
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE_END:
+                return {
+                    ...state,
+                    dateRangeEnd: action.dateRangeEnd,
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE_START:
+                return {
+                    ...state,
+                    dateRangeStart: action.dateRangeStart,
                 };
 
             case ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_EMPLOYEE_FILTER:
@@ -339,7 +519,9 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                     isLoading: false,
                     detailsReportData: null,
                 };
+            /* END: UI Gesture Actions for Time Activity Details Report/Listing Page */
 
+            /* BEGIN: Initialize New/Select Existing Time Activity to View/Manage */
             case ActionType.INITIALIZE_NEW_TIME_ACTIVITY:
                 return {
                     ...state,
@@ -359,6 +541,137 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                     },
                     // TODO: Validation state
                 };
+
+            case ActionType.SELECT_EXISTING_TIME_ACTIVITY: {
+                const { existingTimeActivity } = state;
+
+                if (isNil(existingTimeActivity)) {
+                    logger.warn('Existing Time Activity was null');
+                    return state;
+                }
+
+                const dirtyTimeActivity = cloneDeep(existingTimeActivity);
+
+                return {
+                    ...state,
+                    dirtyTimeActivity,
+                    // TODO: Validation state
+                };
+            }
+            /* END: Initialize New/Select Existing Time Activity to View/Manage */
+
+            /* BEGIN: UI Gesture Actions for single Time Activity Entry Modal Dialog */
+            case ActionType.UPDATE_TIME_ACTIVITY_BREAK_TIME:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        break: action.breakTime,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_CUSTOMER:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        customerId: action.customerId,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_DATE:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        date: action.date,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_DESCRIPTION:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        description: action.description,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_EMPLOYEE:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        employeeId: action.employeeId,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_END_TIME:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        endTime: action.endTime,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_HOURLY_RATE:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        hourlyBillingRate: action.hourlyRate,
+                        hourlyBillingRateAsString: action.hourlyRateAsString,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_IS_BILLABLE:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        isBillable: action.isBillable,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_PRODUCT:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        productId: action.productId,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_START_TIME:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        startTime: action.startTime,
+                    },
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_TIME_ZONE:
+                return {
+                    ...state,
+                    dirtyTimeActivity: {
+                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                        timeZone: action.timeZoneId,
+                    },
+                };
+            /* END: UI Gesture Actions for single Time Activity Entry Modal Dialog */
+
+            /* BEGIN: Resets */
+            case ActionType.RESET_DIRTY_TIME_ACTIVITY:
+                return {
+                    ...state,
+                    dirtyTimeActivity: null,
+                };
+
+            case ActionType.RESET_TIME_ACTIVITY_STORE_STATE:
+                return unloadedState;
+            /* END: Resets */
         }
     }
 

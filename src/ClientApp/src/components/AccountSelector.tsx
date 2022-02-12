@@ -73,6 +73,7 @@ class AccountSelector extends React.PureComponent<AccountSelectorProps> {
         if (selectElement.selectedIndex === -1) {
             console.log('Nothing selected');
             onChange(null);
+            return;
         }
 
         const selectedOption = selectElement.selectedOptions[0];

@@ -158,7 +158,6 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
     }
 
     private ensureDataFetched() {
-        // TODO: Also fetch Products
         const {
             requestCustomers,
             requestEmployees,

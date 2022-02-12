@@ -36,6 +36,7 @@ const mapStateToProps = (state: ApplicationState) => {
         isSaving: state.timeActivity?.isSaving ?? false,
         products: state.products?.products ?? [],
         timeActivity: state.timeActivity?.dirtyTimeActivity,
+        timeZones: state.lookups?.timeZones ?? [],
         // TODO: Validation state
     };
 };
@@ -63,6 +64,7 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
         this.onClickCancel = this.onClickCancel.bind(this);
         this.onClickDelete = this.onClickDelete.bind(this);
         this.onClickSave = this.onClickSave.bind(this);
+        this.onTimeActivityDateChanged = this.onTimeActivityDateChanged.bind(this);
     }
 
     public render() {
@@ -120,14 +122,16 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
                     </Row>
                 </ModalHeader>
                 <ModalBody>
-                    <p>Hello World!</p>
+                    <Form>
+
+                    </Form>
                 </ModalBody>
             </Modal>
         );
     }
 
     private onClickCancel(event: React.MouseEvent<any>) {
-        // TODO: Also reset dirty time activity /selected time activity state
+        // TODO: Also reset dirty time activity/selected time activity state
         const { onClose } = this.props;
         onClose(event);
     }
@@ -138,6 +142,11 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
 
     private onClickSave(event: React.MouseEvent<any>) {
         this.logger.debug('Saving the time activity...');
+    }
+
+    private onTimeActivityDateChanged(e: React.FormEvent<HTMLInputElement>) {
+        const { updateDate } = this.props;
+        updateDate(e.currentTarget.value ?? null);
     }
 }
 

@@ -3,7 +3,7 @@
     employeeNumber: number; // uint
     displayName: string;
     isBillableByDefault: boolean;
-    hourlyBillableRate: number;
+    hourlyBillableRate: number | null;
     isUser: boolean;
     userId: string | null; // GUID
 }

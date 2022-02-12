@@ -53,8 +53,10 @@ class AssetTypeSelector extends React.PureComponent<AssetTypeProps> {
         const { assetTypes, onChange } = this.props;
         const selectElement = event.target;
 
-        if (selectElement.selectedIndex === -1)
+        if (selectElement.selectedIndex === -1) {
             onChange(null);
+            return;
+        }
 
         const selectedOption = selectElement.selectedOptions[0];
         const selectedAssetType = find(assetTypes, at => at.id === parseInt(selectedOption.value));
