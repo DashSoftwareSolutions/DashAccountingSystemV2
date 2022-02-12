@@ -27,6 +27,7 @@ import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
 import TimeActivityEntryModalDialog from './TimeActivityEntryModalDialog';
 import * as CustomerStore from '../store/Customer';
 import * as EmployeeStore from '../store/Employee';
+import * as LookupValuesStore from '../store/LookupValues';
 import * as ProductStore from '../store/Product';
 import * as TimeActivityStore from '../store/TimeActivity';
 
@@ -50,6 +51,7 @@ const mapDispatchToProps = {
     ...EmployeeStore.actionCreators,
     ...ProductStore.actionCreators,
     ...TimeActivityStore.actionCreators,
+    requestLookupValues: LookupValuesStore.actionCreators.requestLookupValues,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -161,10 +163,12 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
         const {
             requestCustomers,
             requestEmployees,
+            requestLookupValues,
             requestProducts,
             requestTimeActivityDetailsReportData,
         } = this.props;
 
+        requestLookupValues();
         requestCustomers();
         requestEmployees();
         requestProducts();

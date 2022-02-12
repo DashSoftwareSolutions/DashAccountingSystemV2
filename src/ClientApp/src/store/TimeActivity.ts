@@ -5,9 +5,11 @@
 } from 'redux';
 import {
     cloneDeep,
+    find,
     isEmpty,
     isNil,
 } from 'lodash';
+import moment from 'moment-timezone';
 import { AppThunkAction } from './';
 import { Logger } from '../common/Logging';
 import apiErrorHandler from '../common/ApiErrorHandler';
@@ -16,9 +18,8 @@ import ActionType from './ActionType';
 import IAction from './IAction';
 import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
-import { Key } from 'react';
 
-// TODO: May need to track validation state for ceating/updating a Time Activity
+// TODO: May need to track validation state for creating/updating a Time Activity
 
 export interface TimeActivityStoreState {
     dateRangeStart: string;
@@ -158,6 +159,7 @@ interface UpdateTimeActivityDescriptionAction extends IAction {
 interface InitializeNewTimeActivityAction extends IAction {
     type: ActionType.INITIALIZE_NEW_TIME_ACTIVITY;
     tenantId: string; // GUID
+    employeeId: string | null; // GUID
 }
 
 interface SelectExistingTimeActivityAction extends IAction {
@@ -318,16 +320,29 @@ export const actionCreators = {
     /* END: REST API Actions */
 
     /* BEGIN: Initialize New/Select Existing Time Activity to View/Manage */
-    initializeNewTimeActivity: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    initializeNewTimeActivity: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
         const tenantId = appState?.tenants?.selectedTenant?.id;
+        const user = await authService.getUser();
+
+        logger.info('User:', user);
+
+        const employees = appState?.employees?.employees;
+        logger.info('Employees:', employees);
+
+        const currentUserEmployee = find(employees, (e) => e.isUser && e.userId === user.sub);
+        logger.info('Current User Employee:', currentUserEmployee);
 
         if (isNil(tenantId)) {
             logger.warn('No selected Tenant.  Cannot create new Time Activity.');
             return;
         }
 
-        dispatch({ type: ActionType.INITIALIZE_NEW_TIME_ACTIVITY, tenantId });
+        dispatch({
+            type: ActionType.INITIALIZE_NEW_TIME_ACTIVITY,
+            employeeId: currentUserEmployee?.id ?? null,
+            tenantId,
+        });
     },
 
     selectTimeActivity: (selectedTimeActivity: TimeActivity): AppThunkAction<KnownAction> => (dispatch) => {
@@ -528,12 +543,12 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                     dirtyTimeActivity: {
                         tenantId: action.tenantId,
                         customerId: null,
-                        employeeId: null,
+                        employeeId: action.employeeId,
                         productId: null,
                         isBillable: false,
                         hourlyBillingRate: null,
-                        date: null,
-                        timeZone: null,
+                        date: moment().format('YYYY-MM-DD'),
+                        timeZone: 'America/Los_Angeles', // TODO: Get this default from settings or preferences somewhere
                         startTime: null,
                         endTime: null,
                         break: null,

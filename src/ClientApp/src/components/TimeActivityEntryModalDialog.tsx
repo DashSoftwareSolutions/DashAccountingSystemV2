@@ -1,4 +1,8 @@
 ﻿import * as React from 'react';
+import {
+    kebabCase,
+    map,
+} from 'lodash';
 import { ConnectedProps, connect } from 'react-redux';
 import {
     Button,
@@ -61,20 +65,42 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
 
         this.logger = new Logger('Time Activity Entry Modal');
 
+        this.onBreakTimeChanged = this.onBreakTimeChanged.bind(this);
         this.onClickCancel = this.onClickCancel.bind(this);
         this.onClickDelete = this.onClickDelete.bind(this);
         this.onClickSave = this.onClickSave.bind(this);
-        this.onTimeActivityDateChanged = this.onTimeActivityDateChanged.bind(this);
+        this.onCustomerSelectionChanged = this.onCustomerSelectionChanged.bind(this);
+        this.onDateChanged = this.onDateChanged.bind(this);
+        this.onDescriptionChanged = this.onDescriptionChanged.bind(this);
+        this.onEmployeeSelectionChanged = this.onEmployeeSelectionChanged.bind(this);
+        this.onEndTimeChanged = this.onEndTimeChanged.bind(this);
+        this.onProductSelectionChanged = this.onProductSelectionChanged.bind(this);
+        this.onStartTimeChanged = this.onStartTimeChanged.bind(this);
+        this.onTimeZoneSelectionChanged = this.onTimeZoneSelectionChanged.bind(this);
     }
 
     public render() {
         const {
+            customers,
+            employees,
             isOpen,
             isDeleting,
             isSaving,
             mode,
             onClose,
+            products,
+            timeActivity,
+            timeZones,
         } = this.props;
+
+        const breakTime = timeActivity?.break ?? '';
+        const customerId = timeActivity?.customerId ?? '';
+        const employeeId = timeActivity?.employeeId ?? '';
+        const endTime = timeActivity?.endTime ?? '';
+        const productId = timeActivity?.productId ?? '';
+        const startTime = timeActivity?.startTime ?? '';
+        const timeActivityDate = timeActivity?.date ?? '';
+        const timeZone = timeActivity?.timeZone ?? '';
 
         return (
             <Modal
@@ -123,11 +149,167 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
                 </ModalHeader>
                 <ModalBody>
                     <Form>
-
+                        <Row form>
+                            <Col sm={6}>
+                                <FormGroup>
+                                    <Label for={`${this.bemBlockName}--time_activity_date_input`}>Date</Label>
+                                    <Input
+                                        id={`${this.bemBlockName}--time_activity_date_input`}
+                                        name="time_activity_date_input"
+                                        onChange={this.onDateChanged}
+                                        type="date"
+                                        value={timeActivityDate}
+                                    />
+                                </FormGroup>
+                            </Col>
+                            <Col sm={6}>
+                                <FormGroup>
+                                    <Label for={`${this.bemBlockName}--time_zone_select`}>Time Zone</Label>
+                                    <select
+                                        className="selectpicker form-control"
+                                        data-width="auto"
+                                        id={`${this.bemBlockName}--time_zone_select`}
+                                        name="time_zone_select"
+                                        onChange={this.onTimeZoneSelectionChanged}
+                                        placeholder="Select Time Zone"
+                                        value={timeZone}
+                                    >
+                                        <option value="">Select</option>
+                                        {map(timeZones, (tz) => ((
+                                            <option key={this.getTimeZoneKey(tz.id)} value={tz.id}>
+                                                {tz.displayName}
+                                            </option>
+                                        )))}
+                                    </select>
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row form>
+                            <Col sm={6}>
+                                <FormGroup>
+                                    <Label for={`${this.bemBlockName}--customer_select`}>Customer</Label>
+                                    <select
+                                        className="selectpicker form-control"
+                                        data-width="auto"
+                                        id={`${this.bemBlockName}--customer_select`}
+                                        name="customer_select"
+                                        onChange={this.onCustomerSelectionChanged}
+                                        placeholder="Select Customer"
+                                        value={customerId}
+                                    >
+                                        <option value="">Select</option>
+                                        {map(customers, (c) => ((
+                                            <option key={`customer-${c.id}`} value={c.id}>
+                                                {c.displayName}
+                                            </option>
+                                        )))}
+                                    </select>
+                                </FormGroup>
+                            </Col>
+                            <Col sm={6}>
+                                <FormGroup>
+                                    <Label for={`${this.bemBlockName}--start_time_input`}>Start Time</Label>
+                                    <Input
+                                        id={`${this.bemBlockName}--start_time_input`}
+                                        name="start_time_input"
+                                        onChange={this.onStartTimeChanged}
+                                        type="time"
+                                        value={startTime}
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row form>
+                            <Col sm={6}>
+                                <FormGroup>
+                                    <Label for={`${this.bemBlockName}--activity_select`}>Activity</Label>
+                                    <select
+                                        className="selectpicker form-control"
+                                        data-width="auto"
+                                        id={`${this.bemBlockName}--activity_select`}
+                                        name="activity_select"
+                                        onChange={this.onProductSelectionChanged}
+                                        placeholder="Select Activity"
+                                        value={productId}
+                                    >
+                                        <option value="">Select</option>
+                                        {map(products, (p) => ((
+                                            <option key={`product-${p.id}`} value={p.id}>
+                                                {p.name}
+                                            </option>
+                                        )))}
+                                    </select>
+                                </FormGroup>
+                            </Col>
+                            <Col sm={6}>
+                                <FormGroup>
+                                    <Label for={`${this.bemBlockName}--end_time_input`}>End Time</Label>
+                                    <Input
+                                        id={`${this.bemBlockName}--end_time_input`}
+                                        name="end_time_input"
+                                        onChange={this.onEndTimeChanged}
+                                        type="time"
+                                        value={endTime}
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row form>
+                            <Col sm={6}>
+                                <FormGroup>
+                                    <Label for={`${this.bemBlockName}--employee_select`}>Employee</Label>
+                                    <select
+                                        className="selectpicker form-control"
+                                        data-width="auto"
+                                        id={`${this.bemBlockName}--employee_select`}
+                                        name="employee_select"
+                                        onChange={this.onEmployeeSelectionChanged}
+                                        placeholder="Select Employee"
+                                        value={employeeId}
+                                    >
+                                        <option value="">Select</option>
+                                        {map(employees, (e) => ((
+                                            <option key={`employee-${e.id}`} value={e.id}>
+                                                {e.displayName}
+                                            </option>
+                                        )))}
+                                    </select>
+                                </FormGroup>
+                            </Col>
+                            <Col sm={6}>
+                                <FormGroup>
+                                    {/* TODO: Use an input mask for the format for break time duration! */}
+                                    <Label for={`${this.bemBlockName}--break_time_input`}>Break</Label>
+                                    <Input
+                                        id={`${this.bemBlockName}--break_time_input`}
+                                        name="break_time_input"
+                                        onChange={this.onBreakTimeChanged}
+                                        placeholder="hh:mm"
+                                        type="text"
+                                        value={breakTime}
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
                     </Form>
                 </ModalBody>
             </Modal>
         );
+    }
+
+    private getTimeZoneKey(timeZoneId: string) {
+        const tzIdProgrammaticKey = kebabCase(
+            timeZoneId
+                .replace('-', 'minus')
+                .replace('-', 'plus'),
+        );
+
+        return `tz-${tzIdProgrammaticKey}`;
+    }
+
+    private onBreakTimeChanged(event: React.FormEvent<HTMLInputElement>) {
+        const { updateBreakTime } = this.props;
+        updateBreakTime(event.currentTarget.value);
     }
 
     private onClickCancel(event: React.MouseEvent<any>) {
@@ -144,9 +326,80 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
         this.logger.debug('Saving the time activity...');
     }
 
-    private onTimeActivityDateChanged(e: React.FormEvent<HTMLInputElement>) {
+    private onCustomerSelectionChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+        const { updateCustomer } = this.props;
+        const selectElement = event.target;
+
+        if (selectElement.selectedIndex === -1) {
+            updateCustomer(null);
+            return;
+        }
+
+        const selectedOption = selectElement.selectedOptions[0];
+
+        updateCustomer(selectedOption.value);
+    }
+
+    private onDateChanged(event: React.FormEvent<HTMLInputElement>) {
         const { updateDate } = this.props;
-        updateDate(e.currentTarget.value ?? null);
+        updateDate(event.currentTarget.value ?? null);
+    }
+
+    private onDescriptionChanged(event: React.FormEvent<HTMLInputElement>) {
+        const { updateDescription } = this.props;
+        updateDescription(event.currentTarget.value ?? null);
+    }
+
+    private onEmployeeSelectionChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+        const { updateEmployee } = this.props;
+        const selectElement = event.target;
+
+        if (selectElement.selectedIndex === -1) {
+            updateEmployee(null);
+            return;
+        }
+
+        const selectedOption = selectElement.selectedOptions[0];
+
+        updateEmployee(selectedOption.value);
+    }
+
+    private onEndTimeChanged(event: React.FormEvent<HTMLInputElement>) {
+        const { updateEndTime } = this.props;
+        updateEndTime(event.currentTarget.value ?? null);
+    }
+
+    private onProductSelectionChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+        const { updateProduct } = this.props;
+        const selectElement = event.target;
+
+        if (selectElement.selectedIndex === -1) {
+            updateProduct(null);
+            return;
+        }
+
+        const selectedOption = selectElement.selectedOptions[0];
+
+        updateProduct(selectedOption.value);
+    }
+
+    private onStartTimeChanged(event: React.FormEvent<HTMLInputElement>) {
+        const { updateStartTime } = this.props;
+        updateStartTime(event.currentTarget.value ?? null);
+    }
+
+    private onTimeZoneSelectionChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+        const { updateTimeZone } = this.props;
+        const selectElement = event.target;
+
+        if (selectElement.selectedIndex === -1) {
+            updateTimeZone(null);
+            return;
+        }
+
+        const selectedOption = selectElement.selectedOptions[0];
+
+        updateTimeZone(selectedOption.value);
     }
 }
 
