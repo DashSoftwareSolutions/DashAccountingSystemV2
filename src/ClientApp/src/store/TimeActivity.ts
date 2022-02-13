@@ -9,10 +9,11 @@ import {
     isEmpty,
     isNil,
 } from 'lodash';
-import moment from 'moment-timezone';
+import moment, { Duration } from 'moment-timezone';
 import { AppThunkAction } from './';
 import { formatWithTwoDecimalPlaces } from '../common/StringUtils';
 import { Logger } from '../common/Logging';
+import { numbersAreEqualWithPrecision } from '../common/NumericUtils';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
@@ -21,7 +22,74 @@ import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
 import EmployeeLite from '../models/EmployeeLite';
 
-// TODO: May need to track validation state for creating/updating a Time Activity
+export interface TimeActivityDurationValidationState {
+    message: string;
+    hasDate: boolean;
+    hasStartTime: boolean;
+    hasEndTime: boolean;
+    hasBreakTime: boolean;
+    hasTimeZone: boolean;
+    isBillable: boolean;
+    hourlyRate: number | null;
+    isStartTimeAfterEndTime: boolean;
+    isValid: boolean;
+    doesBreakTimeExceedWorkingTime: boolean;
+    workTimeDuration: Duration | null;
+    breakTimeDuration: Duration | null;
+    netDuration: Duration | null;
+    billableAmount: number | null;
+}
+
+export interface TimeActivityAttributeValidationState {
+    valid: boolean | undefined;
+    invalid: boolean | undefined;
+    error: string | null;
+}
+
+export interface TimeActivityValidationState {
+    attributes: Map<string, TimeActivityAttributeValidationState>;
+    duration: TimeActivityDurationValidationState;
+    canSave: boolean;
+}
+
+const DEFAULT_ATTRIBUTE_VALIDATION_STATE: TimeActivityAttributeValidationState = {
+    error: null,
+    valid: undefined,
+    invalid: undefined,
+};
+
+const DEFAULT_DURATION_VALIDATION_STATE: TimeActivityDurationValidationState = {
+    message: '',
+    hasDate: false,
+    hasStartTime: false,
+    hasEndTime: false,
+    hasBreakTime: false,
+    hasTimeZone: false,
+    isBillable: false,
+    hourlyRate: null,
+    isStartTimeAfterEndTime: false,
+    isValid: false,
+    doesBreakTimeExceedWorkingTime: false,
+    workTimeDuration: null,
+    breakTimeDuration: null,
+    netDuration: null,
+    billableAmount: null,
+};
+
+const DEFAULT_VALIDATION_STATE: TimeActivityValidationState = {
+    attributes: new Map([
+        ['customerId', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['employeeId', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['productId', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['timeZone', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['date', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['startTime', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['endTime', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+        ['description', { ...DEFAULT_ATTRIBUTE_VALIDATION_STATE }],
+    ]),
+    duration: { ...DEFAULT_DURATION_VALIDATION_STATE },
+    canSave: false,
+};
 
 export interface TimeActivityStoreState {
     dateRangeStart: string;
@@ -34,6 +102,7 @@ export interface TimeActivityStoreState {
     isLoading: boolean;
     isSaving: boolean;
     isDeleting: boolean;
+    validation: TimeActivityValidationState;
 }
 
 /* BEGIN: REST API Actions */
@@ -443,7 +512,97 @@ const unloadedState: TimeActivityStoreState = {
     isLoading: false,
     isSaving: false,
     isDeleting: false,
+    validation: { ...DEFAULT_VALIDATION_STATE },
 };
+
+const updateTimeActivityDurationState = (state: TimeActivityStoreState, updatedDirtyTimeActivity: TimeActivity): TimeActivityStoreState => {
+    const {
+        validation: {
+            duration: durationValidationState,
+        },
+    } = state;
+
+    const updatedDurationValidationState = { ...durationValidationState };
+
+    updatedDurationValidationState.hasDate = !isEmpty(updatedDirtyTimeActivity.date);
+    updatedDurationValidationState.hasStartTime = !isEmpty(updatedDirtyTimeActivity.startTime);
+    updatedDurationValidationState.hasEndTime = !isEmpty(updatedDirtyTimeActivity.endTime);
+    updatedDurationValidationState.hasTimeZone = !isEmpty(updatedDirtyTimeActivity.timeZone);
+    updatedDurationValidationState.isBillable = updatedDirtyTimeActivity.isBillable;
+    updatedDurationValidationState.hourlyRate = updatedDirtyTimeActivity.hourlyBillingRate;
+
+    if (updatedDurationValidationState.hasDate &&
+        updatedDurationValidationState.hasStartTime &&
+        updatedDurationValidationState.hasEndTime &&
+        updatedDurationValidationState.hasTimeZone) {
+        const startDateTime = moment.tz(`${updatedDirtyTimeActivity.date} ${updatedDirtyTimeActivity.startTime}`, updatedDirtyTimeActivity.timeZone);
+        const endDateTime = moment.tz(`${updatedDirtyTimeActivity.date} ${updatedDirtyTimeActivity.endTime}`, updatedDirtyTimeActivity.timeZone);
+
+        if (startDateTime.isSame(endDateTime)) {
+            updatedDurationValidationState.message = 'Start time and end time are the same.  Zero time worked.';
+        } else if (startDateTime.isAfter(endDateTime)) {
+            updatedDurationValidationState.message = 'Start time is after end time.';
+        } else {
+            updatedDurationValidationState.workTimeDuration = moment.duration(endDateTime.diff(startDateTime));
+
+            if (!isEmpty(updatedDirtyTimeActivity.break)) {
+                updatedDurationValidationState.breakTimeDuration = moment.duration(`${updatedDirtyTimeActivity.break}:00`);
+
+                if (updatedDurationValidationState.breakTimeDuration > updatedDurationValidationState.workTimeDuration) {
+                    updatedDurationValidationState.message = 'The break time cannot exceed the total time worked. Please correct.';
+                } else {
+                    updatedDurationValidationState.netDuration = updatedDurationValidationState.workTimeDuration.subtract(updatedDurationValidationState.breakTimeDuration);
+                }
+            } else {
+                updatedDurationValidationState.netDuration = updatedDurationValidationState.workTimeDuration.clone();
+            }
+
+            if (updatedDurationValidationState.isBillable &&
+                !isNil(updatedDurationValidationState.hourlyRate)) {
+                if (numbersAreEqualWithPrecision(updatedDurationValidationState.hourlyRate, 0.00)) {
+                    updatedDurationValidationState.message = 'If the activity is billable, then the hourly rate cannot be 0.00.';
+                } else if (updatedDurationValidationState.hourlyRate < 0.0) {
+                    updatedDurationValidationState.message = 'The hourly rate cannot be negative.';
+                } else {
+                    updatedDurationValidationState.isValid = true;
+                    updatedDurationValidationState.billableAmount = updatedDurationValidationState.netDuration.asHours() * updatedDurationValidationState.hourlyRate;
+
+                    const hourlyRateFormatted = updatedDurationValidationState.hourlyRate
+                        .toLocaleString(
+                            'en-US', // TODO: Make to dynamic/configurable per settings
+                            {
+                                style: 'currency',
+                                currency: 'USD',  // TODO: Make to dynamic/configurable per settings
+                                minimumFractionDigits: 2,
+                            });
+
+                    const totalBillableAmountFormatted = updatedDurationValidationState.billableAmount
+                        .toLocaleString(
+                            'en-US', // TODO: Make to dynamic/configurable per settings
+                            {
+                                style: 'currency',
+                                currency: 'USD',  // TODO: Make to dynamic/configurable per settings
+                                minimumFractionDigits: 2,
+                            });
+
+                    updatedDurationValidationState.message = `${updatedDurationValidationState.netDuration.humanize()} at ${hourlyRateFormatted} = ${totalBillableAmountFormatted}`;
+                }
+            } else { // Not Billable
+                updatedDurationValidationState.isValid = true;
+                updatedDurationValidationState.message = updatedDurationValidationState.netDuration.humanize();
+            }
+        }
+    }
+
+    return {
+        ...state,
+        dirtyTimeActivity: updatedDirtyTimeActivity,
+        validation: {
+            ...state.validation,
+            duration: updatedDurationValidationState,
+        },
+    };
+}
 
 export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStoreState | undefined, incomingAction: Action): TimeActivityStoreState => {
     if (state === undefined) {
@@ -586,14 +745,14 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
             /* END: Initialize New/Select Existing Time Activity to View/Manage */
 
             /* BEGIN: UI Gesture Actions for single Time Activity Entry Modal Dialog */
-            case ActionType.UPDATE_TIME_ACTIVITY_BREAK_TIME:
-                return {
-                    ...state,
-                    dirtyTimeActivity: {
-                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
-                        break: action.breakTime,
-                    },
+            case ActionType.UPDATE_TIME_ACTIVITY_BREAK_TIME: {
+                const updatedDirtyTimeActivity = {
+                    ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                    break: action.breakTime,
                 };
+
+                return updateTimeActivityDurationState(state, updatedDirtyTimeActivity);
+            }
 
             case ActionType.UPDATE_TIME_ACTIVITY_CUSTOMER:
                 return {
@@ -604,14 +763,14 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                     },
                 };
 
-            case ActionType.UPDATE_TIME_ACTIVITY_DATE:
-                return {
-                    ...state,
-                    dirtyTimeActivity: {
-                        ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
-                        date: action.date,
-                    },
+            case ActionType.UPDATE_TIME_ACTIVITY_DATE: {
+                const updatedDirtyTimeActivity = {
+                    ...state.dirtyTimeActivity as Pick<TimeActivity, keyof TimeActivity>,
+                    date: action.date,
                 };
+
+                return updateTimeActivityDurationState(state, updatedDirtyTimeActivity);
+            }
 
             case ActionType.UPDATE_TIME_ACTIVITY_DESCRIPTION:
                 return {
@@ -692,6 +851,7 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                 return {
                     ...state,
                     dirtyTimeActivity: null,
+                    validation: { ...DEFAULT_VALIDATION_STATE },
                 };
 
             case ActionType.RESET_TIME_ACTIVITY_STORE_STATE:

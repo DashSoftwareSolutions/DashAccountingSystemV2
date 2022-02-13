@@ -18,6 +18,7 @@ import {
 import { AppThunkAction } from './';
 import { isStringNullOrWhiteSpace } from '../common/StringUtils';
 import { Logger } from '../common/Logging';
+import { numbersAreEqualWithPrecision } from '../common/NumericUtils';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
@@ -536,14 +537,6 @@ const sumDebits = (accounts: JournalEntryAccount[]): number => {
         (sum, next) => sum + next,
         0);
 };
-
-// Helper function for checking two numbers for equality
-// 'cause ... you know ... floating point number issues! ;-)
-// Adapted from: https://stackoverflow.com/a/49261488
-const defaultPrecision = 0.001;
-const numbersAreEqualWithPrecision = (n1: number, n2: number, precision: number = defaultPrecision): boolean => {
-    return Math.abs(n1 - n2) <= precision;
-}
 
 const updateStateAfterAccountChange = (state: JournalEntryState, updatedJournalEntry: JournalEntry): JournalEntryState => {
     let accountValidation: JournalEntryAccountsValidationState = { ...DEFAULT_ACCOUNT_VALIDATION_STATE };
