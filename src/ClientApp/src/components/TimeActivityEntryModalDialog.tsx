@@ -17,6 +17,7 @@ import {
     ModalFooter,
     Row,
 } from 'reactstrap';
+import InputMasked from 'react-text-mask';
 import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import {
@@ -278,10 +279,11 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
                             </Col>
                             <Col sm={6}>
                                 <FormGroup>
-                                    {/* TODO: Use an input mask for the format for break time duration! */}
                                     <Label for={`${this.bemBlockName}--break_time_input`}>Break</Label>
-                                    <Input
+                                    <InputMasked
+                                        className="form-control"
                                         id={`${this.bemBlockName}--break_time_input`}
+                                        mask={[/\d/, ':', /\d/, /\d/]}
                                         name="break_time_input"
                                         onChange={this.onBreakTimeChanged}
                                         placeholder="hh:mm"
