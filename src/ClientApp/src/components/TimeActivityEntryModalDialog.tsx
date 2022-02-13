@@ -1,5 +1,6 @@
 ﻿import * as React from 'react';
 import {
+    isFinite,
     kebabCase,
     map,
 } from 'lodash';
@@ -75,6 +76,8 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
         this.onDescriptionChanged = this.onDescriptionChanged.bind(this);
         this.onEmployeeSelectionChanged = this.onEmployeeSelectionChanged.bind(this);
         this.onEndTimeChanged = this.onEndTimeChanged.bind(this);
+        this.onHourlyBillingRateChanged = this.onHourlyBillingRateChanged.bind(this);
+        this.onIsBillableChanged = this.onIsBillableChanged.bind(this);
         this.onProductSelectionChanged = this.onProductSelectionChanged.bind(this);
         this.onStartTimeChanged = this.onStartTimeChanged.bind(this);
         this.onTimeZoneSelectionChanged = this.onTimeZoneSelectionChanged.bind(this);
@@ -96,8 +99,11 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
 
         const breakTime = timeActivity?.break ?? '';
         const customerId = timeActivity?.customerId ?? '';
+        const description = timeActivity?.description ?? '';
         const employeeId = timeActivity?.employeeId ?? '';
         const endTime = timeActivity?.endTime ?? '';
+        const hourlyRateAsString = timeActivity?.hourlyBillingRateAsString ?? '';
+        const isBillable = timeActivity?.isBillable ?? false;
         const productId = timeActivity?.productId ?? '';
         const startTime = timeActivity?.startTime ?? '';
         const timeActivityDate = timeActivity?.date ?? '';
@@ -106,6 +112,7 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
         return (
             <Modal
                 centered
+                className={this.bemBlockName}
                 id={this.bemBlockName}
                 isOpen={isOpen}
                 size="lg"
@@ -293,8 +300,55 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
                                 </FormGroup>
                             </Col>
                         </Row>
+                        <Row form>
+                            <Col sm={3}>
+                                <FormGroup
+                                    check
+                                    inline
+                                >
+                                    <Input
+                                        checked={isBillable}
+                                        id={`${this.bemBlockName}--is_billable_checkbox`}
+                                        name="is_billable_checkbox"
+                                        onChange={this.onIsBillableChanged}
+                                        type="checkbox"
+                                    />
+                                    <Label
+                                        check
+                                        for={`${this.bemBlockName}--is_billable_checkbox`}>Billable&nbsp;(/hr)
+                                    </Label>
+                                </FormGroup>
+                            </Col>
+                            <Col sm={3}>
+                                <Input
+                                    id={`${this.bemBlockName}--hourly_billing_rate_input`}
+                                    onChange={this.onHourlyBillingRateChanged}
+                                    step="any"
+                                    style={{ textAlign: 'right' }}
+                                    type="number"
+                                    value={hourlyRateAsString}
+                                />
+                            </Col>
+                        </Row>
+                        <Row form>
+                            <Col sm={12}>
+                                <FormGroup>
+                                    <Label for={`${this.bemBlockName}--description_textarea`}>Description</Label>
+                                    <Input
+                                        id={`${this.bemBlockName}--description_textarea`}
+                                        name="description_textarea"
+                                        onChange={this.onDescriptionChanged}
+                                        type="textarea"
+                                        value={description}
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
                     </Form>
                 </ModalBody>
+                <ModalFooter>
+                    This is the footer
+                </ModalFooter>
             </Modal>
         );
     }
@@ -369,6 +423,24 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
     private onEndTimeChanged(event: React.FormEvent<HTMLInputElement>) {
         const { updateEndTime } = this.props;
         updateEndTime(event.currentTarget.value ?? null);
+    }
+
+    private onHourlyBillingRateChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        const { updateHourlyRate } = this.props;
+
+        const amountAsString = event.currentTarget.value;
+        const parsedAmount = parseFloat(amountAsString);
+
+        const safeValueForUpdate = isFinite(parsedAmount) ?
+            parsedAmount :
+            null;
+
+        updateHourlyRate(safeValueForUpdate, amountAsString);
+    }
+
+    private onIsBillableChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        const { updateIsBillable } = this.props;
+        updateIsBillable(event.target.checked);
     }
 
     private onProductSelectionChanged(event: React.ChangeEvent<HTMLSelectElement>) {

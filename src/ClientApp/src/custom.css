@@ -110,3 +110,9 @@ th.sticky-border:after {
     width: 100%;
 }
 
+.time_activity_entry_modal textarea {
+    resize: none;
+    height: 96px;
+    width: 100%;
+}
+

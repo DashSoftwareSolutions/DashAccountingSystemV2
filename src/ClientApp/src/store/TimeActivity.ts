@@ -11,6 +11,7 @@ import {
 } from 'lodash';
 import moment from 'moment-timezone';
 import { AppThunkAction } from './';
+import { formatWithTwoDecimalPlaces } from '../common/StringUtils';
 import { Logger } from '../common/Logging';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
@@ -18,6 +19,7 @@ import ActionType from './ActionType';
 import IAction from './IAction';
 import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
+import EmployeeLite from '../models/EmployeeLite';
 
 // TODO: May need to track validation state for creating/updating a Time Activity
 
@@ -159,7 +161,7 @@ interface UpdateTimeActivityDescriptionAction extends IAction {
 interface InitializeNewTimeActivityAction extends IAction {
     type: ActionType.INITIALIZE_NEW_TIME_ACTIVITY;
     tenantId: string; // GUID
-    employeeId: string | null; // GUID
+    employee: EmployeeLite | null;
 }
 
 interface SelectExistingTimeActivityAction extends IAction {
@@ -340,7 +342,7 @@ export const actionCreators = {
 
         dispatch({
             type: ActionType.INITIALIZE_NEW_TIME_ACTIVITY,
-            employeeId: currentUserEmployee?.id ?? null,
+            employee: currentUserEmployee ?? null,
             tenantId,
         });
     },
@@ -537,16 +539,29 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
             /* END: UI Gesture Actions for Time Activity Details Report/Listing Page */
 
             /* BEGIN: Initialize New/Select Existing Time Activity to View/Manage */
-            case ActionType.INITIALIZE_NEW_TIME_ACTIVITY:
+            case ActionType.INITIALIZE_NEW_TIME_ACTIVITY: {
+                let employeeId = null;
+                let hourlyBillingRate = 0.0;
+                let hourlyBillingRateAsString = '0.00';
+                let isBillable = false;
+
+                if (!isNil(action.employee)) {
+                    employeeId = action.employee.id;
+                    isBillable = action.employee.isBillableByDefault;
+                    hourlyBillingRate = action.employee.hourlyBillableRate;
+                    hourlyBillingRateAsString = formatWithTwoDecimalPlaces(hourlyBillingRate.toString());
+                }
+
                 return {
                     ...state,
                     dirtyTimeActivity: {
+                        employeeId,
+                        isBillable,
+                        hourlyBillingRate,
+                        hourlyBillingRateAsString,
                         tenantId: action.tenantId,
                         customerId: null,
-                        employeeId: action.employeeId,
                         productId: null,
-                        isBillable: false,
-                        hourlyBillingRate: null,
                         date: moment().format('YYYY-MM-DD'),
                         timeZone: 'America/Los_Angeles', // TODO: Get this default from settings or preferences somewhere
                         startTime: null,
@@ -556,6 +571,7 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
                     },
                     // TODO: Validation state
                 };
+            }
 
             case ActionType.SELECT_EXISTING_TIME_ACTIVITY: {
                 const dirtyTimeActivity = cloneDeep(action.selectedTimeActivity);
