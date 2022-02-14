@@ -1,5 +1,6 @@
 ﻿import * as React from 'react';
 import {
+    isEmpty,
     isFinite,
     kebabCase,
     map,
@@ -43,7 +44,7 @@ const mapStateToProps = (state: ApplicationState) => {
         products: state.products?.products ?? [],
         timeActivity: state.timeActivity?.dirtyTimeActivity,
         timeZones: state.lookups?.timeZones ?? [],
-        // TODO: Validation state
+        validationState: state.timeActivity?.validation ?? null,
     };
 };
 
@@ -95,6 +96,7 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
             products,
             timeActivity,
             timeZones,
+            validationState,
         } = this.props;
 
         const breakTime = timeActivity?.break ?? '';
@@ -108,6 +110,8 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
         const startTime = timeActivity?.startTime ?? '';
         const timeActivityDate = timeActivity?.date ?? '';
         const timeZone = timeActivity?.timeZone ?? '';
+
+        // this.logger.info('Time Activity Validation State:', validationState);
 
         return (
             <Modal
@@ -347,7 +351,7 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
                     </Form>
                 </ModalBody>
                 <ModalFooter>
-                    This is the footer
+                    {isEmpty(validationState?.duration?.message) ? '\u00A0' : validationState?.duration?.message}
                 </ModalFooter>
             </Modal>
         );
