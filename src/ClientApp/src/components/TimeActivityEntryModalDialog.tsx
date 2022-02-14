@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import {
     isEmpty,
     isFinite,
@@ -110,8 +110,7 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
         const startTime = timeActivity?.startTime ?? '';
         const timeActivityDate = timeActivity?.date ?? '';
         const timeZone = timeActivity?.timeZone ?? '';
-
-        // this.logger.info('Time Activity Validation State:', validationState);
+        const canSave = validationState?.canSave ?? false;
 
         return (
             <Modal
@@ -149,7 +148,7 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
                             ) : null}
                             <Button
                                 color="success"
-                                disabled={isSaving} // TODO: Disable if cannot save due to validation
+                                disabled={isSaving || !canSave}
                                 id={`${this.bemBlockName}--save_button`}
                                 onClick={this.onClickSave}
                                 style={{ width: 88 }}
@@ -351,7 +350,7 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
                     </Form>
                 </ModalBody>
                 <ModalFooter>
-                    {isEmpty(validationState?.duration?.message) ? '\u00A0' : validationState?.duration?.message}
+                    {isEmpty(validationState?.message) ? '\u00A0' : validationState?.message}
                 </ModalFooter>
             </Modal>
         );
