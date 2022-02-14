@@ -102,5 +102,33 @@ namespace DashAccountingSystemV2.BusinessLogic
                 return new BusinessLogicResponse<TimeActivity>(ErrorType.RuntimeException, "Failed to create new Time Activity");
             }
         }
+
+        public async Task<BusinessLogicResponse<TimeActivity>> UpdateTimeActivity(TimeActivity timeActivity, Guid contextUserId)
+        {
+            var existingTimeActivity = await _timeActivityRespository.GetByIdAsync(timeActivity.Id);
+
+            if (existingTimeActivity == null)
+                return new BusinessLogicResponse<TimeActivity>(ErrorType.RequestedEntityNotFound);
+
+            // TODO: Check that user has access to this tenant and permission for the requested time activity
+
+            var updatedTimeActivity = await _timeActivityRespository.UpdateAsync(timeActivity, contextUserId);
+
+            return new BusinessLogicResponse<TimeActivity>(updatedTimeActivity);
+        }
+
+        public async Task<BusinessLogicResponse> DeleteTimeActivity(Guid timeActivityId, Guid contextUserId)
+        {
+            var existingTimeActivity = await _timeActivityRespository.GetByIdAsync(timeActivityId);
+
+            if (existingTimeActivity == null)
+                return new BusinessLogicResponse<TimeActivity>(ErrorType.RequestedEntityNotFound);
+
+            // TODO: Check that user has access to this tenant and permission for the requested time activity
+
+            await _timeActivityRespository.DeleteAsync(timeActivityId, contextUserId);
+
+            return new BusinessLogicResponse();
+        }
     }
 }

@@ -37,6 +37,36 @@ namespace DashAccountingSystemV2.Controllers
             return this.Result(createTimeActivityBizLogicResponse, TimeActivityResponseViewModel.FromModel);
         }
 
+        [HttpPut("time-activity/{timeActivityId:guid}")]
+        public Task<IActionResult> UpdateTimeActivity(
+            [FromRoute] Guid timeActivityId,
+            [FromBody] TimeActivityUpdateRequestViewModel viewModel)
+        {
+            if (viewModel == null)
+                return Task.FromResult(this.ErrorResponse("Invalid PUT body"));
+
+            if (timeActivityId != viewModel.Id)
+                return Task.FromResult(this.ErrorResponse("The ID in the PUT body does not match the ID in the URL"));
+
+            if (!ModelState.IsValid)
+                return Task.FromResult(this.ErrorResponse(ModelState));
+
+            var timeActivityToUpdate = TimeActivityUpdateRequestViewModel.ToModel(viewModel);
+            var contextUserId = User.GetUserId();
+
+            var updateTimeActivityBizLogicResponse = _timeActivityBusinessLogic.UpdateTimeActivity(timeActivityToUpdate, contextUserId);
+
+            return this.Result(updateTimeActivityBizLogicResponse, TimeActivityResponseViewModel.FromModel);
+        }
+
+        [HttpDelete("time-activity/{timeActivityId:guid}")]
+        public Task<IActionResult> DeleteTimeActivity([FromRoute] Guid timeActivityId)
+        {
+            var contextUserId = User.GetUserId();
+            var bizLogicResponse = _timeActivityBusinessLogic.DeleteTimeActivity(timeActivityId, contextUserId);
+            return this.Result(bizLogicResponse);
+        }
+
         [HttpGet("{tenantId:guid}/time-activities-report")]
         public Task<IActionResult> GetTimeActivitiesDetailReport(
             [FromRoute] Guid tenantId,

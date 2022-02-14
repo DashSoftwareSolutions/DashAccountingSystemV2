@@ -24,5 +24,9 @@ namespace DashAccountingSystemV2.BusinessLogic
             IEnumerable<uint> includeEmployees = null);
 
         Task<BusinessLogicResponse<TimeActivity>> CreateTimeActivity(TimeActivity timeActivity);
+
+        Task<BusinessLogicResponse<TimeActivity>> UpdateTimeActivity(TimeActivity timeActivity, Guid contextUserId);
+
+        Task<BusinessLogicResponse> DeleteTimeActivity(Guid timeActivityId, Guid contextUserId);
     }
 }
