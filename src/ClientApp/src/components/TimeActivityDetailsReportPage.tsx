@@ -15,12 +15,16 @@ import {
 import { RouteComponentProps, withRouter } from 'react-router';
 import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
+import {
+    ILogger,
+    Logger,
+} from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
 import LinkButton from './LinkButton';
 import Mode from '../models/Mode';
-import ReportParametersAndControls from './ReportParametersAndControls'; // TODO: Use this initially but neeed one w/ Empliyee and Customer filters
+import ReportParametersAndControls from './ReportParametersAndControls'; // TODO: Use this initially but eventually we need one w/ Employee and Customer filters
 import TenantBasePage from './TenantBasePage';
 import TimeActivity from '../models/TimeActivity';
 import TimeActivityDetailsReport from '../models/TimeActivityDetailsReport';
@@ -29,7 +33,9 @@ import * as CustomerStore from '../store/Customer';
 import * as EmployeeStore from '../store/Employee';
 import * as LookupValuesStore from '../store/LookupValues';
 import * as ProductStore from '../store/Product';
+import * as SystemNotificationsStore from '../store/SystemNotifications';
 import * as TimeActivityStore from '../store/TimeActivity';
+import DateRangeMacroType from '../models/DateRangeMacroType';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
@@ -38,10 +44,13 @@ const mapStateToProps = (state: ApplicationState) => {
         employees: state?.employees?.employees ?? [],
         dateRangeEnd: state?.timeActivity?.dateRangeEnd,
         dateRangeStart: state?.timeActivity?.dateRangeStart,
+        isDeleting: state.timeActivity?.isDeleting ?? false,
         isFetchingCustomers: state.customers?.isLoading ?? false,
         isFetchingEmployees: state.employees?.isLoading ?? false,
         isFectingProducts: state.products?.isLoading ?? false,
         isFetchingTimeActivityData: state.timeActivity?.isLoading ?? false,
+        isSaving: state.timeActivity?.isSaving ?? false,
+        savedTimeActivity: state.timeActivity?.existingTimeActivity ?? null,
         selectedTenant: state.tenants?.selectedTenant ?? null,
     };
 }
@@ -52,6 +61,7 @@ const mapDispatchToProps = {
     ...ProductStore.actionCreators,
     ...TimeActivityStore.actionCreators,
     requestLookupValues: LookupValuesStore.actionCreators.requestLookupValues,
+    showAlert: SystemNotificationsStore.actionCreators.showAlert,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -67,16 +77,20 @@ interface TimeActivityDetailsReportPageState {
 }
 
 class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDetailsReportPageProps, TimeActivityDetailsReportPageState> {
+    private logger: ILogger;
     private bemBlockName: string = 'time_activities_detail_report_page';
 
     constructor(props: TimeActivityDetailsReportPageProps) {
         super(props);
+
+        this.logger = new Logger('Time Activity Details Report Page');
 
         this.state = {
             isTimeActivityEntryModalOpen: false,
             timeActivityEntryModalMode: null,
         };
 
+        this.onCancelTimeEntryModal = this.onCancelTimeEntryModal.bind(this);
         this.onClickExistingTimeActivity = this.onClickExistingTimeActivity.bind(this);
         this.onClickNewTimeActivity = this.onClickNewTimeActivity.bind(this);
         this.onCloseTimeActivityEntryModal = this.onCloseTimeActivityEntryModal.bind(this);
@@ -87,6 +101,42 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
 
     public componentDidMount() {
         this.ensureDataFetched();
+    }
+
+    public componentDidUpdate(prevProps: TimeActivityDetailsReportPageProps, prevState: TimeActivityDetailsReportPageState) {
+        const { isSaving: wasSaving } = prevProps;
+
+        const {
+            isSaving,
+            requestTimeActivityDetailsReportData,
+            resetDirtyTimeActivity,
+            resetTimeActivityDetailsReportData,
+            savedTimeActivity,
+            showAlert,
+        } = this.props;
+
+        const {
+            timeActivityEntryModalMode: mode,
+        } = this.state;
+
+        if (wasSaving && !isSaving) {
+            this.logger.info('Finished saving!');
+
+            if (mode === Mode.Add &&
+                !isNil(savedTimeActivity)) {
+                showAlert('success', 'Successfully created the Time Activity', true);
+                resetDirtyTimeActivity();
+                resetTimeActivityDetailsReportData();
+                requestTimeActivityDetailsReportData();
+            } else if (mode === Mode.Edit) {
+                // TODO/FIXME: How to detect if save was unsuccessful?!
+                // For now, assume it succeeded
+                showAlert('success', 'Successfully updated the Time Activity', true);
+                resetDirtyTimeActivity();
+                resetTimeActivityDetailsReportData();
+                requestTimeActivityDetailsReportData();
+            }
+        }
     }
 
     public render() {
@@ -136,6 +186,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                         bemBlockName={this.bemBlockName}
                         dateRangeEnd={dateRangeEnd ?? null}
                         dateRangeStart={dateRangeStart ?? null}
+                        defaultDateRangeMacro={DateRangeMacroType.Today}
                         onDateRangeEndChanged={this.onDateRangeEndChanged}
                         onDateRangeStartChanged={this.onDateRangeStartChanged}
                         onRunReport={this.onRunReport}
@@ -152,6 +203,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                     <TimeActivityEntryModalDialog
                         isOpen={isTimeActivityEntryModalOpen}
                         mode={timeActivityEntryModalMode}
+                        onCancel={this.onCancelTimeEntryModal}
                         onClose={this.onCloseTimeActivityEntryModal}
                     />
                 </TenantBasePage.Content>
@@ -175,10 +227,14 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
         requestTimeActivityDetailsReportData();
     }
 
+    private onCancelTimeEntryModal(event: React.MouseEvent<any>) {
+        this.onCloseTimeActivityEntryModal(event, true);
+    }
+
     private onClickExistingTimeActivity(timeActivity: TimeActivity) {
         const { selectTimeActivity } = this.props;
         selectTimeActivity(timeActivity);
-        console.log('Open Modal to start editing the selected Time Activity...');
+
         this.setState({
             isTimeActivityEntryModalOpen: true,
             timeActivityEntryModalMode: Mode.Edit,
@@ -186,20 +242,20 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
     }
 
     private onClickNewTimeActivity() {
-        console.log('Open Modal to start making a new Time Activity...');
         const { initializeNewTimeActivity } = this.props;
         initializeNewTimeActivity();
+
         this.setState({
             isTimeActivityEntryModalOpen: true,
             timeActivityEntryModalMode: Mode.Add,
         });
     }
 
-    private onCloseTimeActivityEntryModal() {
-        this.setState({
+    private onCloseTimeActivityEntryModal(_: React.MouseEvent<any>, isCancelling: boolean = false) {
+        this.setState(({ timeActivityEntryModalMode }) => ({
             isTimeActivityEntryModalOpen: false,
-            timeActivityEntryModalMode: null,
-        });
+            timeActivityEntryModalMode: isCancelling ? null : timeActivityEntryModalMode,
+        }));
     }
 
     private onDateRangeEndChanged(newEndDate: string) {
@@ -308,7 +364,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                                                     onClick={() => this.onClickExistingTimeActivity(timeActivity)}
                                                 >
                                                     <span
-                                                        dangerouslySetInnerHTML={{ __html: timeActivity?.description?.replace('\r\n', '<br />') ?? '' }}
+                                                        dangerouslySetInnerHTML={{ __html: timeActivity?.description?.replace(/\r?\n/g, '<br />') ?? '' }}
                                                             style={{ wordWrap: 'break-word' }}
                                                     />
                                                 </LinkButton>

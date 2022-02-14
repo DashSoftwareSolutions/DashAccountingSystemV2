@@ -15,6 +15,7 @@ interface ReportParametersAndControlsProps {
     bemBlockName: string;
     dateRangeEnd: string | null; // Date in YYYY-MM-DD
     dateRangeStart: string | null; // Date in YYYY-MM-DD
+    defaultDateRangeMacro?: DateRangeMacroType,
     isRequestingExcelDownload?: boolean;
     onDateRangeEndChanged: Function;
     onDateRangeStartChanged: Function;
@@ -27,6 +28,7 @@ const ReportParametersAndControls: React.FC<ReportParametersAndControlsProps> = 
     bemBlockName,
     dateRangeEnd,
     dateRangeStart,
+    defaultDateRangeMacro,
     isRequestingExcelDownload,
     onDateRangeEndChanged,
     onDateRangeStartChanged,
@@ -38,7 +40,7 @@ const ReportParametersAndControls: React.FC<ReportParametersAndControlsProps> = 
     const showDownloadExcelButtonSafe = showDownloadExcelButton ?? false;
     const isRequestingExcelDownloadSafe = isRequestingExcelDownload ?? false;
 
-    const [selectedDateRangeMacro, setSelectedDateRangeMacro] = React.useState(DateRangeMacroType.Custom);
+    const [selectedDateRangeMacro, setSelectedDateRangeMacro] = React.useState(defaultDateRangeMacro ?? DateRangeMacroType.Custom);
 
     const onDateRangeEndInputChanged = (event: React.FormEvent<HTMLInputElement>) => {
         onDateRangeEndChanged(event.currentTarget.value);

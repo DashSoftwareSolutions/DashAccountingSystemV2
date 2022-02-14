@@ -318,12 +318,26 @@ export const actionCreators = {
 
     saveNewTimeActivity: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
-        const timeActivityToSave = appState.timeActivity?.dirtyTimeActivity;
 
-        if (isNil(timeActivityToSave)) {
-            logger.warn('No Journal Entry found in store state.  Bailing out.');
+        const dirtyTimeActivity: TimeActivity | null = appState.timeActivity?.dirtyTimeActivity ?? null;
+
+        if (isNil(dirtyTimeActivity)) {
+            logger.warn('No Time Activity found in store state.  Bailing out...');
             return;
         }
+
+        if (!appState.timeActivity?.validation?.canSave) {
+            logger.info('Cannot save Time Activity.  Bailing out...');
+        }
+
+        const timeActivityToSave: TimeActivity = {
+            ...dirtyTimeActivity,
+            startTime: `${dirtyTimeActivity.startTime}:00`, // add seconds so it is interpreetted correctly on the back-end
+            endTime: `${dirtyTimeActivity.endTime}:00`,
+            break: isEmpty(dirtyTimeActivity.break) ? null : `${dirtyTimeActivity.break}:00`,
+        };
+
+        logger.info('Finalized Time Activity ready to save:', timeActivityToSave);
 
         const accessToken = await authService.getAccessToken();
 
@@ -470,11 +484,13 @@ export const actionCreators = {
     /* END: Resets */
 };
 
+
+const today = moment().format('YYYY-MM-DD');
+
 const unloadedState: TimeActivityStoreState = {
-    // TODO: Different defaults for the dates
     currentUserEmployee: null,
-    dateRangeStart: '2021-07-01',
-    dateRangeEnd: '2021-07-31',
+    dateRangeStart: today,
+    dateRangeEnd: today,
     detailsReportData: null,
     dirtyTimeActivity: null,
     existingTimeActivity: null,

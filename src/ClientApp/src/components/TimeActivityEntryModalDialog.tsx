@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import {
     isEmpty,
     isFinite,
@@ -20,7 +20,6 @@ import {
     Row,
 } from 'reactstrap';
 import InputMasked from 'react-text-mask';
-import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import {
     ILogger,
@@ -32,6 +31,7 @@ import * as TimeActivityStore from '../store/TimeActivity';
 interface TimeActivityEntryModalDialogOwnProps {
     isOpen: boolean;
     mode: Mode | null;
+    onCancel: Function;
     onClose: React.MouseEventHandler<any>;
 }
 
@@ -372,9 +372,13 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
     }
 
     private onClickCancel(event: React.MouseEvent<any>) {
-        // TODO: Also reset dirty time activity/selected time activity state
-        const { onClose } = this.props;
-        onClose(event);
+        const {
+            onCancel,
+            resetDirtyTimeActivity,
+        } = this.props;
+
+        resetDirtyTimeActivity();
+        onCancel(event);
     }
 
     private onClickDelete(event: React.MouseEvent<any>) {
@@ -382,7 +386,22 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
     }
 
     private onClickSave(event: React.MouseEvent<any>) {
-        this.logger.debug('Saving the time activity...');
+        this.logger.info('Saving the time activity...');
+
+        const {
+            mode,
+            onClose,
+            saveNewTimeActivity,
+            updateTimeActivity,
+        } = this.props;
+
+        if (mode === Mode.Add) {
+            saveNewTimeActivity();
+            onClose(event); // TODO/FIXME: Do we want to close the modal on error?  Right now we have to in order to see the error message.  Need to rethink error handling???
+        } else { // Edit Model
+            updateTimeActivity();
+            onClose(event);
+        }
     }
 
     private onCustomerSelectionChanged(event: React.ChangeEvent<HTMLSelectElement>) {
