@@ -104,9 +104,13 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
     }
 
     public componentDidUpdate(prevProps: TimeActivityDetailsReportPageProps, prevState: TimeActivityDetailsReportPageState) {
-        const { isSaving: wasSaving } = prevProps;
+        const {
+            isDeleting: wasDeleting,
+            isSaving: wasSaving,
+        } = prevProps;
 
         const {
+            isDeleting,
             isSaving,
             requestTimeActivityDetailsReportData,
             resetDirtyTimeActivity,
@@ -128,6 +132,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                 resetDirtyTimeActivity();
                 resetTimeActivityDetailsReportData();
                 requestTimeActivityDetailsReportData();
+                return;
             } else if (mode === Mode.Edit) {
                 // TODO/FIXME: How to detect if save was unsuccessful?!
                 // For now, assume it succeeded
@@ -135,7 +140,20 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                 resetDirtyTimeActivity();
                 resetTimeActivityDetailsReportData();
                 requestTimeActivityDetailsReportData();
+                return;
             }
+        }
+
+        if (wasDeleting && !isDeleting) {
+            this.logger.info('Finished deleting!');
+
+            // TODO/FIXME: How to detect if delete was unsuccessful?!
+            // For now, assume it succeeded
+            showAlert('success', 'Successfully deleted the Time Activity', true);
+            resetDirtyTimeActivity();
+            resetTimeActivityDetailsReportData();
+            requestTimeActivityDetailsReportData();
+            return;
         }
     }
 

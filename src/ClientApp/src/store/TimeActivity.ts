@@ -372,11 +372,92 @@ export const actionCreators = {
     },
 
     updateTimeActivity: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
-        // TODO: Implement me
+        const appState = getState();
+
+        const dirtyTimeActivity: TimeActivity | null = appState.timeActivity?.dirtyTimeActivity ?? null;
+
+        if (isNil(dirtyTimeActivity)) {
+            logger.warn('No Time Activity found in store state.  Bailing out...');
+            return;
+        }
+
+        if (!appState.timeActivity?.validation?.canSave) {
+            logger.info('Cannot save Time Activity.  Bailing out...');
+        }
+
+        const timeOfDayRegex = new RegExp(/^\d{1,2}:\d{2}:00$/);
+
+        const timeActivityToSave: TimeActivity = {
+            ...dirtyTimeActivity,
+            startTime: timeOfDayRegex.test(dirtyTimeActivity.startTime) ?
+                dirtyTimeActivity.startTime :
+                `${dirtyTimeActivity.startTime}:00`, // add seconds if necessary so it is interpretted correctly on the back-end
+            endTime: timeOfDayRegex.test(dirtyTimeActivity.endTime) ?
+                dirtyTimeActivity.endTime :
+                `${dirtyTimeActivity.endTime}:00`,
+            break: isEmpty(dirtyTimeActivity.break) ?
+                null :
+                timeOfDayRegex.test(dirtyTimeActivity.break) ?
+                    dirtyTimeActivity.break :
+                    `${dirtyTimeActivity.break}:00`,
+        };
+
+        logger.info('Finalized Time Activity ready to save:', timeActivityToSave);
+
+        const accessToken = await authService.getAccessToken();
+
+        const requestOptions = {
+            method: 'PUT',
+            body: JSON.stringify(timeActivityToSave),
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch(`api/time-tracking/time-activity/${timeActivityToSave.id}`, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler
+                        .handleError(response, dispatch as Dispatch<IAction>)
+                        .then(() => { dispatch({ type: ActionType.SAVE_TIME_ACTIVITY_ERROR }); });
+
+                    return null;
+                }
+
+                return response.json() as Promise<TimeActivity>;
+            })
+            .then((savedTimeActivity) => {
+                if (!isNil(savedTimeActivity)) {
+                    dispatch({ type: ActionType.UPDATED_TIME_ACTIVITY_SAVE_COMPLETED, savedTimeActivity });
+                }
+            });
+
+        dispatch({ type: ActionType.REQUEST_SAVE_UPDATED_TIME_ACTIVITY });
     },
 
     deleteTimeActivity: (timeActivityId: string): AppThunkAction<KnownAction> => async (dispatch, getState) => {
-        // TODO: Implement me
+        const accessToken = await authService.getAccessToken();
+
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch(`api/time-tracking/time-activity/${timeActivityId}`, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                    return;
+                }
+
+                dispatch({ type: ActionType.DELETE_TIME_ACTIVITY_COMPLETED });
+            });
+
+        dispatch({ type: ActionType.REQUEST_DELETE_TIME_ACTIVITY });
     },
     /* END: REST API Actions */
 

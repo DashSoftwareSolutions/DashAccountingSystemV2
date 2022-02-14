@@ -382,7 +382,16 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
     }
 
     private onClickDelete(event: React.MouseEvent<any>) {
-        this.logger.debug('Deleting the time activity...');
+        this.logger.info('Deleting the time activity...');
+
+        const {
+            timeActivity: { id: timeActivityId },
+            onClose,
+            deleteTimeActivity,
+        } = this.props;
+
+        deleteTimeActivity(timeActivityId);
+        onClose(event);
     }
 
     private onClickSave(event: React.MouseEvent<any>) {
