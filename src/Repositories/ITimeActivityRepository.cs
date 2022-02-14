@@ -18,8 +18,8 @@ namespace DashAccountingSystemV2.Repositories
 
         Task<TimeActivity> InsertAsync(TimeActivity timeActivity);
 
-        Task<TimeActivity> UpdateAsync(TimeActivity timeActivity);
+        Task<TimeActivity> UpdateAsync(TimeActivity timeActivity, Guid contextUserId);
 
-        Task DeleteAsync(Guid timeActivityId);
+        Task DeleteAsync(Guid timeActivityId, Guid contextUserId);
     }
 }

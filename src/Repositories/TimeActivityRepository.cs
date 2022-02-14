@@ -19,9 +19,9 @@ namespace DashAccountingSystemV2.Repositories
             _db = applicationDbContext;
         }
 
-        public async Task DeleteAsync(Guid timeActivityId)
+        public async Task DeleteAsync(Guid timeActivityId, Guid contextUserId)
         {
-            // TODO: For now, this is a _HARD_ delete.  Perhaps in the future we can consider soft-deletion if it makes sense (e.g. "Oops; I ddeleted it by accident!  Undo that please!")
+            // TODO: For now, this is a _HARD_ delete.  Perhaps in the future we can consider soft-deletion if it makes sense (e.g. "Oops; I deleted it by accident!  Undo that please!")
             var entryToDelete = await _db.TimeActivity.FirstOrDefaultAsync(ta => ta.Id == timeActivityId);
             
             if (entryToDelete != null)
@@ -160,17 +160,26 @@ ORDER BY c.""DisplayName""
             return await GetByIdAsync(timeActivity.Id);
         }
 
-        public async Task<TimeActivity> UpdateAsync(TimeActivity timeActivity)
+        public async Task<TimeActivity> UpdateAsync(TimeActivity timeActivity, Guid contextUserId)
         {
-            var entryToUpdate = await _db.TimeActivity.FirstOrDefaultAsync(ta => ta.Id == timeActivity.Id);
+            var timeActivityToUpdate = await _db.TimeActivity.FirstOrDefaultAsync(ta => ta.Id == timeActivity.Id);
 
-            if (entryToUpdate != null)
+            if (timeActivityToUpdate != null)
             {
-                entryToUpdate.Description = timeActivity.Description;
-                entryToUpdate.Date = timeActivity.Date;
-                entryToUpdate.StartTime = timeActivity.StartTime;
-                entryToUpdate.EndTime = timeActivity.EndTime;
-                entryToUpdate.Break = timeActivity.Break;
+                timeActivityToUpdate.EmployeeId = timeActivity.EmployeeId;
+                timeActivityToUpdate.CustomerId = timeActivity.CustomerId;
+                timeActivityToUpdate.ProductId = timeActivity.ProductId;
+                timeActivityToUpdate.Description = timeActivity.Description;
+                timeActivityToUpdate.TimeZone = timeActivity.TimeZone;
+                timeActivityToUpdate.Date = timeActivity.Date;
+                timeActivityToUpdate.StartTime = timeActivity.StartTime;
+                timeActivityToUpdate.EndTime = timeActivity.EndTime;
+                timeActivityToUpdate.Break = timeActivity.Break;
+                timeActivityToUpdate.HourlyBillingRate = timeActivity.HourlyBillingRate;
+                timeActivityToUpdate.IsBillable = timeActivity.IsBillable;
+
+                timeActivityToUpdate.Updated = DateTime.UtcNow;
+                timeActivityToUpdate.UpdatedById = contextUserId;
 
                 await _db.SaveChangesAsync();
                 return await GetByIdAsync(timeActivity.Id);

@@ -9,7 +9,7 @@ namespace DashAccountingSystemV2.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
 
         [Required]
         public Guid TenantId { get; set; }
@@ -124,5 +124,37 @@ namespace DashAccountingSystemV2.Models
 
         public Guid? UpdatedById { get; set; }
         public ApplicationUser UpdatedBy { get; set; }
+
+        public TimeActivity() { }
+
+        public TimeActivity(TimeActivity source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            Id = source.Id;
+            TenantId = source.TenantId;
+            Tenant = source.Tenant;
+            CustomerId = source.CustomerId;
+            Customer = source.Customer;
+            EmployeeId = source.EmployeeId;
+            Employee = source.Employee;
+            ProductId = source.ProductId;
+            ProductOrService = source.ProductOrService;
+            Date = source.Date;
+            StartTime = source.StartTime;
+            EndTime = source.EndTime;
+            Break = source.Break;
+            TimeZone = source.TimeZone;
+            Description = source.Description;
+            IsBillable = source.IsBillable;
+            HourlyBillingRate = source.HourlyBillingRate;
+            Created = source.Created;
+            CreatedBy = source.CreatedBy;
+            CreatedById = source.CreatedById;
+            Updated = source.Updated;
+            UpdatedBy = source.UpdatedBy;
+            UpdatedById = source.UpdatedById;
+        }
     }
 }
