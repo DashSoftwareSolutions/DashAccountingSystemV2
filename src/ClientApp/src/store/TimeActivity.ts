@@ -781,12 +781,23 @@ export const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStor
             case ActionType.SELECT_EXISTING_TIME_ACTIVITY: {
                 const dirtyTimeActivity = cloneDeep(action.selectedTimeActivity);
 
-                return {
-                    ...state,
-                    dirtyTimeActivity,
-                    existingTimeActivity: action.selectedTimeActivity,
-                    // TODO: Validation state
-                };
+                // Set hourly billing rate formatted as a string
+                dirtyTimeActivity.hourlyBillingRateAsString =
+                    !isNil(dirtyTimeActivity.hourlyBillingRate) ?
+                        formatWithTwoDecimalPlaces(dirtyTimeActivity.hourlyBillingRate.toString()) :
+                        null;
+
+                // Strip seconds and leading zero from break time
+                dirtyTimeActivity.break = !isNil(dirtyTimeActivity.break) ?
+                    dirtyTimeActivity.break.replace(/:00$/, '').replace(/^0/, '') :
+                    null;
+
+                return updateTimeActivityDurationState(
+                    {
+                        ...state,
+                        existingTimeActivity: action.selectedTimeActivity,
+                    },
+                    dirtyTimeActivity);
             }
             /* END: Initialize New/Select Existing Time Activity to View/Manage */
 
