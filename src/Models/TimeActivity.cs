@@ -125,6 +125,9 @@ namespace DashAccountingSystemV2.Models
         public Guid? UpdatedById { get; set; }
         public ApplicationUser UpdatedBy { get; set; }
 
+        public Guid? InvoiceLineItemId { get; set; }
+        public InvoiceLineItem InvoiceLineItem { get; private set; }
+
         public TimeActivity() { }
 
         public TimeActivity(TimeActivity source)

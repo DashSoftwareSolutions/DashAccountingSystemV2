@@ -81,11 +81,21 @@ namespace DashAccountingSystemV2.Data
 
         public DbSet<Customer> Customer { get; set; }
 
+        public DbSet<Product> Product { get; set; }
+
         public DbSet<ProductCategory> ProductCategory { get; set; }
 
         public DbSet<TimeActivity> TimeActivity { get; set; }
 
-        public DbSet<Product> Product { get; set; }
+        public DbSet<InvoiceTerms> InvoiceTerms { get; set; }
+
+        public DbSet<Invoice> Invoice { get; set; }
+
+        public DbSet<InvoiceLineItem> InvoiceLineItem { get; set; }
+
+        public DbSet<PaymentMethod> PaymentMethod { get; set; }
+
+        public DbSet<Payment> Payment { get; set; }
         #endregion Employee Time Tracking / Sales & Invoicing
 
         #endregion Main Application Schema
@@ -334,6 +344,66 @@ namespace DashAccountingSystemV2.Data
             builder.Entity<TimeActivity>()
                 .HasIndex(t => new { t.TenantId, t.EmployeeId, t.CustomerId, t.Date });
 
+            builder.Entity<InvoiceTerms>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<InvoiceTerms>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<InvoiceTerms>()
+                .HasIndex(it => it.TenantId)
+                .HasFilter($"\"{nameof(Models.InvoiceTerms.TenantId)}\" IS NOT NULL");
+
+            builder.Entity<Invoice>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Invoice>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Invoice>()
+                .HasIndex(i => new { i.TenantId, i.CustomerId });
+
+            builder.Entity<InvoiceLineItem>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<InvoiceLineItem>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<InvoiceLineItem>()
+                .HasIndex(ili => ili.InvoiceId);
+
+            builder.Entity<Payment>()
+                .Property("Id")
+                .HasColumnType("UUID")
+                .HasDefaultValueSql(GENERATE_GUID)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Payment>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Payment>()
+                .HasIndex(p => new { p.TenantId, p.CustomerId });
             #endregion Employee Time Tracking / Sales & Invoicing
         }
 
