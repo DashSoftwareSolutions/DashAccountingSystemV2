@@ -6,7 +6,9 @@ DECLARE
     ACCOUNT_TYPE_REVENUE INTEGER;
     ACCOUNT_TYPE_EXPENSE INTEGER;
 BEGIN
+    -- =======================================================================
     -- Account Types
+    -- =======================================================================
     INSERT INTO "AccountType" ( "Name" )
     SELECT acct_type_name
     FROM UNNEST ( ARRAY [
@@ -24,8 +26,10 @@ BEGIN
     ACCOUNT_TYPE_REVENUE := (SELECT "Id" FROM "AccountType" WHERE LOWER("Name") = LOWER('Revenue'));
     ACCOUNT_TYPE_EXPENSE := (SELECT "Id" FROM "AccountType" WHERE LOWER("Name") = LOWER('Expense'));
 
-    -- Account Sub Types
-        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_sub_type_row_type') THEN
+    -- =======================================================================
+    -- BEGIN: Account Sub Types
+    -- =======================================================================
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_sub_type_row_type') THEN
         CREATE TYPE account_sub_type_row_type AS (
             "Name" VARCHAR(255),
             "AccountTypeId" INTEGER
@@ -59,6 +63,16 @@ BEGIN
     ]::account_sub_type_row_type[] ) the_new_account_sub_type
     WHERE NOT EXISTS ( SELECT 1 FROM "AccountSubType" WHERE LOWER("Name") = LOWER(the_new_account_sub_type."Name") );
 
+    IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_sub_type_row_type') THEN
+        DROP TYPE account_sub_type_row_type;
+    END IF;
+    -- =======================================================================
+    -- END: Account Sub Types
+    -- =======================================================================
+
+    -- =======================================================================
+    -- BEGIN: Asset Types
+    -- =======================================================================
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_type_row_type') THEN
         CREATE TYPE asset_type_row_type AS (
             "Name" VARCHAR(255),
@@ -67,7 +81,6 @@ BEGIN
         );
     END IF;
 
-    -- Asset Types
     INSERT INTO "AssetType" ( "Name", "Description", "Symbol" )
     SELECT "Name", "Description", "Symbol"
     FROM UNNEST ( ARRAY [
@@ -84,5 +97,8 @@ BEGIN
     IF EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asset_type_row_type') THEN
         DROP TYPE asset_type_row_type;
     END IF;
+    -- =======================================================================
+    -- END: Asset Types
+    -- =======================================================================
 END
 $$ LANGUAGE plpgsql;
