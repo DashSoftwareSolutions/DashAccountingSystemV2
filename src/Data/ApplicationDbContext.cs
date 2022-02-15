@@ -360,6 +360,16 @@ namespace DashAccountingSystemV2.Data
                 .HasIndex(it => it.TenantId)
                 .HasFilter($"\"{nameof(Models.InvoiceTerms.TenantId)}\" IS NOT NULL");
 
+            builder.Entity<InvoiceTerms>()
+                .HasIndex(it => it.Name)
+                .HasFilter($"\"{nameof(Models.InvoiceTerms.TenantId)}\" IS NULL")
+                .IsUnique();
+
+            builder.Entity<InvoiceTerms>()
+                .HasIndex(it => new { it.Name, it.TenantId })
+                .HasFilter($"\"{nameof(Models.InvoiceTerms.TenantId)}\" IS NOT NULL")
+                .IsUnique();
+
             builder.Entity<Invoice>()
                 .Property("Id")
                 .HasColumnType("UUID")

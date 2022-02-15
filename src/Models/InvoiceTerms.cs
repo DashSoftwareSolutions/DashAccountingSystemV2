@@ -11,6 +11,7 @@ namespace DashAccountingSystemV2.Models
         public Guid Id { get; private set; }
 
         public Guid? TenantId { get; set; }
+        public Tenant Tenant { get; private set; }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(256)]
