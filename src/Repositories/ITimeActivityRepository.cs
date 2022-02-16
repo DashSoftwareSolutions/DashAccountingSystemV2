@@ -9,7 +9,7 @@ namespace DashAccountingSystemV2.Repositories
     {
         Task<TimeActivity> GetByIdAsync(Guid timeActivityId);
 
-        Task<IEnumerable<TimeActivity>> GetFiltered(
+        Task<IEnumerable<TimeActivity>> GetFilteredAsync(
             Guid tenantId,
             DateTime dateRangeStart,
             DateTime dateRangeEnd,

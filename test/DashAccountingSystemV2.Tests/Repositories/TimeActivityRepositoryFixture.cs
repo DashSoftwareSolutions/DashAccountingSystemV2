@@ -52,7 +52,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 // Also quick test for GetFiltered()
                 // TODO: A more robust test where we make lots of time entries and exercise the filter options
-                var retrived = await subjectUnderTest.GetFiltered(
+                var retrived = await subjectUnderTest.GetFilteredAsync(
                     _tenantId,
                     new DateTime(2021, 7, 14),
                     new DateTime(2021, 7, 14));

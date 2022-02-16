@@ -62,7 +62,7 @@ namespace DashAccountingSystemV2.BusinessLogic
                 parsedIncludedEmployeeIds = employees?.Select(e => e.EntityId);
             }
 
-            var timeActivities = await _timeActivityRespository.GetFiltered(
+            var timeActivities = await _timeActivityRespository.GetFilteredAsync(
                 tenantId,
                 dateRangeStart,
                 dateRangeEnd,

@@ -44,7 +44,7 @@ namespace DashAccountingSystemV2.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<TimeActivity>> GetFiltered(
+        public async Task<IEnumerable<TimeActivity>> GetFilteredAsync(
             Guid tenantId,
             DateTime dateRangeStart,
             DateTime dateRangeEnd,
