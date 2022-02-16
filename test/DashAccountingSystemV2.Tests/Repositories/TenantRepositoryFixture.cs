@@ -63,21 +63,21 @@ namespace DashAccountingSystemV2.Tests.Repositories
             return new TenantRepository(appDbContext);
         }
 
-        private void Initialize()
+        private async Task Initialize()
         {
             var connString = TestUtilities.GetConnectionString();
             _tenantName = $"Unit Testing {Guid.NewGuid()}, Inc.";
 
             using (var connection = new NpgsqlConnection(connString))
             {
-                _tenantId = connection.QueryFirstOrDefault<Guid>($@"
+                _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
                     INSERT INTO ""Tenant"" ( ""Name"" )
                     VALUES ( '{_tenantName}' )
                     RETURNING ""Id"";");
             }
         }
 
-        private void Cleanup()
+        private async Task Cleanup()
         {
             var connString = TestUtilities.GetConnectionString();
 
@@ -85,7 +85,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
             {
                 var parameters = new { _tenantId };
 
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
                     DELETE FROM ""Tenant"" WHERE ""Id"" = @_tenantId;",
                     parameters);
             }

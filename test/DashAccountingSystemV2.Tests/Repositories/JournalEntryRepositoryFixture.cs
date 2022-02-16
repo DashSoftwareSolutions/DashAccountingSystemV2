@@ -543,25 +543,25 @@ namespace DashAccountingSystemV2.Tests.Repositories
             return savedAccount;
         }
 
-        private void Initialize()
+        private async Task Initialize()
         {
             var connString = TestUtilities.GetConnectionString();
 
             using (var connection = new NpgsqlConnection(connString))
             {
                 // Make a Tenant
-                _tenantId = connection.QueryFirstOrDefault<Guid>($@"
+                _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
                     INSERT INTO ""Tenant"" ( ""Name"" )
                     VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
                     RETURNING ""Id"";");
 
                 // Get a User to use
-                _userId = connection.QueryFirstOrDefault<Guid>(@"
+                _userId = await connection.QueryFirstOrDefaultAsync<Guid>(@"
                     SELECT ""Id"" FROM ""AspNetUsers"" ORDER BY ""LastName"", ""FirstName"" LIMIT 1;");
             }
         }
 
-        private void Cleanup()
+        private async Task Cleanup()
         {
             var connString = TestUtilities.GetConnectionString();
 
@@ -569,19 +569,19 @@ namespace DashAccountingSystemV2.Tests.Repositories
             {
                 var parameters = new { _tenantId };
 
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
                     DELETE FROM ""JournalEntryAccount"" WHERE ""JournalEntryId"" IN ( SELECT ""Id"" FROM ""JournalEntry"" WHERE ""TenantId"" = @_tenantId );",
                     parameters);
 
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
                     DELETE FROM ""JournalEntry"" WHERE ""TenantId"" = @_tenantId;",
                     parameters);
 
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
                     DELETE FROM ""Account"" WHERE ""TenantId"" = @_tenantId;",
                     parameters);
 
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
                     DELETE FROM ""Tenant"" WHERE ""Id"" = @_tenantId;",
                     parameters);
             }
