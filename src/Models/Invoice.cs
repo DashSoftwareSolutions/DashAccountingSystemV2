@@ -48,11 +48,18 @@ namespace DashAccountingSystemV2.Models
 
         public ICollection<InvoiceLineItem> LineItems { get; set; } = new List<InvoiceLineItem>();
 
+        private decimal? _total;
+
+        [NotMapped]
         public decimal Total
         {
             get
             {
-                return LineItems?.Sum(li => li.Total) ?? 0.0m;
+                return _total ?? LineItems?.Sum(li => li.Total) ?? 0.0m;
+            }
+            set
+            {
+                _total = value;
             }
         }
 

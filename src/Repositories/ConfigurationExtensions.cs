@@ -16,7 +16,8 @@ namespace DashAccountingSystemV2.Repositories
                 .AddScoped<IEmployeeRepository, EmployeeRepository>()
                 .AddScoped<IProductRepository, ProductRepository>()
                 .AddScoped<ITimeActivityRepository, TimeActivityRepository>()
-                .AddScoped<IInvoiceTermsRepository, InvoiceTermsRepository>();
+                .AddScoped<IInvoiceTermsRepository, InvoiceTermsRepository>()
+                .AddScoped<IInvoiceRepository, InvoiceRepository>();
 
             return services;
         }
