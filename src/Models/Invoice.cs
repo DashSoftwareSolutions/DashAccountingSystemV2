@@ -28,7 +28,7 @@ namespace DashAccountingSystemV2.Models
 
         [EmailAddress]
         [MaxLength(256)]
-        public string CustomrEmail { get; set; }
+        public string CustomerEmail { get; set; }
 
         [MaxLength(2048)]
         public string CustomerAddress { get; set; }
