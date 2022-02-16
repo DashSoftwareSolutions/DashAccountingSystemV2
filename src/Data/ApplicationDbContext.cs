@@ -385,6 +385,10 @@ namespace DashAccountingSystemV2.Data
             builder.Entity<Invoice>()
                 .HasIndex(i => new { i.TenantId, i.CustomerId });
 
+            builder.Entity<Invoice>()
+                .HasIndex(i => new { i.TenantId, i.InvoiceNumber })
+                .IsUnique();
+
             builder.Entity<InvoiceLineItem>()
                 .Property("Id")
                 .HasColumnType("UUID")
