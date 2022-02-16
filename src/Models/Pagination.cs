@@ -3,37 +3,8 @@ using System.Linq;
 
 namespace DashAccountingSystemV2.Models
 {
-    public class Pagination
+    public class Pagination : PaginationBase
     {
-        #region - Pagination -
-
-        /// <summary>
-        /// Current page of paged record sets
-        /// </summary>
-        public int? PageNumber { get; set; }
-
-        /// <summary>
-        /// Size of paged record sets
-        /// </summary>
-        public int? PageSize { get; set; }
-
-        /// <summary>
-        /// Count of how many records
-        /// </summary>
-        public int RecordCount { get; set; }
-
-        /// <summary>
-        /// Number of total pages
-        /// </summary>
-        public int? PageCount { get; set; }
-
-        /// <summary>
-        /// Flag indicating whether more records are available to caller when paging
-        /// </summary>
-        public bool ContainsMoreRecords { get; set; } = false;
-
-        #endregion - Pagination -
-
         #region - Sorting -
 
         /// <summary>

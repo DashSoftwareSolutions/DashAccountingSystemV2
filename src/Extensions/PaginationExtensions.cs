@@ -20,20 +20,17 @@ namespace DashAccountingSystemV2.Extensions
         {
             var result = new PagedResult<TData>();
             result.Pagination = pagination;
-            result.Pagination.RecordCount = query.Count();
+
+            var totalNumResults = query.Count();
+            result.Total = totalNumResults;
 
             // If pageNumber is null, default to the first page
             var pageNumber = pagination.PageNumber.HasValue ? (pagination.PageNumber.Value > 0 ? pagination.PageNumber.Value : 1) : 1;
             pagination.PageNumber = pageNumber;
 
             // If pageSize is null, default to the record count
-            var pageSize = pagination.PageSize.HasValue ? (pagination.PageSize.Value > 0 ? pagination.PageSize.Value : result.Pagination.RecordCount) : result.Pagination.RecordCount;
+            var pageSize = pagination.PageSize.HasValue ? (pagination.PageSize.Value > 0 ? pagination.PageSize.Value : totalNumResults) : totalNumResults;
             pagination.PageSize = pageSize;
-
-            var pageCount = (double)result.Pagination.RecordCount / pageSize;
-            result.Pagination.PageCount = (int)Math.Ceiling(pageCount);
-
-            result.Pagination.ContainsMoreRecords = pagination.RecordCount > (pageNumber * pageSize);
 
             var skip = (pageNumber - 1) * pageSize;
             result.Results = query.Skip(skip).Take(pageSize).ToList();
@@ -46,20 +43,17 @@ namespace DashAccountingSystemV2.Extensions
         {
             var result = new PagedResult<TData>();
             result.Pagination = pagination;
-            result.Pagination.RecordCount = await query.CountAsync();
+
+            var totalNumResults = await query.CountAsync();
+            result.Total = totalNumResults;
 
             // If pageNumber is null, default to the first page
             var pageNumber = pagination.PageNumber.HasValue ? (pagination.PageNumber.Value > 0 ? pagination.PageNumber.Value : 1) : 1;
             pagination.PageNumber = pageNumber;
 
             // If pageSize is null, default to the record count
-            var pageSize = pagination.PageSize.HasValue ? (pagination.PageSize.Value > 0 ? pagination.PageSize.Value : result.Pagination.RecordCount) : result.Pagination.RecordCount;
+            var pageSize = pagination.PageSize.HasValue ? (pagination.PageSize.Value > 0 ? pagination.PageSize.Value : totalNumResults) : totalNumResults;
             pagination.PageSize = pageSize;
-
-            var pageCount = (double)result.Pagination.RecordCount / pageSize;
-            result.Pagination.PageCount = (int)Math.Ceiling(pageCount);
-
-            result.Pagination.ContainsMoreRecords = pagination.RecordCount > (pageNumber * pageSize);
 
             var skip = (pageNumber - 1) * pageSize;
             result.Results = await query.Skip(skip).Take(pageSize).ToListAsync();
