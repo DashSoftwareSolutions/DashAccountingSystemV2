@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,6 +22,8 @@ namespace DashAccountingSystemV2.Models
         // Navigation Properties
         public ICollection<Account> Accounts { get; } = new List<Account>();
         public ICollection<JournalEntry> JournalEntries { get; } = new List<JournalEntry>();
+
+        public Tenant() { }
 
         public Tenant(string name)
         {

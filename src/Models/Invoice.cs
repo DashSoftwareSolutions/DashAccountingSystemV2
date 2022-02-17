@@ -14,7 +14,7 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         public Guid TenantId { get; set; }
-        public Tenant Tenant { get; private set; }
+        public Tenant Tenant { get; set; }
 
         [Required]
         public uint InvoiceNumber { get; set; }
@@ -24,7 +24,7 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         public Guid CustomerId { get; set; }
-        public Customer Customer { get; private set; }
+        public Customer Customer { get; set; }
 
         [EmailAddress]
         [MaxLength(256)]
@@ -35,7 +35,7 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         public Guid InvoiceTermsId { get; set; }
-        public InvoiceTerms InvoiceTerms { get; private set; }
+        public InvoiceTerms InvoiceTerms { get; set; }
 
         [Required]
         public DateTime IssueDate { get; set; }

@@ -24,9 +24,21 @@ namespace DashAccountingSystemV2.Repositories
 
         Task<uint> GetNextInvoiceNumberAsync(Guid tenantId);
 
-        Task<Invoice> InsertAsync(Invoice invoice);
+        Task<Invoice> CreateInvoiceAsync(Invoice invoice);
 
-        Task<Invoice> UpdateAsync(Invoice invoice, Guid contextUserId);
+        Task<Invoice> UpdateCompleteInvoiceAsync(Invoice invoice, Guid contextUserId);
+
+        Task<Invoice> UpdateInvoiceStatusAsync(
+            Guid tenantId,
+            uint invoiceNumber,
+            InvoiceStatus newStatus,
+            Guid contextUserId);
+
+        Task<Invoice> MarkInvoicePaidAsync(
+            Guid tenantId,
+            uint invoiceNumber,
+            Guid paymentId,
+            Guid contextUserId);
 
         Task DeleteAsync(Guid invoiceId, Guid contextUserId);
     }
