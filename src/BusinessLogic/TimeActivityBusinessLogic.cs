@@ -90,6 +90,10 @@ namespace DashAccountingSystemV2.BusinessLogic
                 return new BusinessLogicResponse<TimeActivity>(ErrorType.RequestNotValid, "Tenant not found");
             }
 
+            // TODO: Check that user has access to this tenant and permission to create the requested time activity
+            // NOTE: Creating a time activity for someone else might require a different permission than
+            // creating a time activity for yourself.
+
             try
             {
                 var savedTimeActivity = await _timeActivityRespository.InsertAsync(timeActivity);
