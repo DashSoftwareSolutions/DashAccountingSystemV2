@@ -404,6 +404,17 @@ namespace DashAccountingSystemV2.Data
             builder.Entity<InvoiceLineItem>()
                 .HasIndex(ili => ili.InvoiceId);
 
+            builder.Entity<InvoiceLineItemTimeActivity>()
+                .HasKey(entity => new { entity.InvoiceLineItemId, entity.TimeActivityId });
+
+            builder.Entity<InvoiceLineItemTimeActivity>()
+                .HasIndex(entity => entity.InvoiceLineItemId)
+                .IsUnique();
+
+            builder.Entity<InvoiceLineItemTimeActivity>()
+                .HasIndex(entity => entity.TimeActivityId)
+                .IsUnique();
+
             builder.Entity<Payment>()
                 .Property("Id")
                 .HasColumnType("UUID")

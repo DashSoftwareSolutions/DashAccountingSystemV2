@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -51,5 +53,22 @@ namespace DashAccountingSystemV2.Models
 
         public Guid? UpdatedById { get; set; }
         public ApplicationUser UpdatedBy { get; private set; }
+
+        /// <summary>
+        /// EF Navigation property to the many-to-many intersection between Time Activities and Invoice Line Items.
+        /// While implemented as a many-to-many, each key field individuall is also contrained to be unique, so that
+        /// this functions as a non-mandatory one-to-one.
+        /// </summary>
+        public ICollection<InvoiceLineItemTimeActivity> TimeActivities { get; set; }
+
+        /// <summary>
+        /// Gets the ID of the single corresponding Time Activity, if any
+        /// </summary>
+        public Guid? TimeActivityId => TimeActivities?.SingleOrDefault()?.TimeActivityId;
+
+        /// <summary>
+        /// Navigation property to the single corresponding Time Activity, if any
+        /// </summary>
+        public TimeActivity TimeActivity => TimeActivities?.SingleOrDefault()?.TimeActivity;
     }
 }

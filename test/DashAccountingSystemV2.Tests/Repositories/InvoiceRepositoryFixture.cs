@@ -168,6 +168,13 @@ namespace DashAccountingSystemV2.Tests.Repositories
                             Total = _timeActivity1.TotalBillableAmount,
                             AssetTypeId = assetTypeUSD.Id,
                             CreatedById = _userId,
+                            TimeActivities = new InvoiceLineItemTimeActivity[]
+                            {
+                                new InvoiceLineItemTimeActivity()
+                                {
+                                    TimeActivityId = _timeActivity1.Id,
+                                }
+                            }
                         },
                         new InvoiceLineItem()
                         {
@@ -180,6 +187,13 @@ namespace DashAccountingSystemV2.Tests.Repositories
                             Total = _timeActivity2.TotalBillableAmount,
                             AssetTypeId = assetTypeUSD.Id,
                             CreatedById = _userId,
+                            TimeActivities = new InvoiceLineItemTimeActivity[]
+                            {
+                                new InvoiceLineItemTimeActivity()
+                                {
+                                    TimeActivityId = _timeActivity2.Id,
+                                }
+                            }
                         },
                         new InvoiceLineItem()
                         {
@@ -192,6 +206,13 @@ namespace DashAccountingSystemV2.Tests.Repositories
                             Total = _timeActivity3.TotalBillableAmount,
                             AssetTypeId = assetTypeUSD.Id,
                             CreatedById = _userId,
+                            TimeActivities = new InvoiceLineItemTimeActivity[]
+                            {
+                                new InvoiceLineItemTimeActivity()
+                                {
+                                    TimeActivityId = _timeActivity3.Id,
+                                }
+                            }
                         },
                 },
             };
