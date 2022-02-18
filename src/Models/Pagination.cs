@@ -8,11 +8,11 @@ namespace DashAccountingSystemV2.Models
         #region - Sorting -
 
         /// <summary>
-        /// Represents the Sort Query. This is a comma	separated value where each value  represents a column/alias
+        /// Represents the Sort specification. This is a comma-separated string value where each item represents a column/alias
         /// to sort by.  To specify sorting by descending order, the value should be prefixed with a "-".
-        /// Otherwise it represents ascending.
+        /// Otherwise it represents an ascending sort.
         /// </summary>
-        public string SortQuery { get; set; }
+        public string SortBy { get; set; }
 
         /// <summary>
         /// Sort Columns that are translated from the SortingQuery
