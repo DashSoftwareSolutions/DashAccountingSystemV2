@@ -7,6 +7,27 @@ namespace DashAccountingSystemV2.Extensions
     public static class IEnumerableExtensions
     {
         /// <summary>
+        /// Intended for use with parameters in Npgsql since it doesn't handle unmaterialized IEnumerables
+        /// </summary>
+        /// <typeparam name="TElement"></typeparam>
+        /// <param name="source"></param>
+        /// <returns>
+        /// null if <paramref name="source"/> is empty; otherwise the value would <em>exclude all records!</em><br/>
+        /// ex: the SQL would end up like: <code>[some_column_you_are_filtering_by] = ANY('{}')</code>
+        /// which will return 0 results!
+        /// </returns>
+        public static TElement[] AsArrayOrNull<TElement>(this IEnumerable<TElement> source)
+        {
+            if (!source.HasAny())
+                return null;
+
+            if (source is TElement[] arraySource)
+                return arraySource;
+
+            return source.ToArray();
+        }
+
+        /// <summary>
         /// Creates enumerable from parameters
         /// </summary>
         /// <typeparam name="T">Item type</typeparam>

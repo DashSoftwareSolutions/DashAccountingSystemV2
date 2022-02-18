@@ -72,8 +72,6 @@ namespace DashAccountingSystemV2.Controllers
             if (!viewModel.Validate(ModelState))
                 return Task.FromResult(this.ErrorResponse(ModelState));
 
-            var inboundAccounts = viewModel.Accounts.ToList();
-
             var contextUserId = User.GetUserId();
             var entryWithUpdates = JournalEntryUpdateRequestViewModel.ToModel(viewModel, contextUserId);
             

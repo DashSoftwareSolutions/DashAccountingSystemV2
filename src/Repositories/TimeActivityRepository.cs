@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
 using DashAccountingSystemV2.Data;
+using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.Repositories
@@ -146,8 +147,8 @@ ORDER BY c.""DisplayName""
                             tenantId,
                             dateRangeStart,
                             dateRangeEnd,
-                            includeCustomers = includeCustomers.AsList(),
-                            includeEmployees = includeEmployees.AsList(),
+                            includeCustomers = includeCustomers.AsArrayOrNull(),
+                            includeEmployees = includeEmployees.AsArrayOrNull(),
                         },
                         splitOn: "time_activity_id,customer_id,employee_id,product_id,product_category_id,created_by_id,updated_by_id");
             }

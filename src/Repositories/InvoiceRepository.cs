@@ -236,7 +236,7 @@ ORDER BY inv.""IssueDate"" DESC
                     tenantId,
                     dateRangeStart,
                     dateRangeEnd,
-                    includeCustomers,
+                    includeCustomers = includeCustomers.AsArrayOrNull(),
                     offset = pagination.Offset,
                     limit = pagination.Limit,
                 };

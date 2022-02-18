@@ -93,39 +93,51 @@ namespace DashAccountingSystemV2.Extensions
         private static readonly Regex s_passwordClausePattern =
             new Regex("password\\s*=\\s*([^,;]*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public static IEnumerable<TEnum> ParseCommaSeparatedEnumValues<TEnum>(this string str) where TEnum : struct
+        public static IEnumerable<TEnum> ParseCommaSeparatedEnumValues<TEnum>(this string commaSeparatedEnumList) where TEnum : struct
         {
-            if (string.IsNullOrWhiteSpace(str)) return Enumerable.Empty<TEnum>();
+            if (string.IsNullOrWhiteSpace(commaSeparatedEnumList))
+                return null;
 
-            return str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                      .Select(s =>
-                      {
-                          if (Enum.TryParse<TEnum>(s, out var res))
-                              return (parsed: true, value: res);
-                          return (parsed: false, value: res);
-                      })
-                      .Where(s => s.parsed)
-                      .Select(s => s.value)
-                      .ToList();
+            return commaSeparatedEnumList
+                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(s =>
+                {
+                    if (Enum.TryParse<TEnum>(s, out var res))
+                        return (Parsed: true, Value: res);
+
+                    return (Parsed: false, Value: res);
+                })
+                .Where(s => s.Parsed)
+                .Select(s => s.Value);
         }
 
-        public static IEnumerable<uint> ParseCommaSeparatedIds(this string str)
+        public static IEnumerable<Guid> ParseCommaSeparatedGuids(this string commaSeparatedGuidList)
         {
-            if (string.IsNullOrWhiteSpace(str)) return Enumerable.Empty<uint>();
+            if (string.IsNullOrWhiteSpace(commaSeparatedGuidList))
+                return null;
 
-            return str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                      .Select(s =>
-                      {
-                          return uint.TryParse(s, out uint parsed) ? parsed : (uint?)null;
-                      })
-                      .Where(id => id.HasValue)
-                      .Select(id => id.Value)
-                      .ToList();
+            return commaSeparatedGuidList
+                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(s => Guid.TryParse(s, out Guid parsed) ? parsed : (Guid?)null)
+                .Where(theGuid => theGuid.HasValue)
+                .Select(theGuid => theGuid.Value);
         }
 
-        public static IEnumerable<uint> ParseCommaSeparatedIds(this IEnumerable<string> commaSeparatedIdList)
+        public static IEnumerable<uint> ParseCommaSeparatedIntegers(this string commaSeparatedIntegerList)
         {
-            return string.Join(",", commaSeparatedIdList ?? Enumerable.Empty<string>()).ParseCommaSeparatedIds();
+            if (string.IsNullOrWhiteSpace(commaSeparatedIntegerList))
+                return null;
+
+            return commaSeparatedIntegerList
+                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(s => uint.TryParse(s, out uint parsed) ? parsed : (uint?)null)
+                .Where(theInt => theInt.HasValue)
+                .Select(theInt => theInt.Value);
+        }
+
+        public static IEnumerable<uint> ParseCommaSeparatedIntegers(this IEnumerable<string> commaSeparatedIntegerLists)
+        {
+            return string.Join(",", commaSeparatedIntegerLists ?? Enumerable.Empty<string>()).ParseCommaSeparatedIntegers();
         }
 
         /// <summary>

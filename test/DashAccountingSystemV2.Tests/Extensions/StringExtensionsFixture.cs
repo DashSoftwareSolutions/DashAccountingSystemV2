@@ -45,14 +45,14 @@ namespace DashAccountingSystemV2.Tests.Extensions
         }
 
         [Fact]
-        public void ParseCommaSeparatedIds_Ok()
+        public void ParseCommaSeparatedIntegers_Ok()
         {
             string input = null;
-            var results = input.ParseCommaSeparatedIds();
-            Assert.Empty(results);
+            var results = input.ParseCommaSeparatedIntegers();
+            Assert.Null(results);
 
             input = "1,3,5,7,9,11, 13, 15,  19";
-            results = input.ParseCommaSeparatedIds();
+            results = input.ParseCommaSeparatedIntegers();
             Assert.Equal(9, results.Count());
             var expectedValues = new uint[] { 1, 3, 5, 7, 9, 11, 13, 15, 19 };
 
@@ -61,28 +61,28 @@ namespace DashAccountingSystemV2.Tests.Extensions
         }
 
         [Fact]
-        public void ParseListOfCommaSeparatedIds_Ok()
+        public void ParseListOfCommaSeparatedIntegers_Ok()
         {
             // Case 1: Input is NULL
             List<string> input = null;
-            var results = input.ParseCommaSeparatedIds();
-            Assert.Empty(results);
+            var results = input.ParseCommaSeparatedIntegers();
+            Assert.Null(results);
 
             // Case 2: Input is Empty
             input = new List<string>();
-            results = input.ParseCommaSeparatedIds();
-            Assert.Empty(results);
+            results = input.ParseCommaSeparatedIntegers();
+            Assert.Null(results);
 
             // Case 3: Input does not contain valid integers
             input.Add("Bad");
             input.Add("Not a Number");
-            results = input.ParseCommaSeparatedIds();
+            results = input.ParseCommaSeparatedIntegers();
             Assert.Empty(results);
 
             // Case 4: Some valid integers which we find
             input.Add("42");
             input.Add("777");
-            results = input.ParseCommaSeparatedIds();
+            results = input.ParseCommaSeparatedIntegers();
             Assert.Equal(2, results.Count());
             Assert.Contains((uint)42, results);
             Assert.Contains((uint)777, results);

@@ -86,14 +86,14 @@ namespace DashAccountingSystemV2.Controllers
                 return Task.FromResult(this.ErrorResponse("dateRangeEnd was not a valid date/time value"));
 
             var parsedCustomerIds = customers.ParseCommaSeparatedValues();
-            var parsedEmployeeIds = employees.ParseCommaSeparatedIds();
+            var parsedEmployeeIds = employees.ParseCommaSeparatedIntegers();
 
             var bizLogicResponse = _timeActivityBusinessLogic.GetTimeActivitiesDetailReportData(
                 tenantId,
                 dateRangeStart: parsedDateRangeStart.Value,
                 dateRangeEnd: parsedDateRangeEnd.Value,
-                includeCustomers: !parsedCustomerIds.HasAny() ? null : parsedCustomerIds,
-                includeEmployees: !parsedEmployeeIds.HasAny() ? null : parsedEmployeeIds);
+                includeCustomers: parsedCustomerIds,
+                includeEmployees: parsedEmployeeIds);
 
             return this.Result(bizLogicResponse, TimeActivitiesReportResponseViewModel.FromModel);
         }
