@@ -332,7 +332,7 @@ ORDER BY inv.""IssueDate"" DESC
                     invoiceToUpdate.Message = invoice.Message;
                     invoiceToUpdate.Updated = DateTime.UtcNow;
                     invoiceToUpdate.UpdatedById = contextUserId;
-                    invoiceToUpdate.LineItems = invoice.LineItems;
+                    invoiceToUpdate.LineItems = invoice.LineItems; // TODO: Might need more specific logic here, to handle audit properties!
 
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
