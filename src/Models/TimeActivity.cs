@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NodaTime;
@@ -124,9 +124,6 @@ namespace DashAccountingSystemV2.Models
 
         public Guid? UpdatedById { get; set; }
         public ApplicationUser UpdatedBy { get; set; }
-
-        public Guid? InvoiceLineItemId { get; set; }
-        public InvoiceLineItem InvoiceLineItem { get; private set; }
 
         public TimeActivity() { }
 
