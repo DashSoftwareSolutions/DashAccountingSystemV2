@@ -19,6 +19,6 @@
         /// Some code requires DefaultPageSize == int.MaxValue (via Pagination.Default)
         /// So changing default size can lead to unpredictable results
         /// </remarks>
-        public const int DefaultPageSize = int.MaxValue;
+        internal const int DefaultPageSize = int.MaxValue;
     }
 }
