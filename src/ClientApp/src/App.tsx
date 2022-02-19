@@ -3,11 +3,13 @@ import { Route } from 'react-router';
 import Layout from './components/Layout';
 import AboutPage from './components/AboutPage';
 import AccountDetailsPage from './components/AccountDetailsPage';
+import AddInvoicePage from './components/AddInvoicePage';
 import AddJournalEntryPage from './components/AddJournalEntryPage';
 import BalanceSheetPage from './components/BalanceSheetPage';
 import ChartOfAccountsPage from './components/ChartOfAccountsPage';
 import DashboardPage from './components/DashboardPage';
 import EditJournalEntryPage from './components/EditJournalEntryPage';
+import InvoiceListPage from './components/InvoiceListPage';
 import LedgerPage from './components/LedgerPage';
 import ProfitAndLossPage from './components/ProfitAndLossPage';
 import SelectTenant from './components/SelectTenant';
@@ -33,6 +35,8 @@ export default () => (
         <AuthorizeRoute path='/ledger' component={LedgerPage} />
         <AuthorizeRoute path='/profit-and-loss' component={ProfitAndLossPage} />
         <AuthorizeRoute path='/time-tracking' component={TimeActivityReportDetailsPage} />
+        <AuthorizeRoute path='/invoicing' component={InvoiceListPage} />
+        <AuthorizeRoute path='/invoice/new' component={AddInvoicePage} />
         <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes} />
     </Layout>
 );

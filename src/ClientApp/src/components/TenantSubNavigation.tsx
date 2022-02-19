@@ -9,6 +9,7 @@ export enum NavigationSection {
     BalanceSheet,
     ProfitAndLoss,
     TimeTracking,
+    Invoicing,
 };
 
 interface TenantSubNavigationProps {
@@ -34,6 +35,9 @@ const TenantSubNavigation: React.FC<TenantSubNavigationProps> = ({ activeSection
         </NavItem>
         <NavItem>
             <NavLink active={activeSection === NavigationSection.TimeTracking} tag={Link} to="/time-tracking">Time Tracking</NavLink>
+        </NavItem>
+        <NavItem>
+            <NavLink active={activeSection === NavigationSection.Invoicing} tag={Link} to="/invoicing">Invoicing</NavLink>
         </NavItem>
     </Nav>
 );
