@@ -78,6 +78,30 @@ namespace DashAccountingSystemV2.BusinessLogic
                 });
         }
 
+        public async Task<BusinessLogicResponse<IEnumerable<TimeActivity>>> GetUnbilledTimeActivitiesForInvoicing(
+            Guid tenantId,
+            string customerNumber,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd)
+        {
+            var customers = await _customerRepository.GetByTenantIdAsync(tenantId, customerNumbers: new string[] { customerNumber });
+            var customer = customers.FirstOrDefault();
+
+            if (customer == null)
+            {
+                return new BusinessLogicResponse<IEnumerable<TimeActivity>>(ErrorType.RequestNotValid, $"Customer with Customer ID '{customerNumber}' does not exist.");
+            }
+
+            // TODO: Check that user has access to this tenant and permission for the requested time activities data
+
+            var unbilledTimeActivities = await _timeActivityRespository.GetUnbilledItemsForInvoicingAsync(
+                customer.EntityId,
+                dateRangeStart,
+                dateRangeEnd);
+
+            return new BusinessLogicResponse<IEnumerable<TimeActivity>>(unbilledTimeActivities);
+        }
+
         public async Task<BusinessLogicResponse<TimeActivity>> CreateTimeActivity(TimeActivity timeActivity)
         {
             if (timeActivity == null)

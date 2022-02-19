@@ -23,6 +23,12 @@ namespace DashAccountingSystemV2.BusinessLogic
             IEnumerable<string> includeCustomers = null,
             IEnumerable<uint> includeEmployees = null);
 
+        Task<BusinessLogicResponse<IEnumerable<TimeActivity>>> GetUnbilledTimeActivitiesForInvoicing(
+            Guid tenantId,
+            string customerNumber,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd);
+
         Task<BusinessLogicResponse<TimeActivity>> CreateTimeActivity(TimeActivity timeActivity);
 
         Task<BusinessLogicResponse<TimeActivity>> UpdateTimeActivity(TimeActivity timeActivity, Guid contextUserId);
