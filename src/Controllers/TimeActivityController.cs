@@ -24,7 +24,7 @@ namespace DashAccountingSystemV2.Controllers
         public Task<IActionResult> CreateTimeActivity([FromBody] TimeActivityCreateRequestViewModel viewModel)
         {
             if (viewModel == null)
-                return Task.FromResult(this.ErrorResponse("Invalid POST body"));
+                return Task.FromResult(this.ErrorResponse("Invalid POST body."));
 
             if (!ModelState.IsValid)
                 return Task.FromResult(this.ErrorResponse(ModelState));
@@ -43,10 +43,10 @@ namespace DashAccountingSystemV2.Controllers
             [FromBody] TimeActivityUpdateRequestViewModel viewModel)
         {
             if (viewModel == null)
-                return Task.FromResult(this.ErrorResponse("Invalid PUT body"));
+                return Task.FromResult(this.ErrorResponse("Invalid PUT body."));
 
             if (timeActivityId != viewModel.Id)
-                return Task.FromResult(this.ErrorResponse("The ID in the PUT body does not match the ID in the URL"));
+                return Task.FromResult(this.ErrorResponse("The ID in the PUT body does not match the ID in the URL."));
 
             if (!ModelState.IsValid)
                 return Task.FromResult(this.ErrorResponse(ModelState));
@@ -78,12 +78,12 @@ namespace DashAccountingSystemV2.Controllers
             var parsedDateRangeStart = dateRangeStart.TryParseAsDateTime();
 
             if (!parsedDateRangeStart.HasValue)
-                return Task.FromResult(this.ErrorResponse("dateRangeStart was not a valid date/time value"));
+                return Task.FromResult(this.ErrorResponse("dateRangeStart was not a valid date/time value."));
 
             var parsedDateRangeEnd = dateRangeEnd.TryParseAsDateTime();
 
             if (!parsedDateRangeEnd.HasValue)
-                return Task.FromResult(this.ErrorResponse("dateRangeEnd was not a valid date/time value"));
+                return Task.FromResult(this.ErrorResponse("dateRangeEnd was not a valid date/time value."));
 
             var parsedCustomerIds = customers.ParseCommaSeparatedValues();
             var parsedEmployeeIds = employees.ParseCommaSeparatedIntegers();
@@ -96,6 +96,35 @@ namespace DashAccountingSystemV2.Controllers
                 includeEmployees: parsedEmployeeIds);
 
             return this.Result(bizLogicResponse, TimeActivitiesReportResponseViewModel.FromModel);
+        }
+
+        [HttpGet("{tenantId:guid}/unbilled-time-activities")]
+        public Task<IActionResult> GetTimeActivitiesDetailReport(
+            [FromRoute] Guid tenantId,
+            [FromQuery] string customer,
+            [FromQuery] string dateRangeStart,
+            [FromQuery] string dateRangeEnd)
+        {
+            var parsedDateRangeStart = dateRangeStart.TryParseAsDateTime();
+
+            if (!parsedDateRangeStart.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeStart was not a valid date/time value."));
+
+            var parsedDateRangeEnd = dateRangeEnd.TryParseAsDateTime();
+
+            if (!parsedDateRangeEnd.HasValue)
+                return Task.FromResult(this.ErrorResponse("dateRangeEnd was not a valid date/time value."));
+
+            if (parsedDateRangeStart.Value > parsedDateRangeEnd.Value)
+                return Task.FromResult(this.ErrorResponse("dateRangeStart must be before or the same as dateRangeEnd."));
+
+            return this.Result(
+                _timeActivityBusinessLogic.GetUnbilledTimeActivitiesForInvoicing(
+                    tenantId,
+                    customer,
+                    parsedDateRangeStart.Value,
+                    parsedDateRangeEnd.Value),
+                TimeActivityResponseViewModel.FromModel);
         }
     }
 }
