@@ -53,6 +53,14 @@ namespace DashAccountingSystemV2.Controllers
             return this.Result(bizLogicResponse, InvoiceResponseViewModel.FromModel);
         }
 
+        [HttpGet("{tenantId:guid}/terms")]
+        public Task<IActionResult> GetInvoiceTerms(
+            [FromRoute] Guid tenantId)
+        {
+            var bizLogicResponse = _invoiceBusinessLogic.GetInvoiceTermsChoicesByTenant(tenantId);
+            return this.Result(bizLogicResponse, InvoiceTermsViewModel.FromModel);
+        }
+
         [HttpPost]
         public Task<IActionResult> CreateInvoice([FromBody] InvoiceCreateRequestViewModel viewModel)
         {
@@ -121,6 +129,15 @@ namespace DashAccountingSystemV2.Controllers
                 contextUserId);
 
             return this.Result(bizLogicResponse, InvoiceResponseViewModel.FromModel);
+        }
+
+        [HttpDelete("{tenantId:guid}/{invoiceNumber:long:min(1):max(4294967295)}")]
+        public Task<IActionResult> DeleteDraftInvoice(
+            [FromRoute] Guid tenantId,
+            [FromRoute] uint invoiceNumber)
+        {
+            var contextUserId = User.GetUserId();
+            return this.Result(_invoiceBusinessLogic.DeleteDraftInvoice(tenantId, invoiceNumber, contextUserId));
         }
     }
 }

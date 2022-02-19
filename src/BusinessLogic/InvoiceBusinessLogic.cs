@@ -10,15 +10,18 @@ namespace DashAccountingSystemV2.BusinessLogic
     public class InvoiceBusinessLogic : IInvoiceBusinessLogic
     {
         private readonly IInvoiceRepository _invoiceRepository = null;
+        private readonly IInvoiceTermsRepository _invoiceTermsRepository = null;
         private readonly ITenantRepository _tenantRepository = null;
         private readonly ILogger _logger = null;
 
         public InvoiceBusinessLogic(
             IInvoiceRepository invoiceRepository,
+            IInvoiceTermsRepository invoiceTermsRepository,
             ITenantRepository tenantRepository,
             ILogger<InvoiceBusinessLogic> logger)
         {
             _invoiceRepository = invoiceRepository;
+            _invoiceTermsRepository = invoiceTermsRepository;
             _tenantRepository = tenantRepository;
             _logger = logger;
         }
@@ -77,6 +80,22 @@ namespace DashAccountingSystemV2.BusinessLogic
             // TODO: Check that user has access to this tenant and permission to view the requested invoice
 
             return new BusinessLogicResponse<Invoice>(invoice);
+        }
+
+        public async Task<BusinessLogicResponse<IEnumerable<InvoiceTerms>>> GetInvoiceTermsChoicesByTenant(Guid tenantId)
+        {
+            var tenant = await _tenantRepository.GetTenantAsync(tenantId);
+
+            if (tenant == null)
+            {
+                return new BusinessLogicResponse<IEnumerable<InvoiceTerms>>(ErrorType.RequestNotValid, "Tenant not found");
+            }
+
+            // TODO: Check that user has access to this tenant
+
+            var results = await _invoiceTermsRepository.GetInvoiceTermsChoicesAsync(tenantId);
+
+            return new BusinessLogicResponse<IEnumerable<InvoiceTerms>>(results);
         }
 
         public async Task<BusinessLogicResponse<PagedResult<Invoice>>> GetPagedFilteredInvoices(Guid tenantId, DateTime? dateRangeStart, DateTime? dateRangeEnd, IEnumerable<Guid> includeCustomers, Pagination pagination)

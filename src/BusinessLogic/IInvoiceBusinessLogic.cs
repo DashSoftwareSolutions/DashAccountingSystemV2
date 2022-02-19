@@ -13,6 +13,8 @@ namespace DashAccountingSystemV2.BusinessLogic
 
         Task<BusinessLogicResponse<Invoice>> GetInvoiceByTenantAndInvoiceNumber(Guid tenantId, uint invoiceNumber);
 
+        Task<BusinessLogicResponse<IEnumerable<InvoiceTerms>>> GetInvoiceTermsChoicesByTenant(Guid tenantId);
+
         Task<BusinessLogicResponse<PagedResult<Invoice>>> GetPagedFilteredInvoices(
             Guid tenantId,
             DateTime? dateRangeStart,
