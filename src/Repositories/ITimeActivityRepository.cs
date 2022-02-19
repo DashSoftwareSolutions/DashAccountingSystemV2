@@ -16,6 +16,11 @@ namespace DashAccountingSystemV2.Repositories
             IEnumerable<Guid> includeCustomers = null,
             IEnumerable<Guid> includeEmployees = null);
 
+        Task<IEnumerable<TimeActivity>> GetUnbilledItemsForInvoicingAsync(
+            Guid customerId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd);
+
         Task<TimeActivity> InsertAsync(TimeActivity timeActivity);
 
         Task<TimeActivity> UpdateAsync(TimeActivity timeActivity, Guid contextUserId);

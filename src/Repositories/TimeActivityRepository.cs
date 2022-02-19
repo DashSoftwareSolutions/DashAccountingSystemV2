@@ -154,6 +154,27 @@ ORDER BY c.""DisplayName""
             }
         }
 
+        public async Task<IEnumerable<TimeActivity>> GetUnbilledItemsForInvoicingAsync(
+            Guid customerId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd)
+        {
+            return await _db.TimeActivity
+                .Where(ta => ta.CustomerId == customerId &&
+                    ta.IsBillable &&
+                    ta.Date >= dateRangeStart &&
+                    ta.Date <= dateRangeEnd &&
+                    !ta.InvoiceLineItems.Any()
+                )
+                .Include(ta => ta.Customer)
+                .Include(ta => ta.Employee)
+                .Include(ta => ta.ProductOrService)
+                    .ThenInclude(p => p.Category)
+                .Include(ta => ta.CreatedBy)
+                .Include(ta => ta.UpdatedBy)
+                .ToListAsync();
+        }
+
         public async Task<TimeActivity> InsertAsync(TimeActivity timeActivity)
         {
             await _db.TimeActivity.AddAsync(timeActivity);

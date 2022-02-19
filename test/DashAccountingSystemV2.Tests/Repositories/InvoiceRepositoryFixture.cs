@@ -24,21 +24,42 @@ namespace DashAccountingSystemV2.Tests.Repositories
         private TimeActivity _timeActivity2;
         private TimeActivity _timeActivity3;
 
+        private static readonly DateTime _timeActivitiesDate = new DateTime(2022, 2, 17, 0, 0, 0, DateTimeKind.Utc);
+
         [Fact]
         [Trait("Category", "Requires Database")]
         public void Invoice_CRUD_Ok()
         {
             TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
             {
+                // Pre-test: Get Unbilled Time Activities - we expect it to contain all three Time Activities created for this scenario
+                var dateToCheck = DateTime.SpecifyKind(_timeActivitiesDate.Date, DateTimeKind.Unspecified);
+                var timeActivityRepository = await GetTimeActivityRepository();
+                var unbilledTimeActivities = await timeActivityRepository.GetUnbilledItemsForInvoicingAsync(
+                    _customer.EntityId,
+                    dateToCheck,
+                    dateToCheck);
+
+                Assert.Equal(3, unbilledTimeActivities.Count());
+                Assert.Single(unbilledTimeActivities, ta => ta.Id == _timeActivity1.Id);
+                Assert.Single(unbilledTimeActivities, ta => ta.Id == _timeActivity2.Id);
+                Assert.Single(unbilledTimeActivities, ta => ta.Id == _timeActivity3.Id);
+
+                // Test Create Invoice
                 var invoice = await BuildInvoice();
-
                 var subjectUnderTest = await GetInvoiceRepository();
-
-                // Test Create
                 var savedInvoice = await subjectUnderTest.CreateInvoiceAsync(invoice);
 
                 Assert.NotNull(savedInvoice);
                 // TODO: Assert all the things!
+
+                // Now check that there are no unbilled Time Activities on the specified Date
+                unbilledTimeActivities = await timeActivityRepository.GetUnbilledItemsForInvoicingAsync(
+                    _customer.EntityId,
+                    dateToCheck,
+                    dateToCheck);
+
+                Assert.Empty(unbilledTimeActivities);
 
                 // Test Get Filtered Invoices by Tenant
                 // TODO: More robust testing of filtering options
@@ -230,6 +251,12 @@ namespace DashAccountingSystemV2.Tests.Repositories
         {
             var appDbContext = await TestUtilities.GetDatabaseContextAsync();
             return new InvoiceRepository(appDbContext);
+        }
+
+        private async Task<ITimeActivityRepository> GetTimeActivityRepository()
+        {
+            var appDbContext = await TestUtilities.GetDatabaseContextAsync();
+            return new TimeActivityRepository(appDbContext);
         }
 
         private async Task<AssetType> GetAssetType(string assetType)
@@ -436,7 +463,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product2.Id,
-                Date = new DateTime(2022, 2, 17, 0, 0, 0, DateTimeKind.Utc),
+                Date = _timeActivitiesDate,
                 StartTime = new TimeSpan(6, 0, 0),
                 EndTime = new TimeSpan(8, 0, 0),
                 TimeZone = "Australia/Sydney",
@@ -454,7 +481,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product3.Id,
-                Date = new DateTime(2022, 2, 17, 0, 0, 0, DateTimeKind.Utc),
+                Date = _timeActivitiesDate,
                 StartTime = new TimeSpan(9, 0, 0),
                 EndTime = new TimeSpan(10, 0, 0),
                 TimeZone = "Australia/Sydney",
@@ -472,7 +499,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product1.Id,
-                Date = new DateTime(2022, 2, 17, 0, 0, 0, DateTimeKind.Utc),
+                Date = _timeActivitiesDate,
                 StartTime = new TimeSpan(13, 0, 0),
                 EndTime = new TimeSpan(16, 0, 0),
                 TimeZone = "Australia/Sydney",

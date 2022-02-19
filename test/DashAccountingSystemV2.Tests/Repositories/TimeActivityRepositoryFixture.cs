@@ -50,7 +50,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 Assert.Equal(5 * savedTimeActivity.HourlyBillingRate, savedTimeActivity.TotalBillableAmount);
                 // Assert all the other things!
 
-                // Also quick test for GetFiltered()
+                // Also quick test for GetFilteredAsync()
                 // TODO: A more robust test where we make lots of time entries and exercise the filter options
                 var retrived = await subjectUnderTest.GetFilteredAsync(
                     _tenantId,
@@ -59,6 +59,15 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 Assert.NotEmpty(retrived);
                 Assert.Contains(retrived, ta => ta.Id == savedTimeActivity.Id);
+
+                // Also quick test for GetUnbilledItemsForInvoicingAsync()
+                var retrievedUnbilled = await subjectUnderTest.GetUnbilledItemsForInvoicingAsync(
+                    _customer.EntityId,
+                    new DateTime(2021, 7, 14),
+                    new DateTime(2021, 7, 14));
+
+                Assert.NotEmpty(retrievedUnbilled);
+                Assert.Contains(retrievedUnbilled, ta => ta.Id == savedTimeActivity.Id);
             });
         }
 
