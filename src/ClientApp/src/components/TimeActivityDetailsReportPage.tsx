@@ -13,7 +13,7 @@ import {
     map,
 } from 'lodash';
 import { RouteComponentProps, withRouter } from 'react-router';
-import moment from 'moment-timezone';
+import * as moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import {
     ILogger,
@@ -301,7 +301,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
             return '';
         }
 
-        return `${this.pad(input.hours(), 2)}:${this.pad(input.minutes(), 2)}`;
+        return `${this.pad(Math.floor(input.asHours()), 2)}:${this.pad(input.minutes(), 2)}`;
     }
 
     private pad(num: number, size: number): string  {

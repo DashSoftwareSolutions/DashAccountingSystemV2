@@ -10,7 +10,7 @@ import {
     isNil,
     trim,
 } from 'lodash';
-import moment, { Duration, Moment } from 'moment-timezone';
+import * as moment from 'moment-timezone';
 import { AppThunkAction } from './';
 import {
     formatWithTwoDecimalPlaces,
@@ -29,9 +29,9 @@ import EmployeeLite from '../models/EmployeeLite';
 export interface TimeActivityValidationState {
     areAllRequiredAttributesSet: boolean;
     billableAmount: number | null;
-    breakTimeDuration: Duration | null;
+    breakTimeDuration: moment.Duration | null;
     canSave: boolean;
-    endTimeMoment: Moment | null;
+    endTimeMoment: moment.Moment | null;
     hasBreakTime: boolean;
     hasDate: boolean;
     hasEndTime: boolean;
@@ -41,9 +41,9 @@ export interface TimeActivityValidationState {
     isBillable: boolean;
     isValid: boolean;
     message: string;
-    netDuration: Duration | null;
-    startTimeMoment: Moment | null;
-    workTimeDuration: Duration | null;
+    netDuration: moment.Duration | null;
+    startTimeMoment: moment.Moment | null;
+    workTimeDuration: moment.Duration | null;
 }
 
 const DEFAULT_VALIDATION_STATE: TimeActivityValidationState = {
@@ -389,15 +389,15 @@ export const actionCreators = {
 
         const timeActivityToSave: TimeActivity = {
             ...dirtyTimeActivity,
-            startTime: timeOfDayRegex.test(dirtyTimeActivity.startTime) ?
+            startTime: timeOfDayRegex.test(dirtyTimeActivity.startTime ?? '') ?
                 dirtyTimeActivity.startTime :
                 `${dirtyTimeActivity.startTime}:00`, // add seconds if necessary so it is interpretted correctly on the back-end
-            endTime: timeOfDayRegex.test(dirtyTimeActivity.endTime) ?
+            endTime: timeOfDayRegex.test(dirtyTimeActivity.endTime ?? '') ?
                 dirtyTimeActivity.endTime :
                 `${dirtyTimeActivity.endTime}:00`,
             break: isEmpty(dirtyTimeActivity.break) ?
                 null :
-                timeOfDayRegex.test(dirtyTimeActivity.break) ?
+                timeOfDayRegex.test(dirtyTimeActivity.break ?? '') ?
                     dirtyTimeActivity.break :
                     `${dirtyTimeActivity.break}:00`,
         };
@@ -607,7 +607,7 @@ const checkIfAllRequiredAttributesAreSet = (timeActivity: TimeActivity): boolean
  * @param {Duration} duration
  * @returns {string}
  */
-const poorMansHumanize = (duration: Duration | null): string => {
+const poorMansHumanize = (duration: moment.Duration | null): string => {
     if (isNil(duration)) {
         return '';
     }
@@ -711,7 +711,7 @@ const updateTimeActivityDurationState = (state: TimeActivityStoreState, updatedD
                                     minimumFractionDigits: 2,
                                 });
 
-                        updatedValidationState.message = `${poorMansHumanize(updatedValidationState.netDuration)} at ${hourlyRateFormatted} = ${totalBillableAmountFormatted}`;
+                        updatedValidationState.message = `${poorMansHumanize(updatedValidationState.netDuration)} at ${hourlyRateFormatted} per hour = ${totalBillableAmountFormatted}`;
                     }
                 } else { // Not Billable
                     updatedValidationState.message = poorMansHumanize(updatedValidationState.netDuration);
