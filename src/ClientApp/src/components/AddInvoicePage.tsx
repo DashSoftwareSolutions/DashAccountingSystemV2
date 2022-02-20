@@ -13,13 +13,17 @@ import {
 } from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
 import TenantBasePage from './TenantBasePage';
+import * as InvoiceStore from '../store/Invoice';
 
 const mapStateToProps = (state: ApplicationState) => {
-    return { selectedTenant: state.tenants?.selectedTenant };
+    return {
+        dirtyInvoice: state.invoice?.details.dirtyInvoice,
+        selectedTenant: state.tenants?.selectedTenant,
+    };
 }
 
 const mapDispatchToProps = {
-    // TODO: Map needed action creators
+    ...InvoiceStore.actionCreators,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -90,10 +94,10 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
     private onClickCancel() {
         const {
             history,
+            resetDirtyInvoice,
         } = this.props;
 
-        // TODO: Dispatch reset action
-
+        resetDirtyInvoice();
         history.push('/invoicing');
     }
 
@@ -105,7 +109,5 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
 }
 
 export default withRouter(
-    connect(
-        mapStateToProps,
-    )(AddInvoicePage as any),
+    connector(AddInvoicePage as any),
 );

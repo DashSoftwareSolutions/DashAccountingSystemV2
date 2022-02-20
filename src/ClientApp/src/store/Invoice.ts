@@ -6,6 +6,7 @@
 import {
     cloneDeep,
     filter,
+    find,
     findIndex,
     groupBy,
     isEmpty,
@@ -15,7 +16,9 @@ import {
     reduce,
     trim,
 } from 'lodash';
+import * as moment from 'moment-timezone';
 import { AppThunkAction } from './';
+import { DEFAULT_INVOICE_TERMS } from '../common/Constants';
 import { isStringNullOrWhiteSpace } from '../common/StringUtils';
 import { Logger } from '../common/Logging';
 import { numbersAreEqualWithPrecision } from '../common/NumericUtils';
@@ -28,6 +31,7 @@ import IAction from './IAction';
 import Invoice from '../models/Invoice';
 import InvoiceLineItem from '../models/InvoiceLineItem';
 import InvoiceLite from '../models/InvoiceLite';
+import InvoiceStatus from '../models/InvoiceStatus';
 import InvoiceTerms from '../models/InvoiceTerms';
 import PagedResult from '../models/PagedResult';
 import TimeActivity from '../models/TimeActivity';
@@ -49,12 +53,14 @@ export interface SingleInvoiceState {
     isLoading: boolean;
     isSaving: boolean;
     isDeleting: boolean;
+    dirtyInvoice: Invoice | null;
 }
 
 const DEFAULT_SINGLE_INVOICE_STATE: SingleInvoiceState = {
     isLoading: false,
     isSaving: false,
     isDeleting: false,
+    dirtyInvoice: null,
 };
 
 export interface InvoiceStoreState {
@@ -68,7 +74,6 @@ const unloadedState: InvoiceStoreState = {
 }
 
 // Always have a logger in case we need to use it for debuggin'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger = new Logger('Invoice Store');
 
 /* BEGIN: REST API Actions */
@@ -109,6 +114,7 @@ type KnownAction = RequestInvoiceListAction |
     ResetInvoiceStoreAction;
 
 export const actionCreators = {
+    /* BEGIN: REST API Actions */
     requestInvoiceList: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
 
@@ -141,6 +147,35 @@ export const actionCreators = {
             dispatch({ type: ActionType.REQUEST_INVOICE_LIST });
         }
     },
+    /* END: REST API Actions */
+
+    /* BEGIN: UI Gesture Actions */
+    initializeNewInvoice: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+        const tenantId = appState.tenants?.selectedTenant?.id;
+
+        if (isNil(tenantId)) {
+            logger.warn('No selected Tenant.  Cannot create Invoice.');
+            return;
+        }
+
+        dispatch({ type: ActionType.INITIALIZE_NEW_INVOICE, tenantId });
+    },
+    /* END: UI Gesture Actions */
+
+    /* BEGIN: Resets */
+    reset: (): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.RESET_INVOICE_STORE_STATE });
+    },
+
+    resetDirtyInvoice: (): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.RESET_DIRTY_INVOICE });
+    },
+
+    resetInvoiceList: (): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.RESET_INVOICE_LIST });
+    },
+    /* END: Resets */
 };
 
 export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | undefined, incomingAction: Action): InvoiceStoreState => {
@@ -174,9 +209,43 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
             /* END: REST API Actions */
 
             /* BEGIN: UI Gesture Actions */
+            case ActionType.INITIALIZE_NEW_INVOICE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice: {
+                            tenantId: action.tenantId,
+                            status: InvoiceStatus.Draft,
+                            issueDate: moment().format('YYYY-MM-DD'),
+                            dueDate: null,
+                            customerId: null,
+                            customerAddress: null,
+                            customerEmail: null,
+                            invoiceTermsId: null,
+                            message: null,
+                            lineItems: [],
+                        },
+                    }
+                };
             /* END: UI Gesture Actions */
 
             /* BEGIN: Resets */
+            case ActionType.RESET_INVOICE_LIST:
+                return {
+                    ...state,
+                    list: { ...DEFAULT_INVOICE_LIST_STATE },
+                };
+
+            case ActionType.RESET_DIRTY_INVOICE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice: null,
+                    },
+                };
+
             case ActionType.RESET_INVOICE_STORE_STATE:
                 return unloadedState;
             /* END: Resets */

@@ -101,8 +101,12 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
     }
 
     private onClickCreateInvoice() {
-        // TODO: Dispatch an initialize action if necessary
-        const { history } = this.props;
+        const {
+            history,
+            initializeNewInvoice,
+        } = this.props;
+
+        initializeNewInvoice();
         history.push('/invoice/new');
     }
 
