@@ -226,6 +226,30 @@ export const actionCreators = {
     /* END: Resets */
 };
 
+const getDueDateBasedOnInvoiceTerms = (invoiceIssueDate: string, terms: InvoiceTerms): string | null => {
+    const issueDateMoment = moment.default(invoiceIssueDate, 'YYYY-MM-DD');
+
+    if (!isNil(terms.dueInDays)) {
+        return moment.default(issueDateMoment).add(terms.dueInDays, 'days').format('YYYY-MM-DD');
+    }
+
+    if (!isNil(terms.dueOnDayOfMonth)) {
+        let dueDate = moment.default(issueDateMoment).date(terms.dueOnDayOfMonth);
+
+        if (!isNil(terms.dueNextMonthThreshold)) {
+            const diff = issueDateMoment.diff(dueDate, 'days');
+
+            if (diff < terms.dueNextMonthThreshold) {
+                dueDate.month(dueDate.month() + 1);
+            }
+        }
+
+        return dueDate.format('YYYY-MM-DD');
+    }
+
+    return null;
+};
+
 export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | undefined, incomingAction: Action): InvoiceStoreState => {
     if (state === undefined) {
         return unloadedState;
@@ -272,10 +296,17 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                     !isEmpty(invoiceTermsOptions) &&
                     dirtyInvoice.invoiceTermsId === null) {
                     const defaultTerms = find(invoiceTermsOptions, (t) => t.name === DEFAULT_INVOICE_TERMS);
+                    let dueDate: string | null = null;
+
+                    if (!isNil(defaultTerms) &&
+                        !isNil(dirtyInvoice.issueDate)) {
+                        dueDate = getDueDateBasedOnInvoiceTerms(dirtyInvoice.issueDate, defaultTerms);
+                    }
+
                     dirtyInvoice = {
                         ...dirtyInvoice as Pick<Invoice, keyof Invoice>,
                         invoiceTermsId: defaultTerms?.id ?? null,
-                        // TODO: Compute due date based on issue date and terms
+                        dueDate,
                     };
                 }
 
@@ -300,7 +331,7 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                         dirtyInvoice: {
                             tenantId: action.tenantId,
                             status: InvoiceStatus.Draft,
-                            issueDate: moment().format('YYYY-MM-DD'),
+                            issueDate: moment.default().format('YYYY-MM-DD'),
                             dueDate: null,
                             customerId: null,
                             customerAddress: null,
