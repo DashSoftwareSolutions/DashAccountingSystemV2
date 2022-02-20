@@ -50,16 +50,20 @@ const DEFAULT_INVOICE_LIST_STATE: InvoiceListState = {
 };
 
 export interface SingleInvoiceState {
-    isLoading: boolean;
+    isLoadingInvoice: boolean;
+    isLoadingInvoiceTerms: boolean;
     isSaving: boolean;
     isDeleting: boolean;
+    invoiceTermsOptions: InvoiceTerms[],
     dirtyInvoice: Invoice | null;
 }
 
 const DEFAULT_SINGLE_INVOICE_STATE: SingleInvoiceState = {
-    isLoading: false,
+    isLoadingInvoice: false,
+    isLoadingInvoiceTerms: false,
     isSaving: false,
     isDeleting: false,
+    invoiceTermsOptions: [],
     dirtyInvoice: null,
 };
 
@@ -85,6 +89,15 @@ interface ReceiveInvoiceListAction extends IAction {
     type: ActionType.RECEIVE_INVOICE_LIST;
     data: PagedResult<InvoiceLite>;
 }
+
+interface RequestInvoiceTermsAction extends IAction {
+    type: ActionType.REQUEST_INVOICE_TERMS,
+}
+
+interface ReceiveInvoiceTermsAction extends IAction {
+    type: ActionType.RECEIVE_INVOICE_TERMS,
+    data: InvoiceTerms[],
+}
 /* END: REST API Actions */
 /* BEGIN: UI Gesture Actions */
 interface InitializeNewInvoiceAction extends IAction {
@@ -108,6 +121,8 @@ interface ResetInvoiceStoreAction extends IAction {
 
 type KnownAction = RequestInvoiceListAction |
     ReceiveInvoiceListAction |
+    RequestInvoiceTermsAction |
+    ReceiveInvoiceTermsAction |
     InitializeNewInvoiceAction |
     ResetInvoiceListAction |
     ResetDirtyInvoiceAction |
@@ -145,6 +160,39 @@ export const actionCreators = {
                 });
 
             dispatch({ type: ActionType.REQUEST_INVOICE_LIST });
+        }
+    },
+
+    requestInvoiceTerms: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+
+        if (!isNil(appState?.invoice) &&
+            !isNil(appState?.tenants?.selectedTenant) &&
+            !appState.invoice.details.isLoadingInvoiceTerms &&
+            isEmpty(appState.invoice?.details.invoiceTermsOptions)) {
+            const accessToken = await authService.getAccessToken();
+            const tenantId = appState?.tenants?.selectedTenant?.id;
+
+            fetch(`api/invoice/${tenantId}/terms`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                        return null;
+                    }
+
+                    return response.json() as Promise<InvoiceTerms[]>
+                })
+                .then((data) => {
+                    if (!isNil(data)) {
+                        dispatch({ type: ActionType.RECEIVE_INVOICE_TERMS, data });
+                    }
+                });
+
+            dispatch({ type: ActionType.REQUEST_INVOICE_TERMS });
         }
     },
     /* END: REST API Actions */
@@ -206,6 +254,41 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                         results: action.data,
                     },
                 };
+
+            case ActionType.REQUEST_INVOICE_TERMS:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        isLoadingInvoiceTerms: true,
+                    },
+                };
+
+            case ActionType.RECEIVE_INVOICE_TERMS: {
+                let dirtyInvoice = state.details.dirtyInvoice;
+                const invoiceTermsOptions = action.data;
+
+                if (!isNil(dirtyInvoice) &&
+                    !isEmpty(invoiceTermsOptions) &&
+                    dirtyInvoice.invoiceTermsId === null) {
+                    const defaultTerms = find(invoiceTermsOptions, (t) => t.name === DEFAULT_INVOICE_TERMS);
+                    dirtyInvoice = {
+                        ...dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                        invoiceTermsId: defaultTerms?.id ?? null,
+                        // TODO: Compute due date based on issue date and terms
+                    };
+                }
+
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        isLoadingInvoiceTerms: false,
+                        invoiceTermsOptions,
+                        dirtyInvoice,
+                    },
+                };
+            }
             /* END: REST API Actions */
 
             /* BEGIN: UI Gesture Actions */

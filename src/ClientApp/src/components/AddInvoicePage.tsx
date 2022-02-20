@@ -13,17 +13,23 @@ import {
 } from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
 import TenantBasePage from './TenantBasePage';
+import * as CustomerStore from '../store/Customer';
 import * as InvoiceStore from '../store/Invoice';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
+        customers: state?.customers?.customers ?? [],
         dirtyInvoice: state.invoice?.details.dirtyInvoice,
+        invoiceTermsOptions: state.invoice?.details.invoiceTermsOptions,
+        isFetchingCustomers: state.customers?.isLoading ?? false,
+        isFetchingInvoiceTerms: state.invoice?.details.isLoadingInvoiceTerms ?? false,
         selectedTenant: state.tenants?.selectedTenant,
     };
 }
 
 const mapDispatchToProps = {
     ...InvoiceStore.actionCreators,
+    requestCustomers: CustomerStore.actionCreators.requestCustomers,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -44,6 +50,10 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
 
         this.onClickCancel = this.onClickCancel.bind(this);
         this.onClickSave = this.onClickSave.bind(this);
+    }
+
+    public componentDidMount() {
+        this.ensureDataFetched();
     }
 
     public render() {
@@ -89,6 +99,18 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
+    }
+
+    private ensureDataFetched() {
+        this.logger.info('Fetching all the things ...');
+
+        const {
+            requestCustomers,
+            requestInvoiceTerms,
+        } = this.props;
+
+        requestCustomers();
+        requestInvoiceTerms();
     }
 
     private onClickCancel() {
