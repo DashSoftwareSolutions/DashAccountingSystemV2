@@ -5,6 +5,7 @@ import {
     Col,
     Row,
 } from 'reactstrap';
+import { isNil } from 'lodash';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import {
@@ -12,14 +13,21 @@ import {
     Logger,
 } from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
+import InvoiceLite from '../models/InvoiceLite';
+import PagedResult from '../models/PagedResult';
 import TenantBasePage from './TenantBasePage';
+import * as InvoiceStore from '../store/Invoice';
 
 const mapStateToProps = (state: ApplicationState) => {
-    return { selectedTenant: state.tenants?.selectedTenant };
+    return {
+        invoiceList: state.invoice?.list.results,
+        isFetching: state.invoice?.list.isLoading,
+        selectedTenant: state.tenants?.selectedTenant,
+    };
 }
 
 const mapDispatchToProps = {
-    // TODO: Map needed action creators
+    ...InvoiceStore.actionCreators,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -38,12 +46,19 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
 
         this.logger = new Logger('Invoice List Page');
 
+        this.ensureDataFetched = this.ensureDataFetched.bind(this);
         this.onClickCreateInvoice = this.onClickCreateInvoice.bind(this);
+    }
+
+    public componentDidMount() {
+        this.ensureDataFetched();
     }
 
     public render() {
         const {
             history,
+            invoiceList,
+            isFetching,
             selectedTenant,
         } = this.props;
 
@@ -67,10 +82,22 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
                     </Row>
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
-                    <p>Coming Soon...</p>
+                    {isFetching ? (
+                        <p>Loading...</p>
+                    ) :
+                        this.renderInvoiceList(invoiceList)
+                    }
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
+    }
+
+    private ensureDataFetched() {
+        const {
+            requestInvoiceList,
+        } = this.props;
+
+        requestInvoiceList();
     }
 
     private onClickCreateInvoice() {
@@ -78,10 +105,20 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
         const { history } = this.props;
         history.push('/invoice/new');
     }
+
+    private renderInvoiceList(invoiceList: PagedResult<InvoiceLite>) {
+        if (isNil(invoiceList) || invoiceList.total === 0) {
+            return (
+                <p>There are currently no invoices in the system.</p>
+            );
+        }
+
+        return (
+            <p>Invoice List is coming soon ...</p>
+        );
+    }
 }
 
 export default withRouter(
-    connect(
-        mapStateToProps,
-    )(InvoiceListPage as any),
+    connector(InvoiceListPage as any),
 );

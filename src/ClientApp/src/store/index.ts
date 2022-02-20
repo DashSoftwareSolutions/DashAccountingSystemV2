@@ -3,6 +3,7 @@ import * as BalanceSheet from './BalanceSheet';
 import * as Customer from './Customer';
 import * as Employee from './Employee';
 import * as ExportDownload from './Export';
+import * as Invoice from './Invoice';
 import * as JournalEntry from './JournalEntry';
 import * as Ledger from './Ledger';
 import * as LookupValues from './LookupValues';
@@ -19,6 +20,7 @@ export interface ApplicationState {
     customers: Customer.CustomerStoreState | undefined;
     employees: Employee.EmployeeStoreState | undefined;
     exportDownload: ExportDownload.ExportState | undefined,
+    invoice: Invoice.InvoiceStoreState | undefined;
     journalEntry: JournalEntry.JournalEntryState | undefined;
     ledger: Ledger.LedgerState | undefined;
     lookups: LookupValues.LookupValuesState | undefined;
@@ -38,6 +40,7 @@ export const reducers = {
     customers: Customer.reducer,
     employees: Employee.reducer,
     exportDownload: ExportDownload.reducer,
+    invoice: Invoice.reducer,
     journalEntry: JournalEntry.reducer,
     ledger: Ledger.reducer,
     lookups: LookupValues.reducer,
