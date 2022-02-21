@@ -28,7 +28,7 @@ namespace DashAccountingSystemV2.BusinessLogic
 
             if (tenant == null)
             {
-                return new BusinessLogicResponse<IEnumerable<Customer>>(ErrorType.RequestedEntityNotFound, "Tenant not found");
+                return new BusinessLogicResponse<IEnumerable<Customer>>(ErrorType.RequestedEntityNotFound, "Tenant not found.");
             }
 
             // TODO: Verify access to tenant and permission for listing customers
@@ -39,6 +39,36 @@ namespace DashAccountingSystemV2.BusinessLogic
                 onlyActive);
 
             return new BusinessLogicResponse<IEnumerable<Customer>>(results);
+        }
+
+        public async Task<BusinessLogicResponse<Customer>> GetDetailedById(Guid customerId)
+        {
+            var customer = await _customerRepository.GetByEntityIdAsync(customerId);
+
+            if (customer == null)
+            {
+                return new BusinessLogicResponse<Customer>(ErrorType.RequestedEntityNotFound, "Customer not found.");
+            }
+
+            // TODO: Verify access to tenant and permission for getting details for this customer
+
+            return new BusinessLogicResponse<Customer>(customer);
+        }
+
+        public async Task<BusinessLogicResponse<Customer>> GetDetailedByTenantIdAndCustomerNumber(
+            Guid tenantId,
+            string customerNumber)
+        {
+            var customer = await _customerRepository.GetByTenantIdAndCustomerNumberAsync(tenantId, customerNumber);
+
+            if (customer == null)
+            {
+                return new BusinessLogicResponse<Customer>(ErrorType.RequestedEntityNotFound, "Customer not found.");
+            }
+
+            // TODO: Verify access to tenant and permission for getting details for this customer
+
+            return new BusinessLogicResponse<Customer>(customer);
         }
     }
 }

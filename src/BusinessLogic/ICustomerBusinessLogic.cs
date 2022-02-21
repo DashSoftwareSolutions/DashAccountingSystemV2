@@ -12,6 +12,12 @@ namespace DashAccountingSystemV2.BusinessLogic
             IEnumerable<string> customerNumbers = null,
             bool onlyActive = true);
 
-        // TODO: Add GetDetaildById() and CUD methods as needed
+        Task<BusinessLogicResponse<Customer>> GetDetailedById(Guid customerId);
+
+        Task<BusinessLogicResponse<Customer>> GetDetailedByTenantIdAndCustomerNumber(
+            Guid tenantId,
+            string customerNumber);
+
+        // TODO: Add CUD methods as needed
     }
 }

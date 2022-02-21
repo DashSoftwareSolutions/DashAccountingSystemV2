@@ -23,8 +23,15 @@ namespace DashAccountingSystemV2.Controllers
         [HttpGet("{tenantId:guid}/customers")]
         public Task<IActionResult> GetCustomers([FromRoute] Guid tenantId)
         {
-            var bizLogcResponse = _customerBusinessLogic.GetByTenant(tenantId);
-            return this.Result(bizLogcResponse, CustomerLiteResponseViewModel.FromModel);
+            var bizLogicResponse = _customerBusinessLogic.GetByTenant(tenantId);
+            return this.Result(bizLogicResponse, CustomerLiteResponseViewModel.FromModel);
+        }
+
+        [HttpGet("{tenantId:guid}/customer/{customerNumber}")]
+        public Task<IActionResult> GetCustomer([FromRoute] Guid tenantId, [FromRoute] string customerNumber)
+        {
+            var bizLogicResponse = _customerBusinessLogic.GetDetailedByTenantIdAndCustomerNumber(tenantId, customerNumber);
+            return this.Result(bizLogicResponse, CustomerDetailedResponseViewModel.FromModel);
         }
     }
 }

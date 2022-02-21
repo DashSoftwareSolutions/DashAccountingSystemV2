@@ -38,6 +38,28 @@ namespace DashAccountingSystemV2.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<Customer> GetByTenantIdAndCustomerNumberAsync(Guid tenantId, string customerNumber)
+        {
+            return await _db.Customer
+                .Where(c =>
+                    c.TenantId == tenantId &&
+                    c.CustomerNumber == customerNumber
+                )
+                .Include(c => c.Entity)
+                    .ThenInclude(e => e.CreatedBy)
+                .Include(c => c.Entity)
+                    .ThenInclude(e => e.UpdatedBy)
+                .Include(c => c.ShippingAddress)
+                    .ThenInclude(sa => sa.Country)
+                .Include(c => c.ShippingAddress)
+                    .ThenInclude(sa => sa.Region)
+                .Include(c => c.BillingAddress)
+                    .ThenInclude(ba => ba.Country)
+                .Include(c => c.BillingAddress)
+                    .ThenInclude(ba => ba.Region)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<Customer>> GetByTenantIdAsync(
             Guid tenantId,
             IEnumerable<string> customerNumbers = null,

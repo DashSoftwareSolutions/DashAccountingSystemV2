@@ -14,6 +14,8 @@ namespace DashAccountingSystemV2.Repositories
 
         Task<Customer> GetByEntityIdAsync(Guid entityId);
 
+        Task<Customer> GetByTenantIdAndCustomerNumberAsync(Guid tenantId, string customerNumber);
+
         Task<Customer> InsertAsync(Customer customer);
 
         Task<Customer> UpdateAsync(Customer customer);

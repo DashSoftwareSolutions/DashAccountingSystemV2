@@ -10,8 +10,6 @@ namespace DashAccountingSystemV2.ViewModels
     {
         public Guid? Id { get; set; }
 
-        public Guid? InvoiceId { get; set; }
-
         [Required(ErrorMessage = "Order Number is required.")]
         public ushort OrderNumber { get; set; }
 
@@ -45,7 +43,6 @@ namespace DashAccountingSystemV2.ViewModels
             return new InvoiceLineItem()
             {
                 Id = viewModel.Id ?? default(Guid),
-                InvoiceId = viewModel.InvoiceId ?? default(Guid),
                 OrderNumber = viewModel.OrderNumber,
                 Date = viewModel.Date,
                 ProductId = viewModel.ProductId,
