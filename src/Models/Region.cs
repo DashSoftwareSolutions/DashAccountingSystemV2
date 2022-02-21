@@ -19,10 +19,10 @@ namespace DashAccountingSystemV2.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// ISO 3166-2 Code for the Region (only the regiona/local segment; not including the parent Country code)
+        /// ISO 3166-2 Code for the Region (only the regional/local segment; not including the parent Country code)
         /// </summary>
         /// <remarks>
-        /// https://en.wikipedia.org/wiki/ISO_3166-2
+        /// <see href="https://en.wikipedia.org/wiki/ISO_3166-2"/>
         /// </remarks>
         [Required(AllowEmptyStrings = false)]
         [MaxLength(3)]
