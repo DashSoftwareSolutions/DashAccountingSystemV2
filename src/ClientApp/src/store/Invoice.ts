@@ -34,6 +34,7 @@ import InvoiceLite from '../models/InvoiceLite';
 import InvoiceStatus from '../models/InvoiceStatus';
 import InvoiceTerms from '../models/InvoiceTerms';
 import PagedResult from '../models/PagedResult';
+import Tenant from '../models/Tenant';
 import TimeActivity from '../models/TimeActivity';
 
 // TODO: Validation state for Invoice CRUD
@@ -102,7 +103,42 @@ interface ReceiveInvoiceTermsAction extends IAction {
 /* BEGIN: UI Gesture Actions */
 interface InitializeNewInvoiceAction extends IAction {
     type: ActionType.INITIALIZE_NEW_INVOICE;
-    tenantId: string; // GUID
+    tenant: Tenant;
+}
+
+interface UpdateCustomerAction extends IAction {
+    type: ActionType.UPDATE_INVOICE_CUSTOMER;
+    customerId: string | null; // GUID
+}
+
+interface UpdateCustomerAddressAction extends IAction {
+    type: ActionType.UPDATE_INVOICE_CUSTOMER_ADDRESS;
+    customerAddress: string | null;
+}
+
+interface UpdateCustomerEmailAction extends IAction {
+    type: ActionType.UPDATE_INVOICE_CUSTOMER_EMAIL,
+    customerEmail: string | null;
+}
+
+interface UpdateInvoiceTermsAction extends IAction {
+    type: ActionType.UPDATE_INVOICE_TERMS;
+    invoiceTermsId: string | null; // GUID
+}
+
+interface UpdateInvoiceIssueDateAction extends IAction {
+    type: ActionType.UPDATE_INVOICE_ISSUE_DATE;
+    issueDate: string | null; // Date as YYYY-MM-DD
+}
+
+interface UpdateInvoiceDueDateAction extends IAction {
+    type: ActionType.UPDATE_INVOICE_DUE_DATE;
+    dueDate: string | null; // Date as YYYY-MM-DD
+}
+
+interface UpdateInvoiceMessageAction extends IAction {
+    type: ActionType.UPDATE_INVOICE_MESSAGE;
+    message: string | null;
 }
 /* END: UI Gesture Actions */
 /* BEGIN: Resets */
@@ -124,6 +160,13 @@ type KnownAction = RequestInvoiceListAction |
     RequestInvoiceTermsAction |
     ReceiveInvoiceTermsAction |
     InitializeNewInvoiceAction |
+    UpdateCustomerAction |
+    UpdateCustomerAddressAction |
+    UpdateCustomerEmailAction |
+    UpdateInvoiceTermsAction |
+    UpdateInvoiceIssueDateAction |
+    UpdateInvoiceDueDateAction |
+    UpdateInvoiceMessageAction |
     ResetInvoiceListAction |
     ResetDirtyInvoiceAction |
     ResetInvoiceStoreAction;
@@ -200,14 +243,42 @@ export const actionCreators = {
     /* BEGIN: UI Gesture Actions */
     initializeNewInvoice: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
         const appState = getState();
-        const tenantId = appState.tenants?.selectedTenant?.id;
+        const tenant = appState.tenants?.selectedTenant;
 
-        if (isNil(tenantId)) {
+        if (isNil(tenant)) {
             logger.warn('No selected Tenant.  Cannot create Invoice.');
             return;
         }
 
-        dispatch({ type: ActionType.INITIALIZE_NEW_INVOICE, tenantId });
+        dispatch({ type: ActionType.INITIALIZE_NEW_INVOICE, tenant });
+    },
+
+    updateCustomer: (customerId: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_INVOICE_CUSTOMER, customerId });
+    },
+
+    updateCustomerAddress: (customerAddress: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_INVOICE_CUSTOMER_ADDRESS, customerAddress });
+    },
+
+    updateCustomerEmail: (customerEmail: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_INVOICE_CUSTOMER_EMAIL, customerEmail });
+    },
+
+    updateInvoiceTerms: (invoiceTermsId: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_INVOICE_TERMS, invoiceTermsId });
+    },
+
+    updateInvoiceIssueDate: (issueDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_INVOICE_ISSUE_DATE, issueDate });
+    },
+
+    updateInvoiceDueDate: (dueDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_INVOICE_DUE_DATE, dueDate });
+    },
+
+    updateInvoiceMessage: (message: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_INVOICE_MESSAGE, message });
     },
     /* END: UI Gesture Actions */
 
@@ -235,6 +306,10 @@ const getDueDateBasedOnInvoiceTerms = (invoiceIssueDate: string, terms: InvoiceT
 
     if (!isNil(terms.dueOnDayOfMonth)) {
         let dueDate = moment.default(issueDateMoment).date(terms.dueOnDayOfMonth);
+
+        if (dueDate.isSameOrBefore(issueDateMoment, 'day')) {
+            dueDate.month(dueDate.month() + 1);
+        }
 
         if (!isNil(terms.dueNextMonthThreshold)) {
             const diff = issueDateMoment.diff(dueDate, 'days');
@@ -329,9 +404,15 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                     details: {
                         ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
                         dirtyInvoice: {
-                            tenantId: action.tenantId,
+                            tenantId: action.tenant.id,
                             status: InvoiceStatus.Draft,
                             issueDate: moment.default().format('YYYY-MM-DD'),
+                            amount: {
+                                amount: 0,
+                                amountAsString: '0.00',
+                                amountType: AmountType.Debit,
+                                assetType: action.tenant.defaultAssetType,
+                            },
                             dueDate: null,
                             customerId: null,
                             customerAddress: null,
@@ -341,6 +422,124 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                             lineItems: [],
                         },
                     }
+                };
+
+            case ActionType.UPDATE_INVOICE_CUSTOMER:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice: {
+                            ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                            customerId: action.customerId,
+                        },
+                    },
+                };
+
+            case ActionType.UPDATE_INVOICE_CUSTOMER_ADDRESS:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice: {
+                            ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                            customerAddress: action.customerAddress,
+                        },
+                    },
+                };
+
+            case ActionType.UPDATE_INVOICE_CUSTOMER_EMAIL:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice: {
+                            ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                            customerEmail: action.customerEmail,
+                        },
+                    },
+                };
+
+            case ActionType.UPDATE_INVOICE_DUE_DATE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice: {
+                            ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                            dueDate: action.dueDate,
+                        },
+                    },
+                };
+
+            case ActionType.UPDATE_INVOICE_ISSUE_DATE: {
+                let dirtyInvoice = {
+                    ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                    issueDate: action.issueDate,
+                };
+
+                if (!isNil(dirtyInvoice.invoiceTermsId)) {
+                    const selectedTerms = find(state.details.invoiceTermsOptions, (ito) => ito.id === dirtyInvoice.invoiceTermsId);
+
+                    if (!isNil(selectedTerms) &&
+                        !isNil(dirtyInvoice.issueDate)) {
+                        const dueDate = getDueDateBasedOnInvoiceTerms(dirtyInvoice.issueDate, selectedTerms);
+
+                        dirtyInvoice = {
+                            ...dirtyInvoice,
+                            dueDate,
+                        };
+                    }
+                }
+
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice,
+                    },
+                };
+            }
+
+            case ActionType.UPDATE_INVOICE_TERMS: {
+                let dirtyInvoice = {
+                    ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                    invoiceTermsId: action.invoiceTermsId,
+                };
+
+                if (!isNil(action.invoiceTermsId)) {
+                    const selectedTerms = find(state.details.invoiceTermsOptions, (ito) => ito.id === action.invoiceTermsId);
+
+                    if (!isNil(selectedTerms) &&
+                        !isNil(dirtyInvoice.issueDate)) {
+                        const dueDate = getDueDateBasedOnInvoiceTerms(dirtyInvoice.issueDate, selectedTerms);
+
+                        dirtyInvoice = {
+                            ...dirtyInvoice,
+                            dueDate,
+                        };
+                    }
+                }
+
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice,
+                    },
+                };
+            }
+
+            case ActionType.UPDATE_INVOICE_MESSAGE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice: {
+                            ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                            message: action.message,
+                        },
+                    },
                 };
             /* END: UI Gesture Actions */
 

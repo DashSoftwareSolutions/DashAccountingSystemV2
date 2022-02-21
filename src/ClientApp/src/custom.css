@@ -116,3 +116,39 @@ th.sticky-border:after {
     width: 100%;
 }
 
+/* Create Invoice Page */
+.add_invoice_page--add_unbilled_time_button {
+    margin-top: 32px;
+}
+
+.add_invoice_page--balance_due_container {
+    text-align: right;
+}
+
+.add_invoice_page--balance_due_label {
+    color: #6c757d;
+}
+
+.add_invoice_page--balance_due_amount {
+    font-size: 1.75rem;
+    font-weight: bold;
+}
+
+.add_invoice_page--second_row {
+    margin-top: 22px;
+}
+
+#add_invoice_page--customer_address_textarea,
+#add_invoice_page--invoice_message_textarea {
+    resize: none;
+    height: 96px;
+    width: 100%;
+}
+
+.add_invoice_page--line_items_table_container {
+    margin-top: 22px;
+}
+
+.add_invoice_page--bottom_row {
+    margin-bottom: 22px;
+}
