@@ -19,6 +19,7 @@ import {
 import { RouteComponentProps, withRouter } from 'react-router';
 import { ApplicationState } from '../store';
 import { DEFAULT_ASSET_TYPE } from '../common/Constants';
+import { formatAddress } from '../common/StringUtils';
 import {
     ILogger,
     Logger,
@@ -106,7 +107,8 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
             !isFetchingCustomerDetails &&
             !isNil(customerDetails)) {
             this.logger.info('Got the customer details!', customerDetails);
-            // TODO: Format the Address and update it
+            const customerAddress = `${customerDetails.companyName}\n${formatAddress(customerDetails.billingAddress)}`;
+            updateCustomerAddress(customerAddress);
             updateCustomerEmail(customerDetails.email);
         }
     }
@@ -358,7 +360,8 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
             if (!isNil(customerDetails) &&
                 customerDetails.customerNumber === customer.customerNumber) {
                 this.logger.info('Already had the customer details!', customerDetails);
-                // TODO: Format the Address and update it
+                const customerAddress = `${customerDetails.companyName}\n${formatAddress(customerDetails.billingAddress)}`;
+                updateCustomerAddress(customerAddress);
                 updateCustomerEmail(customerDetails.email);
             } else {
                 this.logger.info('Fetching the customer details ...');

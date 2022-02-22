@@ -141,7 +141,7 @@ th.sticky-border:after {
 #add_invoice_page--customer_address_textarea,
 #add_invoice_page--invoice_message_textarea {
     resize: none;
-    height: 96px;
+    height: 120px;
     width: 100%;
 }
 
