@@ -152,3 +152,7 @@ th.sticky-border:after {
 .add_invoice_page--bottom_row {
     margin-bottom: 22px;
 }
+
+.select_time_activities_for_invoicing_modal--modal_header .modal-title {
+    width: 100%;
+}

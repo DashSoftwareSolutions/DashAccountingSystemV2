@@ -28,6 +28,7 @@ import { NavigationSection } from './TenantSubNavigation';
 import Amount from '../models/Amount';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
+import SelectTimeActivitiesForInvoicingModalDialog from './SelectTimeActivitiesForInvoicingModalDialog';
 import TenantBasePage from './TenantBasePage';
 import * as CustomerStore from '../store/Customer';
 import * as InvoiceStore from '../store/Invoice';
@@ -66,7 +67,11 @@ const DEFAULT_AMOUNT: Amount = {
     assetType: DEFAULT_ASSET_TYPE,
 };
 
-class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
+interface AddInvoicePageState {
+    isSelectTimeActivitiesModalOpen: boolean;
+}
+
+class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoicePageState> {
     private logger: ILogger;
     private bemBlockName: string = 'add_invoice_page';
 
@@ -75,9 +80,14 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
 
         this.logger = new Logger('Add Invoice Page');
 
+        this.state = {
+            isSelectTimeActivitiesModalOpen: false,
+        };
+
         this.onClickAddUnbilledTime = this.onClickAddUnbilledTime.bind(this);
         this.onClickCancel = this.onClickCancel.bind(this);
         this.onClickSave = this.onClickSave.bind(this);
+        this.onCloseAddUnbilledTimeModal = this.onCloseAddUnbilledTimeModal.bind(this);
         this.onCustomerAddressChanged = this.onCustomerAddressChanged.bind(this);
         this.onCustomerEmailChanged = this.onCustomerEmailChanged.bind(this);
         this.onCustomerSelectionChanged = this.onCustomerSelectionChanged.bind(this);
@@ -121,6 +131,10 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
             invoiceTermsOptions,
             selectedTenant,
         } = this.props;
+
+        const {
+            isSelectTimeActivitiesModalOpen,
+        } = this.state;
 
         const amount: Amount = dirtyInvoice?.amount ?? DEFAULT_AMOUNT;
 
@@ -288,6 +302,10 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
                             </Col>
                         </Row>
                     </Form>
+                    <SelectTimeActivitiesForInvoicingModalDialog
+                        isOpen={isSelectTimeActivitiesModalOpen}
+                        onClose={this.onCloseAddUnbilledTimeModal}
+                    />
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -305,6 +323,7 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
 
     private onClickAddUnbilledTime() {
         this.logger.info('Open the modal dialog to select unbilled Time Activities to add to the Invoice...');
+        this.setState({ isSelectTimeActivitiesModalOpen: true });
     }
 
     private onClickCancel() {
@@ -321,6 +340,10 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
         this.logger.info('Saving the invoice...');
 
         // TODO: Implement save
+    }
+
+    private onCloseAddUnbilledTimeModal(_: React.MouseEvent<any>) {
+        this.setState({ isSelectTimeActivitiesModalOpen: false });
     }
 
     private onCustomerAddressChanged(event: React.FormEvent<HTMLInputElement>) {
