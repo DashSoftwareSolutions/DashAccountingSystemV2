@@ -1,9 +1,8 @@
 ﻿import * as React from 'react';
 import {
+    find,
     isEmpty,
-    isFinite,
     isNil,
-    kebabCase,
     map,
 } from 'lodash';
 import { ConnectedProps, connect } from 'react-redux';
@@ -35,10 +34,12 @@ import InvoiceLineItem from '../models/InvoiceLineItem';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
-        customers: state?.customers?.customers ?? [],
+        customers: state?.customers?.list.customers ?? [],
+        customerDetails: state?.customers?.details.customer ?? null,
         dirtyInvoice: state.invoice?.details.dirtyInvoice,
         invoiceTermsOptions: state.invoice?.details.invoiceTermsOptions,
-        isFetchingCustomers: state.customers?.isLoading ?? false,
+        isFetchingCustomerDetails: state?.customers?.details.isLoading ?? false,
+        isFetchingCustomers: state.customers?.list.isLoading ?? false,
         isFetchingInvoiceTerms: state.invoice?.details.isLoadingInvoiceTerms ?? false,
         selectedTenant: state.tenants?.selectedTenant,
     };
@@ -46,6 +47,7 @@ const mapStateToProps = (state: ApplicationState) => {
 
 const mapDispatchToProps = {
     ...InvoiceStore.actionCreators,
+    requestCustomerDetails: CustomerStore.actionCreators.requestCustomerDetails,
     requestCustomers: CustomerStore.actionCreators.requestCustomers,
 };
 
@@ -86,6 +88,27 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
 
     public componentDidMount() {
         this.ensureDataFetched();
+    }
+
+    public componentDidUpdate(prevProps: AddInvoicePageProps) {
+        const {
+            isFetchingCustomerDetails: wasFetchingCustomerDetails,
+        } = prevProps;
+
+        const {
+            customerDetails,
+            isFetchingCustomerDetails,
+            updateCustomerAddress,
+            updateCustomerEmail,
+        } = this.props;
+
+        if (wasFetchingCustomerDetails &&
+            !isFetchingCustomerDetails &&
+            !isNil(customerDetails)) {
+            this.logger.info('Got the customer details!', customerDetails);
+            // TODO: Format the Address and update it
+            updateCustomerEmail(customerDetails.email);
+        }
     }
 
     public render() {
@@ -309,7 +332,15 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
     }
 
     private onCustomerSelectionChanged(event: React.ChangeEvent<HTMLSelectElement>) {
-        const { updateCustomer } = this.props;
+        const {
+            customers,
+            customerDetails,
+            requestCustomerDetails,
+            updateCustomer,
+            updateCustomerAddress,
+            updateCustomerEmail,
+        } = this.props;
+
         const selectElement = event.target;
 
         if (selectElement.selectedIndex === -1) {
@@ -320,6 +351,20 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps> {
         const selectedOption = selectElement.selectedOptions[0];
 
         updateCustomer(selectedOption.value);
+
+        const customer = find(customers, (c) => c.id === selectedOption.value);
+
+        if (!isNil(customer)) {
+            if (!isNil(customerDetails) &&
+                customerDetails.customerNumber === customer.customerNumber) {
+                this.logger.info('Already had the customer details!', customerDetails);
+                // TODO: Format the Address and update it
+                updateCustomerEmail(customerDetails.email);
+            } else {
+                this.logger.info('Fetching the customer details ...');
+                requestCustomerDetails(customer.customerNumber);
+            }
+        }
     }
 
     private onInvoiceDueDateChanged(event: React.FormEvent<HTMLInputElement>) {

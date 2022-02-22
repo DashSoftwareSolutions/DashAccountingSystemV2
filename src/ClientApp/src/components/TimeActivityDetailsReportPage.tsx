@@ -40,12 +40,12 @@ import DateRangeMacroType from '../models/DateRangeMacroType';
 const mapStateToProps = (state: ApplicationState) => {
     return {
         reportData: state?.timeActivity?.detailsReportData ?? null,
-        customers: state?.customers?.customers ?? [],
+        customers: state?.customers?.list.customers ?? [],
         employees: state?.employees?.employees ?? [],
         dateRangeEnd: state?.timeActivity?.dateRangeEnd,
         dateRangeStart: state?.timeActivity?.dateRangeStart,
         isDeleting: state.timeActivity?.isDeleting ?? false,
-        isFetchingCustomers: state.customers?.isLoading ?? false,
+        isFetchingCustomers: state.customers?.list.isLoading ?? false,
         isFetchingEmployees: state.employees?.isLoading ?? false,
         isFectingProducts: state.products?.isLoading ?? false,
         isFetchingTimeActivityData: state.timeActivity?.isLoading ?? false,

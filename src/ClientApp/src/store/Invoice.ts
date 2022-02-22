@@ -298,14 +298,14 @@ export const actionCreators = {
 };
 
 const getDueDateBasedOnInvoiceTerms = (invoiceIssueDate: string, terms: InvoiceTerms): string | null => {
-    const issueDateMoment = moment.default(invoiceIssueDate, 'YYYY-MM-DD');
+    const issueDateMoment = moment(invoiceIssueDate, 'YYYY-MM-DD');
 
     if (!isNil(terms.dueInDays)) {
-        return moment.default(issueDateMoment).add(terms.dueInDays, 'days').format('YYYY-MM-DD');
+        return moment(issueDateMoment).add(terms.dueInDays, 'days').format('YYYY-MM-DD');
     }
 
     if (!isNil(terms.dueOnDayOfMonth)) {
-        let dueDate = moment.default(issueDateMoment).date(terms.dueOnDayOfMonth);
+        let dueDate = moment(issueDateMoment).date(terms.dueOnDayOfMonth);
 
         if (dueDate.isSameOrBefore(issueDateMoment, 'day')) {
             dueDate.month(dueDate.month() + 1);
@@ -406,7 +406,7 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                         dirtyInvoice: {
                             tenantId: action.tenant.id,
                             status: InvoiceStatus.Draft,
-                            issueDate: moment.default().format('YYYY-MM-DD'),
+                            issueDate: moment().format('YYYY-MM-DD'),
                             amount: {
                                 amount: 0,
                                 amountAsString: '0.00',

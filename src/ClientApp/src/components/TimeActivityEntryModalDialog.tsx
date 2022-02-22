@@ -37,7 +37,7 @@ interface TimeActivityEntryModalDialogOwnProps {
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
-        customers: state?.customers?.customers ?? [],
+        customers: state?.customers?.list.customers ?? [],
         employees: state?.employees?.employees ?? [],
         isDeleting: state.timeActivity?.isDeleting ?? false,
         isSaving: state.timeActivity?.isSaving ?? false,
