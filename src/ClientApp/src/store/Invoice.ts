@@ -51,21 +51,29 @@ const DEFAULT_INVOICE_LIST_STATE: InvoiceListState = {
 };
 
 export interface SingleInvoiceState {
+    dirtyInvoice: Invoice | null;
+    isDeleting: boolean;
     isLoadingInvoice: boolean;
     isLoadingInvoiceTerms: boolean;
+    isLoadingUnbilledTimeActivities: boolean;
     isSaving: boolean;
-    isDeleting: boolean;
     invoiceTermsOptions: InvoiceTerms[],
-    dirtyInvoice: Invoice | null;
+    unbilledTimeActivities: TimeActivity[];
+    unbilledTimeActivitiesFilterStartDate: string | null;
+    unbilledTimeActivitiesFilterEndDate: string | null;
 }
 
 const DEFAULT_SINGLE_INVOICE_STATE: SingleInvoiceState = {
+    dirtyInvoice: null,
+    isDeleting: false,
     isLoadingInvoice: false,
     isLoadingInvoiceTerms: false,
+    isLoadingUnbilledTimeActivities: false,
     isSaving: false,
-    isDeleting: false,
     invoiceTermsOptions: [],
-    dirtyInvoice: null,
+    unbilledTimeActivities: [],
+    unbilledTimeActivitiesFilterStartDate: null,
+    unbilledTimeActivitiesFilterEndDate: null,
 };
 
 export interface InvoiceStoreState {
@@ -98,6 +106,15 @@ interface RequestInvoiceTermsAction extends IAction {
 interface ReceiveInvoiceTermsAction extends IAction {
     type: ActionType.RECEIVE_INVOICE_TERMS,
     data: InvoiceTerms[],
+}
+
+interface RequestUnbilledTimeActivitiesAction extends IAction {
+    type: ActionType.REQUEST_UNBILLED_TIME_ACTIVITIES;
+}
+
+interface ReceiveUnbilledTimeActivitiesAction extends IAction {
+    type: ActionType.RECEIVE_UNBILLED_TIME_ACTIVITIES;
+    timeActivities: TimeActivity[];
 }
 /* END: REST API Actions */
 /* BEGIN: UI Gesture Actions */
@@ -140,6 +157,16 @@ interface UpdateInvoiceMessageAction extends IAction {
     type: ActionType.UPDATE_INVOICE_MESSAGE;
     message: string | null;
 }
+
+interface UpdateUnbilledTimeActivitiesFilterStartDateAction {
+    type: ActionType.UPDATE_UNBILLED_TIME_ACTIVITIES_FILTER_START_DATE;
+    startDate: string | null; // Date in YYYY-MM-DD format
+}
+
+interface UpdateUnbilledTimeActivitiesFilterEndDateAction {
+    type: ActionType.UPDATE_UNBILLED_TIME_ACTIVITIES_FILTER_END_DATE;
+    endDate: string | null; // Date in YYYY-MM-DD format
+}
 /* END: UI Gesture Actions */
 /* BEGIN: Resets */
 interface ResetInvoiceListAction extends IAction {
@@ -159,6 +186,8 @@ type KnownAction = RequestInvoiceListAction |
     ReceiveInvoiceListAction |
     RequestInvoiceTermsAction |
     ReceiveInvoiceTermsAction |
+    RequestUnbilledTimeActivitiesAction |
+    ReceiveUnbilledTimeActivitiesAction |
     InitializeNewInvoiceAction |
     UpdateCustomerAction |
     UpdateCustomerAddressAction |
@@ -167,6 +196,8 @@ type KnownAction = RequestInvoiceListAction |
     UpdateInvoiceIssueDateAction |
     UpdateInvoiceDueDateAction |
     UpdateInvoiceMessageAction |
+    UpdateUnbilledTimeActivitiesFilterStartDateAction |
+    UpdateUnbilledTimeActivitiesFilterEndDateAction |
     ResetInvoiceListAction |
     ResetDirtyInvoiceAction |
     ResetInvoiceStoreAction;
@@ -238,6 +269,47 @@ export const actionCreators = {
             dispatch({ type: ActionType.REQUEST_INVOICE_TERMS });
         }
     },
+
+    requestUnbilledTimeActivities: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+
+        if (!isNil(appState?.invoice) &&
+            !isNil(appState?.tenants?.selectedTenant) &&
+            !appState.invoice.details.isLoadingUnbilledTimeActivities &&
+            !isNil(appState.invoice.details.dirtyInvoice.customerId) &&
+            !isNil(appState.invoice.details.unbilledTimeActivitiesFilterStartDate) &&
+            !isNil(appState.invoice.details.unbilledTimeActivitiesFilterEndDate) &&
+            isEmpty(appState.invoice?.details.unbilledTimeActivities)) {
+            const customer = find(appState.customers.list.customers, (c) => c.id === appState.invoice.details.dirtyInvoice.customerId);
+
+            if (!isNil(customer)) {
+                const accessToken = await authService.getAccessToken();
+                const tenantId = appState?.tenants?.selectedTenant?.id;
+                const requestUrl = `api/time-tracking/${tenantId}/unbilled-time-activities?customer=${customer.customerNumber}&dateRangeStart=${appState.invoice.details.unbilledTimeActivitiesFilterStartDate}&dateRangeEnd=${appState.invoice.details.unbilledTimeActivitiesFilterEndDate}`;
+
+                fetch(requestUrl, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                            return null;
+                        }
+
+                        return response.json() as Promise<TimeActivity[]>
+                    })
+                    .then((timeActivities) => {
+                        if (!isNil(timeActivities)) {
+                            dispatch({ type: ActionType.RECEIVE_UNBILLED_TIME_ACTIVITIES, timeActivities });
+                        }
+                    });
+
+                dispatch({ type: ActionType.REQUEST_UNBILLED_TIME_ACTIVITIES });
+            }
+        }
+    },
     /* END: REST API Actions */
 
     /* BEGIN: UI Gesture Actions */
@@ -279,6 +351,14 @@ export const actionCreators = {
 
     updateInvoiceMessage: (message: string | null): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.UPDATE_INVOICE_MESSAGE, message });
+    },
+
+    updateUnbilledTimeActivitiesFilterStartDate: (startDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_UNBILLED_TIME_ACTIVITIES_FILTER_START_DATE, startDate });
+    },
+
+    updateUnbilledTimeActivitiesFilterEndDate: (endDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_UNBILLED_TIME_ACTIVITIES_FILTER_END_DATE, endDate });
     },
     /* END: UI Gesture Actions */
 
@@ -395,6 +475,25 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                     },
                 };
             }
+
+            case ActionType.REQUEST_UNBILLED_TIME_ACTIVITIES:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        isLoadingUnbilledTimeActivities: true,
+                    },
+                };
+
+            case ActionType.RECEIVE_UNBILLED_TIME_ACTIVITIES:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        isLoadingUnbilledTimeActivities: false,
+                        unbilledTimeActivities: action.timeActivities,
+                    },
+                };
             /* END: REST API Actions */
 
             /* BEGIN: UI Gesture Actions */
@@ -539,6 +638,24 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                             ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
                             message: action.message,
                         },
+                    },
+                };
+
+            case ActionType.UPDATE_UNBILLED_TIME_ACTIVITIES_FILTER_START_DATE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        unbilledTimeActivitiesFilterStartDate: action.startDate,
+                    },
+                };
+
+            case ActionType.UPDATE_UNBILLED_TIME_ACTIVITIES_FILTER_END_DATE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        unbilledTimeActivitiesFilterEndDate: action.endDate,
                     },
                 };
             /* END: UI Gesture Actions */

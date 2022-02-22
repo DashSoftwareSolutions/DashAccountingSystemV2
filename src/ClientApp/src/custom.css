@@ -156,3 +156,12 @@ th.sticky-border:after {
 .select_time_activities_for_invoicing_modal--modal_header .modal-title {
     width: 100%;
 }
+
+.select_time_activities_for_invoicing_modal--main_content_container {
+    height: 400px;
+    overflow-y: auto; /* TODO: Might want to get custom scrollbars */
+}
+
+.select_time_activities_for_invoicing_modal--main_content_container p {
+    margin-top: 176px; /* Trying to roughtly center vertically ... 176px = 200px - 24px content height */
+}
