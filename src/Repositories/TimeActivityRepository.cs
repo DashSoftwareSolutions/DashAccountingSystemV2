@@ -172,6 +172,8 @@ ORDER BY c.""DisplayName""
                     .ThenInclude(p => p.Category)
                 .Include(ta => ta.CreatedBy)
                 .Include(ta => ta.UpdatedBy)
+                .OrderBy(ta => ta.Date)
+                .ThenBy(ta => ta.StartTime)
                 .ToListAsync();
         }
 
