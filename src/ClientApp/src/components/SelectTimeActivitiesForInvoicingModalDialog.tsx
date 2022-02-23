@@ -204,8 +204,6 @@ class SelectTimeActivitiesForInvoicingModalDialog extends React.PureComponent<Se
     }
 
     private onClickAddSelectedItemsToInvoice(event: React.MouseEvent<any>) {
-        this.logger.info('Adding selected items to the invoice ...');
-
         this.setState(({ selectedTimeActivityIds }) => {
             const {
                 addSelectedTimeActivitiesAsInvoiceLineItems,

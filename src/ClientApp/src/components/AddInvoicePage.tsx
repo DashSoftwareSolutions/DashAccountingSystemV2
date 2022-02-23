@@ -27,11 +27,12 @@ import { NavigationSection } from './TenantSubNavigation';
 import Amount from '../models/Amount';
 import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
+import InvoiceLineItem from '../models/InvoiceLineItem';
 import SelectTimeActivitiesForInvoicingModalDialog from './SelectTimeActivitiesForInvoicingModalDialog';
 import TenantBasePage from './TenantBasePage';
 import * as CustomerStore from '../store/Customer';
 import * as InvoiceStore from '../store/Invoice';
-import InvoiceLineItem from '../models/InvoiceLineItem';
+import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
@@ -42,6 +43,8 @@ const mapStateToProps = (state: ApplicationState) => {
         isFetchingCustomerDetails: state?.customers?.details.isLoading ?? false,
         isFetchingCustomers: state.customers?.list.isLoading ?? false,
         isFetchingInvoiceTerms: state.invoice?.details.isLoadingInvoiceTerms ?? false,
+        isSaving: state.invoice?.details.isSaving ?? false,
+        savedInvoice: state.invoice?.details.existingInvoice ?? null,
         selectedTenant: state.tenants?.selectedTenant,
     };
 }
@@ -50,6 +53,7 @@ const mapDispatchToProps = {
     ...InvoiceStore.actionCreators,
     requestCustomerDetails: CustomerStore.actionCreators.requestCustomerDetails,
     requestCustomers: CustomerStore.actionCreators.requestCustomers,
+    showAlert: SystemNotificationsStore.actionCreators.showAlert,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -103,11 +107,18 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
     public componentDidUpdate(prevProps: AddInvoicePageProps) {
         const {
             isFetchingCustomerDetails: wasFetchingCustomerDetails,
+            isSaving: wasSaving,
         } = prevProps;
 
         const {
             customerDetails,
+            history,
             isFetchingCustomerDetails,
+            isSaving,
+            resetInvoiceList,
+            resetDirtyInvoice,
+            savedInvoice,
+            showAlert,
             updateCustomerAddress,
             updateCustomerEmail,
         } = this.props;
@@ -115,10 +126,19 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
         if (wasFetchingCustomerDetails &&
             !isFetchingCustomerDetails &&
             !isNil(customerDetails)) {
-            this.logger.info('Got the customer details!', customerDetails);
             const customerAddress = `${customerDetails.companyName}\n${formatAddress(customerDetails.billingAddress)}`;
             updateCustomerAddress(customerAddress);
             updateCustomerEmail(customerDetails.email);
+        }
+
+        if (wasSaving &&
+            !isSaving &&
+            !isNil(savedInvoice)) {
+            this.logger.info('Saved the Invoice!', savedInvoice);
+            showAlert('success', `Successfully created Invoice # ${savedInvoice.invoiceNumber}`, true);
+            resetDirtyInvoice();
+            resetInvoiceList();
+            history.push('/invoicing'); // TODO/FIXME: May go to view details page for the new Invoice instead
         }
     }
 
@@ -338,7 +358,8 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
     private onClickSave() {
         this.logger.info('Saving the invoice...');
 
-        // TODO: Implement save
+        const { saveNewInvoice } = this.props;
+        saveNewInvoice();
     }
 
     private onCloseAddUnbilledTimeModal(_: React.MouseEvent<any>) {
