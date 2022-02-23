@@ -13,7 +13,7 @@ import {
     map,
 } from 'lodash';
 import { RouteComponentProps, withRouter } from 'react-router';
-import * as moment from 'moment-timezone';
+import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import {
     ILogger,

@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup Label="Package">
     <PackageId>DashAccountingSystemV2</PackageId>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Authors>Geoffrey Roberts</Authors>
     <Company>Dash Software Solutions, Inc.</Company>
-    <Copyright>Copyright (C) 2021 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
+    <Copyright>Copyright (C) 2022 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Label="Build">
@@ -52,24 +52,25 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
-  </ItemGroup>
-
-  <ItemGroup>
+  <ItemGroup Label="Single Page Application (SPA) Files">
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Folder Includes">
     <Folder Include="Services\Export\ExcelTemplates\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
   <ItemGroup Label="Excel Templates Include">
     <ExcelTemplates Include="Services\Export\ExcelTemplates\*.xlsx" />
+  </ItemGroup>
+
+  <ItemGroup Label="TypeScript Config">
+    <None Remove="ClientApp\tsconfig.json" />
+    <Content Include="ClientApp\tsconfig.json" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

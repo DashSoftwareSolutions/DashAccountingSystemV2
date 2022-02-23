@@ -16,7 +16,7 @@ import {
     reduce,
     trim,
 } from 'lodash';
-import * as moment from 'moment-timezone';
+import moment from 'moment-timezone';
 import { AppThunkAction } from './';
 import { DEFAULT_INVOICE_TERMS } from '../common/Constants';
 import { isStringNullOrWhiteSpace } from '../common/StringUtils';
@@ -276,11 +276,11 @@ export const actionCreators = {
         if (!isNil(appState?.invoice) &&
             !isNil(appState?.tenants?.selectedTenant) &&
             !appState.invoice.details.isLoadingUnbilledTimeActivities &&
-            !isNil(appState.invoice.details.dirtyInvoice.customerId) &&
+            !isNil(appState.invoice.details.dirtyInvoice?.customerId) &&
             !isNil(appState.invoice.details.unbilledTimeActivitiesFilterStartDate) &&
             !isNil(appState.invoice.details.unbilledTimeActivitiesFilterEndDate) &&
             isEmpty(appState.invoice?.details.unbilledTimeActivities)) {
-            const customer = find(appState.customers.list.customers, (c) => c.id === appState.invoice.details.dirtyInvoice.customerId);
+            const customer = find(appState.customers?.list.customers, (c) => c.id === appState.invoice?.details.dirtyInvoice?.customerId);
 
             if (!isNil(customer)) {
                 const accessToken = await authService.getAccessToken();

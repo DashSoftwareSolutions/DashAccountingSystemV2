@@ -18,7 +18,7 @@ import {
     isNil,
     some,
 } from 'lodash';
-import * as moment from 'moment-timezone';
+import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import {
     ILogger,
