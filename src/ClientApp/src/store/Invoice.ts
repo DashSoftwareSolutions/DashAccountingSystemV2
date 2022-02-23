@@ -4,29 +4,24 @@
     Reducer,
 } from 'redux';
 import {
-    cloneDeep,
-    filter,
     find,
-    findIndex,
-    groupBy,
     isEmpty,
     isNil,
-    keys,
     map,
     reduce,
-    trim,
 } from 'lodash';
 import moment from 'moment-timezone';
 import { AppThunkAction } from './';
-import { DEFAULT_INVOICE_TERMS } from '../common/Constants';
-import { isStringNullOrWhiteSpace } from '../common/StringUtils';
+import {
+    DEFAULT_ASSET_TYPE,
+    DEFAULT_INVOICE_TERMS,
+} from '../common/Constants';
 import { Logger } from '../common/Logging';
-import { numbersAreEqualWithPrecision } from '../common/NumericUtils';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
-import Amount from '../models/Amount';
 import AmountType from '../models/AmountType';
+import AssetType from '../models/AssetType';
 import IAction from './IAction';
 import Invoice from '../models/Invoice';
 import InvoiceLineItem from '../models/InvoiceLineItem';
@@ -37,7 +32,7 @@ import PagedResult from '../models/PagedResult';
 import Tenant from '../models/Tenant';
 import TimeActivity from '../models/TimeActivity';
 
-// TODO: Validation state for Invoice CRUD
+// TODO: Validation state for Invoice Create/Update
 
 export interface InvoiceListState {
     isLoading: boolean;
@@ -167,6 +162,12 @@ interface UpdateUnbilledTimeActivitiesFilterEndDateAction {
     type: ActionType.UPDATE_UNBILLED_TIME_ACTIVITIES_FILTER_END_DATE;
     endDate: string | null; // Date in YYYY-MM-DD format
 }
+
+interface AddSelectedTimeActivitiesAsInvoiceLineItemsAction {
+    type: ActionType.ADD_SELECTED_TIME_ACTIVITIES_AS_INVOICE_LINE_ITEMS,
+    assetType: AssetType;
+    timeActivities: TimeActivity[];
+}
 /* END: UI Gesture Actions */
 /* BEGIN: Resets */
 interface ResetInvoiceListAction extends IAction {
@@ -198,6 +199,7 @@ type KnownAction = RequestInvoiceListAction |
     UpdateInvoiceMessageAction |
     UpdateUnbilledTimeActivitiesFilterStartDateAction |
     UpdateUnbilledTimeActivitiesFilterEndDateAction |
+    AddSelectedTimeActivitiesAsInvoiceLineItemsAction |
     ResetInvoiceListAction |
     ResetDirtyInvoiceAction |
     ResetInvoiceStoreAction;
@@ -359,6 +361,17 @@ export const actionCreators = {
 
     updateUnbilledTimeActivitiesFilterEndDate: (endDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.UPDATE_UNBILLED_TIME_ACTIVITIES_FILTER_END_DATE, endDate });
+    },
+
+    addSelectedTimeActivitiesAsInvoiceLineItems: (timeActivities: TimeActivity[]): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+        const assetType = appState.tenants?.selectedTenant?.defaultAssetType ?? DEFAULT_ASSET_TYPE;
+
+        dispatch({
+            type: ActionType.ADD_SELECTED_TIME_ACTIVITIES_AS_INVOICE_LINE_ITEMS,
+            assetType,
+            timeActivities
+        });
     },
     /* END: UI Gesture Actions */
 
@@ -658,6 +671,71 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                         unbilledTimeActivitiesFilterEndDate: action.endDate,
                     },
                 };
+
+            case ActionType.ADD_SELECTED_TIME_ACTIVITIES_AS_INVOICE_LINE_ITEMS: {
+                logger.info('Here come the Time Activities!', action.timeActivities);
+
+                const existingLineItems = state.details.dirtyInvoice?.lineItems ?? [];
+                const maxExistingOrderNumber = reduce(
+                    map(existingLineItems, (li) => li.orderNumber),
+                    (prevMax, current) => current > prevMax ? current : prevMax,
+                    0);
+
+                let nextOrderNumber = maxExistingOrderNumber;
+
+                const newLineItems = map(
+                    action.timeActivities,
+                    (ta: TimeActivity): InvoiceLineItem => {
+                        const quantity = moment.duration(ta.totalTime).asHours();
+
+                        return {
+                            id: null,
+                            orderNumber: ++nextOrderNumber,
+                            date: ta.date,
+                            productId: ta.productId,
+                            productOrService: ta.product?.name,
+                            productCategory: ta.product?.category,
+                            description: ta.description,
+                            quantity,
+                            unitPrice: {
+                                amount: ta.hourlyBillingRate ?? 0,
+                                amountType: AmountType.Debit,
+                                assetType: action.assetType,
+                            },
+                            total: {
+                                amount: quantity * (ta.hourlyBillingRate ?? 0),
+                                amountType: AmountType.Debit,
+                                assetType: action.assetType,
+                            },
+                            timeActivityId: ta.id ?? '',
+                        };
+                    },
+                );
+
+                const updatedLineItems = [...existingLineItems, ...newLineItems];
+
+                const invoiceTotal = reduce(
+                    map(updatedLineItems, (li) => li.total?.amount ?? 0),
+                    (sum, next) => (sum + next),
+                    0);
+
+
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        dirtyInvoice: {
+                            ...state.details.dirtyInvoice as Pick<Invoice, keyof Invoice>,
+                            lineItems: updatedLineItems,
+                            amount: {
+                                amount: invoiceTotal,
+                                amountType: AmountType.Debit,
+                                assetType: action.assetType,
+                            },
+                        },
+                    },
+                };
+            }
             /* END: UI Gesture Actions */
 
             /* BEGIN: Resets */

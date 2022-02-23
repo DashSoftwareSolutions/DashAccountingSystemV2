@@ -14,6 +14,8 @@ import {
     Row,
 } from 'reactstrap';
 import {
+    filter,
+    includes,
     isEmpty,
     isNil,
     map,
@@ -204,17 +206,31 @@ class SelectTimeActivitiesForInvoicingModalDialog extends React.PureComponent<Se
     private onClickAddSelectedItemsToInvoice(event: React.MouseEvent<any>) {
         this.logger.info('Adding selected items to the invoice ...');
 
-        // TODO: Dispatch action to add the selected Time Activties to the Invoice
+        this.setState(({ selectedTimeActivityIds }) => {
+            const {
+                addSelectedTimeActivitiesAsInvoiceLineItems,
+                onClose,
+                timeActivities,
+            } = this.props;
 
-        // Reset component state
-        this.setState({
-            hasCheckedForTimeActivities: false,
-            isSelectAllChecked: false,
-            selectedTimeActivityIds: [],
+            const selectedTimeActivities = filter(
+                timeActivities,
+                (ta) => includes(selectedTimeActivityIds, ta.id),
+            );
+
+            // Dispatch action to add the selected Time Activties to the Invoice
+            addSelectedTimeActivitiesAsInvoiceLineItems(selectedTimeActivities);
+
+            // Close the modal
+            onClose(event);
+
+            // Reset component state
+            return {
+                hasCheckedForTimeActivities: false,
+                isSelectAllChecked: false,
+                selectedTimeActivityIds: [],
+            };
         });
-
-        const { onClose } = this.props;
-        onClose(event);
     }
 
     private onClickCancel(event: React.MouseEvent<any>) {

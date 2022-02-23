@@ -10,13 +10,12 @@ import {
     Button,
     Col,
     Form,
-    FormFeedback,
-    FormGroup,
     Input,
     Label,
     Row,
 } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
+import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import { DEFAULT_ASSET_TYPE } from '../common/Constants';
 import { formatAddress } from '../common/StringUtils';
@@ -289,7 +288,7 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
                             </Col>
                         </Row>
                         <Row form className={`${this.bemBlockName}--bottom_row`}>
-                            <Col sm={6} md={4}>
+                            <Col sm={6}>
                                 <Label for={`${this.bemBlockName}--customer_address_textarea`}>Message on Invoice</Label>
                                 <Input
                                     id={`${this.bemBlockName}--invoice_message_textarea`}
@@ -428,9 +427,9 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
                 <thead>
                     <tr>
                         <th className="col-md-1 bg-white sticky-top sticky-border">#</th>
-                        <th className="col-md-2 bg-white sticky-top sticky-border">Service Date</th>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">{'Service\u00A0Date'}</th>
                         <th className="col-md-2 bg-white sticky-top sticky-border">Product/Service</th>
-                        <th className="col-md-4 bg-white sticky-top sticky-border">Description</th>
+                        <th className="col-md-5 bg-white sticky-top sticky-border">Description</th>
                         <th className="col-md-1 bg-white sticky-top sticky-border text-right">Qty</th>
                         <th className="col-md-1 bg-white sticky-top sticky-border text-right">Rate</th>
                         <th className="col-md-1 bg-white sticky-top sticky-border text-right">Amount</th>
@@ -440,7 +439,9 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
                     {map(lineItems, (li) => ((
                         <tr key={`line-item-${li.id ?? li.orderNumber.toString()}`}>
                             <td>{li.orderNumber}</td>
-                            <td>{li.date}</td>
+                            <td>
+                                {moment(li.date).format('L')}
+                            </td>
                             <td>{li.productOrService}</td>
                             <td>
                                 <span
@@ -448,14 +449,14 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
                                     style={{ wordWrap: 'break-word' }}
                                 />
                             </td>
-                            <td>{li.quantity}</td>
-                            <td>
+                            <td className="text-right">{li.quantity}</td>
+                            <td className="text-right">
                                 <AmountDisplay
                                     amount={li.unitPrice ?? DEFAULT_AMOUNT}
                                     showCurrency
                                 />
                             </td>
-                            <td>
+                            <td className="text-right">
                                 <AmountDisplay
                                     amount={li.total ?? DEFAULT_AMOUNT}
                                     showCurrency
