@@ -15,6 +15,7 @@ import {
 import { RouteComponentProps, withRouter } from 'react-router';
 import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
+import { displayHhMm } from '../common/StringUtils';
 import {
     ILogger,
     Logger,
@@ -296,24 +297,6 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
         requestTimeActivityDetailsReportData();
     }
 
-    private displayHhMm(input: any): string {
-        if (!moment.isDuration(input)) {
-            return '';
-        }
-
-        return `${this.pad(Math.floor(input.asHours()), 2)}:${this.pad(input.minutes(), 2)}`;
-    }
-
-    private pad(num: number, size: number): string  {
-        let result = num.toString();
-
-        while (result.length < size) {
-            result = `0${result}`;
-        }
-
-        return result;
-    }
-
     private renderTimeAcitivityReport(reportData: TimeActivityDetailsReport | null): JSX.Element {
         if (isNil(reportData) || isEmpty(reportData.timeActivities)) {
             return (
@@ -393,7 +376,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                                                     onClick={() => this.onClickExistingTimeActivity(timeActivity)}
                                                     style={{ textAlign: 'right' }}
                                                 >
-                                                    {this.displayHhMm(moment.duration(timeActivity.totalTime))}
+                                                    {displayHhMm(moment.duration(timeActivity.totalTime))}
                                                 </LinkButton>
                                             </td>
                                             <td className="col-md-2 text-right">
@@ -425,7 +408,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                                         {`Total for ${customerGroup.customerDisplayName}`}
                                     </td>
                                     <td className="text-right">
-                                        {this.displayHhMm(totalDuration)}
+                                        {displayHhMm(totalDuration)}
                                     </td>
                                     <td className="text-right">
                                         <AmountDisplay

@@ -3,8 +3,23 @@
     isEmpty,
     isString,
 } from 'lodash';
-
+import moment from 'moment-timezone';
 import Address from '../models/Address';
+
+/**
+ * Formats Durations strings as hh:mm
+ * 
+ * @param input - Should be a Moment Duration object
+ * 
+ * @returns {String} - formatted duration
+ */
+export function displayHhMm(input: any): string {
+    if (!moment.isDuration(input)) {
+        return '';
+    }
+
+    return `${pad(Math.floor(input.asHours()), 2)}:${pad(input.minutes(), 2)}`;
+}
 
 /**
  * Formats a mailing address.
@@ -57,26 +72,56 @@ export function formatWithTwoDecimalPlaces(input: string) {
  *
  * @example
  * // returns true
- * Utils.isStringNullOrWhiteSpace('');
+ * isStringNullOrWhiteSpace('');
  *
  * @example
  * // returns true
- * Utils.isStringNullOrWhiteSpace('  ');
+ * isStringNullOrWhiteSpace('  ');
  *
  * @example
  * // return false
- * Utils.isStringNullOrWhiteSpace('foo');
+ * isStringNullOrWhiteSpace('foo');
  *
  * @example
  * // return false
- * Utils.isStringNullOrWhiteSpace('123');
+ * isStringNullOrWhiteSpace('123');
  *
  * @example
- * // return true (we require the input to actually be of type string)
- * Utils.isStringNullOrWhiteSpace(123);
+ * // return true (we require the input to actually be of type `string`)
+ * isStringNullOrWhiteSpace(123);
  *
  * @returns {Boolean}
  */
 export function isStringNullOrWhiteSpace(input: any) {
     return !isString(input) || isEmpty(input) || /^\s+$/.test(input);
+}
+
+/**
+ * Pads a number with leading zeroes until it has reached the specified size.
+ * 
+ * @param {Number} num - The number to pad
+ * @param {Number} size - The desired size, including as many leading zeroes as necessary
+ * 
+ * @example
+ * // returns 05
+ * pad(5, 2);
+ * 
+ * @example
+ * // returns 007
+ * pad(7, 3);
+ * 
+ * @example
+ * // returns 0042
+ * pad(42, 4);
+ * 
+ * @returns {String}
+ */
+export function pad(num: number, size: number): string {
+    let result = num.toString();
+
+    while (result.length < size) {
+        result = `0${result}`;
+    }
+
+    return result;
 }

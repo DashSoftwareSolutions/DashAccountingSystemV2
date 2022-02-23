@@ -16,16 +16,22 @@ import {
 import {
     isEmpty,
     isNil,
+    map,
     some,
+    without,
 } from 'lodash';
+import ClassNames from 'classnames';
 import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
+import { DEFAULT_ASSET_TYPE } from '../common/Constants';
+import { displayHhMm } from '../common/StringUtils';
 import {
     ILogger,
     Logger,
 } from '../common/Logging';
+import AmountType from '../models/AmountType';
+import AmountDisplay from './AmountDisplay';
 import * as InvoiceStore from '../store/Invoice';
-import TimeActivity from '../models/TimeActivity';
 
 interface SelectTimeActivitiesForInvoicingModalDialogOwnProps {
     isOpen: boolean;
@@ -34,6 +40,7 @@ interface SelectTimeActivitiesForInvoicingModalDialogOwnProps {
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
+        defaultAssetType: state?.tenants?.selectedTenant?.defaultAssetType ?? DEFAULT_ASSET_TYPE,
         startDate: state?.invoice?.details.unbilledTimeActivitiesFilterStartDate ?? null,
         endDate: state?.invoice?.details.unbilledTimeActivitiesFilterEndDate ?? null,
         isLoading: state?.invoice?.details.isLoadingUnbilledTimeActivities ?? false,
@@ -77,6 +84,8 @@ class SelectTimeActivitiesForInvoicingModalDialog extends React.PureComponent<Se
         this.onClickCancel = this.onClickCancel.bind(this);
         this.onClickCheckForUnbilledTimeActivities = this.onClickCheckForUnbilledTimeActivities.bind(this);
         this.onEndDateChanged = this.onEndDateChanged.bind(this);
+        this.onSelectAllCheckChanged = this.onSelectAllCheckChanged.bind(this);
+        this.onSelectTimeActivityCheckChanged = this.onSelectTimeActivityCheckChanged.bind(this);
         this.onStartDateChanged = this.onStartDateChanged.bind(this);
     }
 
@@ -92,7 +101,6 @@ class SelectTimeActivitiesForInvoicingModalDialog extends React.PureComponent<Se
 
         const {
             hasCheckedForTimeActivities,
-            isSelectAllChecked,
             selectedTimeActivityIds,
         } = this.state;
 
@@ -166,6 +174,7 @@ class SelectTimeActivitiesForInvoicingModalDialog extends React.PureComponent<Se
                                     disabled={!hasValidDateRange}
                                     id={`${this.bemBlockName}--check_for_unbilled_time_button`}
                                     onClick={this.onClickCheckForUnbilledTimeActivities}
+                                    outline
                                     style={{ width: 220, marginTop: 32 }}
                                 >
                                     Check for Unbilled Time
@@ -176,9 +185,9 @@ class SelectTimeActivitiesForInvoicingModalDialog extends React.PureComponent<Se
                             <Col sm={12} className={`${this.bemBlockName}--main_content_container`}>
                                 {isLoading ? (
                                     <p>Loading...</p>
-                                ) : !isEmpty(timeActivities) ? (
-                                        <p>TODO: Render the Time Activities!</p>
-                                    ) : hasCheckedForTimeActivities ? (
+                                ) : !isEmpty(timeActivities) ?
+                                        this.renderTimeActivities()
+                                    : hasCheckedForTimeActivities ? (
                                             <p>No Unbilled Time Activities found for this Customer and the selected date range.</p>
                                         ) : null}
                             </Col>
@@ -235,9 +244,131 @@ class SelectTimeActivitiesForInvoicingModalDialog extends React.PureComponent<Se
         updateUnbilledTimeActivitiesFilterEndDate(event.currentTarget.value ?? null);
     }
 
+    private onSelectAllCheckChanged(_: React.FormEvent<HTMLInputElement>) {
+        this.setState((prevState) => {
+            const { isSelectAllChecked: wasSelectAllChecked } = prevState;
+            const { timeActivities } = this.props;
+
+            const updatedState: SelectTimeActivitiesForInvoicingModalDialogState = {
+                ...prevState as Pick<SelectTimeActivitiesForInvoicingModalDialogState, keyof SelectTimeActivitiesForInvoicingModalDialogState>,
+                isSelectAllChecked: !wasSelectAllChecked,
+            };
+
+            if (wasSelectAllChecked) {
+                // going from checked to unchecked - deselect all the things!
+                updatedState.selectedTimeActivityIds = [];
+            } else {
+                // going from unchecked to checked - select all the things!
+                updatedState.selectedTimeActivityIds = map(timeActivities, (ta) => ta.id ?? '');
+            }
+
+            return updatedState;
+        })
+    }
+
+    private onSelectTimeActivityCheckChanged(_: React.FormEvent<HTMLInputElement>, timeActivityId: string) {
+        this.setState(({ selectedTimeActivityIds: prevSelectedTimeActivityIds }) => {
+            const { timeActivities } = this.props;
+
+            const wasSelected = some(prevSelectedTimeActivityIds, (id) => id === timeActivityId);
+
+            const selectedTimeActivityIds = wasSelected ?
+                without(prevSelectedTimeActivityIds, timeActivityId) :
+                [...prevSelectedTimeActivityIds, timeActivityId];
+
+            const isSelectAllChecked = timeActivities.length === selectedTimeActivityIds.length;
+
+            return {
+                isSelectAllChecked,
+                selectedTimeActivityIds, 
+            };
+        });
+    }
+
     private onStartDateChanged(event: React.FormEvent<HTMLInputElement>) {
         const { updateUnbilledTimeActivitiesFilterStartDate } = this.props;
         updateUnbilledTimeActivitiesFilterStartDate(event.currentTarget.value ?? null);
+    }
+
+    private renderTimeActivities(): JSX.Element {
+        const {
+            defaultAssetType,
+            timeActivities,
+        } = this.props;
+
+        const {
+            isSelectAllChecked,
+            selectedTimeActivityIds,
+        } = this.state;
+
+        const tableClasses = ClassNames(
+            'table',
+            'table-hover',
+            'table-sm',
+            'report-table',
+            `${this.bemBlockName}--time_activities_table`,
+        );
+
+        return (
+            <table className={tableClasses}>
+                <thead>
+                    <tr>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">
+                            <FormGroup check inline>
+                                <Input
+                                    checked={isSelectAllChecked}
+                                    id={`${this.bemBlockName}--select_all_checkbox`}
+                                    onChange={this.onSelectAllCheckChanged}
+                                    type="checkbox"
+                                />
+                            </FormGroup>
+                        </th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border">Activity Date</th>
+                        <th className="col-md-5 bg-white sticky-top sticky-border">Memo/Description</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Duration</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {map(timeActivities, (ta) => ((
+                        <tr key={ta.id}>
+                            <td>
+                                <FormGroup check inline>
+                                    <Input
+                                        checked={some(selectedTimeActivityIds, (id) => id === ta.id)}
+                                        id={`${this.bemBlockName}--select_checkbox_${ta.id}`}
+                                        onChange={(e: React.FormEvent<HTMLInputElement>) => this.onSelectTimeActivityCheckChanged(e, ta.id ?? '')}
+                                        type="checkbox"
+                                    />
+                                </FormGroup>
+                            </td>
+                            <td>
+                                {moment(ta.date).format('L')}
+                            </td>
+                            <td>
+                                <span
+                                    dangerouslySetInnerHTML={{ __html: ta.description?.replace(/\r?\n/g, '<br />') ?? '' }}
+                                    style={{ wordWrap: 'break-word' }}
+                                />
+                            </td>
+                            <td className="text-right">
+                                {displayHhMm(moment.duration(ta.totalTime))}
+                            </td>
+                            <td className="text-right">
+                                <AmountDisplay
+                                    amount={{
+                                        amount: ta.totalBillableAmount ?? 0,
+                                        amountType: AmountType.Debit,
+                                        assetType: defaultAssetType,
+                                    }}
+                                    showCurrency
+                                />
+                            </td>
+                        </tr>
+                    )))}
+                </tbody>
+            </table>
+        );
     }
 }
 
