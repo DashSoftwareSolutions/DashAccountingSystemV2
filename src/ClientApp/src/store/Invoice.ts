@@ -135,6 +135,15 @@ interface ReceiveInvoiceAction extends IAction {
     type: ActionType.RECEIVE_INVOICE;
     invoice: Invoice;
 }
+
+interface RequestSendInvoiceAction extends IAction {
+    type: ActionType.REQUEST_SEND_INVOICE;
+}
+
+interface SendInvoiceCompletedAction extends IAction {
+    type: ActionType.SEND_INVOICE_COMPLETED;
+    updatedInvoice: Invoice;
+}
 /* END: REST API Actions */
 
 /* BEGIN: UI Gesture Actions */
@@ -220,6 +229,8 @@ type KnownAction = RequestInvoiceListAction |
     RequestInvoiceAction |
     ReceiveInvoiceAction |
     NewInvoiceSaveCompletedAction |
+    RequestSendInvoiceAction |
+    SendInvoiceCompletedAction |
     InitializeNewInvoiceAction |
     UpdateCustomerAction |
     UpdateCustomerAddressAction |
@@ -420,6 +431,51 @@ export const actionCreators = {
             });
 
         dispatch({ type: ActionType.REQUEST_SAVE_NEW_INVOICE });
+    },
+
+    sendInvoice: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const tenantId = appState.tenants?.selectedTenant?.id;
+        const invoiceToSend = appState.invoice?.details.existingInvoice;
+
+        if (isNil(invoiceToSend)) {
+            logger.warn('No Invoice found in store state.  Bailing out.');
+            return;
+        }
+
+        const accessToken = await authService.getAccessToken();
+
+        const requestBody = {
+            tenantId,
+            invoiceNumber: invoiceToSend.invoiceNumber,
+            status: InvoiceStatus.Sent,
+        };
+
+        const requestOptions = {
+            method: 'PUT',
+            body: JSON.stringify(requestBody),
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch(`api/invoice/${tenantId}/${invoiceToSend.invoiceNumber}/status`, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                    return null;
+                }
+
+                return response.json() as Promise<Invoice>;
+            })
+            .then((updatedInvoice) => {
+                if (!isNil(updatedInvoice)) {
+                    dispatch({ type: ActionType.SEND_INVOICE_COMPLETED, updatedInvoice });
+                }
+            });
+
+        dispatch({ type: ActionType.REQUEST_SEND_INVOICE });
     },
     /* END: REST API Actions */
 
@@ -637,6 +693,7 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                 };
 
             case ActionType.REQUEST_SAVE_NEW_INVOICE:
+            case ActionType.REQUEST_SEND_INVOICE:
                 return {
                     ...state,
                     details: {
@@ -660,6 +717,16 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                     details: {
                         ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
                         existingInvoice: action.savedInvoice,
+                        isSaving: false,
+                    },
+                };
+
+            case ActionType.SEND_INVOICE_COMPLETED:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        existingInvoice: action.updatedInvoice,
                         isSaving: false,
                     },
                 };

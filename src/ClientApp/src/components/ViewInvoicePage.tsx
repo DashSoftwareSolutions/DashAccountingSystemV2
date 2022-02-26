@@ -24,22 +24,25 @@ import {
 import { NavigationSection } from './TenantSubNavigation';
 import AmountDisplay from './AmountDisplay';
 import InvoiceLineItemsTable from './InvoiceLineItemsTable';
+import InvoiceStatus from '../models/InvoiceStatus';
 import InvoiceStatusLabel from './InvoiceStatusLabel';
 import TenantBasePage from './TenantBasePage';
 import * as InvoiceStore from '../store/Invoice';
-import InvoiceStatus from '../models/InvoiceStatus';
+import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
         invoice: state.invoice?.details.existingInvoice ?? null,
         isDeleting: state.invoice?.details.isDeleting ?? false,
         isFetching: state.invoice?.details.isLoadingInvoice ?? false,
+        isSaving: state.invoice?.details.isSaving ?? false,
         selectedTenant: state.tenants?.selectedTenant,
     };
 }
 
 const mapDispatchToProps = {
-    requestInvoice: InvoiceStore.actionCreators.requestInvoice,
+    ...InvoiceStore.actionCreators,
+    showAlert: SystemNotificationsStore.actionCreators.showAlert,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -85,11 +88,50 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         this.ensureDataFetched();
     }
 
+    public componentDidUpdate(prevProps: ViewInvoicePageProps) {
+        const {
+            isDeleting: wasDeleting,
+            isSaving: wasSaving,
+        } = prevProps;
+
+        const {
+            history,
+            isDeleting,
+            isSaving,
+            invoice,
+            match: {
+                params: { invoiceNumber },
+            },
+            showAlert,
+            reset,
+            resetInvoiceList,
+        } = this.props;
+
+        if (wasSaving &&
+            !isSaving &&
+            !isNil(invoice)) {
+            this.setState({ isConfirmSendInvoiceModalOpen: false });
+            this.logger.debug('Just finished sending the invoice.');
+            showAlert('success', `Successfully updated Invoice # ${invoiceNumber} from 'Draft' to 'Sent'`, true);
+            resetInvoiceList();
+            return;
+        }
+
+        if (wasDeleting && !isDeleting) {
+            this.setState({ isConfirmDeleteInvoiceModalOpen: false });
+            this.logger.debug('Just finished deleting the journal entry.');
+            showAlert('success', `Successfully deleted Invoice # ${invoiceNumber}`, true);
+            reset();
+            history.push('/invoicing');
+        }
+    }
+
     public render() {
         const {
             history,
             invoice,
             isDeleting,
+            isSaving,
             selectedTenant,
         } = this.props;
 
@@ -233,13 +275,15 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
                         <ModalFooter>
                             <Button
                                 color="primary"
+                                disabled={isSaving}
                                 onClick={this.onSendInvoiceConfirmed}
                             >
-                                Yes, Send It
+                                {isSaving ? 'Sending...' : 'Yes, Send It'}
                             </Button>
                             {' '}
                             <Button
                                 color="secondary"
+                                disabled={isSaving}
                                 onClick={this.onSendInvoiceDeclined}
                             >
                                 No, Cancel
@@ -302,9 +346,8 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
 
     private onSendInvoiceConfirmed() {
         this.logger.info('We\'re sure we want to send the invoice.  Doing it...');
-        this.setState({ isConfirmSendInvoiceModalOpen: false });
-
-        // TODO: Implement end invoice action
+        const { sendInvoice } = this.props;
+        sendInvoice();
     }
 
     private onSendInvoiceDeclined() {
