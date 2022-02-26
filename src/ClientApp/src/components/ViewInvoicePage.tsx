@@ -159,9 +159,9 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
                     <ListGroupItem>
                         <Row>
                             <Col md={2}><strong>Invoice #</strong></Col>
-                            <Col md={4}>{invoice.invoiceNumber}</Col>
+                            <Col md={2}>{invoice.invoiceNumber}</Col>
                             <Col md={2}><strong>Amount</strong></Col>
-                            <Col md={4}>
+                            <Col md={2}>
                                 {!isNil(invoice.amount) && (
                                     <AmountDisplay
                                         amount={invoice.amount}
@@ -169,24 +169,20 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
                                     />
                                 )}
                             </Col>
-                        </Row>
-                    </ListGroupItem>
-                    <ListGroupItem>
-                        <Row>
                             <Col md={2}><strong>Status</strong></Col>
-                            <Col md={4}>
+                            <Col md={2}>
                                 <InvoiceStatusLabel isPastDue={isPastDue} status={invoice.status} />
                             </Col>
-                            <Col md={2}><strong>Terms</strong></Col>
-                            <Col md={4}>{invoice.invoiceTerms?.name}</Col>
                         </Row>
                     </ListGroupItem>
                     <ListGroupItem>
                         <Row>
                             <Col md={2}><strong>Issue Date</strong></Col>
-                            <Col md={4}>{issueDateMoment.format('L')}</Col>
+                            <Col md={2}>{issueDateMoment.format('L')}</Col>
+                            <Col md={2}><strong>Terms</strong></Col>
+                            <Col md={2}>{invoice.invoiceTerms?.name}</Col>
                             <Col md={2}><strong>Due Date</strong></Col>
-                            <Col md={4}>{dueDateMoment.format('L')}</Col>
+                            <Col md={2}>{dueDateMoment.format('L')}</Col>
                         </Row>
                     </ListGroupItem>
                     <ListGroupItem>
@@ -196,16 +192,18 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
                         </Row>
                     </ListGroupItem>
                     <ListGroupItem>
-                        <Col md={2}><strong>Message</strong></Col>
-                        <Col md={10}>
-                            {!isNil(invoice.message) && (
-                                <span
-                                    dangerouslySetInnerHTML={{
-                                        __html: invoice.message.replace(/\n/g, '<br />'),
-                                    }}
-                                />
-                            )}
-                        </Col>
+                        <Row>
+                            <Col md={2}><strong>Message</strong></Col>
+                            <Col md={10}>
+                                {!isNil(invoice.message) && (
+                                    <span
+                                        dangerouslySetInnerHTML={{
+                                            __html: invoice.message.replace(/\n/g, '<br />'),
+                                        }}
+                                    />
+                                )}
+                            </Col>
+                        </Row>
                     </ListGroupItem>
                 </ListGroup>
                 <div style={{ marginTop: 22 }}>
