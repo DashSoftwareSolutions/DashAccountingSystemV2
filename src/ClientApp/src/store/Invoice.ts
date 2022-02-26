@@ -126,6 +126,15 @@ interface NewInvoiceSaveCompletedAction extends IAction {
 interface SaveInvoiceErrorAction extends IAction {
     type: ActionType.SAVE_INVOICE_ERROR;
 }
+
+interface RequestInvoiceAction extends IAction {
+    type: ActionType.REQUEST_INVOICE;
+}
+
+interface ReceiveInvoiceAction extends IAction {
+    type: ActionType.RECEIVE_INVOICE;
+    invoice: Invoice;
+}
 /* END: REST API Actions */
 
 /* BEGIN: UI Gesture Actions */
@@ -208,6 +217,8 @@ type KnownAction = RequestInvoiceListAction |
     ReceiveUnbilledTimeActivitiesAction |
     RequestSaveNewInvoiceAction |
     SaveInvoiceErrorAction |
+    RequestInvoiceAction |
+    ReceiveInvoiceAction |
     NewInvoiceSaveCompletedAction |
     InitializeNewInvoiceAction |
     UpdateCustomerAction |
@@ -226,6 +237,40 @@ type KnownAction = RequestInvoiceListAction |
 
 export const actionCreators = {
     /* BEGIN: REST API Actions */
+    requestInvoice: (invoiceNumber: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+
+        if (!isNil(appState?.invoice) &&
+            !isNil(appState?.tenants?.selectedTenant) &&
+            !appState.invoice.details.isLoadingInvoice &&
+            (isEmpty(appState.invoice?.details.existingInvoice) ||
+                appState.invoice?.details.existingInvoice?.invoiceNumber !== invoiceNumber)) {
+            const accessToken = await authService.getAccessToken();
+            const tenantId = appState?.tenants?.selectedTenant?.id;
+
+            fetch(`api/invoice/${tenantId}/${invoiceNumber}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                        return null;
+                    }
+
+                    return response.json() as Promise<Invoice>
+                })
+                .then((invoice) => {
+                    if (!isNil(invoice)) {
+                        dispatch({ type: ActionType.RECEIVE_INVOICE, invoice });
+                    }
+                });
+
+            dispatch({ type: ActionType.REQUEST_INVOICE });
+        }
+    },
+
     requestInvoiceList: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
 
@@ -492,6 +537,25 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
     if (!isNil(action)) {
         switch (action.type) {
             /* BEGIN: REST API Actions */
+            case ActionType.REQUEST_INVOICE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        isLoadingInvoice: true,
+                    },
+                };
+
+            case ActionType.RECEIVE_INVOICE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        existingInvoice: action.invoice,
+                        isLoadingInvoice: false,
+                    },
+                };
+
             case ActionType.REQUEST_INVOICE_LIST:
                 return {
                     ...state,

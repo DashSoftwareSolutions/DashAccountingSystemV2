@@ -14,6 +14,7 @@ import LedgerPage from './components/LedgerPage';
 import ProfitAndLossPage from './components/ProfitAndLossPage';
 import SelectTenant from './components/SelectTenant';
 import TimeActivityReportDetailsPage from './components/TimeActivityDetailsReportPage';
+import ViewInvoicePage from './components/ViewInvoicePage';
 import ViewJournalEntryPage from './components/ViewJournalEntryPage';
 import AuthorizeRoute from './components/api-authorization/AuthorizeRoute';
 import ApiAuthorizationRoutes from './components/api-authorization/ApiAuthorizationRoutes';
@@ -37,6 +38,7 @@ export default () => (
         <AuthorizeRoute path='/time-tracking' component={TimeActivityReportDetailsPage} />
         <AuthorizeRoute path='/invoicing' component={InvoiceListPage} />
         <AuthorizeRoute path='/invoice/new' component={AddInvoicePage} />
+        <AuthorizeRoute path='/invoice/view/:invoiceNumber' component={ViewInvoicePage} />
         <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes} />
     </Layout>
 );

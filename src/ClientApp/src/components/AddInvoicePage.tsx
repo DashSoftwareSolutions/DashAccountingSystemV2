@@ -17,7 +17,9 @@ import {
 import { RouteComponentProps, withRouter } from 'react-router';
 import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
-import { DEFAULT_ASSET_TYPE } from '../common/Constants';
+import {
+    DEFAULT_AMOUNT,
+} from '../common/Constants';
 import { formatAddress } from '../common/StringUtils';
 import {
     ILogger,
@@ -25,9 +27,8 @@ import {
 } from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
 import Amount from '../models/Amount';
-import AmountType from '../models/AmountType';
 import AmountDisplay from './AmountDisplay';
-import InvoiceLineItem from '../models/InvoiceLineItem';
+import InvoiceLineItemsTable from './InvoiceLineItemsTable';
 import SelectTimeActivitiesForInvoicingModalDialog from './SelectTimeActivitiesForInvoicingModalDialog';
 import TenantBasePage from './TenantBasePage';
 import * as CustomerStore from '../store/Customer';
@@ -62,13 +63,6 @@ type AddInvoicePageReduxProps = ConnectedProps<typeof connector>;
 
 type AddInvoicePageProps = AddInvoicePageReduxProps
     & RouteComponentProps;
-
-const DEFAULT_AMOUNT: Amount = {
-    amount: 0,
-    amountAsString: '0.00',
-    amountType: AmountType.Debit,
-    assetType: DEFAULT_ASSET_TYPE,
-};
 
 interface AddInvoicePageState {
     isSelectTimeActivitiesModalOpen: boolean;
@@ -304,7 +298,7 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
                         </Row>
                         <Row form className={`${this.bemBlockName}--line_items_table_container`}>
                             <Col sm={12}>
-                                {this.renderInvoiceLineItems(dirtyInvoice?.lineItems ?? [])}
+                                <InvoiceLineItemsTable lineItems={dirtyInvoice?.lineItems ?? []} />
                             </Col>
                         </Row>
                         <Row form className={`${this.bemBlockName}--bottom_row`}>
@@ -440,54 +434,6 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
         const selectedOption = selectElement.selectedOptions[0];
 
         updateInvoiceTerms(selectedOption.value);
-    }
-
-    private renderInvoiceLineItems(lineItems: InvoiceLineItem[]): JSX.Element {
-        return (
-            <table className="table table-hover table-sm report-table">
-                <thead>
-                    <tr>
-                        <th className="col-md-1 bg-white sticky-top sticky-border">#</th>
-                        <th className="col-md-1 bg-white sticky-top sticky-border">{'Service\u00A0Date'}</th>
-                        <th className="col-md-2 bg-white sticky-top sticky-border">Product/Service</th>
-                        <th className="col-md-5 bg-white sticky-top sticky-border">Description</th>
-                        <th className="col-md-1 bg-white sticky-top sticky-border text-right">Qty</th>
-                        <th className="col-md-1 bg-white sticky-top sticky-border text-right">Rate</th>
-                        <th className="col-md-1 bg-white sticky-top sticky-border text-right">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {map(lineItems, (li) => ((
-                        <tr key={`line-item-${li.id ?? li.orderNumber.toString()}`}>
-                            <td>{li.orderNumber}</td>
-                            <td>
-                                {moment(li.date).format('L')}
-                            </td>
-                            <td>{li.productOrService}</td>
-                            <td>
-                                <span
-                                    dangerouslySetInnerHTML={{ __html: li.description?.replace(/\r?\n/g, '<br />') ?? '' }}
-                                    style={{ wordWrap: 'break-word' }}
-                                />
-                            </td>
-                            <td className="text-right">{li.quantity}</td>
-                            <td className="text-right">
-                                <AmountDisplay
-                                    amount={li.unitPrice ?? DEFAULT_AMOUNT}
-                                    showCurrency
-                                />
-                            </td>
-                            <td className="text-right">
-                                <AmountDisplay
-                                    amount={li.total ?? DEFAULT_AMOUNT}
-                                    showCurrency
-                                />
-                            </td>
-                        </tr>
-                    )))}
-                </tbody>
-            </table>
-        );
     }
 }
 

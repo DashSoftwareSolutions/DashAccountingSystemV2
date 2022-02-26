@@ -1,6 +1,15 @@
-﻿import AssetType from '../models/AssetType';
+﻿import Amount from '../models/Amount';
+import AmountType from '../models/AmountType';
+import AssetType from '../models/AssetType';
 
 export const DEFAULT_ASSET_TYPE: AssetType = { id: 1, name: 'USD', symbol: '$' };
+
+export const DEFAULT_AMOUNT: Amount = {
+    amount: 0,
+    amountAsString: '0.00',
+    amountType: AmountType.Debit,
+    assetType: DEFAULT_ASSET_TYPE,
+};
 
 export const DEFAULT_INVOICE_TERMS: string = 'Net 30';
 
