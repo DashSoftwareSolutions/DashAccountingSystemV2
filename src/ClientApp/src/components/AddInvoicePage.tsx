@@ -142,6 +142,7 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
             dirtyInvoice,
             history,
             invoiceTermsOptions,
+            isSaving,
             selectedTenant,
         } = this.props;
 
@@ -182,11 +183,12 @@ class AddInvoicePage extends React.PureComponent<AddInvoicePageProps, AddInvoice
                             </Button>
                             <Button
                                 color="success"
+                                disabled={isSaving}
                                 id={`${this.bemBlockName}--save_button`}
                                 onClick={this.onClickSave}
                                 style={{ width: 88 }}
                             >
-                                Save
+                                {isSaving ? 'Saving...' : 'Save'}
                             </Button>
                         </Col>
                     </Row>

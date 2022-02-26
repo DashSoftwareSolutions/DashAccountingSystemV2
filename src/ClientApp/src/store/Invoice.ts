@@ -144,6 +144,18 @@ interface SendInvoiceCompletedAction extends IAction {
     type: ActionType.SEND_INVOICE_COMPLETED;
     updatedInvoice: Invoice;
 }
+
+interface RequestDeleteInvoiceAction extends IAction {
+    type: ActionType.REQUEST_DELETE_INVOICE;
+}
+
+interface DeleteInvoiceCompletedAction extends IAction {
+    type: ActionType.DELETE_INVOICE_COMPLETED;
+}
+
+interface DeleteInvoiceErrorAction extends IAction {
+    type: ActionType.DELETE_INVOICE_ERROR;
+}
 /* END: REST API Actions */
 
 /* BEGIN: UI Gesture Actions */
@@ -231,6 +243,9 @@ type KnownAction = RequestInvoiceListAction |
     NewInvoiceSaveCompletedAction |
     RequestSendInvoiceAction |
     SendInvoiceCompletedAction |
+    RequestDeleteInvoiceAction |
+    DeleteInvoiceCompletedAction |
+    DeleteInvoiceErrorAction |
     InitializeNewInvoiceAction |
     UpdateCustomerAction |
     UpdateCustomerAddressAction |
@@ -476,6 +491,39 @@ export const actionCreators = {
             });
 
         dispatch({ type: ActionType.REQUEST_SEND_INVOICE });
+    },
+
+    deleteInvoice: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const tenantId = appState.tenants?.selectedTenant?.id;
+        const accessToken = await authService.getAccessToken();
+        const invoiceToDelete = appState.invoice?.details.existingInvoice;
+
+        if (isNil(invoiceToDelete)) {
+            logger.warn('No Invoice found in store state.  Bailing out.');
+            return;
+        }
+
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch(`api/invoice/${tenantId}/${invoiceToDelete.invoiceNumber}`, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                    dispatch({ type: ActionType.DELETE_INVOICE_ERROR });
+                    return;
+                }
+
+                dispatch({ type: ActionType.DELETE_INVOICE_COMPLETED });
+            });
+
+        dispatch({ type: ActionType.REQUEST_DELETE_INVOICE });
     },
     /* END: REST API Actions */
 
@@ -730,6 +778,28 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                         isSaving: false,
                     },
                 };
+
+            case ActionType.REQUEST_DELETE_INVOICE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        isDeleting: true,
+                    },
+                };
+
+            case ActionType.DELETE_INVOICE_COMPLETED:
+                return unloadedState;
+
+            case ActionType.DELETE_INVOICE_ERROR:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        isDeleting: false,
+                    },
+                };
+
             /* END: REST API Actions */
 
             /* BEGIN: UI Gesture Actions */

@@ -335,9 +335,8 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
 
     private onDeleteInvoiceConfirmed() {
         this.logger.info('We\'re sure we want to delete the invoice.  Doing it...');
-        this.setState({ isConfirmDeleteInvoiceModalOpen: false });
-
-        // TODO: Implement delete invoice action
+        const { deleteInvoice } = this.props;
+        deleteInvoice();
     }
 
     private onDeleteInvoiceDeclined() {
@@ -345,7 +344,6 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
     }
 
     private onSendInvoiceConfirmed() {
-        this.logger.info('We\'re sure we want to send the invoice.  Doing it...');
         const { sendInvoice } = this.props;
         sendInvoice();
     }
