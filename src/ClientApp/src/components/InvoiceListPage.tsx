@@ -5,15 +5,21 @@ import {
     Col,
     Row,
 } from 'reactstrap';
-import { isNil } from 'lodash';
+import {
+    isNil,
+    map,
+} from 'lodash';
 import { RouteComponentProps, withRouter } from 'react-router';
+import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import {
     ILogger,
     Logger,
 } from '../common/Logging';
 import { NavigationSection } from './TenantSubNavigation';
+import AmountDisplay from './AmountDisplay';
 import InvoiceLite from '../models/InvoiceLite';
+import LinkButton from './LinkButton';
 import PagedResult from '../models/PagedResult';
 import TenantBasePage from './TenantBasePage';
 import * as InvoiceStore from '../store/Invoice';
@@ -48,6 +54,7 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
 
         this.ensureDataFetched = this.ensureDataFetched.bind(this);
         this.onClickCreateInvoice = this.onClickCreateInvoice.bind(this);
+        this.onClickExistingInvoice = this.onClickExistingInvoice.bind(this);
     }
 
     public componentDidMount() {
@@ -66,7 +73,7 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
             <TenantBasePage
                 history={history}
                 section={NavigationSection.Invoicing}
-                selectedTenant={selectedTenant}
+                selectedTenant={selectedTenant ?? null}
             >
                 <TenantBasePage.Header id={`${this.bemBlockName}--header`}>
                     <Row>
@@ -84,9 +91,9 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
                     {isFetching ? (
                         <p>Loading...</p>
-                    ) :
+                    ) : !isNil(invoiceList) ?
                         this.renderInvoiceList(invoiceList)
-                    }
+                    : <React.Fragment />}
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -110,6 +117,10 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
         history.push('/invoice/new');
     }
 
+    private onClickExistingInvoice(invoice: InvoiceLite) {
+        this.logger.info('Clicked Invoice:', invoice);
+    }
+
     private renderInvoiceList(invoiceList: PagedResult<InvoiceLite>) {
         if (isNil(invoiceList) || invoiceList.total === 0) {
             return (
@@ -117,8 +128,82 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
             );
         }
 
+        // TODO: Pagination Controls if necessary
+
         return (
-            <p>Invoice List is coming soon ...</p>
+            <table className="table table-hover table-sm report-table">
+                <thead>
+                    <tr>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">{'Invoice\u00A0Date'}</th>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">Invoice #</th>
+                        <th className="col-md-3 bg-white sticky-top sticky-border">Customer</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Amount</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border">Status</th>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">Due</th>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {map(invoiceList.results, (invoice) => ((
+                        <tr key={invoice.id}>
+                            <td className="col-md-1">
+                                <LinkButton
+                                    className="btn-link-report-item"
+                                    onClick={() => this.onClickExistingInvoice(invoice)}
+                                >
+                                    {moment(invoice.issueDate).format('L')}
+                                </LinkButton>
+                            </td>
+                            <td className="col-md-1">
+                                <LinkButton
+                                    className="btn-link-report-item"
+                                    onClick={() => this.onClickExistingInvoice(invoice)}
+                                >
+                                    {invoice.invoiceNumber}
+                                </LinkButton>
+                            </td>
+                            <td className="col-md-3">
+                                <LinkButton
+                                    className="btn-link-report-item"
+                                    onClick={() => this.onClickExistingInvoice(invoice)}
+                                >
+                                    {invoice.customerName}
+                                </LinkButton>
+                            </td>
+                            <td className="col-md-2 text-right">
+                                <LinkButton
+                                    className="btn-link-report-item"
+                                    onClick={() => this.onClickExistingInvoice(invoice)}
+                                >
+                                    <AmountDisplay
+                                        amount={invoice.amount}
+                                        showCurrency
+                                    />
+                                </LinkButton>
+                            </td>
+                            <td className="col-md-2">
+                                <LinkButton
+                                    className="btn-link-report-item"
+                                    onClick={() => this.onClickExistingInvoice(invoice)}
+                                >
+                                    {invoice.status}
+                                </LinkButton>
+                            </td>
+                            <td className="col-md-1">
+                                <LinkButton
+                                    className="btn-link-report-item"
+                                    onClick={() => this.onClickExistingInvoice(invoice)}
+                                >
+                                    {moment(invoice.dueDate).format('L')}
+                                </LinkButton>
+                            </td>
+                            <td>
+                                &nbsp;
+                            </td>
+                        </tr>
+                    )))}
+                </tbody>
+            </table>
         );
     }
 }
