@@ -5,6 +5,10 @@ import {
     Col,
     ListGroup,
     ListGroupItem,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
     Row,
 } from 'reactstrap';
 import {
@@ -23,6 +27,7 @@ import InvoiceLineItemsTable from './InvoiceLineItemsTable';
 import InvoiceStatusLabel from './InvoiceStatusLabel';
 import TenantBasePage from './TenantBasePage';
 import * as InvoiceStore from '../store/Invoice';
+import InvoiceStatus from '../models/InvoiceStatus';
 
 const mapStateToProps = (state: ApplicationState) => {
     return {
@@ -43,7 +48,12 @@ type ViewInvoicePageReduxProps = ConnectedProps<typeof connector>;
 type ViewInvoicePageProps = ViewInvoicePageReduxProps
     & RouteComponentProps<{ invoiceNumber: string }>;
 
-class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
+type ViewInvoicePageState = {
+    isConfirmDeleteInvoiceModalOpen: boolean;
+    isConfirmSendInvoiceModalOpen: boolean;
+};
+
+class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvoicePageState> {
     private logger: ILogger;
     private bemBlockName: string = 'view_invoice_page';
 
@@ -52,8 +62,22 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
 
         this.logger = new Logger('View Invoice Page');
 
+        this.state = {
+            isConfirmDeleteInvoiceModalOpen: false,
+            isConfirmSendInvoiceModalOpen: false,
+        }
+
         this.onClickBack = this.onClickBack.bind(this);
+        this.onClickDeleteInvoice = this.onClickDeleteInvoice.bind(this);
+        this.onClickDownloadPdf = this.onClickDownloadPdf.bind(this);
         this.onClickEditInvoice = this.onClickEditInvoice.bind(this);
+        this.onClickReceivePayment = this.onClickReceivePayment.bind(this);
+        this.onClickSendInvoice = this.onClickSendInvoice.bind(this);
+        this.onClickViewPayment = this.onClickViewPayment.bind(this);
+        this.onDeleteInvoiceConfirmed = this.onDeleteInvoiceConfirmed.bind(this);
+        this.onDeleteInvoiceDeclined = this.onDeleteInvoiceDeclined.bind(this);
+        this.onSendInvoiceConfirmed = this.onSendInvoiceConfirmed.bind(this);
+        this.onSendInvoiceDeclined = this.onSendInvoiceDeclined.bind(this);
     }
 
     public componentDidMount() {
@@ -63,8 +87,14 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
     public render() {
         const {
             history,
+            invoice,
             selectedTenant,
         } = this.props;
+
+        const {
+            isConfirmDeleteInvoiceModalOpen,
+            isConfirmSendInvoiceModalOpen,
+        } = this.state;
 
         return (
             <TenantBasePage
@@ -79,6 +109,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
                             <p className="lead">{selectedTenant?.name}</p>
                         </Col>
                         <Col className="text-right" md={7}>
+                            {/* We always get a Back button */}
                             <Button
                                 color="secondary"
                                 id={`${this.bemBlockName}--back_button`}
@@ -87,14 +118,73 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
                             >
                                 Back
                             </Button>
+
+                            {/* We always get a Download PDF button */}
                             <Button
                                 color="primary"
-                                id={`${this.bemBlockName}--edit_button`}
-                                onClick={this.onClickEditInvoice}
-                                style={{ width: 88 }}
+                                id={`${this.bemBlockName}--download_button`}
+                                onClick={this.onClickDownloadPdf}
+                                style={{ marginRight: 22, width: 150 }}
                             >
-                                Edit
+                                Download PDF
                             </Button>
+
+                            {invoice?.status === InvoiceStatus.Draft && (
+                                <React.Fragment>
+                                    <Button
+                                        color="success"
+                                        id={`${this.bemBlockName}--send_button`}
+                                        onClick={this.onClickSendInvoice}
+                                        style={{ marginRight: 22, width: 88 }}
+                                    >
+                                        Send
+                                    </Button>
+
+                                    <Button
+                                        color="primary"
+                                        id={`${this.bemBlockName}--edit_button`}
+                                        onClick={this.onClickEditInvoice}
+                                        style={{ marginRight: 22, width: 88 }}
+                                    >
+                                        Edit
+                                    </Button>
+
+                                    <Button
+                                        color="danger"
+                                        id={`${this.bemBlockName}--delete_button`}
+                                        onClick={this.onClickDeleteInvoice}
+                                        style={{ width: 88 }}
+                                    >
+                                        Delete
+                                    </Button>
+                                </React.Fragment>
+                            )}
+
+                            {invoice?.status === InvoiceStatus.Sent && (
+                                <React.Fragment>
+                                    <Button
+                                        color="success"
+                                        id={`${this.bemBlockName}--receive_payment_button`}
+                                        onClick={this.onClickReceivePayment}
+                                        style={{ width: 150 }}
+                                    >
+                                        Receive Payment
+                                    </Button>
+                                </React.Fragment>
+                            )}
+
+                            {invoice?.status === InvoiceStatus.Paid && (
+                                <React.Fragment>
+                                    <Button
+                                        color="success"
+                                        id={`${this.bemBlockName}--view_payment_button`}
+                                        onClick={this.onClickViewPayment}
+                                        style={{ width: 150 }}
+                                    >
+                                        View Payment
+                                    </Button>
+                                </React.Fragment>
+                            )}
                         </Col>
                     </Row>
                 </TenantBasePage.Header>
@@ -106,19 +196,69 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
     }
 
     private onClickBack() {
-        const {
-            history,
-        } = this.props;
+        // TODO: Dispatch reset action if needed
+        const { history } = this.props;
+        history.goBack();
+    }
 
-        // TODO: Dispatch reset action
+    private onClickDeleteInvoice() {
+        this.logger.debug('Deleting the invoice...');
 
-        history.push('/invoicing');
+        // TODO: Open the modal 'Are you sure?' prompt for deleting
+    }
+
+    private onClickDownloadPdf() {
+        this.logger.debug('Downloading the PDF Invoice ...');
+
+        // TODO: Implement downlaod PDF invoice action
     }
 
     private onClickEditInvoice() {
         this.logger.debug('Editing the invoice...');
 
         // TODO: Implement edit invoice action
+    }
+
+    private onClickReceivePayment() {
+        this.logger.debug('Receiving payment for the invoice...');
+
+        // TODO: Implement receive payment action
+    }
+
+    private onClickSendInvoice() {
+        this.logger.debug('Sending the invoice...');
+
+        // TODO: Open the modal 'Are you sure?' prompt for sending
+    }
+
+    private onClickViewPayment() {
+        this.logger.debug('Viewing the payment...');
+
+        // TODO: Implement view payment action
+    }
+
+    private onDeleteInvoiceConfirmed() {
+        this.logger.debug('We\'re sure we want to delete the invoice.  Doing it...');
+
+        // TODO: Implement delete invoice action
+    }
+
+    private onDeleteInvoiceDeclined() {
+        this.logger.debug('Just kidding.  Don\'t delete it!');
+
+        // TODO: Close the modal 'Are you sure?' prompt for deleting
+    }
+
+    private onSendInvoiceConfirmed() {
+        this.logger.debug('We\'re sure we want to send the invoice.  Doing it...');
+
+        // TODO: Implement delete invoice action
+    }
+
+    private onSendInvoiceDeclined() {
+        this.logger.debug('Just kidding.  Don\'t send it yet!');
+
+        // TODO: Close the modal 'Are you sure?' prompt for sending
     }
 
     private ensureDataFetched() {
@@ -151,7 +291,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps> {
 
         const issueDateMoment = moment(invoice.issueDate);
         const dueDateMoment = moment(invoice.dueDate);
-        const isPastDue = dueDateMoment.isAfter(moment(), 'day');
+        const isPastDue = dueDateMoment.isBefore(moment(), 'day');
 
         return (
             <React.Fragment>
