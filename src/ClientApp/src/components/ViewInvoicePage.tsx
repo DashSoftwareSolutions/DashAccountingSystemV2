@@ -32,6 +32,7 @@ import InvoiceStatus from '../models/InvoiceStatus';
 const mapStateToProps = (state: ApplicationState) => {
     return {
         invoice: state.invoice?.details.existingInvoice ?? null,
+        isDeleting: state.invoice?.details.isDeleting ?? false,
         isFetching: state.invoice?.details.isLoadingInvoice ?? false,
         selectedTenant: state.tenants?.selectedTenant,
     };
@@ -88,6 +89,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         const {
             history,
             invoice,
+            isDeleting,
             selectedTenant,
         } = this.props;
 
@@ -190,6 +192,60 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
                 </TenantBasePage.Header>
                 <TenantBasePage.Content id={`${this.bemBlockName}--content`}>
                     {this.renderInvoice()}
+
+                    <Modal
+                        id={`${this.bemBlockName}--delete_confirm_modal`}
+                        isOpen={isConfirmDeleteInvoiceModalOpen}
+                        toggle={this.onDeleteInvoiceDeclined}
+                    >
+                        <ModalHeader toggle={this.onDeleteInvoiceDeclined}>Delete Invoice</ModalHeader>
+                        <ModalBody>
+                            This action cannot be undone.  Are you sure?
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button
+                                color="danger"
+                                disabled={isDeleting}
+                                onClick={this.onDeleteInvoiceConfirmed}
+                            >
+                                {isDeleting ? 'Deleting...' : 'Yes, Delete It'}
+                            </Button>
+                            {' '}
+                            <Button
+                                color="secondary"
+                                disabled={isDeleting}
+                                onClick={this.onDeleteInvoiceDeclined}
+                            >
+                                No, Cancel
+                            </Button>
+                        </ModalFooter>
+                    </Modal>
+
+                    <Modal
+                        id={`${this.bemBlockName}--send_invoice_confirm_modal`}
+                        isOpen={isConfirmSendInvoiceModalOpen}
+                        toggle={this.onSendInvoiceDeclined}
+                    >
+                        <ModalHeader toggle={this.onSendInvoiceDeclined}>Send Invoice</ModalHeader>
+                        <ModalBody>
+                            This should only be done once the draft invoice is finalized.  Are you sure?
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button
+                                color="primary"
+                                onClick={this.onSendInvoiceConfirmed}
+                            >
+                                Yes, Send It
+                            </Button>
+                            {' '}
+                            <Button
+                                color="secondary"
+                                onClick={this.onSendInvoiceDeclined}
+                            >
+                                No, Cancel
+                            </Button>
+                        </ModalFooter>
+                    </Modal>
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -202,63 +258,57 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
     }
 
     private onClickDeleteInvoice() {
-        this.logger.debug('Deleting the invoice...');
-
-        // TODO: Open the modal 'Are you sure?' prompt for deleting
+        this.setState({ isConfirmDeleteInvoiceModalOpen: true });
     }
 
     private onClickDownloadPdf() {
-        this.logger.debug('Downloading the PDF Invoice ...');
+        this.logger.info('Downloading the PDF Invoice ...');
 
         // TODO: Implement downlaod PDF invoice action
     }
 
     private onClickEditInvoice() {
-        this.logger.debug('Editing the invoice...');
+        this.logger.info('Editing the invoice...');
 
         // TODO: Implement edit invoice action
     }
 
     private onClickReceivePayment() {
-        this.logger.debug('Receiving payment for the invoice...');
+        this.logger.info('Receiving payment for the invoice...');
 
         // TODO: Implement receive payment action
     }
 
     private onClickSendInvoice() {
-        this.logger.debug('Sending the invoice...');
-
-        // TODO: Open the modal 'Are you sure?' prompt for sending
+        this.setState({ isConfirmSendInvoiceModalOpen: true });
     }
 
     private onClickViewPayment() {
-        this.logger.debug('Viewing the payment...');
+        this.logger.info('Viewing the payment...');
 
         // TODO: Implement view payment action
     }
 
     private onDeleteInvoiceConfirmed() {
-        this.logger.debug('We\'re sure we want to delete the invoice.  Doing it...');
+        this.logger.info('We\'re sure we want to delete the invoice.  Doing it...');
+        this.setState({ isConfirmDeleteInvoiceModalOpen: false });
 
         // TODO: Implement delete invoice action
     }
 
     private onDeleteInvoiceDeclined() {
-        this.logger.debug('Just kidding.  Don\'t delete it!');
-
-        // TODO: Close the modal 'Are you sure?' prompt for deleting
+        this.setState({ isConfirmDeleteInvoiceModalOpen: false });
     }
 
     private onSendInvoiceConfirmed() {
-        this.logger.debug('We\'re sure we want to send the invoice.  Doing it...');
+        this.logger.info('We\'re sure we want to send the invoice.  Doing it...');
+        this.setState({ isConfirmSendInvoiceModalOpen: false });
 
-        // TODO: Implement delete invoice action
+        // TODO: Implement end invoice action
     }
 
     private onSendInvoiceDeclined() {
-        this.logger.debug('Just kidding.  Don\'t send it yet!');
-
-        // TODO: Close the modal 'Are you sure?' prompt for sending
+        this.setState({ isConfirmSendInvoiceModalOpen: false });
     }
 
     private ensureDataFetched() {

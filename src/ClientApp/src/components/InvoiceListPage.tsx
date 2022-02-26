@@ -118,8 +118,6 @@ class InvoiceListPage extends React.PureComponent<InvoiceListPagePageProps> {
     }
 
     private onClickExistingInvoice(invoice: InvoiceLite) {
-        this.logger.info('Clicked Invoice:', invoice);
-
         const {
             history,
         } = this.props;
