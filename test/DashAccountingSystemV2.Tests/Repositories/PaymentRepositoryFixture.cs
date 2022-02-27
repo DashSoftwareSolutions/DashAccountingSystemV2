@@ -53,7 +53,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     CreatedById = _userId,
                     Invoices = new InvoicePayment[]
                     {
-                        new InvoicePayment() { InvoiceId = _invoice.Id },
+                        new InvoicePayment() { InvoiceId = _invoice.Id, Amount = _invoice.Total },
                     },
                 };
 

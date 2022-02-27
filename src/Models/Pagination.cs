@@ -91,6 +91,9 @@ namespace DashAccountingSystemV2.Models
         public string DBLimit => Limit == DefaultPageSize ? "ALL" : Limit.ToString();
         #endregion - DB related -
 
+        /// <summary>
+        /// Default pagination parameters.  <see cref="Pagination.PageSize"/> is <see cref="int.MaxValue"/> so use with caution!
+        /// </summary>
         public static Pagination Default => new Pagination
         {
             PageNumber = 1, /* Using 1-based page numbers  */

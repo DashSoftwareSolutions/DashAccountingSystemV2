@@ -148,6 +148,7 @@ namespace DashAccountingSystemV2.Repositories
             DateTime? dateRangeStart,
             DateTime? dateRangeEnd,
             IEnumerable<Guid> includeCustomers,
+            IEnumerable<Guid> includeInvoices,
             Pagination pagination)
         {
             // TODO: Implement support for other sorting options (per specification in the pagination parameters) if needed/wanted
@@ -237,6 +238,7 @@ ORDER BY inv.""IssueDate"" DESC
     FROM ""Invoice"" inv
    WHERE inv.""TenantId"" = @tenantId
      AND ( @includeCustomers::UUID[] IS NULL OR inv.""CustomerId"" = ANY ( @includeCustomers ) )
+     AND ( @includeInvoices::UUID[] IS NULL OR inv.""Id"" = ANY ( @includeInvoices ) )
      AND ( @dateRangeStart::TIMESTAMP IS NULL OR inv.""IssueDate"" >= @dateRangeStart )
      AND ( @dateRangeEnd::TIMESTAMP IS NULL OR inv.""IssueDate"" <= @dateRangeEnd )
 ";
@@ -248,6 +250,7 @@ ORDER BY inv.""IssueDate"" DESC
                     dateRangeStart,
                     dateRangeEnd,
                     includeCustomers = includeCustomers.AsArrayOrNull(),
+                    includeInvoices = includeInvoices.AsArrayOrNull(),
                     offset = pagination.Offset,
                     limit = pagination.Limit,
                 };
@@ -332,6 +335,25 @@ ORDER BY inv.""IssueDate"" DESC
                     throw;
                 }
             }
+        }
+
+        public async Task<Invoice> UpdateInvoiceStatusAsync(
+            Guid invoiceId,
+            InvoiceStatus newStatus,
+            Guid contextUserId)
+        {
+            var invoiceToUpdate = await _db.Invoice.FirstOrDefaultAsync(i => i.Id == invoiceId);
+
+            if (invoiceToUpdate == null)
+                return null;
+
+            invoiceToUpdate.Status = newStatus;
+            invoiceToUpdate.Updated = DateTime.UtcNow;
+            invoiceToUpdate.UpdatedById = contextUserId;
+
+            await _db.SaveChangesAsync();
+
+            return await GetDetailedByIdAsync(invoiceToUpdate.Id);
         }
 
         public async Task<Invoice> UpdateInvoiceStatusAsync(

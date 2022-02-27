@@ -33,6 +33,7 @@ namespace DashAccountingSystemV2.Controllers
                 filters.ParsedDateRangeStart,
                 filters.ParsedDateRangeEnd,
                 filters.ParsedCustomerIds,
+                includeInvoices: null,
                 PaginationRequestViewModel.ToModel(pagination));
 
             return this.Result(bizLogicResult, (data) => data.ToViewModels(InvoiceLiteResponseViewModel.FromModel));

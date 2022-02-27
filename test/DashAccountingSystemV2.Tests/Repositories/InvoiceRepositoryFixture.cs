@@ -68,6 +68,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     dateRangeStart: null,
                     dateRangeEnd: null,
                     includeCustomers: null,
+                    includeInvoices: null,
                     pagination: Pagination.Default);
 
                 Assert.NotNull(filteredPagedInvoices);
@@ -117,6 +118,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     dateRangeStart: null,
                     dateRangeEnd: null,
                     includeCustomers: null,
+                    includeInvoices: null,
                     pagination: Pagination.Default);
 
                 Assert.NotNull(filteredPagedInvoices);

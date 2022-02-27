@@ -20,6 +20,7 @@ namespace DashAccountingSystemV2.Repositories
             DateTime? dateRangeStart,
             DateTime? dateRangeEnd,
             IEnumerable<Guid> includeCustomers,
+            IEnumerable<Guid> includeInvoices,
             Pagination pagination);
 
         Task<uint> GetNextInvoiceNumberAsync(Guid tenantId);
@@ -27,6 +28,11 @@ namespace DashAccountingSystemV2.Repositories
         Task<Invoice> CreateInvoiceAsync(Invoice invoice);
 
         Task<Invoice> UpdateCompleteInvoiceAsync(Invoice invoice, Guid contextUserId);
+
+        Task<Invoice> UpdateInvoiceStatusAsync(
+            Guid invoiceId,
+            InvoiceStatus newStatus,
+            Guid contextUserId);
 
         Task<Invoice> UpdateInvoiceStatusAsync(
             Guid tenantId,

@@ -98,14 +98,22 @@ namespace DashAccountingSystemV2.BusinessLogic
             return new BusinessLogicResponse<IEnumerable<InvoiceTerms>>(results);
         }
 
-        public async Task<BusinessLogicResponse<PagedResult<Invoice>>> GetPagedFilteredInvoices(Guid tenantId, DateTime? dateRangeStart, DateTime? dateRangeEnd, IEnumerable<Guid> includeCustomers, Pagination pagination)
+        public async Task<BusinessLogicResponse<PagedResult<Invoice>>> GetPagedFilteredInvoices(
+            Guid tenantId,
+            DateTime? dateRangeStart,
+            DateTime? dateRangeEnd,
+            IEnumerable<Guid> includeCustomers,
+            IEnumerable<Guid> includeInvoices,
+            Pagination pagination)
         {
             // TODO: Check that user has access to this tenant and permission to view the requested invoices
+
             var results = await _invoiceRepository.GetFilteredAsync(
                 tenantId,
                 dateRangeStart,
                 dateRangeEnd,
                 includeCustomers,
+                includeInvoices,
                 pagination);
 
             return new BusinessLogicResponse<PagedResult<Invoice>>(results);
@@ -133,6 +141,17 @@ namespace DashAccountingSystemV2.BusinessLogic
                 _logger.LogError(ex, "Failed to Update Invoice");
                 return new BusinessLogicResponse<Invoice>(ErrorType.RuntimeException, "Failed to Update Invoice");
             }
+        }
+
+        public async Task<BusinessLogicResponse<Invoice>> UpdateInvoiceStatus(Guid invoiceId, InvoiceStatus newStatus, Guid contextUserId)
+        {
+            // TODO: Check that user has access to this tenant and permission to update the requested invoice
+            var updatedInvoice = await _invoiceRepository.UpdateInvoiceStatusAsync(invoiceId, newStatus, contextUserId);
+
+            if (updatedInvoice == null)
+                return new BusinessLogicResponse<Invoice>(ErrorType.RequestedEntityNotFound);
+
+            return new BusinessLogicResponse<Invoice>(updatedInvoice);
         }
 
         public async Task<BusinessLogicResponse<Invoice>> UpdateInvoiceStatus(Guid tenantId, uint invoiceNumber, InvoiceStatus newStatus, Guid contextUserId)

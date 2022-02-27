@@ -20,9 +20,15 @@ namespace DashAccountingSystemV2.BusinessLogic
             DateTime? dateRangeStart,
             DateTime? dateRangeEnd,
             IEnumerable<Guid> includeCustomers,
+            IEnumerable<Guid> includeInvoices,
             Pagination pagination);
 
         Task<BusinessLogicResponse<Invoice>> UpdateInvoice(Invoice invoice, Guid contextUserId);
+
+        Task<BusinessLogicResponse<Invoice>> UpdateInvoiceStatus(
+            Guid invoiceId,
+            InvoiceStatus newStatus,
+            Guid contextUserId);
 
         Task<BusinessLogicResponse<Invoice>> UpdateInvoiceStatus(
             Guid tenantId,

@@ -6,6 +6,7 @@ namespace DashAccountingSystemV2.BusinessLogic
     {
         public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
         {
+            // Business Logic layer objects
             services
                 .AddScoped<ITenantBusinessLogic, TenantBusinessLogic>()
                 .AddScoped<IAccountBusinessLogic, AccountBusinessLogic>()
@@ -17,7 +18,12 @@ namespace DashAccountingSystemV2.BusinessLogic
                 .AddScoped<IProductBusinessLogic, ProductBusinessLogic>()
                 .AddScoped<ITimeActivityBusinessLogic, TimeActivityBusinessLogic>()
                 .AddScoped<ITimeZoneBusinessLogic, TimeZoneBusinessLogic>()
-                .AddScoped<IInvoiceBusinessLogic, InvoiceBusinessLogic>();
+                .AddScoped<IInvoiceBusinessLogic, InvoiceBusinessLogic>()
+                .AddScoped<IPaymentBusinessLogic, PaymentBusinessLogic>();
+
+            // Business Logic Facades
+            services
+                .AddScoped<IPaymentFacade, PaymentFacade>();
 
             return services;
         }

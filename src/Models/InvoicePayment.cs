@@ -13,5 +13,9 @@ namespace DashAccountingSystemV2.Models
         public Guid PaymentId { get; set; }
         public Payment Payment { get; set; }
 
+        /// <summary>
+        /// Amount of the specified Payment that is applied to the specified Invoice.
+        /// </summary>
+        public decimal Amount { get; set; }
     }
 }
