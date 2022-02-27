@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -30,6 +30,8 @@ namespace DashAccountingSystemV2.Models
         [Required]
         public int PaymentMethodId { get; set; }
         public PaymentMethod PaymentMethod { get; private set; }
+
+        public uint? CheckNumber { get; set; }
 
         [Required]
         public DateTime Date { get; set; }
