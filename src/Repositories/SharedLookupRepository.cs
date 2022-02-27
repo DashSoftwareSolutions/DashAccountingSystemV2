@@ -43,6 +43,14 @@ namespace DashAccountingSystemV2.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<PaymentMethod>> GetPaymentMethodsAsync()
+        {
+            return await _db
+                .PaymentMethod
+                .OrderBy(pm => pm.Name)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Region>> GetRegionsByCountryAsync(int countryId)
         {
             return await _db

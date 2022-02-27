@@ -14,6 +14,8 @@ namespace DashAccountingSystemV2.Repositories
 
         Task<IEnumerable<Country>> GetCountriesAsync();
 
+        Task<IEnumerable<PaymentMethod>> GetPaymentMethodsAsync();
+
         Task<IEnumerable<Region>> GetRegionsByCountryAsync(int countryId);
 
         Task<IEnumerable<Region>> GetRegionsByCountryAlpha2CodeAsync(string countryAlpha2Code);

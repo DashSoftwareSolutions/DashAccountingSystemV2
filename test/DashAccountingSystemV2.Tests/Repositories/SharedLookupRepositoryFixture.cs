@@ -63,6 +63,19 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
         [Fact]
         [Trait("Category", "Requires Database")]
+        public async Task GetPaymentMethods_Ok()
+        {
+            var repository = GetSharedLookupRepository();
+            var paymentMethods = await repository.GetPaymentMethodsAsync();
+            Assert.NotEmpty(paymentMethods);
+            Assert.Contains(paymentMethods, pm => pm.Name == "Cash");
+            Assert.Contains(paymentMethods, pm => pm.Name == "Check");
+            Assert.Contains(paymentMethods, pm => pm.Name == "Credit Card");
+            Assert.Contains(paymentMethods, pm => pm.Name == "Direct Deposit");
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
         public async Task GetRegionsByCountryId_Ok()
         {
             var repository = GetSharedLookupRepository();

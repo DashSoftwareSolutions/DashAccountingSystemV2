@@ -100,5 +100,21 @@ BEGIN
     -- =======================================================================
     -- END: Asset Types
     -- =======================================================================
+
+    -- =======================================================================
+    -- BEGIN: Payment Methods
+    -- =======================================================================
+    INSERT INTO "PaymentMethod" ( "Name" )
+    SELECT payment_method_name
+    FROM UNNEST ( ARRAY [
+        'Cash',
+        'Check',
+        'Credit Card',
+        'Direct Deposit'
+    ] ) payment_method_name
+    WHERE NOT EXISTS ( SELECT 1 FROM "PaymentMethod" WHERE LOWER("Name") = LOWER(payment_method_name) );
+    -- =======================================================================
+    -- END: Payment Methods
+    -- =======================================================================
 END
 $$ LANGUAGE plpgsql;
