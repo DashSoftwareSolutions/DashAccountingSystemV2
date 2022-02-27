@@ -106,6 +106,12 @@ namespace DashAccountingSystemV2.Repositories
                     .ThenInclude(invLineItem => invLineItem.ProductOrService.Category)
                 .Include(inv => inv.LineItems)
                     .ThenInclude(invLineItem => invLineItem.AssetType)
+                .Include(inv => inv.Payments)
+                    .ThenInclude(invPmt => invPmt.Payment)
+                        .ThenInclude(pmt => pmt.DepositAccount)
+                .Include(inv => inv.Payments)
+                    .ThenInclude(invPmt => invPmt.Payment)
+                        .ThenInclude(pmt => pmt.RevenueAccount)
                 .SingleOrDefaultAsync();
         }
 
@@ -128,6 +134,12 @@ namespace DashAccountingSystemV2.Repositories
                     .ThenInclude(invLineItem => invLineItem.ProductOrService.Category)
                 .Include(inv => inv.LineItems)
                     .ThenInclude(invLineItem => invLineItem.AssetType)
+                .Include(inv => inv.Payments)
+                    .ThenInclude(invPmt => invPmt.Payment)
+                        .ThenInclude(pmt => pmt.DepositAccount)
+                .Include(inv => inv.Payments)
+                    .ThenInclude(invPmt => invPmt.Payment)
+                        .ThenInclude(pmt => pmt.RevenueAccount)
                 .SingleOrDefaultAsync();
         }
 
@@ -172,7 +184,6 @@ GROUP BY inv.""Id""
         ,inv.""IssueDate""
         ,inv.""DueDate""
         ,inv.""Message""
-        ,inv.""PaymentId""
         ,inv.""Created""
         ,inv.""CreatedById""
         ,inv.""Updated""
