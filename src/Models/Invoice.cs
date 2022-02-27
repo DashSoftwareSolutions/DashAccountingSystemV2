@@ -63,9 +63,6 @@ namespace DashAccountingSystemV2.Models
             }
         }
 
-        public Guid? PaymentId { get; set; }
-        public Payment Payment { get; private set; }
-
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Created { get; private set; }

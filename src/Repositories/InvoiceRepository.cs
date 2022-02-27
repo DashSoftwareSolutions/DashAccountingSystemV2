@@ -286,30 +286,6 @@ ORDER BY inv.""IssueDate"" DESC
             return ++maxCurrentInvoiceNumber;
         }
 
-        // TODO/FIXME: Might want this operation transactional with creating the Payment
-        public async Task<Invoice> MarkInvoicePaidAsync(
-            Guid tenantId,
-            uint invoiceNumber,
-            Guid paymentId,
-            Guid contextUserId)
-        {
-            var invoiceToUpdate = await _db.Invoice.FirstOrDefaultAsync(i =>
-                i.TenantId == tenantId &&
-                i.InvoiceNumber == invoiceNumber);
-
-            if (invoiceToUpdate == null)
-                return null;
-
-            invoiceToUpdate.Status = InvoiceStatus.Paid;
-            invoiceToUpdate.PaymentId = paymentId;
-            invoiceToUpdate.Updated = DateTime.UtcNow;
-            invoiceToUpdate.UpdatedById = contextUserId;
-
-            await _db.SaveChangesAsync();
-
-            return await GetDetailedByIdAsync(invoiceToUpdate.Id);
-        }
-
         public async Task<Invoice> UpdateCompleteInvoiceAsync(Invoice invoice, Guid contextUserId)
         {
             var invoiceToUpdate = await _db.Invoice.FirstOrDefaultAsync(i => i.Id == invoice.Id);

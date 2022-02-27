@@ -34,12 +34,6 @@ namespace DashAccountingSystemV2.Repositories
             InvoiceStatus newStatus,
             Guid contextUserId);
 
-        Task<Invoice> MarkInvoicePaidAsync(
-            Guid tenantId,
-            uint invoiceNumber,
-            Guid paymentId,
-            Guid contextUserId);
-
         Task DeleteAsync(Guid invoiceId, Guid contextUserId);
     }
 }
