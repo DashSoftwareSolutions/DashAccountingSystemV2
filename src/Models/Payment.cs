@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,9 +24,13 @@ namespace DashAccountingSystemV2.Models
         public Account DepositAccount { get; private set; }
 
         [Required]
+        public Guid RevenueAccountId { get; set; }
+        public Account RevenueAccount { get; private set; }
+
+        [Required]
         public int PaymentMethodId { get; set; }
         public PaymentMethod PaymentMethod { get; private set; }
-        
+
         [Required]
         public DateTime Date { get; set; }
 
@@ -52,5 +57,7 @@ namespace DashAccountingSystemV2.Models
 
         public Guid? UpdatedById { get; set; }
         public ApplicationUser UpdatedBy { get; private set; }
+
+        public ICollection<InvoicePayment> Invoices { get; set; }
     }
 }

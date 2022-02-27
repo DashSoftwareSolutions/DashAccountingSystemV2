@@ -1,0 +1,17 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace DashAccountingSystemV2.Models
+{
+    public class InvoicePayment
+    {
+        [Required]
+        public Guid InvoiceId { get; set; }
+        public Invoice Invoice { get; set; }
+
+        [Required]
+        public Guid PaymentId { get; set; }
+        public Payment Payment { get; set; }
+
+    }
+}

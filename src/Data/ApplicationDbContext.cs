@@ -429,6 +429,15 @@ namespace DashAccountingSystemV2.Data
 
             builder.Entity<Payment>()
                 .HasIndex(p => new { p.TenantId, p.CustomerId });
+
+            builder.Entity<InvoicePayment>()
+                .HasKey(ip => new { ip.InvoiceId, ip.PaymentId });
+
+            builder.Entity<InvoicePayment>()
+                .HasIndex(ip => ip.InvoiceId);
+
+            builder.Entity<InvoicePayment>()
+                .HasIndex(ip => ip.PaymentId);
             #endregion Employee Time Tracking / Sales & Invoicing
         }
 

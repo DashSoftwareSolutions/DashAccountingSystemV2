@@ -75,5 +75,7 @@ namespace DashAccountingSystemV2.Models
 
         public Guid? UpdatedById { get; set; }
         public ApplicationUser UpdatedBy { get; private set; }
+
+        public ICollection<InvoicePayment> Payments { get; private set; }
     }
 }
