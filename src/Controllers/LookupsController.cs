@@ -31,6 +31,7 @@ namespace DashAccountingSystemV2.Controllers
             var accountTypes = await _sharedLookupRepository.GetAccountTypesAsync();
             var accountSubTypes = await _sharedLookupRepository.GetAccountSubTypesAsync();
             var assetTypes = await _sharedLookupRepository.GetAssetTypesAsync();
+            var paymentMethods = await _sharedLookupRepository.GetPaymentMethodsAsync();
             var timeZonesBizLogResponse = await _timeZoneBusinessLogic.GetTimeZones();
 
             if (!timeZonesBizLogResponse.IsSuccessful)
@@ -41,6 +42,7 @@ namespace DashAccountingSystemV2.Controllers
                 AccountTypes = accountTypes.Select(at => new LookupValueViewModel(at.Id, at.Name)),
                 AccountSubTypes = accountSubTypes.Select(AccountSubTypeViewModel.FromModel),
                 AssetTypes = assetTypes.Select(ExtendedAssetTypeViewModel.FromModel),
+                PaymentMethods = paymentMethods.Select(pm => new LookupValueViewModel(pm.Id, pm.Name)),
                 TimeZones = timeZonesBizLogResponse.Data,
             };
 

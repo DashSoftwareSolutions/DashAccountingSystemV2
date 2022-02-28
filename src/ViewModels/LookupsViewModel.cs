@@ -8,6 +8,7 @@ namespace DashAccountingSystemV2.ViewModels
         public IEnumerable<LookupValueViewModel> AccountTypes { get; set; }
         public IEnumerable<LookupValueViewModel> AccountSubTypes { get; set; }
         public IEnumerable<ExtendedAssetTypeViewModel> AssetTypes { get; set; }
+        public IEnumerable<LookupValueViewModel> PaymentMethods { get; set; }
         public IEnumerable<TimeZone> TimeZones { get; set; }
     }
 }
