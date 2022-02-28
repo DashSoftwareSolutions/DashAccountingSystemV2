@@ -12,6 +12,7 @@ import AccountSubType from '../models/AccountSubType';
 import AccountType from '../models/AccountType';
 import AssetType from '../models/AssetType';
 import IAction from './IAction';
+import PaymentMethod from '../models/PaymentMethod';
 import TimeZone from '../models/TimeZone';
 
 export interface LookupValuesState {
@@ -19,6 +20,7 @@ export interface LookupValuesState {
     accountTypes: AccountType[];
     accountSubTypes: AccountSubType[];
     assetTypes: AssetType[];
+    paymentMethods: PaymentMethod[];
     timeZones: TimeZone[];
 }
 
@@ -31,6 +33,7 @@ interface ReceiveLookupValuesAction extends IAction {
     accountTypes: AccountType[];
     accountSubTypes: AccountSubType[];
     assetTypes: AssetType[];
+    paymentMethods: PaymentMethod[];
     timeZones: TimeZone[];
 }
 
@@ -38,6 +41,7 @@ interface LookupsApiResponse {
     accountTypes: AccountType[];
     accountSubTypes: AccountSubType[];
     assetTypes: AssetType[];
+    paymentMethods: PaymentMethod[];
     timeZones: TimeZone[];
 }
 
@@ -84,6 +88,7 @@ const unloadedState: LookupValuesState = {
     accountTypes: [],
     accountSubTypes: [],
     assetTypes: [],
+    paymentMethods: [],
     timeZones: [],
 };
 
@@ -109,6 +114,7 @@ export const reducer: Reducer<LookupValuesState> = (state: LookupValuesState | u
                     accountTypes: action.accountTypes,
                     accountSubTypes: action.accountSubTypes,
                     assetTypes: action.assetTypes,
+                    paymentMethods: action.paymentMethods,
                     timeZones: action.timeZones,
                 };
         }
