@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystemV2.BusinessLogic;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.ViewModels;
-using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.Controllers
 {
