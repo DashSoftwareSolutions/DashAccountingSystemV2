@@ -91,7 +91,7 @@ namespace DashAccountingSystemV2.Repositories
 
         public async Task<Invoice> GetDetailedByIdAsync(Guid invoiceId)
         {
-            return await _db
+            var invoice = await _db
                 .Invoice
                 .Where(inv => inv.Id == invoiceId)
                 .Include(inv => inv.Tenant)
@@ -113,11 +113,16 @@ namespace DashAccountingSystemV2.Repositories
                     .ThenInclude(invPmt => invPmt.Payment)
                         .ThenInclude(pmt => pmt.RevenueAccount)
                 .SingleOrDefaultAsync();
+
+            if (invoice != null)
+                invoice.LineItems = invoice.LineItems.OrderBy(li => li.OrderNumber).AsArrayOrNull();
+
+            return invoice;
         }
 
         public async Task<Invoice> GetDetailedByTenantIdAndInvoiceNumberAsync(Guid tenantId, uint invoiceNumber)
         {
-            return await _db
+            var invoice = await _db
                 .Invoice
                 .Where(inv =>
                     inv.TenantId == tenantId &&
@@ -141,6 +146,11 @@ namespace DashAccountingSystemV2.Repositories
                     .ThenInclude(invPmt => invPmt.Payment)
                         .ThenInclude(pmt => pmt.RevenueAccount)
                 .SingleOrDefaultAsync();
+
+            if (invoice != null)
+                invoice.LineItems = invoice.LineItems.OrderBy(li => li.OrderNumber).AsArrayOrNull();
+
+            return invoice;
         }
 
         public async Task<PagedResult<Invoice>> GetFilteredAsync(
