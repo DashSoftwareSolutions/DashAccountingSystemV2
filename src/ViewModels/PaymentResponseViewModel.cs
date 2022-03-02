@@ -41,6 +41,10 @@ namespace DashAccountingSystemV2.ViewModels
 
         public JournalEntryLiteResponseViewModel JournalEntry { get; set; }
 
+        public string Description => JournalEntry?.Description;
+
+        public bool IsPosted => JournalEntry?.Status == TransactionStatus.Posted;
+
         public IEnumerable<InvoicePaymentResponseViewModel> Invoices { get; set; }
 
         [JsonConverter(typeof(JsonIsoDateTimeConverter))]
