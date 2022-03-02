@@ -10,7 +10,7 @@ import {
     isNil,
     trim,
 } from 'lodash';
-import * as moment from 'moment-timezone';
+import moment from 'moment-timezone';
 import { AppThunkAction } from './';
 import {
     formatWithTwoDecimalPlaces,

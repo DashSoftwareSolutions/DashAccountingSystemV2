@@ -7,6 +7,7 @@ import * as Invoice from './Invoice';
 import * as JournalEntry from './JournalEntry';
 import * as Ledger from './Ledger';
 import * as LookupValues from './LookupValues';
+import * as Payment from './Payment';
 import * as Product from './Product';
 import * as ProfitAndLoss from './ProfitAndLoss';
 import * as SystemNotifications from './SystemNotifications';
@@ -24,6 +25,7 @@ export interface ApplicationState {
     journalEntry: JournalEntry.JournalEntryState | undefined;
     ledger: Ledger.LedgerState | undefined;
     lookups: LookupValues.LookupValuesState | undefined;
+    payment: Payment.PaymentStoreState | undefined;
     products: Product.ProductStoreState | undefined;
     profitAndLoss: ProfitAndLoss.ProfitAndLossState | undefined;
     systemNotifications: SystemNotifications.SystemNotificationsState | undefined;
@@ -44,6 +46,7 @@ export const reducers = {
     journalEntry: JournalEntry.reducer,
     ledger: Ledger.reducer,
     lookups: LookupValues.reducer,
+    payment: Payment.reducer,
     products: Product.reducer,
     profitAndLoss: ProfitAndLoss.reducer,
     systemNotifications: SystemNotifications.reducer,
