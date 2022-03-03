@@ -26,6 +26,7 @@ import AmountDisplay from './AmountDisplay';
 import InvoiceLineItemsTable from './InvoiceLineItemsTable';
 import InvoiceStatus from '../models/InvoiceStatus';
 import InvoiceStatusLabel from './InvoiceStatusLabel';
+import ReceivePaymentModalDialog from './ReceivePaymentModalDialog';
 import TenantBasePage from './TenantBasePage';
 import * as InvoiceStore from '../store/Invoice';
 import * as SystemNotificationsStore from '../store/SystemNotifications';
@@ -55,6 +56,7 @@ type ViewInvoicePageProps = ViewInvoicePageReduxProps
 type ViewInvoicePageState = {
     isConfirmDeleteInvoiceModalOpen: boolean;
     isConfirmSendInvoiceModalOpen: boolean;
+    isReceivePaymentModalOpen: boolean;
 };
 
 class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvoicePageState> {
@@ -69,6 +71,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         this.state = {
             isConfirmDeleteInvoiceModalOpen: false,
             isConfirmSendInvoiceModalOpen: false,
+            isReceivePaymentModalOpen: false,
         }
 
         this.onClickBack = this.onClickBack.bind(this);
@@ -78,6 +81,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         this.onClickReceivePayment = this.onClickReceivePayment.bind(this);
         this.onClickSendInvoice = this.onClickSendInvoice.bind(this);
         this.onClickViewPayment = this.onClickViewPayment.bind(this);
+        this.onCloseReceivePaymentModal = this.onCloseReceivePaymentModal.bind(this);
         this.onDeleteInvoiceConfirmed = this.onDeleteInvoiceConfirmed.bind(this);
         this.onDeleteInvoiceDeclined = this.onDeleteInvoiceDeclined.bind(this);
         this.onSendInvoiceConfirmed = this.onSendInvoiceConfirmed.bind(this);
@@ -138,6 +142,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         const {
             isConfirmDeleteInvoiceModalOpen,
             isConfirmSendInvoiceModalOpen,
+            isReceivePaymentModalOpen,
         } = this.state;
 
         return (
@@ -290,6 +295,11 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
                             </Button>
                         </ModalFooter>
                     </Modal>
+
+                    <ReceivePaymentModalDialog
+                        isOpen={isReceivePaymentModalOpen}
+                        onClose={this.onCloseReceivePaymentModal}
+                    />
                 </TenantBasePage.Content>
             </TenantBasePage>
         );
@@ -318,9 +328,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
     }
 
     private onClickReceivePayment() {
-        this.logger.info('Receiving payment for the invoice...');
-
-        // TODO: Implement receive payment action
+        this.setState({ isReceivePaymentModalOpen: true });
     }
 
     private onClickSendInvoice() {
@@ -331,6 +339,10 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         this.logger.info('Viewing the payment...');
 
         // TODO: Implement view payment action
+    }
+
+    private onCloseReceivePaymentModal() {
+        this.setState({ isReceivePaymentModalOpen: false });
     }
 
     private onDeleteInvoiceConfirmed() {

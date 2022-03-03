@@ -166,3 +166,8 @@ th.sticky-border:after {
 .select_time_activities_for_invoicing_modal--main_content_container p {
     margin-top: 176px; /* Trying to roughtly center vertically ... 176px = 200px - 24px content height */
 }
+
+/* Receive Payments Modal Dialog */
+.receive_payment_modal--modal_header .modal-title {
+    width: 100%;
+}
