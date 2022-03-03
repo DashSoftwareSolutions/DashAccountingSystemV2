@@ -1,6 +1,6 @@
 ﻿import AccountLite from './AccountLite';
 import Amount from './Amount';
-import CustomerLite from './Customer';
+import CustomerLite from './CustomerLite';
 import InvoicePayment from './InvoicePayment';
 import JournalEntryLite from './JournalEntryLite';
 import PaymentMethod from './PaymentMethod';
