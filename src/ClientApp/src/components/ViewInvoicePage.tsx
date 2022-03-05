@@ -29,6 +29,7 @@ import InvoiceStatusLabel from './InvoiceStatusLabel';
 import ReceivePaymentModalDialog from './ReceivePaymentModalDialog';
 import TenantBasePage from './TenantBasePage';
 import * as InvoiceStore from '../store/Invoice';
+import * as PaymentStore from '../store/Payment';
 import * as SystemNotificationsStore from '../store/SystemNotifications';
 
 const mapStateToProps = (state: ApplicationState) => {
@@ -43,6 +44,7 @@ const mapStateToProps = (state: ApplicationState) => {
 
 const mapDispatchToProps = {
     ...InvoiceStore.actionCreators,
+    initializeNewPayment: PaymentStore.actionCreators.initializeNewPayment,
     showAlert: SystemNotificationsStore.actionCreators.showAlert,
 };
 
@@ -328,7 +330,15 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
     }
 
     private onClickReceivePayment() {
-        this.setState({ isReceivePaymentModalOpen: true });
+        const {
+            initializeNewPayment,
+            invoice,
+        } = this.props;
+
+        if (!isNil(invoice)) {
+            initializeNewPayment(invoice);
+            this.setState({ isReceivePaymentModalOpen: true });
+        }
     }
 
     private onClickSendInvoice() {

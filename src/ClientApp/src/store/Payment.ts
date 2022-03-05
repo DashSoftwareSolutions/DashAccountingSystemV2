@@ -11,10 +11,12 @@ import { AppThunkAction } from './';
 import {
     DEFAULT_AMOUNT,
 } from '../common/Constants';
+import { formatWithTwoDecimalPlaces } from '../common/StringUtils';
 import { Logger } from '../common/Logging';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
+import Amount from '../models/Amount';
 import IAction from './IAction';
 import Invoice from '../models/Invoice';
 import Payment from '../models/Payment';
@@ -46,6 +48,17 @@ interface SavePaymentErrorAction {
 interface InitializeNewPaymentAction {
     type: ActionType.INITIALIZE_NEW_PAYMENT;
     invoice: Invoice;
+}
+
+interface UpdatePaymentAmountAction {
+    type: ActionType.UPDATE_PAYMENT_AMOUNT;
+    amount: number | null; // New Amount / `null` to clear existing value
+    amountAsString: string | null; // New Amount as originally entered / `null` to clear existing value
+}
+
+interface UpdatePaymentCheckNumberAction {
+    type: ActionType.UPDATE_PAYMENT_CHECK_NUMBER;
+    checkNumber: number | null;
 }
 
 interface UpdatePaymentDateAction {
@@ -89,6 +102,8 @@ type KnownAction = RequestSaveNewPaymentAction |
     NewPaymentSaveCompletedAction |
     SavePaymentErrorAction |
     InitializeNewPaymentAction |
+    UpdatePaymentAmountAction |
+    UpdatePaymentCheckNumberAction |
     UpdatePaymentDateAction |
     UpdatePaymentDepositAccountAction |
     UpdatePaymentDescriptionAction |
@@ -150,6 +165,14 @@ export const actionCreators = {
     /* BEGIN: UI Gesture Actions */
     initializeNewPayment: (invoice: Invoice): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.INITIALIZE_NEW_PAYMENT, invoice });
+    },
+
+    updatePaymentAmount: (amountAsString: string | null, amount: number | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_PAYMENT_AMOUNT, amount, amountAsString });
+    },
+
+    updatePaymentCheckNumber: (checkNumber: number | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_PAYMENT_CHECK_NUMBER, checkNumber });
     },
 
     updatePaymentDate: (date: string | null): AppThunkAction<KnownAction> => (dispatch) => {
@@ -224,6 +247,13 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
 
             /* BEGIN: UI Gesture Actions */
             case ActionType.INITIALIZE_NEW_PAYMENT: {
+                const invoiceAmount: Amount = isNil(action.invoice.amount) ?
+                    DEFAULT_AMOUNT :
+                    {
+                        ...action.invoice.amount,
+                        amountAsString: formatWithTwoDecimalPlaces((action.invoice.amount.amount ?? 0).toString()),
+                    };
+
                 const dirtyPayment: Payment = {
                     tenantId: action.invoice.tenantId,
                     customerId: action.invoice.customerId,
@@ -232,7 +262,7 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                     revenueAccountId: null,
                     paymentMethodId: null,
                     paymentDate: moment().format('YYYY-MM-DD'),
-                    amount: action.invoice.amount ?? DEFAULT_AMOUNT,
+                    amount: invoiceAmount,
                     description: '',
                     checkNumber: null,
                     isPosted: false,
@@ -249,8 +279,8 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                                 terms: action.invoice.invoiceTerms?.name ?? '',
                                 status: action.invoice.status,
                             },
-                            amount: action.invoice.amount ?? DEFAULT_AMOUNT,
-                        }
+                            amount: invoiceAmount,
+                        },
                     ],
                 };
 
@@ -259,6 +289,28 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                     dirtyPayment,
                 };
             }
+
+            case ActionType.UPDATE_PAYMENT_AMOUNT:
+                return {
+                    ...state,
+                    dirtyPayment: {
+                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                        amount: {
+                            ...state.dirtyPayment?.amount as Pick<Amount, keyof Amount>,
+                            amount: action.amount,
+                            amountAsString: action.amountAsString,
+                        },
+                    },
+                };
+
+            case ActionType.UPDATE_PAYMENT_CHECK_NUMBER:
+                return {
+                    ...state,
+                    dirtyPayment: {
+                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                        checkNumber: action.checkNumber,
+                    },
+                };
 
             case ActionType.UPDATE_PAYMENT_DATE:
                 return {

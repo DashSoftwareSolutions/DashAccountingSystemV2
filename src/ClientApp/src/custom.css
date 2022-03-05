@@ -171,3 +171,13 @@ th.sticky-border:after {
 .receive_payment_modal--modal_header .modal-title {
     width: 100%;
 }
+
+#receive_payment_modal--is_posted_button_group {
+    width: 100%;
+}
+
+#receive_payment_modal--description_textarea {
+    resize: none;
+    height: 120px;
+    width: 100%;
+}
