@@ -1,8 +1,10 @@
 ﻿import * as React from 'react';
 import {
+    every,
     filter,
     isEmpty,
     isFinite,
+    isNil,
     map,
 } from 'lodash';
 import { ConnectedProps, connect } from 'react-redux';
@@ -27,6 +29,7 @@ import {
 } from '../common/Logging';
 import Account from '../models/Account';
 import AccountSelectOption from '../models/AccountSelectOption';
+import InvoicePayment from '../models/InvoicePayment';
 import KnownAccountType from '../models/KnownAccountType';
 import KnownAccountSubType from '../models/KnownAccountSubType';
 import * as AccountsStore from '../store/Accounts';
@@ -368,6 +371,16 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
                                 </FormGroup>
                             </Col>
                         </Row>
+                        <Row>
+                            <Col sm={12}>
+                                <h6>Oustanding Invoices</h6>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col sm={12} className={`${this.bemBlockName}--invoices_table_container`}>
+                                {this.renderInvoicesTable()}
+                            </Col>
+                        </Row>
                     </Form>
                 </ModalBody>
                 <ModalFooter>
@@ -485,6 +498,23 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
         const selectedOption = selectElement.selectedOptions[0];
 
         updatePaymentRevenueAccount(selectedOption.value);
+    }
+
+    private renderInvoicesTable(): JSX.Element {
+        const {
+            dirtyPayment,
+        } = this.props;
+
+        if (isNil(dirtyPayment))
+            return (<React.Fragment />);
+
+        const areAllInvociesSelected = every(dirtyPayment.invoices, (i: InvoicePayment) => i.isSelected ?? false);
+
+        return (
+            <div>
+                TODO: Render the Invoices!
+            </div>
+        );
     }
 }
 

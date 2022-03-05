@@ -4,6 +4,8 @@
     Reducer,
 } from 'redux';
 import {
+    findIndex,
+    isEmpty,
     isNil,
 } from 'lodash';
 import moment from 'moment-timezone';
@@ -19,6 +21,7 @@ import ActionType from './ActionType';
 import Amount from '../models/Amount';
 import IAction from './IAction';
 import Invoice from '../models/Invoice';
+import InvoicePayment from '../models/InvoicePayment';
 import Payment from '../models/Payment';
 
 export interface PaymentStoreState {
@@ -56,6 +59,11 @@ interface UpdatePaymentAmountAction {
     amountAsString: string | null; // New Amount as originally entered / `null` to clear existing value
 }
 
+interface UpdatePaymentAreAllInvoicesSelectedAction {
+    type: ActionType.UPDATE_PAYMENT_ARE_ALL_INVOICES_SELECTED;
+    isSelected: boolean;
+}
+
 interface UpdatePaymentCheckNumberAction {
     type: ActionType.UPDATE_PAYMENT_CHECK_NUMBER;
     checkNumber: number | null;
@@ -74,6 +82,18 @@ interface UpdatePaymentDepositAccountAction {
 interface UpdatePaymentDescriptionAction {
     type: ActionType.UPDATE_PAYMENT_DESCRIPTION;
     description: string | null;
+}
+
+interface UpdatePaymentInvoiceAmount {
+    type: ActionType.UPDATE_PAYMENT_INVOICE_AMOUNT;
+    invoiceId: string;
+    amount: number | null;
+    amountAsString: string | null;
+}
+
+interface UpdatePaymentInvoiceIsSelectedAction {
+    type: ActionType.UPDATE_PAYMENT_INVOICE_IS_SELECTED;
+    isSelected: boolean;
 }
 
 interface UpdatePaymentIsPostedAction {
@@ -103,10 +123,13 @@ type KnownAction = RequestSaveNewPaymentAction |
     SavePaymentErrorAction |
     InitializeNewPaymentAction |
     UpdatePaymentAmountAction |
+    UpdatePaymentAreAllInvoicesSelectedAction |
     UpdatePaymentCheckNumberAction |
     UpdatePaymentDateAction |
     UpdatePaymentDepositAccountAction |
     UpdatePaymentDescriptionAction |
+    UpdatePaymentInvoiceAmount |
+    UpdatePaymentInvoiceIsSelectedAction |
     UpdatePaymentIsPostedAction |
     UpdatePaymentMethodAction |
     UpdatePaymentRevenueAccountAction |
@@ -185,6 +208,15 @@ export const actionCreators = {
 
     updatePaymentDescription: (description: string | null): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.UPDATE_PAYMENT_DESCRIPTION, description });
+    },
+
+    updatePaymentInvoiceAmount: (invoiceId: string, amountAsString: string | null, amount: number | null): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({
+            type: ActionType.UPDATE_PAYMENT_INVOICE_AMOUNT,
+            invoiceId,
+            amountAsString,
+            amount,
+        });
     },
 
     updatePaymentIsPosted: (isPosted: boolean): AppThunkAction<KnownAction> => (dispatch) => {
@@ -338,6 +370,49 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                         description: action.description,
                     },
                 };
+
+            case ActionType.UPDATE_PAYMENT_INVOICE_AMOUNT: {
+                const updatedDirtyPayment: Payment = { ...state.dirtyPayment as Pick<Payment, keyof Payment> };
+                const existingInvoicePayments = updatedDirtyPayment.invoices;
+
+                if (isEmpty(existingInvoicePayments)) {
+                    logger.warn('No existing invoices associated to the the payment');
+                    return state;
+                }
+
+                const indexOfSpecifiedInvoice = findIndex(
+                    existingInvoicePayments,
+                    (i: InvoicePayment): boolean => i.invoiceId === action.invoiceId,
+                );
+
+                if (indexOfSpecifiedInvoice === -1) {
+                    logger.warn(`Invoice with ID ${action.invoiceId} not presently in the invoices collection`)
+                    return state;
+                }
+
+                const existingInvoicePayment = existingInvoicePayments[indexOfSpecifiedInvoice];
+                const updatedInvoicePaymentAmount = { ...(existingInvoicePayment.amount ?? { ...DEFAULT_AMOUNT }) };
+                updatedInvoicePaymentAmount.amountAsString = action.amountAsString;
+                updatedInvoicePaymentAmount.amount = action.amount;
+
+                const updatedInvoicePayment = {
+                    ...existingInvoicePayment,
+                    amount: updatedInvoicePaymentAmount,
+                };
+
+                updatedDirtyPayment.invoices = [
+                    ...existingInvoicePayments.slice(0, indexOfSpecifiedInvoice),
+                    updatedInvoicePayment,
+                    ...existingInvoicePayments.slice(indexOfSpecifiedInvoice + 1),
+                ];
+
+                // TODO: Validation (i.e. ensuring the sum of the selected invoice payment amount(s) equals the total payment amount)
+
+                return {
+                    ...state,
+                    dirtyPayment: updatedDirtyPayment,
+                };
+            }
 
             case ActionType.UPDATE_PAYMENT_IS_POSTED:
                 return {
