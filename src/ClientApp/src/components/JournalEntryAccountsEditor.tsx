@@ -271,7 +271,6 @@ class JournalEntryAccountsEditor extends React.PureComponent<JournalEntryAccount
                                     <td className="col-md-2">
                                         <Input
                                             id={`${this.bemBlockName}--edit_credit_amount_input_${safeAccountId}`}
-                                            name="check_number_input"
                                             onChange={(e) => this.onEditCreditAmountChanged(e, safeAccountId)}
                                             step="any"
                                             style={{ textAlign: 'right' }}
