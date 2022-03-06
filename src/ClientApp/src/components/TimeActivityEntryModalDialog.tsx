@@ -2,6 +2,7 @@
 import {
     isEmpty,
     isFinite,
+    isNil,
     kebabCase,
     map,
 } from 'lodash';
@@ -385,12 +386,17 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
         this.logger.info('Deleting the time activity...');
 
         const {
-            timeActivity: { id: timeActivityId },
+            timeActivity,
             onClose,
             deleteTimeActivity,
         } = this.props;
 
-        deleteTimeActivity(timeActivityId);
+        if (isNil(timeActivity) ||
+            isNil(timeActivity.id)) {
+            return;
+        }
+
+        deleteTimeActivity(timeActivity?.id);
         onClose(event);
     }
 
