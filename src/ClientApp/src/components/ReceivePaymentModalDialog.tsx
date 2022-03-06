@@ -2,10 +2,12 @@
 import {
     every,
     filter,
+    find,
     isEmpty,
     isFinite,
     isNil,
     map,
+    reduce,
 } from 'lodash';
 import { ConnectedProps, connect } from 'react-redux';
 import {
@@ -22,13 +24,22 @@ import {
     ModalFooter,
     Row,
 } from 'reactstrap';
+import ClassNames from 'classnames';
+import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
+import {
+    DEFAULT_AMOUNT,
+    DEFAULT_ASSET_TYPE,
+} from '../common/Constants';
 import {
     ILogger,
     Logger,
 } from '../common/Logging';
 import Account from '../models/Account';
 import AccountSelectOption from '../models/AccountSelectOption';
+import Amount from '../models/Amount';
+import AmountDisplay from './AmountDisplay';
+import AmountType from '../models/AmountType';
 import InvoicePayment from '../models/InvoicePayment';
 import KnownAccountType from '../models/KnownAccountType';
 import KnownAccountSubType from '../models/KnownAccountSubType';
@@ -44,6 +55,7 @@ interface ReceivePaymentModalDialogOwnProps {
 const mapStateToProps = (state: ApplicationState) => {
     return {
         accounts: state.accounts?.accounts ?? [],
+        assetType: state.tenants?.selectedTenant?.defaultAssetType ?? DEFAULT_ASSET_TYPE,
         dirtyPayment: state.payment?.dirtyPayment ?? null,
         isSaving: state.payment?.isSaving ?? false,
         paymentMethods: state.lookups?.paymentMethods ?? [],
@@ -108,6 +120,7 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
         this.ensureDataFetched = this.ensureDataFetched.bind(this);
         this.onClickCancel = this.onClickCancel.bind(this);
         this.onClickSave = this.onClickSave.bind(this);
+        this.onInvoicePaymentAmountChanged = this.onInvoicePaymentAmountChanged.bind(this);
         this.onPaymentAmountChanged = this.onPaymentAmountChanged.bind(this);
         this.onPaymentCheckNumberChanged = this.onPaymentCheckNumberChanged.bind(this);
         this.onPaymentDateChanged = this.onPaymentDateChanged.bind(this);
@@ -117,6 +130,8 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
         this.onPaymentIsPostedYesClicked = this.onPaymentIsPostedYesClicked.bind(this);
         this.onPaymentMethodSelectionChanged = this.onPaymentMethodSelectionChanged.bind(this);
         this.onPaymentRevenueAccountSelectionChanged = this.onPaymentRevenueAccountSelectionChanged.bind(this);
+        this.onSelectAllCheckChanged = this.onSelectAllCheckChanged.bind(this);
+        this.onSelectInvoiceCheckChanged = this.onSelectInvoiceCheckChanged.bind(this);
     }
 
     public componentDidUpdate(prevProps: ReceivePaymentModalDialogProps) {
@@ -156,6 +171,7 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
 
     public render() {
         const {
+            assetType,
             dirtyPayment,
             isOpen,
             isSaving,
@@ -177,6 +193,20 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
         const paymentIsPosted = dirtyPayment?.isPosted ?? false;
         const paymentMethodId = dirtyPayment?.paymentMethodId?.toString() ?? '';
         const paymentRevenueAccountId = dirtyPayment?.revenueAccountId ?? '';
+
+        const invoicePaymentsTotal = reduce(
+            map(
+                filter(dirtyPayment?.invoices, (i) => i.isSelected ?? false),
+                (i) => i.amount.amount ?? 0,
+            ),
+            (prev, current) => prev += current,
+            0);
+
+        const invoicePaymentsTotalAmount: Amount = {
+            amount: invoicePaymentsTotal,
+            amountType: AmountType.Debit,
+            assetType,
+        };
 
         return (
             <Modal
@@ -373,7 +403,7 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
                         </Row>
                         <Row>
                             <Col sm={12}>
-                                <h6>Oustanding Invoices</h6>
+                                <h6>Outstanding Invoices</h6>
                             </Col>
                         </Row>
                         <Row>
@@ -384,7 +414,14 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
                     </Form>
                 </ModalBody>
                 <ModalFooter>
-                    {'\u00A0'}
+                    <div style={{ fontWeight: 'bold' }}>
+                        Total:
+                        {'\u00A0'}
+                        <AmountDisplay
+                            amount={invoicePaymentsTotalAmount}
+                            showCurrency
+                        />
+                    </div>
                 </ModalFooter>
             </Modal>
         );
@@ -412,6 +449,15 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
 
     private onClickSave(event: React.MouseEvent<any>) {
         this.logger.info('Saving the payment ...');
+    }
+
+    private onInvoicePaymentAmountChanged(event: React.ChangeEvent<HTMLInputElement>, invoiceId: string) {
+        const amountAsString = event.currentTarget.value;
+        const parsedAmount = parseFloat(amountAsString);
+
+        const { updatePaymentInvoiceAmount } = this.props;
+
+        updatePaymentInvoiceAmount(invoiceId, amountAsString, isFinite(parsedAmount) ? parsedAmount : null);
     }
 
     private onPaymentAmountChanged(event: React.ChangeEvent<HTMLInputElement>) {
@@ -500,6 +546,22 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
         updatePaymentRevenueAccount(selectedOption.value);
     }
 
+    private onSelectAllCheckChanged(_: React.FormEvent<HTMLInputElement>) {
+        const {
+            dirtyPayment,
+            updatePaymentSelectAllInvoices,
+        } = this.props;
+
+        const areAllInvoicesCurrentlySelected = every(dirtyPayment?.invoices ?? [], (i: InvoicePayment) => i.isSelected ?? false);
+
+        updatePaymentSelectAllInvoices(!areAllInvoicesCurrentlySelected);
+    }
+
+    private onSelectInvoiceCheckChanged(_: React.FormEvent<HTMLInputElement>, invoicePayment: InvoicePayment) {
+        const { updatePaymentInvoiceIsSelected } = this.props;
+        updatePaymentInvoiceIsSelected(invoicePayment.invoiceId, !(invoicePayment.isSelected ?? false));
+    }
+
     private renderInvoicesTable(): JSX.Element {
         const {
             dirtyPayment,
@@ -508,12 +570,91 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
         if (isNil(dirtyPayment))
             return (<React.Fragment />);
 
-        const areAllInvociesSelected = every(dirtyPayment.invoices, (i: InvoicePayment) => i.isSelected ?? false);
+        if (isEmpty(dirtyPayment.invoices)) {
+            return (
+                <p>
+                    No Invoices are selected
+                </p>
+            );
+        }
+
+        const areAllInvoicesSelected = every(dirtyPayment.invoices, (i: InvoicePayment) => i.isSelected ?? false);
+
+        const tableClasses = ClassNames(
+            'table',
+            'table-hover',
+            'table-sm',
+            'report-table',
+            `${this.bemBlockName}--time_activities_table`,
+        );
 
         return (
-            <div>
-                TODO: Render the Invoices!
-            </div>
+            <table className={tableClasses}>
+                <thead>
+                    <tr>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">
+                            <FormGroup check inline>
+                                <Input
+                                    checked={areAllInvoicesSelected}
+                                    id={`${this.bemBlockName}--select_all_checkbox`}
+                                    onChange={this.onSelectAllCheckChanged}
+                                    type="checkbox"
+                                />
+                            </FormGroup>
+                        </th>
+                        <th className="col-md-3 bg-white sticky-top sticky-border">Invoice</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border">Due Date</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Original Amount</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Open Balance</th>
+                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {map(dirtyPayment.invoices, (invoicePayment: InvoicePayment) => (
+                        <tr key={invoicePayment.invoiceId} className={`${this.bemBlockName}--invoices_table_row`}>
+                            <td>
+                                <FormGroup check inline>
+                                    <Input
+                                        checked={invoicePayment.isSelected ?? false}
+                                        id={`${this.bemBlockName}--select_invoice_checkbox_${invoicePayment.invoice?.invoiceNumber ?? invoicePayment.invoiceId}`}
+                                        onChange={(e) => this.onSelectInvoiceCheckChanged(e, invoicePayment)}
+                                        type="checkbox"
+                                    />
+                                </FormGroup>
+                            </td>
+                            <td>
+                                {`Invoice # ${invoicePayment.invoice?.invoiceNumber} (${moment(invoicePayment.invoice?.issueDate).format('L')})`}
+                            </td>
+                            <td>
+                                {moment(invoicePayment.invoice?.dueDate).format('L')}
+                            </td>
+                            <td className="text-right">
+                                <AmountDisplay
+                                    amount={invoicePayment.invoice?.amount ?? DEFAULT_AMOUNT}
+                                    showCurrency
+                                />
+                            </td>
+                            <td className="text-right">
+                                {/* TODO: This should be the invoice total minus any previous partial payments */}
+                                <AmountDisplay
+                                    amount={invoicePayment.invoice?.amount ?? DEFAULT_AMOUNT}
+                                    showCurrency
+                                />
+                            </td>
+                            <td className="text-right" style={{ paddingRight: 0 }}>
+                                <Input
+                                    id={`${this.bemBlockName}--edit_invoice_payment_amount_input_${invoicePayment.invoice?.invoiceNumber ?? invoicePayment.invoiceId}`}
+                                    onChange={(e) => this.onInvoicePaymentAmountChanged(e, invoicePayment.invoiceId)}
+                                    step="any"
+                                    style={{ textAlign: 'right' }}
+                                    type="number"
+                                    value={invoicePayment.amount.amountAsString ?? ''}
+                                />
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         );
     }
 }

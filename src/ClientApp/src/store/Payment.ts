@@ -7,6 +7,7 @@ import {
     findIndex,
     isEmpty,
     isNil,
+    map,
 } from 'lodash';
 import moment from 'moment-timezone';
 import { AppThunkAction } from './';
@@ -93,6 +94,7 @@ interface UpdatePaymentInvoiceAmount {
 
 interface UpdatePaymentInvoiceIsSelectedAction {
     type: ActionType.UPDATE_PAYMENT_INVOICE_IS_SELECTED;
+    invoiceId: string;
     isSelected: boolean;
 }
 
@@ -219,6 +221,10 @@ export const actionCreators = {
         });
     },
 
+    updatePaymentInvoiceIsSelected: (invoiceId: string, isSelected: boolean): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_PAYMENT_INVOICE_IS_SELECTED, invoiceId, isSelected });
+    },
+
     updatePaymentIsPosted: (isPosted: boolean): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.UPDATE_PAYMENT_IS_POSTED, isPosted });
     },
@@ -229,6 +235,10 @@ export const actionCreators = {
 
     updatePaymentRevenueAccount: (revenueAccountId: string | null): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.UPDATE_PAYMENT_REVENUE_ACCOUNT, revenueAccountId });
+    },
+
+    updatePaymentSelectAllInvoices: (isSelected: boolean): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.UPDATE_PAYMENT_ARE_ALL_INVOICES_SELECTED, isSelected });
     },
     /* END: UI Gesture Actions */
 
@@ -312,6 +322,7 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                                 status: action.invoice.status,
                             },
                             amount: invoiceAmount,
+                            isSelected: true,
                         },
                     ],
                 };
@@ -332,6 +343,18 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                             amount: action.amount,
                             amountAsString: action.amountAsString,
                         },
+                    },
+                };
+
+            case ActionType.UPDATE_PAYMENT_ARE_ALL_INVOICES_SELECTED:
+                return {
+                    ...state,
+                    dirtyPayment: {
+                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                        invoices: map(state.dirtyPayment?.invoices, (i) => ({
+                            ...i,
+                            isSelected: action.isSelected,
+                        })),
                     },
                 };
 
@@ -398,6 +421,46 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                 const updatedInvoicePayment = {
                     ...existingInvoicePayment,
                     amount: updatedInvoicePaymentAmount,
+                };
+
+                updatedDirtyPayment.invoices = [
+                    ...existingInvoicePayments.slice(0, indexOfSpecifiedInvoice),
+                    updatedInvoicePayment,
+                    ...existingInvoicePayments.slice(indexOfSpecifiedInvoice + 1),
+                ];
+
+                // TODO: Validation (i.e. ensuring the sum of the selected invoice payment amount(s) equals the total payment amount)
+
+                return {
+                    ...state,
+                    dirtyPayment: updatedDirtyPayment,
+                };
+            }
+
+            case ActionType.UPDATE_PAYMENT_INVOICE_IS_SELECTED: {
+                const updatedDirtyPayment: Payment = { ...state.dirtyPayment as Pick<Payment, keyof Payment> };
+                const existingInvoicePayments = updatedDirtyPayment.invoices;
+
+                if (isEmpty(existingInvoicePayments)) {
+                    logger.warn('No existing invoices associated to the the payment');
+                    return state;
+                }
+
+                const indexOfSpecifiedInvoice = findIndex(
+                    existingInvoicePayments,
+                    (i: InvoicePayment): boolean => i.invoiceId === action.invoiceId,
+                );
+
+                if (indexOfSpecifiedInvoice === -1) {
+                    logger.warn(`Invoice with ID ${action.invoiceId} not presently in the invoices collection`)
+                    return state;
+                }
+
+                const existingInvoicePayment = existingInvoicePayments[indexOfSpecifiedInvoice];
+
+                const updatedInvoicePayment = {
+                    ...existingInvoicePayment,
+                    isSelected: action.isSelected,
                 };
 
                 updatedDirtyPayment.invoices = [

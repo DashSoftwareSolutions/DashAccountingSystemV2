@@ -182,6 +182,10 @@ th.sticky-border:after {
     width: 100%;
 }
 
-.select_time_activities_for_invoicing_modal--invoices_table_container {
-    margin-top: 22px;
+.receive_payment_modal--invoices_table_container {
+    margin-top: 11px;
+}
+
+.receive_payment_modal--invoices_table_row td {
+    vertical-align: middle;
 }
