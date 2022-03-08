@@ -4,18 +4,24 @@
     Reducer,
 } from 'redux';
 import {
+    filter,
     findIndex,
     isEmpty,
     isNil,
     map,
+    reduce,
 } from 'lodash';
 import moment from 'moment-timezone';
 import { AppThunkAction } from './';
 import {
     DEFAULT_AMOUNT,
 } from '../common/Constants';
-import { formatWithTwoDecimalPlaces } from '../common/StringUtils';
+import {
+    formatWithTwoDecimalPlaces,
+    isStringNullOrWhiteSpace,
+} from '../common/StringUtils';
 import { Logger } from '../common/Logging';
+import { numbersAreEqualWithPrecision } from '../common/NumericUtils';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
@@ -257,6 +263,33 @@ const unloadedState: PaymentStoreState = {
     isSaving: false,
 };
 
+const isPaymentValid = (payment: Payment): boolean => {
+    const allRequiredAttributesAreSet = !isNil(payment.depositAccountId) &&
+        !isNil(payment.revenueAccountId) &&
+        !isNil(payment.paymentMethodId) &&
+        !isNil(payment.paymentDate) &&
+        !isNil(payment.amount) &&
+        (payment.amount.amount ?? 0) > 0 &&
+        !isStringNullOrWhiteSpace(payment.description);
+
+    if (!allRequiredAttributesAreSet) {
+        return false;
+    }
+
+    const selectedInvoices = filter(payment.invoices, (i) => i.isSelected ?? false);
+
+    if (isEmpty(selectedInvoices)) {
+        return false;
+    }
+
+    const selectedInvoicePaymentsTotal = reduce(
+        map(selectedInvoices, (i) => i.paymentAmount.amount ?? 0),
+        (prev, current) => prev += current,
+        0);
+
+    return numbersAreEqualWithPrecision(payment.amount?.amount ?? 0, selectedInvoicePaymentsTotal);
+}
+
 export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | undefined, incomingAction: Action): PaymentStoreState => {
     if (state === undefined) {
         return unloadedState;
@@ -321,7 +354,7 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                                 terms: action.invoice.invoiceTerms?.name ?? '',
                                 status: action.invoice.status,
                             },
-                            amount: invoiceAmount,
+                            paymentAmount: invoiceAmount,
                             isSelected: true,
                         },
                     ],
@@ -333,30 +366,38 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                 };
             }
 
-            case ActionType.UPDATE_PAYMENT_AMOUNT:
-                return {
-                    ...state,
-                    dirtyPayment: {
-                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
-                        amount: {
-                            ...state.dirtyPayment?.amount as Pick<Amount, keyof Amount>,
-                            amount: action.amount,
-                            amountAsString: action.amountAsString,
-                        },
+            case ActionType.UPDATE_PAYMENT_AMOUNT: {
+                const updatedDirtyPayment = {
+                    ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                    amount: {
+                        ...state.dirtyPayment?.amount as Pick<Amount, keyof Amount>,
+                        amount: action.amount,
+                        amountAsString: action.amountAsString,
                     },
                 };
 
-            case ActionType.UPDATE_PAYMENT_ARE_ALL_INVOICES_SELECTED:
                 return {
                     ...state,
-                    dirtyPayment: {
-                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
-                        invoices: map(state.dirtyPayment?.invoices, (i) => ({
-                            ...i,
-                            isSelected: action.isSelected,
-                        })),
-                    },
+                    canSave: isPaymentValid(updatedDirtyPayment),
+                    dirtyPayment: updatedDirtyPayment,
                 };
+            }
+
+            case ActionType.UPDATE_PAYMENT_ARE_ALL_INVOICES_SELECTED: {
+                const updatedDirtyPayment = {
+                    ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                    invoices: map(state.dirtyPayment?.invoices, (i) => ({
+                        ...i,
+                        isSelected: action.isSelected,
+                    })),
+                };
+
+                return {
+                    ...state,
+                    canSave: isPaymentValid(updatedDirtyPayment),
+                    dirtyPayment: updatedDirtyPayment,
+                };
+            }
 
             case ActionType.UPDATE_PAYMENT_CHECK_NUMBER:
                 return {
@@ -367,32 +408,44 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                     },
                 };
 
-            case ActionType.UPDATE_PAYMENT_DATE:
-                return {
-                    ...state,
-                    dirtyPayment: {
-                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
-                        paymentDate: action.date,
-                    },
+            case ActionType.UPDATE_PAYMENT_DATE: {
+                const updatedDirtyPayment = {
+                    ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                    paymentDate: action.date,
                 };
 
-            case ActionType.UPDATE_PAYMENT_DEPOSIT_ACCOUNT:
                 return {
                     ...state,
-                    dirtyPayment: {
-                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
-                        depositAccountId: action.depositAccountId,
-                    },
+                    canSave: isPaymentValid(updatedDirtyPayment),
+                    dirtyPayment: updatedDirtyPayment,
+                };
+            }
+
+            case ActionType.UPDATE_PAYMENT_DEPOSIT_ACCOUNT: {
+                const updatedDirtyPayment = {
+                    ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                    depositAccountId: action.depositAccountId,
                 };
 
-            case ActionType.UPDATE_PAYMENT_DESCRIPTION:
                 return {
                     ...state,
-                    dirtyPayment: {
-                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
-                        description: action.description,
-                    },
+                    canSave: isPaymentValid(updatedDirtyPayment),
+                    dirtyPayment: updatedDirtyPayment,
                 };
+            }
+
+            case ActionType.UPDATE_PAYMENT_DESCRIPTION: {
+                const updatedDirtyPayment = {
+                    ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                    description: action.description,
+                };
+
+                return {
+                    ...state,
+                    canSave: isPaymentValid(updatedDirtyPayment),
+                    dirtyPayment: updatedDirtyPayment,
+                };
+            }
 
             case ActionType.UPDATE_PAYMENT_INVOICE_AMOUNT: {
                 const updatedDirtyPayment: Payment = { ...state.dirtyPayment as Pick<Payment, keyof Payment> };
@@ -414,7 +467,7 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                 }
 
                 const existingInvoicePayment = existingInvoicePayments[indexOfSpecifiedInvoice];
-                const updatedInvoicePaymentAmount = { ...(existingInvoicePayment.amount ?? { ...DEFAULT_AMOUNT }) };
+                const updatedInvoicePaymentAmount = { ...(existingInvoicePayment.paymentAmount ?? { ...DEFAULT_AMOUNT }) };
                 updatedInvoicePaymentAmount.amountAsString = action.amountAsString;
                 updatedInvoicePaymentAmount.amount = action.amount;
 
@@ -429,10 +482,9 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                     ...existingInvoicePayments.slice(indexOfSpecifiedInvoice + 1),
                 ];
 
-                // TODO: Validation (i.e. ensuring the sum of the selected invoice payment amount(s) equals the total payment amount)
-
                 return {
                     ...state,
+                    canSave: isPaymentValid(updatedDirtyPayment),
                     dirtyPayment: updatedDirtyPayment,
                 };
             }
@@ -469,10 +521,9 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                     ...existingInvoicePayments.slice(indexOfSpecifiedInvoice + 1),
                 ];
 
-                // TODO: Validation (i.e. ensuring the sum of the selected invoice payment amount(s) equals the total payment amount)
-
                 return {
                     ...state,
+                    canSave: isPaymentValid(updatedDirtyPayment),
                     dirtyPayment: updatedDirtyPayment,
                 };
             }
@@ -486,23 +537,31 @@ export const reducer: Reducer<PaymentStoreState> = (state: PaymentStoreState | u
                     },
                 };
 
-            case ActionType.UPDATE_PAYMENT_METHOD:
-                return {
-                    ...state,
-                    dirtyPayment: {
-                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
-                        paymentMethodId: action.paymentMethodId,
-                    },
+            case ActionType.UPDATE_PAYMENT_METHOD: {
+                const updatedDirtyPayment = {
+                    ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                    paymentMethodId: action.paymentMethodId,
                 };
 
-            case ActionType.UPDATE_PAYMENT_REVENUE_ACCOUNT:
                 return {
                     ...state,
-                    dirtyPayment: {
-                        ...state.dirtyPayment as Pick<Payment, keyof Payment>,
-                        revenueAccountId: action.revenueAccountId,
-                    },
+                    canSave: isPaymentValid(updatedDirtyPayment),
+                    dirtyPayment: updatedDirtyPayment,
                 };
+            }
+
+            case ActionType.UPDATE_PAYMENT_REVENUE_ACCOUNT: {
+                const updatedDirtyPayment = {
+                    ...state.dirtyPayment as Pick<Payment, keyof Payment>,
+                    revenueAccountId: action.revenueAccountId,
+                };
+
+                return {
+                    ...state,
+                    canSave: isPaymentValid(updatedDirtyPayment),
+                    dirtyPayment: updatedDirtyPayment,
+                };
+            }
             /* END: UI Gesture Actions */
 
             /* BEGIN: Resets */

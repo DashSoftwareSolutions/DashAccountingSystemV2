@@ -38,6 +38,8 @@ const mapStateToProps = (state: ApplicationState) => {
         isDeleting: state.invoice?.details.isDeleting ?? false,
         isFetching: state.invoice?.details.isLoadingInvoice ?? false,
         isSaving: state.invoice?.details.isSaving ?? false,
+        isSavingPayment: state.payment?.isSaving ?? false,
+        savedPayment: state.payment?.existingPayment ?? null,
         selectedTenant: state.tenants?.selectedTenant,
     };
 }
@@ -45,6 +47,7 @@ const mapStateToProps = (state: ApplicationState) => {
 const mapDispatchToProps = {
     ...InvoiceStore.actionCreators,
     initializeNewPayment: PaymentStore.actionCreators.initializeNewPayment,
+    resetPaymentStore: PaymentStore.actionCreators.reset,
     showAlert: SystemNotificationsStore.actionCreators.showAlert,
 };
 
@@ -98,26 +101,30 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         const {
             isDeleting: wasDeleting,
             isSaving: wasSaving,
+            isSavingPayment: wasSavingPayment,
         } = prevProps;
 
         const {
             history,
             isDeleting,
             isSaving,
+            isSavingPayment,
             invoice,
             match: {
                 params: { invoiceNumber },
             },
+            savedPayment,
             showAlert,
             reset,
+            resetExistingInvoice,
             resetInvoiceList,
+            resetPaymentStore,
         } = this.props;
 
         if (wasSaving &&
             !isSaving &&
             !isNil(invoice)) {
             this.setState({ isConfirmSendInvoiceModalOpen: false });
-            this.logger.debug('Just finished sending the invoice.');
             showAlert('success', `Successfully updated Invoice # ${invoiceNumber} from 'Draft' to 'Sent'`, true);
             resetInvoiceList();
             return;
@@ -125,10 +132,20 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
 
         if (wasDeleting && !isDeleting) {
             this.setState({ isConfirmDeleteInvoiceModalOpen: false });
-            this.logger.debug('Just finished deleting the journal entry.');
             showAlert('success', `Successfully deleted Invoice # ${invoiceNumber}`, true);
             reset();
             history.push('/invoicing');
+            return;
+        }
+
+        if (wasSavingPayment &&
+            !isSavingPayment &&
+            !isNil(savedPayment)) {
+            showAlert('success', `Successfully recorded payment for Invoice # ${invoiceNumber}`, true);
+            resetPaymentStore();
+            resetExistingInvoice();
+            resetInvoiceList();
+            this.ensureDataFetched(); // re-fetch the Invoice details so it now shows Paid status
         }
     }
 

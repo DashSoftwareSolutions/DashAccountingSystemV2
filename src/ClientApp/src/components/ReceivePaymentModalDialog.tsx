@@ -56,6 +56,7 @@ const mapStateToProps = (state: ApplicationState) => {
     return {
         accounts: state.accounts?.accounts ?? [],
         assetType: state.tenants?.selectedTenant?.defaultAssetType ?? DEFAULT_ASSET_TYPE,
+        canSave: state.payment?.canSave ?? false,
         dirtyPayment: state.payment?.dirtyPayment ?? null,
         isSaving: state.payment?.isSaving ?? false,
         paymentMethods: state.lookups?.paymentMethods ?? [],
@@ -172,6 +173,7 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
     public render() {
         const {
             assetType,
+            canSave,
             dirtyPayment,
             isOpen,
             isSaving,
@@ -197,7 +199,7 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
         const invoicePaymentsTotal = reduce(
             map(
                 filter(dirtyPayment?.invoices, (i) => i.isSelected ?? false),
-                (i) => i.amount.amount ?? 0,
+                (i) => i.paymentAmount.amount ?? 0,
             ),
             (prev, current) => prev += current,
             0);
@@ -232,7 +234,7 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
                             </Button>
                             <Button
                                 color="success"
-                                disabled={isSaving} // TODO: Disable if cannot save due to validation
+                                disabled={!canSave || isSaving}
                                 id={`${this.bemBlockName}--save_button`}
                                 onClick={this.onClickSave}
                                 style={{ width: 88 }}
@@ -449,6 +451,14 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
 
     private onClickSave(event: React.MouseEvent<any>) {
         this.logger.info('Saving the payment ...');
+
+        const {
+            onClose,
+            saveNewPayment,
+        } = this.props;
+
+        saveNewPayment();
+        onClose(event); // TODO/FIXME: Do we want to close the modal on error?  Right now we have to in order to see the error message.  Need to rethink error handling???
     }
 
     private onInvoicePaymentAmountChanged(event: React.ChangeEvent<HTMLInputElement>, invoiceId: string) {
@@ -648,7 +658,7 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
                                     step="any"
                                     style={{ textAlign: 'right' }}
                                     type="number"
-                                    value={invoicePayment.amount.amountAsString ?? ''}
+                                    value={invoicePayment.paymentAmount.amountAsString ?? ''}
                                 />
                             </td>
                         </tr>

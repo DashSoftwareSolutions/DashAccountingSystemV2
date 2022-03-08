@@ -225,6 +225,10 @@ interface ResetDirtyInvoiceAction extends IAction {
     type: ActionType.RESET_DIRTY_INVOICE;
 }
 
+interface ResetExistingInvoiceAction extends IAction {
+    type: ActionType.RESET_EXISTING_INVOICE;
+}
+
 interface ResetInvoiceStoreAction extends IAction {
     type: ActionType.RESET_INVOICE_STORE_STATE;
 }
@@ -259,6 +263,7 @@ type KnownAction = RequestInvoiceListAction |
     AddSelectedTimeActivitiesAsInvoiceLineItemsAction |
     ResetInvoiceListAction |
     ResetDirtyInvoiceAction |
+    ResetExistingInvoiceAction |
     ResetInvoiceStoreAction;
 
 export const actionCreators = {
@@ -595,6 +600,10 @@ export const actionCreators = {
 
     resetDirtyInvoice: (): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.RESET_DIRTY_INVOICE });
+    },
+
+    resetExistingInvoice: (): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.RESET_EXISTING_INVOICE });
     },
 
     resetInvoiceList: (): AppThunkAction<KnownAction> => (dispatch) => {
@@ -1044,6 +1053,15 @@ export const reducer: Reducer<InvoiceStoreState> = (state: InvoiceStoreState | u
                     details: {
                         ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
                         dirtyInvoice: null,
+                    },
+                };
+
+            case ActionType.RESET_EXISTING_INVOICE:
+                return {
+                    ...state,
+                    details: {
+                        ...state.details as Pick<SingleInvoiceState, keyof SingleInvoiceState>,
+                        existingInvoice: null,
                     },
                 };
 
