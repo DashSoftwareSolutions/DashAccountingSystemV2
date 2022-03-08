@@ -182,6 +182,7 @@ namespace DashAccountingSystemV2.Repositories
           LEFT JOIN ""InvoiceLineItem"" inv_line_item ON inv.""Id"" = inv_line_item.""InvoiceId""
    WHERE inv.""TenantId"" = @tenantId
      AND ( @includeCustomers::UUID[] IS NULL OR inv.""CustomerId"" = ANY ( @includeCustomers ) )
+     AND ( @includeInvoices::UUID[] IS NULL OR inv.""Id"" = ANY ( @includeInvoices ) )
      AND ( @dateRangeStart::TIMESTAMP IS NULL OR inv.""IssueDate"" >= @dateRangeStart )
      AND ( @dateRangeEnd::TIMESTAMP IS NULL OR inv.""IssueDate"" <= @dateRangeEnd )
 GROUP BY inv.""Id""
