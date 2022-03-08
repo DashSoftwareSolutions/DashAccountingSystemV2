@@ -74,7 +74,17 @@ namespace DashAccountingSystemV2.BusinessLogic
                 return new BusinessLogicResponse<Payment>(invoicesToPayResponse);
 
             var invoicesToPay = invoicesToPayResponse.Data.Results;
-            
+
+            var missingInvoices = invoiceIdsToPay.Where(invId => !invoicesToPay.Any(i => i.Id == invId));
+            if (missingInvoices.Any())
+            {
+                var missingInvoiceIds = string.Join(" ", missingInvoices);
+
+                return new BusinessLogicResponse<Payment>(
+                    ErrorType.RequestNotValid,
+                    $"Invoice ID {missingInvoiceIds} could not be found.");
+            }
+
             // Validate that none of the specified Invoices are in 'Draft' status.
             var draftInvoices = invoicesToPay.Where(i => i.Status == InvoiceStatus.Draft);
             if (draftInvoices.Any())
