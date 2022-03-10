@@ -9,6 +9,9 @@ namespace DashAccountingSystemV2.Services.Template
             // Template Provider
             services.AddSingleton<ITemplateProvider, FileSystemTemplateProvider>();
 
+            // Template Service
+            services.AddSingleton<ITemplateService, TemplateService>();
+
             return services;
         }
     }

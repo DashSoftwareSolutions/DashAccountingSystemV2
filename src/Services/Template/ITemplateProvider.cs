@@ -5,6 +5,6 @@ namespace DashAccountingSystemV2.Services.Template
 {
     public interface ITemplateProvider
     {
-        Task<string> GetTemplate(Guid tenantId, string templateName);
+        Task<string> GetTemplate(string templateName);
     }
 }

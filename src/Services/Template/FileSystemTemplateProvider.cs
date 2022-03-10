@@ -16,7 +16,7 @@ namespace DashAccountingSystemV2.Services.Template
             _logger = logger;
         }
 
-        public Task<string> GetTemplate(Guid tenantId, string templateName)
+        public Task<string> GetTemplate(string templateName)
         {
             var filePath = $"{_TemplatesDirectory}{Path.DirectorySeparatorChar}{templateName}";
 
