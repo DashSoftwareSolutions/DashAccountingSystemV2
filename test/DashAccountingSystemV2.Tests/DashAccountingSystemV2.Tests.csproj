@@ -1,12 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
+  <PropertyGroup Label="Package">
+    <PackageId>DashAccountingSystemV2.Tests</PackageId>
+    <Version>2.0.0</Version>
+    <Authors>Geoffrey Roberts</Authors>
+    <Company>Dash Software Solutions, Inc.</Company>
+    <Copyright>Copyright (C) 2022 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="Build">
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>338122a3-0812-4421-ba78-e20c312529da</UserSecretsId>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Package References">
     <PackageReference Include="Dapper" Version="2.0.90" />
     <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="5.0.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
@@ -26,14 +34,27 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Project References">
     <ProjectReference Include="..\..\src\DashAccountingSystemV2.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Resources">
     <None Update="appsettings.UnitTests.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <PropertyGroup Label="Stuff to allow use of Razor Templating">
+    <PreserveCompilationReferences>true</PreserveCompilationReferences>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+
+  <ItemGroup Label="Razor Templates Include">
+    <RazorTemplates Include="Services\Template\RazorTemplates\*.cshtml" />
+  </ItemGroup>
+
+  <Target Name="CopyTemplates" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(RazorTemplates)" DestinationFolder="$(OutDir)\RazorTemplates" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>
