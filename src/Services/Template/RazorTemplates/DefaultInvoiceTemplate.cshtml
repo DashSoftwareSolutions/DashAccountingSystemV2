@@ -1,12 +1,16 @@
 ﻿@*
     Default Invoice Template for Dash Accounting System v2.0
 *@
-@model DashAccountingSystemV2.Models.Invoice
+@using System.Net
+@using DashAccountingSystemV2.Models
+@model Invoice
+@inherits RazorLight.TemplatePage<Invoice>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>@Model.Tenant.Name - Invoice @Model.InvoiceNumber</title>
     <style type="text/css">
         body {
             width: 100%;
@@ -14,17 +18,95 @@
 
         .page[size="A4"] {
             background: white;
-            width: 100%;
-            height: 29.7cm;
             display: block;
-            margin: 0 auto;
-            margin-bottom: 0.5cm;
+            height: 11in;
+            margin: 1in;
+            width: 100%;
         }
+
+        dl.invoice-metadata {
+            padding: 0.5em;
+        }
+
+            dl.invoice-metadata dt {
+                clear: left;
+                float: left;
+                font-weight: bold;
+                text-align: right;
+                text-transform: uppercase;
+                width: 100px;
+            }
+
+            dl.invoice-metadata dd {
+                margin: 0 0 0 110px;
+                padding: 0 0 0.5em 0;
+            }
     </style>
 </head>
 <body>
-    <h1>Invoice</h1>
-    <p>@Model.Tenant.Name</p>
-    <p>@Model.InvoiceNumber</p>
+    <div class="page" size="A4">
+        @* Tenant Info and Logo *@
+        <div style="display: flex">
+            <div style="flex: 0 0 75%">
+                <strong>@Model.Tenant.Name</strong><br />
+                @* TODO: Make Tenant Address and Email Address Data-Driven!!! *@
+                @* TODO: Handle international addresses *@
+                <span>123 Some Street</span><br />
+                <span>Santa Ana, CA 92701 USA</span><br />
+                <span>dash-software@example.com</span>
+            </div>
+            <div style="flex: 0 0 25%; align-content: flex-end">
+                <p>[Logo Image]</p>
+            </div>
+        </div>
+
+        <h1>Invoice</h1>
+
+        @* Invoice Info *@
+        <div style="display: flex">
+            <div style="flex: 0 0 67%">
+                <h2>Bill To</h2>
+                <strong>@Model.Customer.CompanyName</strong><br />
+                @* TODO: Handle international addresses *@
+                <div>
+                    @Raw(WebUtility.HtmlEncode(Model.CustomerAddress).Replace("\n", "<br />"))
+                </div>
+            </div>
+            <div style="flex: 0 0 33%;">
+                <dl class="invoice-metadata">
+                    <dt>Invoice #</dt>
+                    <dd>@Model.InvoiceNumber</dd>
+                    <dt>Date</dt>
+                    <dd>@Model.IssueDate.ToString("MM/dd/yyyy")</dd> @* TODO: i18n/l10n -- don't like standard format "d" due to it not using two digit months and days *@
+                    <dt>Due Date</dt>
+                    <dd>@Model.DueDate.ToString("MM/dd/yyyy")</dd> @* TODO: i18n/l10n  -- don't like standard format "d" due to it not using two digit months and days *@
+                    <dt>Terms</dt>
+                    <dd>@Model.InvoiceTerms.Name</dd>
+                </dl>
+            </div>
+        </div>
+
+        <hr />
+
+        @* TODO: Table of Invoice Items *@
+        <p>[TODO: INVOICE ITEMS]</p>
+
+        <hr />
+
+        @* Invoice Total and Message *@
+        <div style="display: flex">
+            <div style="flex: 0 0 50%; padding-right: 33px;">
+                @Raw(WebUtility.HtmlEncode(Model.Message).Replace("\n", "<br />"))
+            </div>
+            <div style="flex: 0 1 25%">
+                BALANCE DUE
+            </div>
+            <div style="flex: 1 0 25%; align-content: flex-end;">
+                <strong>
+                    @Model.Total.ToString("C") @* TODO: Asset Type?  l10n/i18n? *@
+                </strong>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

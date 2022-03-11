@@ -37,6 +37,11 @@ namespace DashAccountingSystemV2.Services.Export.DataExporters
                 // TODO: Specify more options for page headers and such
 
                 var invoiceAsPdf = pdfConverter.ConvertHtmlString(invoiceAsHtml);
+                invoiceAsPdf.DocumentInformation.Title = $"{invoice.Tenant.Name} - Invoice ${invoice.InvoiceNumber}";
+                invoiceAsPdf.DocumentInformation.Author = "Dash Accounting System 2.0";
+                invoiceAsPdf.DocumentInformation.CreationDate = DateTime.UtcNow;
+                invoiceAsPdf.DocumentInformation.Language = "en"; // TODO: l10n / i18n 
+
                 var invoiceAsPdfBytes = invoiceAsPdf.Save();
 
                 return new ExportedDataDto()
