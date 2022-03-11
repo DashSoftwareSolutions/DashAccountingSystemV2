@@ -105,13 +105,13 @@ export const actionCreators = {
     requestProfitAndLossReportExcelExport: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
 
-        if (!isNil(appState?.balanceSheet) &&
+        if (!isNil(appState?.profitAndLoss) &&
             !isNil(appState?.exportDownload) &&
             !isNil(appState?.tenants?.selectedTenant) &&
             !appState.exportDownload.isLoading) {
             const tenantId = appState?.tenants?.selectedTenant?.id;
-            const dateRangeStart = appState.balanceSheet.dateRangeStart;
-            const dateRangeEnd = appState.balanceSheet.dateRangeEnd;
+            const dateRangeStart = appState.profitAndLoss.dateRangeStart;
+            const dateRangeEnd = appState.profitAndLoss.dateRangeEnd;
 
             const exportRequestParameters = {
                 tenantId,
