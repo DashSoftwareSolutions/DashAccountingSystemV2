@@ -21,6 +21,7 @@ using DashAccountingSystemV2.Security.Authorization;
 using DashAccountingSystemV2.Security.ExportDownloads;
 using DashAccountingSystemV2.Services.Caching;
 using DashAccountingSystemV2.Services.Export;
+using DashAccountingSystemV2.Services.Template;
 using DashAccountingSystemV2.Services.Time;
 using static DashAccountingSystemV2.Security.Constants;
 
@@ -90,6 +91,7 @@ namespace DashAccountingSystemV2
             services.AddRepositories();
             services.AddBusinessLogic();
 
+            services.AddTemplateService();
             services.AddExportDownloadSecurityTokenService();
             services.AddExportService();
 

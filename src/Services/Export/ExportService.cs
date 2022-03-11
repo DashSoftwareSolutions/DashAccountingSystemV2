@@ -1,30 +1,29 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Security.ExportDownloads;
 using DashAccountingSystemV2.Services.Caching;
-using DashAccountingSystemV2.Services.Export.DataExporters;
 using static DashAccountingSystemV2.Services.Caching.Constants;
 
 namespace DashAccountingSystemV2.Services.Export
 {
     public class ExportService : IExportService
     {
-        private readonly ILoggerFactory _loggerFactory = null;
-        private readonly ILogger _logger = null;
         private readonly IExtendedDistributedCache _cache = null;
+        private readonly IDataExporterFactory _dataExporterFactory = null;
         private readonly IExportDownloadSecurityTokenService _securityTokenService = null;
+        private readonly ILogger _logger = null;
 
         public ExportService(
-            ILoggerFactory loggerFactory,
             IExtendedDistributedCache cache,
-            IExportDownloadSecurityTokenService securityTokenService)
+            IDataExporterFactory dataExporterFactory,
+            IExportDownloadSecurityTokenService securityTokenService,
+            ILogger<ExportService> logger)
         {
-            _loggerFactory = loggerFactory;
-            _logger = loggerFactory.CreateLogger<ExportService>();
             _cache = cache;
+            _dataExporterFactory = dataExporterFactory;
             _securityTokenService = securityTokenService;
+            _logger = logger;
         }
 
         public async Task<ExportResultDto> GetDataExport<TUnderlyingData>(
@@ -33,7 +32,7 @@ namespace DashAccountingSystemV2.Services.Export
         {
             try
             {
-                var dataExporter = GetDataExporter<TUnderlyingData>(parameters);
+                var dataExporter = _dataExporterFactory.CreateDataExporter(typeof(TUnderlyingData), parameters) as IDataExporter<TUnderlyingData>;
                 var exportedData = await dataExporter.GetDataExport(parameters, data);
 
                 if (exportedData != null)
@@ -58,43 +57,6 @@ namespace DashAccountingSystemV2.Services.Export
             {
                 _logger.LogError(ex, "Error generating requested data export");
                 return new ExportResultDto(parameters, "Error generating requested data export");
-            }
-        }
-
-        // TODO: This might move to a separate Factory class
-        private IDataExporter<TUnderlyingData> GetDataExporter<TUnderlyingData>(ExportRequestParameters parameters)
-            where TUnderlyingData : class
-        {
-            switch (parameters.ExportType)
-            {
-                case ExportType.BalanceSheetReport:
-                    if (typeof(TUnderlyingData) != typeof(BalanceSheetReportDto))
-                    {
-                        throw new ArgumentException("Unexpected kind of data transfer object supplied to Balance Sheet Report Export request");
-                    }
-
-                    if (parameters.ExportFormat != ExportFormat.XLSX)
-                    {
-                        throw new NotImplementedException($"No support for exporting Balance Sheet Report to format {parameters.ExportFormat}");
-                    }
-
-                    return new BalanceSheetReportExcelExporter(_loggerFactory.CreateLogger<BalanceSheetReportExcelExporter>()) as IDataExporter<TUnderlyingData>;
-
-                case ExportType.ProfitAndLossReport:
-                    if (typeof(TUnderlyingData) != typeof(ProfitAndLossReportDto))
-                    {
-                        throw new ArgumentException("Unexpected kind of data transfer object supplied to Profit & Loss Report Export request");
-                    }
-
-                    if (parameters.ExportFormat != ExportFormat.XLSX)
-                    {
-                        throw new NotImplementedException($"No support for exporting Profit & Loss Report to format {parameters.ExportFormat}");
-                    }
-
-                    return new ProfitAndLossReportExcelExporter(_loggerFactory.CreateLogger<ProfitAndLossReportExcelExporter>()) as IDataExporter<TUnderlyingData>;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(parameters.ExportType), $"No support for export type {parameters.ExportType}");
             }
         }
     }
