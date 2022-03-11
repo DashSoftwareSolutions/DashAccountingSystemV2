@@ -36,9 +36,12 @@ const mapStateToProps = (state: ApplicationState) => {
     return {
         invoice: state.invoice?.details.existingInvoice ?? null,
         isDeleting: state.invoice?.details.isDeleting ?? false,
+        isDownloading: state?.exportDownload?.isLoading ?? false,
         isFetching: state.invoice?.details.isLoadingInvoice ?? false,
         isSaving: state.invoice?.details.isSaving ?? false,
         isSavingPayment: state.payment?.isSaving ?? false,
+        pdfDownloadError: state?.exportDownload?.error ?? null,
+        pdfDownloadInfo: state?.exportDownload?.downloadInfo ?? null,
         savedPayment: state.payment?.existingPayment ?? null,
         selectedTenant: state.tenants?.selectedTenant,
     };
@@ -61,6 +64,7 @@ type ViewInvoicePageProps = ViewInvoicePageReduxProps
 type ViewInvoicePageState = {
     isConfirmDeleteInvoiceModalOpen: boolean;
     isConfirmSendInvoiceModalOpen: boolean;
+    isDownloadInProgress: boolean;
     isReceivePaymentModalOpen: boolean;
     isViewPaymentModalOpen: boolean;
 };
@@ -77,6 +81,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         this.state = {
             isConfirmDeleteInvoiceModalOpen: false,
             isConfirmSendInvoiceModalOpen: false,
+            isDownloadInProgress: false,
             isReceivePaymentModalOpen: false,
             isViewPaymentModalOpen: false,
         }
@@ -103,6 +108,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
     public componentDidUpdate(prevProps: ViewInvoicePageProps) {
         const {
             isDeleting: wasDeleting,
+            isDownloading: wasDownloading,
             isSaving: wasSaving,
             isSavingPayment: wasSavingPayment,
         } = prevProps;
@@ -110,20 +116,24 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         const {
             history,
             isDeleting,
+            isDownloading,
             isSaving,
             isSavingPayment,
             invoice,
             match: {
                 params: { invoiceNumber },
             },
-            savedPayment,
-            showAlert,
+            pdfDownloadError,
+            pdfDownloadInfo,
             reset,
             resetExistingInvoice,
             resetInvoiceList,
             resetPaymentStore,
+            savedPayment,
+            showAlert,
         } = this.props;
 
+        // Handle Save Invoice
         if (wasSaving &&
             !isSaving &&
             !isNil(invoice)) {
@@ -133,6 +143,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
             return;
         }
 
+        // Handle Delete Invoice
         if (wasDeleting && !isDeleting) {
             this.setState({ isConfirmDeleteInvoiceModalOpen: false });
             showAlert('success', `Successfully deleted Invoice # ${invoiceNumber}`, true);
@@ -141,6 +152,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
             return;
         }
 
+        // Handle Save Payment
         if (wasSavingPayment &&
             !isSavingPayment &&
             !isNil(savedPayment)) {
@@ -149,6 +161,18 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
             resetExistingInvoice();
             resetInvoiceList();
             this.ensureDataFetched(); // re-fetch the Invoice details so it now shows Paid status
+            return;
+        }
+
+        // Handle Download PDF Invoice
+        if (wasDownloading && !isDownloading) {
+            if (!isNil(pdfDownloadError)) {
+                showAlert('danger', 'Error requesting PDF Invoice', true);
+            } else if (!isNil(pdfDownloadInfo)) {
+                window.location.href = `${window.location.origin}/api/export-download?filename=${pdfDownloadInfo.fileName}&format=${pdfDownloadInfo.format}&token=${pdfDownloadInfo.token}`;
+            }
+
+            setTimeout(() => { this.setState({ isDownloadInProgress: false }); }, 750); // delay clearing `isDownloadInProgress` flag until save download window pops open
         }
     }
 
@@ -157,6 +181,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
             history,
             invoice,
             isDeleting,
+            isDownloading,
             isSaving,
             selectedTenant,
         } = this.props;
@@ -164,9 +189,12 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
         const {
             isConfirmDeleteInvoiceModalOpen,
             isConfirmSendInvoiceModalOpen,
+            isDownloadInProgress,
             isReceivePaymentModalOpen,
             isViewPaymentModalOpen,
         } = this.state;
+
+        const isDownloadingAuthoritative = isDownloading || isDownloadInProgress;
 
         return (
             <TenantBasePage
@@ -194,11 +222,12 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
                             {/* We always get a Download PDF button */}
                             <Button
                                 color="primary"
+                                disabled={isDownloadingAuthoritative}
                                 id={`${this.bemBlockName}--download_button`}
                                 onClick={this.onClickDownloadPdf}
                                 style={{ marginRight: 22, width: 150 }}
                             >
-                                Download PDF
+                                {isDownloadingAuthoritative ? 'Downloading...' : 'Download PDF'}
                             </Button>
 
                             {invoice?.status === InvoiceStatus.Draft && (
@@ -352,7 +381,18 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
     private onClickDownloadPdf() {
         this.logger.info('Downloading the PDF Invoice ...');
 
-        // TODO: Implement downlaod PDF invoice action
+        const {
+            match: {
+                params: { invoiceNumber },
+            },
+            requestInvoicePdfExport,
+        } = this.props;
+
+        const parsedInvoiceNumber = parseInt(invoiceNumber, 10) || 0;
+
+        requestInvoicePdfExport(parsedInvoiceNumber);
+
+        this.setState({ isDownloadInProgress: true });
     }
 
     private onClickEditInvoice() {

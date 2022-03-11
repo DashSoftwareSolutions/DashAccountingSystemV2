@@ -17,11 +17,19 @@ import {
     DEFAULT_INVOICE_TERMS,
 } from '../common/Constants';
 import { Logger } from '../common/Logging';
+import {
+    RequestDownloadAction,
+    ReceiveDownloadErrorAction,
+    ReceiveDownloadInfoAction,
+} from './Export';
 import apiErrorHandler from '../common/ApiErrorHandler';
 import authService from '../components/api-authorization/AuthorizeService';
 import ActionType from './ActionType';
 import AmountType from '../models/AmountType';
+import ApiExportDownloadErrorResponse from '../models/ApiExportDownloadErrorResponse';
 import AssetType from '../models/AssetType';
+import ExportDownloadInfo from '../models/ExportDownloadInfo';
+import ExportFormat from '../models/ExportFormat';
 import IAction from './IAction';
 import Invoice from '../models/Invoice';
 import InvoiceLineItem from '../models/InvoiceLineItem';
@@ -264,7 +272,10 @@ type KnownAction = RequestInvoiceListAction |
     ResetInvoiceListAction |
     ResetDirtyInvoiceAction |
     ResetExistingInvoiceAction |
-    ResetInvoiceStoreAction;
+    ResetInvoiceStoreAction |
+    RequestDownloadAction |
+    ReceiveDownloadErrorAction |
+    ReceiveDownloadInfoAction;
 
 export const actionCreators = {
     /* BEGIN: REST API Actions */
@@ -332,6 +343,60 @@ export const actionCreators = {
                 });
 
             dispatch({ type: ActionType.REQUEST_INVOICE_LIST });
+        }
+    },
+
+    requestInvoicePdfExport: (invoiceNumber: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+
+        if (!isNil(appState?.invoice) &&
+            !isNil(appState?.exportDownload) &&
+            !isNil(appState?.tenants?.selectedTenant) &&
+            !appState.exportDownload.isLoading) {
+            const tenantId = appState?.tenants?.selectedTenant?.id;
+
+            const exportRequestParameters = {
+                tenantId,
+                exportType: 'Invoice',
+                exportFormat: ExportFormat.PDF,
+            };
+
+            const accessToken = await authService.getAccessToken();
+
+            const requestOptions = {
+                method: 'POST',
+                body: JSON.stringify(exportRequestParameters),
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+            };
+
+            fetch(`api/invoice/${tenantId}/${invoiceNumber}/export-pdf`, requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        try {
+                            response
+                                .json()
+                                .then((apiErrorResponse: ApiExportDownloadErrorResponse) => {
+                                    dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_ERROR, error: apiErrorResponse.error })
+                                });
+                        } catch (error) {
+                            logger.error('Secondary error parsing error response from Invoice PDF Export request:', error);
+                        }
+
+                        return null;
+                    }
+
+                    return response.json() as Promise<ExportDownloadInfo>
+                })
+                .then((downloadInfo) => {
+                    if (!isNil(downloadInfo)) {
+                        dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_INFO, downloadInfo });
+                    }
+                });
+
+            dispatch({ type: ActionType.REQUEST_EXPORT_DOWNLOAD });
         }
     },
 
