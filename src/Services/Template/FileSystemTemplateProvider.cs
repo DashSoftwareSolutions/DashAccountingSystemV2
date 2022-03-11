@@ -18,7 +18,7 @@ namespace DashAccountingSystemV2.Services.Template
 
         public Task<string> GetTemplate(string templateName)
         {
-            var filePath = $"{_TemplatesDirectory}{Path.DirectorySeparatorChar}{templateName}";
+            var filePath = $"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_TemplatesDirectory}{Path.DirectorySeparatorChar}{templateName}";
 
             if (!File.Exists(filePath))
             {

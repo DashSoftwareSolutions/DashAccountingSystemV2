@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystemV2.BusinessLogic;
 using DashAccountingSystemV2.Extensions;
+using DashAccountingSystemV2.Services.Export;
 using DashAccountingSystemV2.ViewModels;
 
 namespace DashAccountingSystemV2.Controllers
@@ -14,10 +15,14 @@ namespace DashAccountingSystemV2.Controllers
     public class InvoiceController : Controller
     {
         private readonly IInvoiceBusinessLogic _invoiceBusinessLogic = null;
+        private readonly IExportService _exportService = null;
 
-        public InvoiceController(IInvoiceBusinessLogic invoiceBusinessLogic)
+        public InvoiceController(
+            IInvoiceBusinessLogic invoiceBusinessLogic,
+            IExportService exportService)
         {
             _invoiceBusinessLogic = invoiceBusinessLogic;
+            _exportService = exportService;
         }
 
         [HttpGet("{tenantId:guid}/list")]
@@ -78,6 +83,41 @@ namespace DashAccountingSystemV2.Controllers
             var bizLogicResponse = _invoiceBusinessLogic.CreateInvoice(inboundInvoice);
 
             return this.Result(bizLogicResponse, InvoiceResponseViewModel.FromModel);
+        }
+
+        [HttpPost("{tenantId:guid}/{invoiceNumber:long:min(1):max(4294967295)}/export-pdf")]
+        public async Task<IActionResult> RequestPdfInvoice(
+            [FromRoute] Guid tenantId,
+            [FromRoute] uint invoiceNumber)
+        {
+            var bizLogicResponse = await _invoiceBusinessLogic.GetInvoiceByTenantAndInvoiceNumber(
+                tenantId,
+                invoiceNumber);
+
+            if (!bizLogicResponse.IsSuccessful)
+                return this.Result(bizLogicResponse);
+
+            var exportRequestParams = new ExportRequestParameters()
+            {
+                ExportFormat = ExportFormat.PDF,
+                ExportType = ExportType.Invoice,
+                RequestingUserId = User.GetUserId(),
+                TenantId = tenantId,
+            };
+
+            var exportServiceResponse = await _exportService.GetDataExport(exportRequestParams, bizLogicResponse.Data);
+
+            if (!exportServiceResponse.IsSuccessful)
+                return this.ErrorResponse(exportServiceResponse.Error);
+
+            var result = new ExportDescriptorRequestAndResponseViewModel()
+            {
+                Format = exportServiceResponse.ExportFormat,
+                FileName = exportServiceResponse.FileName,
+                Token = exportServiceResponse.Token,
+            };
+
+            return Json(result);
         }
 
         [HttpPut("{tenantId:guid}/{invoiceNumber:long:min(1):max(4294967295)}")]

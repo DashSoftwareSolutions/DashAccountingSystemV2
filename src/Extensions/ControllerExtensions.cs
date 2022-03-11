@@ -94,6 +94,17 @@ namespace DashAccountingSystemV2.Extensions
         }
 
         #region Business Logic Result Support
+        #region Sync
+        public static IActionResult Result(this Controller controller, BusinessLogicResponse bizLogicResponse)
+        {
+            if (bizLogicResponse.IsSuccessful)
+                return controller.Ok();
+
+            return controller.ErrorResponse(bizLogicResponse);
+        }
+        #endregion Sync
+
+        #region Async
         public static async Task<IActionResult> Result(
             this Controller controller,
             Task<BusinessLogicResponse> asyncBizLogicTask)
@@ -143,6 +154,7 @@ namespace DashAccountingSystemV2.Extensions
 
             return controller.ErrorResponse(bizLogicResponse);
         }
+        #endregion Async
         #endregion Business Logic Result Support
 
         private static int MapBusinessLogicErrorTypeToHttpStatus(ErrorType errorType)
