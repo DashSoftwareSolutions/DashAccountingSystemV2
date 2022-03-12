@@ -1,6 +1,6 @@
 ﻿namespace DashAccountingSystemV2.Models
 {
-    public enum AddressType
+    public enum AddressType : ushort
     {
         Unknown = 0,
         Home = 1,

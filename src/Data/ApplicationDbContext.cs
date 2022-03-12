@@ -253,10 +253,10 @@ namespace DashAccountingSystemV2.Data
 
             builder.Entity<Address>()
                 .Property(a => a.AddressType)
-                .HasMaxLength(32)
+                .HasColumnType("INT4")
                 .HasConversion(
-                    v => v.ToString(),
-                    v => Enum.Parse<AddressType>(v));
+                    v => (int)v,
+                    v => (AddressType)v);
 
             builder.Entity<Employee>()
                 .HasIndex(e => e.EntityId)

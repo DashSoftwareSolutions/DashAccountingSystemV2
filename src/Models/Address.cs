@@ -18,7 +18,7 @@ namespace DashAccountingSystemV2.Models
         public Guid EntityId { get; set; }
         public Entity Entity { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
+        [Required]
         public AddressType AddressType { get; set; }
 
         [Required(AllowEmptyStrings = false)]
