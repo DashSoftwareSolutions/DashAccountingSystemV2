@@ -19,9 +19,18 @@ namespace DashAccountingSystemV2.Models
         public int DefaultAssetTypeId { get; set; }
         public AssetType DefaultAssetType { get; set; }
 
-        // Navigation Properties
+        [EmailAddress]
+        [MaxLength(256)]
+        public string ContactEmailAddress { get; set; }
+        
+        [NotMapped]
+        public Address MailingAddress { get; set; }
+
+        #region Navigation Properties
         public ICollection<Account> Accounts { get; } = new List<Account>();
+
         public ICollection<JournalEntry> JournalEntries { get; } = new List<JournalEntry>();
+        #endregion Navigation Properties
 
         public Tenant() { }
 
