@@ -295,7 +295,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 Entity = new Entity()
                 {
                     TenantId = _tenantId,
-                    EntityType = EntityType.Organization | EntityType.Customer,
+                    EntityType = EntityType.ExternalOrganization | EntityType.Customer,
                     CreatedById = _userId,
                 },
                 TenantId = _tenantId,

@@ -8,12 +8,13 @@ namespace DashAccountingSystemV2.Models
         Unknown = 0,
 
         // Basic Types
-        Person = 1, // 2^0
-        Organization = 2, // 2^1
+        Tenant = 1, // 2^0
+        Person = 2, // 2^1
+        ExternalOrganization = 4, // 2^2
 
         // Worker Types
-        Employee = 4, // 2^2
-        Contractor = 8, // 2^4
+        Employee = 8, // 2^3
+        Contractor = 16, // 2^4
         // 2^5 ... 2^8 reserved for future use
 
         // Business Partner Types
@@ -25,14 +26,19 @@ namespace DashAccountingSystemV2.Models
 
     public static class EntityTypeExtensions
     {
+        public static bool IsTenant(this EntityType entityType)
+        {
+            return entityType.HasFlag(EntityType.Tenant);
+        }
+
         public static bool IsPerson(this EntityType entityType)
         {
             return entityType.HasFlag(EntityType.Person);
         }
 
-        public static bool IsOrganization(this EntityType entityType)
+        public static bool IsExternalOrganization(this EntityType entityType)
         {
-            return entityType.HasFlag(EntityType.Organization);
+            return entityType.HasFlag(EntityType.ExternalOrganization);
         }
 
         public static bool IsEmployee(this EntityType entityType)
