@@ -13,6 +13,7 @@
     <title>@Model.Tenant.Name - Invoice @Model.InvoiceNumber</title>
     <style type="text/css">
         body {
+            font-family: Arial, Helvetica, sans-serif;
             width: 100%;
         }
 
@@ -21,7 +22,7 @@
             display: block;
             height: 11in;
             margin: 1in;
-            width: 100%;
+            width: 8.5in;
         }
 
         dl.invoice-metadata {
@@ -49,14 +50,14 @@
         <div style="display: flex">
             <div style="flex: 0 0 75%">
                 <strong>@Model.Tenant.Name</strong><br />
-                @* TODO: Make Tenant Address and Email Address Data-Driven!!! *@
                 @* TODO: Handle international addresses *@
-                <span>123 Some Street</span><br />
-                <span>Santa Ana, CA 92701 USA</span><br />
-                <span>dash-software@example.com</span>
+                <span>@Model.Tenant.MailingAddress.StreetAddress1</span><br />
+                <span>@Model.Tenant.MailingAddress.City, @Model.Tenant.MailingAddress.Region.Code @Model.Tenant.MailingAddress.PostalCode</span><br />
+                <span>@Model.Tenant.MailingAddress.Country.Name</span><br />
+                <span>@Model.Tenant.ContactEmailAddress</span>
             </div>
-            <div style="flex: 0 0 25%; align-content: flex-end">
-                <p>[Logo Image]</p>
+            <div style="flex: 0 0 25%; align-content: flex-end; text-align: right">
+                <div>[Logo Image]</div>
             </div>
         </div>
 
@@ -66,8 +67,6 @@
         <div style="display: flex">
             <div style="flex: 0 0 67%">
                 <h2>Bill To</h2>
-                <strong>@Model.Customer.CompanyName</strong><br />
-                @* TODO: Handle international addresses *@
                 <div>
                     @Raw(WebUtility.HtmlEncode(Model.CustomerAddress).Replace("\n", "<br />"))
                 </div>
@@ -88,8 +87,28 @@
 
         <hr />
 
-        @* TODO: Table of Invoice Items *@
-        <p>[TODO: INVOICE ITEMS]</p>
+        @* Table of Invoice Items *@
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 16.65%">DATE</th>
+                    <th style="width: 66.7%">DESCRIPTION</th>
+                    <th style="width: 16.65%">AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var lineItem in Model.LineItems)
+                {
+                    <tr>
+                        <td style="width: 16.65%">@lineItem.Date.ToString("MM/dd/yyyy")</td>
+                        <td style="width: 66.7%">
+                            @Raw(WebUtility.HtmlEncode(lineItem.Description).Replace("\n", "<br />"))
+                        </td>
+                        <td style="width: 16.65%">@lineItem.Total.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
         <hr />
 
@@ -101,7 +120,7 @@
             <div style="flex: 0 1 25%">
                 BALANCE DUE
             </div>
-            <div style="flex: 1 0 25%; align-content: flex-end;">
+            <div style="flex: 1 0 25%; align-content: flex-end; text-align: right">
                 <strong>
                     @Model.Total.ToString("C") @* TODO: Asset Type?  l10n/i18n? *@
                 </strong>
