@@ -43,6 +43,36 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
         [Fact]
         [Trait("Category", "Requires Database")]
+        public void GetTenantDetailed_Ok()
+        {
+            TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
+            {
+                var repository = await GetTenantRepository();
+                
+                var retrievedTenant = await repository.GetTenantDetailedAsync(_tenantId);
+                Assert.NotNull(retrievedTenant);
+                Assert.Equal(_tenantId, retrievedTenant.Id);
+                Assert.Equal(_tenantName, retrievedTenant.Name);
+                Assert.NotNull(retrievedTenant.MailingAddress);
+                Assert.NotNull(retrievedTenant.MailingAddress.Tenant);
+                Assert.NotNull(retrievedTenant.MailingAddress.Entity);
+                Assert.NotNull(retrievedTenant.MailingAddress.Region);
+                Assert.NotNull(retrievedTenant.MailingAddress.Country);
+
+                retrievedTenant = await repository.GetTenantDetailedByNameAsync(_tenantName);
+                Assert.NotNull(retrievedTenant);
+                Assert.Equal(_tenantId, retrievedTenant.Id);
+                Assert.Equal(_tenantName, retrievedTenant.Name);
+                Assert.NotNull(retrievedTenant.MailingAddress);
+                Assert.NotNull(retrievedTenant.MailingAddress.Tenant);
+                Assert.NotNull(retrievedTenant.MailingAddress.Entity);
+                Assert.NotNull(retrievedTenant.MailingAddress.Region);
+                Assert.NotNull(retrievedTenant.MailingAddress.Country);
+            });
+        }
+
+        [Fact]
+        [Trait("Category", "Requires Database")]
         public void GetTenants_Ok()
         {
             TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>

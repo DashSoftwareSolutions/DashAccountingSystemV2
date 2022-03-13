@@ -21,6 +21,14 @@ namespace DashAccountingSystemV2.Repositories
 
         public async Task<Tenant> GetTenantAsync(Guid tenantId)
         {
+            return await _db
+                .Tenant
+                .Include(t => t.DefaultAssetType)
+                .FirstOrDefaultAsync(t => t.Id == tenantId);
+        }
+
+        public async Task<Tenant> GetTenantDetailedAsync(Guid tenantId)
+        {
             var sql = $@"
   SELECT t.""Id"" AS tenant_id
         ,t.""Id""
@@ -126,6 +134,14 @@ namespace DashAccountingSystemV2.Repositories
         }
 
         public async Task<Tenant> GetTenantByNameAsync(string tenantName)
+        {
+            return await _db
+                .Tenant
+                .Include(t => t.DefaultAssetType)
+                .FirstOrDefaultAsync(t => t.Name.ToLower() == tenantName.ToLower());
+        }
+
+        public async Task<Tenant> GetTenantDetailedByNameAsync(string tenantName)
         {
             var sql = $@"
   SELECT t.""Id"" AS tenant_id
