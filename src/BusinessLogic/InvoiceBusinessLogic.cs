@@ -72,12 +72,19 @@ namespace DashAccountingSystemV2.BusinessLogic
 
         public async Task<BusinessLogicResponse<Invoice>> GetInvoiceByTenantAndInvoiceNumber(Guid tenantId, uint invoiceNumber)
         {
+            var tenant = await _tenantRepository.GetTenantDetailedAsync(tenantId);
+
+            if (tenant == null)
+                return new BusinessLogicResponse<Invoice>(ErrorType.RequestedEntityNotFound);
+
             var invoice = await _invoiceRepository.GetDetailedByTenantIdAndInvoiceNumberAsync(tenantId, invoiceNumber);
 
             if (invoice == null)
                 return new BusinessLogicResponse<Invoice>(ErrorType.RequestedEntityNotFound);
 
             // TODO: Check that user has access to this tenant and permission to view the requested invoice
+
+            invoice.Tenant = tenant;
 
             return new BusinessLogicResponse<Invoice>(invoice);
         }
