@@ -42,10 +42,12 @@ namespace DashAccountingSystemV2.Models
         [MaxLength(16)]
         public string PostalCode { get; set; }
 
+        [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Created { get; private set; }
 
-        public Guid? CreatedById { get; set; }
+        [Required]
+        public Guid CreatedById { get; set; }
         public ApplicationUser CreatedBy { get; private set; }
 
         public DateTime? Updated { get; set; }
