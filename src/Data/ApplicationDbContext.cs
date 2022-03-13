@@ -252,6 +252,12 @@ namespace DashAccountingSystemV2.Data
                 .ValueGeneratedOnAdd();
 
             builder.Entity<Address>()
+                .Property("Created")
+                .HasColumnType("TIMESTAMP")
+                .HasDefaultValueSql(GET_UTC_TIMESTAMP)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Address>()
                 .Property(a => a.AddressType)
                 .HasColumnType("INT4")
                 .HasConversion(

@@ -42,6 +42,17 @@ namespace DashAccountingSystemV2.Models
         [MaxLength(16)]
         public string PostalCode { get; set; }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime Created { get; private set; }
+
+        public Guid? CreatedById { get; set; }
+        public ApplicationUser CreatedBy { get; private set; }
+
+        public DateTime? Updated { get; set; }
+
+        public Guid? UpdatedById { get; set; }
+        public ApplicationUser UpdatedBy { get; private set; }
+
         public Address Clone()
         {
             return (Address)this.MemberwiseClone();
