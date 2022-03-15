@@ -54,6 +54,7 @@ namespace DashAccountingSystemV2.Repositories
                 }
             }
         }
+
         public async Task DeleteAsync(Guid invoiceId, Guid contextUserId)
         {
             // TODO: For now, this is a _HARD_ delete.  Perhaps in the future we can consider soft-deletion if it makes sense (e.g. "Oops; I deleted it by accident!  Undo that please!")
@@ -106,6 +107,8 @@ namespace DashAccountingSystemV2.Repositories
                     .ThenInclude(invLineItem => invLineItem.ProductOrService.Category)
                 .Include(inv => inv.LineItems)
                     .ThenInclude(invLineItem => invLineItem.AssetType)
+                .Include(inv => inv.LineItems)
+                    .ThenInclude(invLineItem => invLineItem.TimeActivities)
                 .Include(inv => inv.Payments)
                     .ThenInclude(invPmt => invPmt.Payment)
                         .ThenInclude(pmt => pmt.DepositAccount)
@@ -139,6 +142,8 @@ namespace DashAccountingSystemV2.Repositories
                     .ThenInclude(invLineItem => invLineItem.ProductOrService.Category)
                 .Include(inv => inv.LineItems)
                     .ThenInclude(invLineItem => invLineItem.AssetType)
+                .Include(inv => inv.LineItems)
+                    .ThenInclude(invLineItem => invLineItem.TimeActivities)
                 .Include(inv => inv.Payments)
                     .ThenInclude(invPmt => invPmt.Payment)
                         .ThenInclude(pmt => pmt.DepositAccount)

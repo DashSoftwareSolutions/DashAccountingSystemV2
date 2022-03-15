@@ -20,7 +20,6 @@
         .page[size="A4"] {
             background: white;
             display: block;
-            margin-bottom: 55px;
             margin-right: 11px;
         }
 
@@ -128,7 +127,7 @@
                     <tr>
                         <td style="width: 16.65%">@lineItem.Date.ToString("MM/dd/yyyy")</td>
                         <td style="width: 66.7%">
-                            @Raw(WebUtility.HtmlEncode(lineItem.Description).Replace("\n", "<br />"))
+                            @Raw(WebUtility.HtmlEncode(lineItem.GetBillableItemDescription()).Replace("\n", "<br />"))
                         </td>
                         <td style="text-align: right; width: 16.65%">@lineItem.Total.ToString("C")</td>
                     </tr>

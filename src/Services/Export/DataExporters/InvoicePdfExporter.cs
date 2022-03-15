@@ -55,7 +55,7 @@ namespace DashAccountingSystemV2.Services.Export.DataExporters
                 pdfConverter.Options.WebPageWidth = 1024;
                 pdfConverter.Options.WebPageHeight = 0; // height will be auto-detected
                 pdfConverter.Options.MarginTop = 10;
-                pdfConverter.Options.MarginBottom = 10;
+                pdfConverter.Options.MarginBottom = 50;
                 pdfConverter.Options.MarginLeft = 20;
                 pdfConverter.Options.MarginRight = 20;
 

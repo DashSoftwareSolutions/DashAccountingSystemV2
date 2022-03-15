@@ -70,5 +70,26 @@ namespace DashAccountingSystemV2.Models
         /// Navigation property to the single corresponding Time Activity, if any
         /// </summary>
         public TimeActivity TimeActivity => TimeActivities?.SingleOrDefault()?.TimeActivity;
+
+        /// <summary>
+        /// Gets a description of the Line Item for the PDF Invoice
+        /// </summary>
+        /// <returns></returns>
+        public string GetBillableItemDescription()
+        {
+            if (TimeActivityId != null)
+            {
+                var timeActivityDuration = TimeSpan.FromHours((double)Quantity);
+                var timeActivityDurationAsString = Quantity > 1 ?
+                    string.Format("{0} {1} {2} mins", timeActivityDuration.Hours, timeActivityDuration.Hours == 1 ? "hr" : "hrs", timeActivityDuration.Minutes) :
+                    string.Format("{0} mins", timeActivityDuration.TotalMinutes);
+
+                return string.Format("{0}, {1} at {2:C}/hr", Description, timeActivityDurationAsString, UnitPrice);
+            }
+
+            // TODO: Handle any other special cases as desired besides Time Activities
+
+            return Description;
+        }
     }
 }
