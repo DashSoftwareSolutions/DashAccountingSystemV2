@@ -20,9 +20,7 @@
         .page[size="A4"] {
             background: white;
             display: block;
-            height: 11in;
-            margin: 1in;
-            width: 8.5in;
+            margin-right: 11px;
         }
 
         dl.invoice-metadata {
@@ -41,6 +39,33 @@
             dl.invoice-metadata dd {
                 margin: 0 0 0 110px;
                 padding: 0 0 0.5em 0;
+            }
+
+        .invoice-table {
+            border-collapse: collapse;
+        }
+
+            .invoice-table thead {
+                margin-bottom: 22px;
+            }
+
+            .invoice-table tr {
+                page-break-inside: avoid;
+            }
+
+            .invoice-table td {
+                padding: 5.5px;
+                vertical-align: top;
+            }
+
+        .invoice-table-header-row {
+            background-color: #6DCFF6;
+            color: #134174;
+        }
+
+            .invoice-table-header-row th {
+                padding: 5.5px;
+                text-align: left;
             }
     </style>
 </head>
@@ -88,12 +113,12 @@
         <hr />
 
         @* Table of Invoice Items *@
-        <table>
+        <table class="invoice-table">
             <thead>
-                <tr>
+                <tr class="invoice-table-header-row">
                     <th style="width: 16.65%">DATE</th>
                     <th style="width: 66.7%">DESCRIPTION</th>
-                    <th style="width: 16.65%">AMOUNT</th>
+                    <th style="text-align: right; width: 16.65%">AMOUNT</th>
                 </tr>
             </thead>
             <tbody>
@@ -104,7 +129,7 @@
                         <td style="width: 66.7%">
                             @Raw(WebUtility.HtmlEncode(lineItem.Description).Replace("\n", "<br />"))
                         </td>
-                        <td style="width: 16.65%">@lineItem.Total.ToString("C")</td>
+                        <td style="text-align: right; width: 16.65%">@lineItem.Total.ToString("C")</td>
                     </tr>
                 }
             </tbody>
@@ -113,7 +138,7 @@
         <hr />
 
         @* Invoice Total and Message *@
-        <div style="display: flex">
+        <div style="display: flex; margin-top: 22px">
             <div style="flex: 0 0 50%; padding-right: 33px;">
                 @Raw(WebUtility.HtmlEncode(Model.Message).Replace("\n", "<br />"))
             </div>
@@ -121,7 +146,7 @@
                 BALANCE DUE
             </div>
             <div style="flex: 1 0 25%; align-content: flex-end; text-align: right">
-                <strong>
+                <strong style="font-size: 24px;">
                     @Model.Total.ToString("C") @* TODO: Asset Type?  l10n/i18n? *@
                 </strong>
             </div>
