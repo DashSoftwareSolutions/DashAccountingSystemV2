@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SelectPdf;
@@ -11,6 +12,7 @@ namespace DashAccountingSystemV2.Services.Export.DataExporters
     {
         private const string _InvoiceTemplateName = "DefaultInvoiceTemplate.cshtml"; // TODO: _SOMEDAY_ we may have multiple template options, allow end-user customization by tenant, etc.  For now, this is all we have; take it or leave it! =)
 
+        // TODO: Consider making Page Header and Footer Partial Views
         private const string _PageHeaderTemplateFormat = @"
 <div style=""float: left;"">
     Invoice {0}
@@ -21,7 +23,13 @@ namespace DashAccountingSystemV2.Services.Export.DataExporters
 <div style=""clear:both; border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;"">
 </div>
 ";
-
+        private const string _PageFooterTemplateFormat = @"
+<div style=""clear:both; border-top: 1px solid; padding-top: 5px; padding-bottom: 5px;"">
+</div>
+<div style=""float: left; font-family: Arial; font-size: 14px;"">
+    {0}
+</div>
+";
         private readonly ILogger _logger = null;
         private readonly ITemplateService _templateService = null;
 
@@ -62,7 +70,21 @@ namespace DashAccountingSystemV2.Services.Export.DataExporters
                 headerHtml.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
                 pdfConverter.Header.Add(headerHtml);
 
-                // TODO: Page Footer with page numbers
+                // Specify Page Footer Options with Page Numbers
+                pdfConverter.Options.DisplayFooter = true;
+                pdfConverter.Footer.DisplayOnFirstPage = true;
+                pdfConverter.Footer.DisplayOnOddPages = true;
+                pdfConverter.Footer.DisplayOnEvenPages = true;
+                pdfConverter.Footer.Height = 50;
+
+                var footerHtml = new PdfHtmlSection(string.Format(_PageFooterTemplateFormat, DateTime.Now.ToString("f")), string.Empty); // TODO: User's Time Zone.  This will work for now since, when running locally, machine time is Pacific Time.
+                footerHtml.AutoFitHeight = HtmlToPdfPageFitMode.AutoFit;
+                pdfConverter.Footer.Add(footerHtml);
+
+                var pageNumbersText = new PdfTextSection(0, 10, "Page {page_number} of {total_pages}  ", new Font("Arial", 8));
+                pageNumbersText.HorizontalAlign = PdfTextHorizontalAlign.Center;
+                pdfConverter.Footer.Add(pageNumbersText);
+
 
                 // Convert the HTML Invoice to PDF
                 var invoiceAsPdf = pdfConverter.ConvertHtmlString(invoiceAsHtml);
