@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DashAccountingSystemV2.Extensions;
 
 namespace DashAccountingSystemV2.Models
 {
@@ -80,11 +81,8 @@ namespace DashAccountingSystemV2.Models
             if (TimeActivityId != null)
             {
                 var timeActivityDuration = TimeSpan.FromHours((double)Quantity);
-                var timeActivityDurationAsString = Quantity > 1 ?
-                    string.Format("{0} {1} {2} mins", timeActivityDuration.Hours, timeActivityDuration.Hours == 1 ? "hr" : "hrs", timeActivityDuration.Minutes) :
-                    string.Format("{0} mins", timeActivityDuration.TotalMinutes);
 
-                return string.Format("{0}, {1} at {2:C}/hr", Description, timeActivityDurationAsString, UnitPrice);
+                return string.Format("{0}, {1} @ {2:C}/hr", Description, timeActivityDuration.HumanizeHoursAndMinutes(), UnitPrice);
             }
 
             // TODO: Handle any other special cases as desired besides Time Activities
