@@ -11,6 +11,7 @@ import DashboardPage from './components/DashboardPage';
 import EditJournalEntryPage from './components/EditJournalEntryPage';
 import InvoiceListPage from './components/InvoiceListPage';
 import LedgerPage from './components/LedgerPage';
+import PrivacyPage from './components/PrivacyPage';
 import ProfitAndLossPage from './components/ProfitAndLossPage';
 import SelectTenant from './components/SelectTenant';
 import TimeActivityReportDetailsPage from './components/TimeActivityDetailsReportPage';
@@ -26,6 +27,7 @@ export default () => (
     <Layout>
         <AuthorizeRoute exact path='/' component={SelectTenant} />
         <Route exact path='/about' component={AboutPage} />
+        <Route exact path='/privacy' component={PrivacyPage} />
         <AuthorizeRoute path='/account-details' component={AccountDetailsPage} />
         <AuthorizeRoute path='/balance-sheet' component={BalanceSheetPage} />
         <AuthorizeRoute path='/chart-of-accounts' component={ChartOfAccountsPage} />
