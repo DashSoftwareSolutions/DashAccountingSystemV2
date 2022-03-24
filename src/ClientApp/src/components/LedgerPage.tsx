@@ -5,7 +5,11 @@ import {
     Col,
     Row,
 } from 'reactstrap';
-import { map, reduce } from 'lodash';
+import {
+    isNil,
+    map,
+    reduce,
+} from 'lodash';
 import { Link } from 'react-router-dom';
 import { RouteComponentProps, withRouter } from 'react-router';
 import moment from 'moment-timezone';
@@ -185,6 +189,13 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                 </tr>
                                 {map(account.transactions, (transaction) => {
                                     const journalEntryViewRoute = `/journal-entry/view/${transaction.entryId}`;
+
+                                    const checkNumberSuffix = !isNil(transaction.checkNumber) ?
+                                        ` (Check #${transaction.checkNumber})` :
+                                        '';
+
+                                    const transactionDescription = `${transaction.description}${checkNumberSuffix}`;
+
                                     return (
                                         <tr key={`acct-${account.accountNumber}-entry-${transaction.entryId}`}>
                                             <td className="col-md-1">
@@ -197,9 +208,9 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                                     {transaction.entryId}
                                                 </Link>
                                             </td>
-                                            <td className="col-md-6" style={{ wordWrap: 'break-word' }}>
+                                            <td className="col-md-7" style={{ wordWrap: 'break-word' }}>
                                                 <Link className="hoverable-link" to={journalEntryViewRoute}>
-                                                    {transaction.description}
+                                                    {transactionDescription}
                                                 </Link>
                                                 {transaction.status === TransactionStatus.Pending ? (
                                                     <React.Fragment>
@@ -208,7 +219,7 @@ class LedgerPage extends React.PureComponent<LedgerPageProps> {
                                                     </React.Fragment>
                                                 ): null}
                                             </td>
-                                            <td className="col-md-2 text-right">
+                                            <td className="col-md-1 text-right">
                                                 <Link className="hoverable-link" to={journalEntryViewRoute}>
                                                     <AmountDisplay
                                                         amount={transaction.amount}
