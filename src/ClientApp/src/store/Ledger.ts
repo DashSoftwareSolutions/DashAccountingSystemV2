@@ -105,11 +105,25 @@ export const actionCreators = {
     },
 };
 
+const getDefaultDateRangeStart = (): string => {
+    const today = moment();
+    let startDate = moment(today).startOf('quarter');
+    logger.info('Start of Quarter:', startDate.format('YYYY-MM-DD'));
+
+    // If start of quarter is less than a month before today, back it up one month
+    logger.info('Difference between today and start of the current quarter in months:', moment.duration(today.diff(startDate)).months());
+    if (moment.duration(today.diff(startDate)).months() < 1) {
+        startDate.subtract(1, 'month');
+        logger.info('Updated Start Date:', startDate.format('YYYY-MM-DD'));
+    }
+
+    return startDate.format('YYYY-MM-DD');
+}
+
 const unloadedState: LedgerState = {
     accounts: [],
     isLoading: false,
-    // TODO: update default date range logic (e.g. current quarter to date, etc.)
-    dateRangeStart: '2018-01-01',
+    dateRangeStart: getDefaultDateRangeStart(),
     dateRangeEnd: moment().format('YYYY-MM-DD'),
 };
 
