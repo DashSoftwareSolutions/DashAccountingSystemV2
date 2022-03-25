@@ -15,7 +15,6 @@ import {
     Row,
 } from 'reactstrap';
 import { RouteComponentProps, withRouter } from 'react-router';
-import moment from 'moment-timezone';
 import { ApplicationState } from '../store';
 import {
     DEFAULT_AMOUNT,
