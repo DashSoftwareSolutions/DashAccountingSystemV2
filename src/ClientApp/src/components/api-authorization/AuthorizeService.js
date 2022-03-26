@@ -3,6 +3,7 @@ import {
     UserManager,
     WebStorageStateStore,
 } from 'oidc-client';
+import { getMutex } from 'simple-mutex-promise';
 import {
     ApplicationPaths,
     ApplicationName,
@@ -12,8 +13,12 @@ import { Logger } from '../../common/Logging';
 export class AuthorizeService {
     _callbacks = [];
     _nextSubscriptionId = 0;
+
     _user = null;
     _isAuthenticated = false;
+    _isInitializingUserManager = false;
+    _userManagerInitializationMutex = getMutex();
+
     _logger = new Logger('Authorize Service');
 
     // By default pop ups are disabled because they don't work properly on Edge.
@@ -107,6 +112,7 @@ export class AuthorizeService {
     //    post logout redirect flow.
     async signOut(state) {
         await this.ensureUserManagerInitialized();
+
         try {
             if (this._popUpDisabled) {
                 throw new Error('Popup disabled. Change \'AuthorizeService.js:AuthorizeService._popupDisabled\' to false to enable it.')
@@ -188,12 +194,42 @@ export class AuthorizeService {
     }
 
     async ensureUserManagerInitialized() {
-        if (this.userManager !== undefined) {
-            return;
-        }
+        this._logger.debug('ensureUserManagerInitialized() was called...');
 
-        // TODO/FIXME: This call gets made a gazillion times.  Need to figure out how to tell everyone else to wait and only call this once while initializing.
-        let response = await fetch(ApplicationPaths.ApiAuthorizationClientConfigurationUrl);
+        const [lock, release] = this._userManagerInitializationMutex.getLock();
+
+        if (!this._isInitializingUserManager) {
+            if (this.userManager !== undefined) {
+                this._logger.debug('User Manager is already initialized.');
+                return;
+            }
+
+            this._logger.debug('Acquiring sync lock...');
+            await lock;
+
+            if (!this._isInitializingUserManager) {
+                this._isInitializingUserManager = true;
+
+                if (this.userManager !== undefined) {
+                    this._logger.debug('User Manager is already initialized.  Releasing sync lock...');
+                    this._isInitializingUserManager = false;
+                    release();
+                    return;
+                }
+
+                this._logger.debug('Starting User Manager initialization...');
+                await this.initializeUserManager();
+
+                this._logger.debug('User Manager initialization complete.  Releasing sync lock...');
+                this._isInitializingUserManager = false;
+                release();
+            }
+        }
+    }
+
+    async initializeUserManager() {
+        const response = await fetch(ApplicationPaths.ApiAuthorizationClientConfigurationUrl);
+
         if (!response.ok) {
             throw new Error(`Could not load settings for '${ApplicationName}'`);
         }
@@ -206,8 +242,8 @@ export class AuthorizeService {
             prefix: ApplicationName
         });
 
-        OidcClientLogging.logger = new Logger('OIDC Client');
-        OidcClientLogging.level = OidcClientLogging.DEBUG;
+        OidcClientLogging.logger = new Logger('OIDC Client'); // Tell OIDC Client library to use our structured logger
+        // OidcClientLogging.level = OidcClientLogging.DEBUG; // Uncomment this if we need more verbose logging from OIDC Client library
 
         this.userManager = new UserManager(settings);
 
@@ -224,8 +260,8 @@ export class AuthorizeService {
         });
 
         this.userManager.events.addUserLoaded((user) => {
-            this._logger.info('UserManager: Setting User');
-            // this.updateState(user); // this might not be correct and might be causing an infinite loop ... stay tuned ...
+            this._logger.info('UserManager: User loaded');
+            this.updateState(user);
         });
 
         this.userManager.events.addUserSessionChanged(() => {
