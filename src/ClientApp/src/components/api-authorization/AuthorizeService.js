@@ -1,11 +1,20 @@
-import { UserManager, WebStorageStateStore } from 'oidc-client';
-import { ApplicationPaths, ApplicationName } from './ApiAuthorizationConstants';
+import {
+    Log as OidcClientLogging,
+    UserManager,
+    WebStorageStateStore,
+} from 'oidc-client';
+import {
+    ApplicationPaths,
+    ApplicationName,
+} from './ApiAuthorizationConstants';
+import { Logger } from '../../common/Logging';
 
 export class AuthorizeService {
     _callbacks = [];
     _nextSubscriptionId = 0;
     _user = null;
     _isAuthenticated = false;
+    _logger = new Logger('Authorize Service');
 
     // By default pop ups are disabled because they don't work properly on Edge.
     // If you want to enable pop up authentication simply set this flag to false.
@@ -42,13 +51,14 @@ export class AuthorizeService {
     //    redirect flow.
     async signIn(state) {
         await this.ensureUserManagerInitialized();
+
         try {
             const silentUser = await this.userManager.signinSilent(this.createArguments());
             this.updateState(silentUser);
             return this.success(state);
         } catch (silentError) {
             // User might not be authenticated, fallback to popup authentication
-            console.log("Silent authentication error: ", silentError);
+            this._logger.info("Silent authentication error: ", silentError);
 
             try {
                 if (this._popUpDisabled) {
@@ -63,7 +73,7 @@ export class AuthorizeService {
                     // The user explicitly cancelled the login action by closing an opened popup.
                     return this.error("The user closed the window.");
                 } else if (!this._popUpDisabled) {
-                    console.log("Popup authentication error: ", popUpError);
+                    this._logger.info("Popup authentication error: ", popUpError);
                 }
 
                 // PopUps might be blocked by the user, fallback to redirect
@@ -71,7 +81,7 @@ export class AuthorizeService {
                     await this.userManager.signinRedirect(this.createArguments(state));
                     return this.redirect();
                 } catch (redirectError) {
-                    console.log("Redirect authentication error: ", redirectError);
+                    this._logger.info("Redirect authentication error: ", redirectError);
                     return this.error(redirectError);
                 }
             }
@@ -85,7 +95,7 @@ export class AuthorizeService {
             this.updateState(user);
             return this.success(user && user.state);
         } catch (error) {
-            console.log('There was an error signing in: ', error);
+            this._logger.info('There was an error signing in: ', error);
             return this.error('There was an error signing in.');
         }
     }
@@ -106,12 +116,13 @@ export class AuthorizeService {
             this.updateState(undefined);
             return this.success(state);
         } catch (popupSignOutError) {
-            console.log("Popup signout error: ", popupSignOutError);
+            this._logger.info("Popup signout error: ", popupSignOutError);
+
             try {
                 await this.userManager.signoutRedirect(this.createArguments(state));
                 return this.redirect();
             } catch (redirectSignOutError) {
-                console.log("Redirect signout error: ", redirectSignOutError);
+                this._logger.info("Redirect signout error: ", redirectSignOutError);
                 return this.error(redirectSignOutError);
             }
         }
@@ -119,12 +130,13 @@ export class AuthorizeService {
 
     async completeSignOut(url) {
         await this.ensureUserManagerInitialized();
+
         try {
             const response = await this.userManager.signoutCallback(url);
             this.updateState(null);
             return this.success(response && response.data);
         } catch (error) {
-            console.log(`There was an error trying to log out '${error}'.`);
+            this._logger.info(`There was an error trying to log out '${error}'.`);
             return this.error(error);
         }
     }
@@ -144,6 +156,7 @@ export class AuthorizeService {
         const subscriptionIndex = this._callbacks
             .map((element, index) => element.subscription === subscriptionId ? { found: true, index } : { found: false })
             .filter(element => element.found === true);
+
         if (subscriptionIndex.length !== 1) {
             throw new Error(`Found an invalid number of subscriptions ${subscriptionIndex.length}`);
         }
@@ -188,15 +201,45 @@ export class AuthorizeService {
         let settings = await response.json();
         settings.automaticSilentRenew = true;
         settings.includeIdTokenInSilentRenew = true;
+
         settings.userStore = new WebStorageStateStore({
             prefix: ApplicationName
         });
 
+        OidcClientLogging.logger = new Logger('OIDC Client');
+        OidcClientLogging.level = OidcClientLogging.DEBUG;
+
         this.userManager = new UserManager(settings);
 
+        this.userManager.events.addAccessTokenExpired(() => {
+            this._logger.info('UserManager: Access token has expired');
+        });
+
+        this.userManager.events.addAccessTokenExpiring(() => {
+            this._logger.info('UserManager: Access token about to expire');
+        });
+
+        this.userManager.events.addSilentRenewError((error) => {
+            this._logger.error('UserManager: Silent Renew Error: ', error);
+        });
+
+        this.userManager.events.addUserLoaded((user) => {
+            this._logger.info('UserManager: Setting User');
+            // this.updateState(user); // this might not be correct and might be causing an infinite loop ... stay tuned ...
+        });
+
+        this.userManager.events.addUserSessionChanged(() => {
+            this._logger.info('UserManager: User session changed');
+        });
+
         this.userManager.events.addUserSignedOut(async () => {
+            this._logger.info('UserManager: User signed out');
             await this.userManager.removeUser();
             this.updateState(undefined);
+        });
+
+        this.userManager.events.addUserUnloaded(() => {
+            this._logger.info('UserManager: User unloaded');
         });
     }
 
