@@ -196,8 +196,6 @@ export class AuthorizeService {
     async ensureUserManagerInitialized() {
         this._logger.debug('ensureUserManagerInitialized() was called...');
 
-        const [lock, release] = this._userManagerInitializationMutex.getLock();
-
         if (!this._isInitializingUserManager) {
             if (this.userManager !== undefined) {
                 this._logger.debug('User Manager is already initialized.');
@@ -205,6 +203,7 @@ export class AuthorizeService {
             }
 
             this._logger.debug('Acquiring sync lock...');
+            const [lock, release] = this._userManagerInitializationMutex.getLock();
             await lock;
 
             if (!this._isInitializingUserManager) {
