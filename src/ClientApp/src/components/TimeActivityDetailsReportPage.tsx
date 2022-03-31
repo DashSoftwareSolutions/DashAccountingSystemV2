@@ -325,10 +325,10 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
             <table className="table table-hover table-sm report-table">
                 <thead>
                     <tr>
-                        <th className="col-md-2 bg-white sticky-top sticky-border">Activity Date</th>
-                        <th className="col-md-6 bg-white sticky-top sticky-border">Memo/Description</th>
-                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Duration</th>
-                        <th className="col-md-2 bg-white sticky-top sticky-border text-right">Amount</th>
+                        <th className="col-md-1 bg-white sticky-top sticky-border">Activity Date</th>
+                        <th className="col-md-9 bg-white sticky-top sticky-border">Memo/Description</th>
+                        <th className="col-md-1 bg-white sticky-top sticky-border text-right">Duration</th>
+                        <th className="col-md-1 bg-white sticky-top sticky-border text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -351,7 +351,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
 
                                     return (
                                         <tr key = { timeActivity.id }>
-                                            <td className="col-md-2">
+                                            <td className="col-md-1">
                                                 <LinkButton
                                                     className="btn-link-report-item"
                                                     onClick={() => this.onClickExistingTimeActivity(timeActivity)}
@@ -359,7 +359,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                                                     {moment(timeActivity.date).format('L')}
                                                 </LinkButton>
                                             </td>
-                                            <td className="col-md-6">
+                                            <td className="col-md-9">
                                                 <LinkButton
                                                     className="btn-link-report-item"
                                                     onClick={() => this.onClickExistingTimeActivity(timeActivity)}
@@ -370,7 +370,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                                                     />
                                                 </LinkButton>
                                             </td>
-                                            <td className="col-md-2 text-right">
+                                            <td className="col-md-1 text-right">
                                                 <LinkButton
                                                     className="btn-link-report-item"
                                                     onClick={() => this.onClickExistingTimeActivity(timeActivity)}
@@ -379,7 +379,7 @@ class TimeActivityDetailsReportPage extends React.PureComponent<TimeActivityDeta
                                                     {displayHhMm(moment.duration(timeActivity.totalTime))}
                                                 </LinkButton>
                                             </td>
-                                            <td className="col-md-2 text-right">
+                                            <td className="col-md-1 text-right">
                                                 <LinkButton
                                                     className="btn-link-report-item"
                                                     onClick={() => this.onClickExistingTimeActivity(timeActivity)}
