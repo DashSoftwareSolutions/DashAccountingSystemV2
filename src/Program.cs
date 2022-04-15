@@ -1,4 +1,6 @@
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,6 +11,8 @@ namespace DashAccountingSystemV2
 {
     public class Program
     {
+        private static IConfiguration _configuration;
+
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
@@ -21,7 +25,11 @@ namespace DashAccountingSystemV2
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseSerilog((hosting, loggerConfig) =>
-                    loggerConfig.ReadFrom.Configuration(hosting.Configuration))
+                {
+                    _configuration = hosting.Configuration;
+
+                    loggerConfig.ReadFrom.Configuration(hosting.Configuration);
+                })
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
@@ -30,6 +38,25 @@ namespace DashAccountingSystemV2
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
+                        .ConfigureKestrel(serverOptions =>
+                        {
+                            // If a custom server HTTPS certificate appears to be configured, use it
+                            var customServerHttpsCertificatePath = _configuration["CertFilename"];
+                            var customServerHttpsCertificatePassword = _configuration["CertPassword"];
+
+                            if (!string.IsNullOrEmpty(customServerHttpsCertificatePath) &&
+                                !string.IsNullOrEmpty(customServerHttpsCertificatePassword))
+                            {
+                                serverOptions.ConfigureHttpsDefaults(listenOptions =>
+                                {
+                                    listenOptions.ServerCertificate = new X509Certificate2(
+                                        customServerHttpsCertificatePath,
+                                        customServerHttpsCertificatePassword);
+                                });
+                            }
+
+                            // Otherwise it should use the default ASP.NET Core HTTPS development certificate
+                        })
                         .UseStartup<Startup>();
                 });
 
