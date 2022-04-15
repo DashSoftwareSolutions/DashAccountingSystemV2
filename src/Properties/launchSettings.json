@@ -18,7 +18,7 @@
     "DashAccountingSystemV2": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:6001;http://localhost:6000",
+      "applicationUrl": "https://local.dashaccounting.io:6001;https://localhost:6001;http://localhost:6000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
