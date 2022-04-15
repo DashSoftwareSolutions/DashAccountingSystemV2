@@ -79,7 +79,52 @@ ORDER BY acct.""AccountNumber"";
 
                 return results.ToDictionary(x => x.AccountId, x => x.Balance);
             }
+        }
 
+        public async Task<Dictionary<Guid, decimal>> GetAccountBalancesAsync(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd,
+            KnownAccountType[] accountTypes = null)
+        {
+            using (var connection = new NpgsqlConnection(_db.Database.GetConnectionString()))
+            {
+                var results = await connection.QueryAsync<AccountBalanceDto>($@"
+WITH transactions AS (
+      SELECT je_acct.""AccountId""
+            ,je_acct.""Amount""
+        FROM ""JournalEntryAccount"" je_acct
+             INNER JOIN ""JournalEntry"" je
+                     ON je_acct.""JournalEntryId"" = je.""Id""
+             INNER JOIN ""Account"" a
+                     ON je_acct.""AccountId"" = a.""Id""
+       WHERE je.""TenantId"" = @tenantId
+         AND ( @accountTypes::INTEGER[] IS NULL OR a.""AccountTypeId"" = ANY ( @accountTypes ) )
+         AND je.""Status"" = {(int)TransactionStatus.Posted}
+         AND je.""PostDate"" >= @dateRangeStart
+         AND je.""PostDate"" <= @dateRangeEnd
+)
+  SELECT acct.""Id"" AS ""AccountId""
+        ,COALESCE(SUM(tx.""Amount""), 0) AS ""Balance""
+    FROM ""Account"" acct
+         LEFT JOIN transactions tx
+                ON acct.""Id"" = tx.""AccountId""
+   WHERE acct.""TenantId"" = @tenantId
+     AND ( @accountTypes::INTEGER[] IS NULL OR acct.""AccountTypeId"" = ANY ( @accountTypes ) )
+GROUP BY acct.""Id""
+ORDER BY acct.""AccountNumber"";
+",
+                        new
+                        {
+                            tenantId,
+                            dateRangeStart,
+                            dateRangeEnd,
+                            accountTypes = accountTypes == null ? null : accountTypes.Cast<int>().ToArray(),
+                        }
+                    );
+
+                return results.ToDictionary(x => x.AccountId, x => x.Balance);
+            }
         }
 
         public Task<Account> GetAccountByIdAsync(Guid accountId)

@@ -26,7 +26,26 @@ namespace DashAccountingSystemV2.BusinessLogic
             DateTime dateRangeEnd)
         {
             var accounts = await _accountRepository.GetAccountsByTenantAsync(tenantId);
-            var accountStartingBalances = await _accountRepository.GetAccountBalancesAsync(tenantId, dateRangeStart.AddDays(-1));
+
+            var accountBalancesDateRangeEnd = dateRangeStart.AddDays(-1);
+            var profitAndLossAccountBalancesStartDate = new DateTime(dateRangeStart.Year, 1, 1);
+
+            var balanceSheetAccountStartingBalances = await _accountRepository.GetAccountBalancesAsync(
+                tenantId,
+                accountBalancesDateRangeEnd,
+                new KnownAccountType[] { KnownAccountType.Assets, KnownAccountType.Liabilities, KnownAccountType.OwnersEquity });
+
+            var profitAndLossAccountStartingBalances = await _accountRepository.GetAccountBalancesAsync(
+                tenantId,
+                profitAndLossAccountBalancesStartDate,
+                accountBalancesDateRangeEnd,
+                new[] { KnownAccountType.Revenue, KnownAccountType.Expenses });
+
+            var accountStartingBalances = new Dictionary<Guid, decimal>()
+                .Concat(balanceSheetAccountStartingBalances)
+                .Concat(profitAndLossAccountStartingBalances)
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            
             var journalEntryAccounts = await _journalEntryRepository.GetJournalEntryAccountsAsync(
                 tenantId,
                 dateRangeStart,

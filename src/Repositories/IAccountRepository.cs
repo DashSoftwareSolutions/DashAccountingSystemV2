@@ -21,6 +21,12 @@ namespace DashAccountingSystemV2.Repositories
             Guid tenantId,
             DateTime date,
             KnownAccountType[] accountTypes = null);
+
+        Task<Dictionary<Guid, decimal>> GetAccountBalancesAsync(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd,
+            KnownAccountType[] accountTypes = null);
         
         Task<IEnumerable<JournalEntryAccount>> GetPendingTransactionsAsync(Guid accountId);
 
