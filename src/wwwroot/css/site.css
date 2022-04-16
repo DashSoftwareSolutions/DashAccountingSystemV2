@@ -54,12 +54,12 @@ body {
   margin-bottom: 60px;
 }
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  overflow: scroll;
-  white-space: nowrap;
-  /* Set the fixed height of the footer here */
-  height: 60px;
-  line-height: 60px; /* Vertically center the text there */
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* overflow: scroll; */ /* This adds undesired scrollbars to the footer.  HOWEVER, it doesn't looks like we actually use this file; we use the original one from Nuget. :-(  See: https://stackoverflow.com/a/67551480 */
+    white-space: nowrap;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    line-height: 60px; /* Vertically center the text there */
 }
