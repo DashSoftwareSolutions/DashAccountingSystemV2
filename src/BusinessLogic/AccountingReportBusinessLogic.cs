@@ -70,10 +70,15 @@ namespace DashAccountingSystemV2.BusinessLogic
 
             _logger.LogDebug("Liabilities + Equity: {0:N2}", combinedLiabilityAndEquity);
 
-            _logger.LogDebug("Fetching revenue and expense transactions for the period...");
+            // For Net Income and Retained Earnings, we need year-to-date for the specified period.
+            // e.g. If the request is "Get the Balance Sheet for 2019 Q2", we want the Net Income for the entire first half of 2019.
+            _logger.LogDebug("Fetching revenue and expense transactions for the year containing the specified period...");
+
+            var revenueAndExpenseDateRangeStart = new DateTime(dateRangeStart.Year, 1, 1);
+
             var revenueAndExpenseTransactions = await _journalEntryRepository.GetPostedJournalEntryAccountsAsync(
                 tenantId,
-                dateRangeStart,
+                revenueAndExpenseDateRangeStart,
                 dateRangeEnd,
                 KnownAccountType.Revenue,
                 KnownAccountType.Expenses);
