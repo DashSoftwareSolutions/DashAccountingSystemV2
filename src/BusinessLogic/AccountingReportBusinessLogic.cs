@@ -174,7 +174,6 @@ namespace DashAccountingSystemV2.BusinessLogic
             DateTime dateRangeEnd)
         {
             _logger.LogDebug("Compiling data for Profit and Loss Report for date range from {0:d} to {1:d}", dateRangeStart, dateRangeEnd);
-            _logger.LogDebug("Getting final balances for all Revenue and Expense accounts...");
 
             var tenant = await _tenantRepository.GetTenantAsync(tenantId);
 
@@ -185,18 +184,35 @@ namespace DashAccountingSystemV2.BusinessLogic
 
             // TODO: Check that user has access to this tenant and permission for profit & loss data
 
-            var profitAndLossAccountsReponse = await GetAccounts(
+            // Get the list of Revenue and Expense Accounts
+            var profitAndLossAccounts = await _accountRepository.GetAccountsByTenantAsync(
                 tenantId,
+                new KnownAccountType[] { KnownAccountType.Revenue, KnownAccountType.Expenses });
+
+            // Get Transactions for Revenue and Expense Accounts for the specified Date Range
+            var revenueAndExpenseTransactions = await _journalEntryRepository.GetPostedJournalEntryAccountsAsync(
+                tenantId,
+                dateRangeStart,
                 dateRangeEnd,
                 KnownAccountType.Revenue,
                 KnownAccountType.Expenses);
 
-            if (!profitAndLossAccountsReponse.IsSuccessful)
-                return new BusinessLogicResponse<ProfitAndLossReportDto>(profitAndLossAccountsReponse);
+            // Group Transactions by Account and Sum the Amounts, and put it in a Dictionary for efficient lookup
+            var revenueAndExpenseAccountAmountsLookup = revenueAndExpenseTransactions
+                .GroupBy(tx => tx.AccountId)
+                .ToDictionary(grp => grp.Key, grp => grp.Sum(tx => tx.Amount));
 
-            var profitAndLossAccounts = profitAndLossAccountsReponse.Data;
-            var revenueAccounts = profitAndLossAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Revenue);
-            var expenseAccounts = profitAndLossAccounts.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Expenses);
+            // Transform the Accounts into `AccountWithBalanceDto` objects with `CurrentBalance` set
+            // to the sum of the transactions for the period
+            var profitAndLossAccountsWithBalances = profitAndLossAccounts.Select(a => new AccountWithBalanceDto()
+            {
+                Account = a,
+                CurrentBalance = revenueAndExpenseAccountAmountsLookup.TryGetValue(a.Id, out var amount) ? amount : 0.0m,
+            });
+
+            // Categorize the Accounts to get the subtotals and totals
+            var revenueAccounts = profitAndLossAccountsWithBalances.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Revenue);
+            var expenseAccounts = profitAndLossAccountsWithBalances.Where(a => a.Account.AccountTypeId == (int)KnownAccountType.Expenses);
             var operatingRevenue = revenueAccounts.Where(a => a.Account.AccountSubTypeId == (int)KnownAccountSubType.OperatingRevenue);
             var otherIncome = revenueAccounts.Where(a => a.Account.AccountSubTypeId == (int)KnownAccountSubType.OtherIncome);
             var operatingExpenses = expenseAccounts.Where(a => a.Account.AccountSubTypeId != (int)KnownAccountSubType.OtherExpense);
