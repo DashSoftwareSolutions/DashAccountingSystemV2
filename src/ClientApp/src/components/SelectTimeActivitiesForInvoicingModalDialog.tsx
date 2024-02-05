@@ -114,6 +114,7 @@ class SelectTimeActivitiesForInvoicingModalDialog extends React.PureComponent<Se
 
         return (
             <Modal
+                backdrop="static"
                 centered
                 className={this.bemBlockName}
                 id={this.bemBlockName}

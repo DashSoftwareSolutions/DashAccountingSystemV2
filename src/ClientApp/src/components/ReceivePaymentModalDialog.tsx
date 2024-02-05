@@ -212,6 +212,7 @@ class ReceivePaymentModalDialog extends React.PureComponent<ReceivePaymentModalD
 
         return (
             <Modal
+                backdrop="static"
                 centered
                 id={this.bemBlockName}
                 isOpen={isOpen}

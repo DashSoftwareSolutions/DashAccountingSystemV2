@@ -293,6 +293,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
                     {this.renderInvoice()}
 
                     <Modal
+                        backdrop="static"
                         id={`${this.bemBlockName}--delete_confirm_modal`}
                         isOpen={isConfirmDeleteInvoiceModalOpen}
                         toggle={this.onDeleteInvoiceDeclined}
@@ -321,6 +322,7 @@ class ViewInvoicePage extends React.PureComponent<ViewInvoicePageProps, ViewInvo
                     </Modal>
 
                     <Modal
+                        backdrop="static"
                         id={`${this.bemBlockName}--send_invoice_confirm_modal`}
                         isOpen={isConfirmSendInvoiceModalOpen}
                         toggle={this.onSendInvoiceDeclined}

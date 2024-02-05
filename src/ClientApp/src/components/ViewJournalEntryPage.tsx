@@ -214,6 +214,7 @@ class ViewJournalEntryPage extends React.PureComponent<ViewJournalEntryPageProps
                     />
 
                     <Modal
+                        backdrop="static"
                         id={`${this.bemBlockName}--delete_confirm_modal`}
                         isOpen={isDeleteEntryModalOpen}
                         toggle={this.onDeleteJournalEntryDeclined}

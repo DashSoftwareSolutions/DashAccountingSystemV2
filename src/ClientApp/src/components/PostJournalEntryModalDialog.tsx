@@ -75,6 +75,7 @@ class PostJournalEntryModalDialog extends React.PureComponent<PostJournalEntryMo
 
         return (
             <Modal
+                backdrop="static"
                 centered
                 id={this.bemBlockName}
                 isOpen={isOpen}

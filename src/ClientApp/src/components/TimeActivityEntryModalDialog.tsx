@@ -115,6 +115,7 @@ class TimeActivityEntryModalDialog extends React.PureComponent<TimeActivityEntry
 
         return (
             <Modal
+                backdrop="static"
                 centered
                 className={this.bemBlockName}
                 id={this.bemBlockName}
