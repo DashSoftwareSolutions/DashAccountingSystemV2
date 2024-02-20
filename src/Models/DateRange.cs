@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DashAccountingSystemV2.Models
+﻿namespace DashAccountingSystemV2.Models
 {
     public class DateRange
     {

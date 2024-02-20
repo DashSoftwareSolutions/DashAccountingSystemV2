@@ -1,10 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
-using Xunit;
+using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Repositories;
 
@@ -33,7 +30,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
             TestUtilities.RunTestAsync(Initialize, Cleanup, async () =>
             {
                 // Pre-test: Get Unbilled Time Activities - we expect it to contain all three Time Activities created for this scenario
-                var dateToCheck = DateTime.SpecifyKind(_timeActivitiesDate.Date, DateTimeKind.Unspecified);
+                var dateToCheck = _timeActivitiesDate.Date.Unkind();
                 var timeActivityRepository = await GetTimeActivityRepository();
                 var unbilledTimeActivities = await timeActivityRepository.GetUnbilledItemsForInvoicingAsync(
                     _customer.EntityId,
@@ -315,9 +312,9 @@ namespace DashAccountingSystemV2.Tests.Repositories
             using (var connection = new NpgsqlConnection(connString))
             {
                 // Make a Tenant
-                _tenantId = connection.QueryFirstOrDefault<Guid>($@"
-                    INSERT INTO ""Tenant"" ( ""Name"" )
-                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
+                _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
+                    INSERT INTO ""Tenant"" ( ""Name"", ""DefaultAssetTypeId"" )
+                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.', 1 )
                     RETURNING ""Id"";");
 
                 // Get a User to use
@@ -467,7 +464,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product2.Id,
-                Date = _timeActivitiesDate,
+                Date = _timeActivitiesDate.Unkind(),
                 StartTime = new TimeSpan(6, 0, 0),
                 EndTime = new TimeSpan(8, 0, 0),
                 TimeZone = "Australia/Sydney",
@@ -485,7 +482,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product3.Id,
-                Date = _timeActivitiesDate,
+                Date = _timeActivitiesDate.Unkind(),
                 StartTime = new TimeSpan(9, 0, 0),
                 EndTime = new TimeSpan(10, 0, 0),
                 TimeZone = "Australia/Sydney",
@@ -503,7 +500,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product1.Id,
-                Date = _timeActivitiesDate,
+                Date = _timeActivitiesDate.Unkind(),
                 StartTime = new TimeSpan(13, 0, 0),
                 EndTime = new TimeSpan(16, 0, 0),
                 TimeZone = "Australia/Sydney",

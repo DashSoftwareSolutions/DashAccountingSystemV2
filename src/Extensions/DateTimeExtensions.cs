@@ -1,5 +1,4 @@
-﻿using System;
-using NodaTime;
+﻿using NodaTime;
 
 namespace DashAccountingSystemV2.Extensions
 {
@@ -98,6 +97,25 @@ namespace DashAccountingSystemV2.Extensions
                 .InZoneStrictly(DateTimeZone.Utc)
                 .WithZone(timeZone)
                 .ToDateTimeUnspecified();
+        }
+
+        /// <summary>
+        /// Changes the <b><c><see cref="DateTime.Kind"/></c></b> property of the <c>DateTime</c> object to <b><c><see cref="DateTimeKind.Unspecified"/></c></b>.
+        /// </summary>
+        /// <remarks>
+        /// Why you might reasonably ask?  'cause Npgsql and Entity Framework are being <em><strong>SUPER LAME</strong></em>
+        /// and will not allow a <c>DateTime</c> value with <c>Kind</c> set to <c><see cref="DateTimeKind.Utc"/></c>
+        /// to be written to a <c>TIMESTAMP WITHOUT TIME ZONE</c> column.<br />
+        /// <br />
+        /// Likely I have some trust issues and have had time zones bite me too many times.
+        /// I suppose I could use <c>TIMESTAMP WITH TIME ZONE</c> typed columns, but I think I like the DB
+        /// not trying to be smart about my values and just store them and retrieve them the way I specify.
+        /// </remarks>
+        /// <param name="dateTime"><c>DateTime</c> object</param>
+        /// <returns>Same <c>DateTime</c> object with its <b><c><see cref="DateTime.Kind"/></c></b> property set to <b><c><see cref="DateTimeKind.Unspecified"/></c></b></returns>
+        public static DateTime Unkind(this DateTime dateTime)
+        {
+            return DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified);
         }
     }
 }

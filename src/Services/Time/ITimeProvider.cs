@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DashAccountingSystemV2.Services.Time
+﻿namespace DashAccountingSystemV2.Services.Time
 {
     /// <summary>
     /// Used to overload getting current time for testing purposes

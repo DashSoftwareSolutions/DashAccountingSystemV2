@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DashAccountingSystemV2.Data;
 using DashAccountingSystemV2.Models;
+using DashAccountingSystemV2.Extensions;
 
 namespace DashAccountingSystemV2.Repositories
 {
@@ -64,7 +65,7 @@ namespace DashAccountingSystemV2.Repositories
                 invoiceTermsToUpdate.DueOnDayOfMonth = invoiceTerms.DueOnDayOfMonth;
                 invoiceTermsToUpdate.DueNextMonthThreshold = invoiceTerms.DueNextMonthThreshold;
 
-                invoiceTermsToUpdate.Updated = DateTime.UtcNow;
+                invoiceTermsToUpdate.Updated = DateTime.UtcNow.Unkind();
                 invoiceTermsToUpdate.UpdatedById = contextUserId;
 
                 await _db.SaveChangesAsync();

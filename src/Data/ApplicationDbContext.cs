@@ -1,29 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using IdentityServer4.EntityFramework.Entities;
-using IdentityServer4.EntityFramework.Extensions;
-using IdentityServer4.EntityFramework.Interfaces;
-using IdentityServer4.EntityFramework.Options;
 using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>, IPersistedGrantDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
-        private readonly IOptions<OperationalStoreOptions> _operationalStoreOptions;
-
-        public ApplicationDbContext(
-            DbContextOptions options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions)
+        public ApplicationDbContext(DbContextOptions options)
             : base(options)
         {
-            _operationalStoreOptions = operationalStoreOptions;
         }
 
-        #region Main Application Schema
         #region Accounting
         /// <summary>
         /// Gets or sets the <see cref="DbSet{AccountType}"/>.
@@ -98,30 +85,10 @@ namespace DashAccountingSystemV2.Data
         public DbSet<Payment> Payment { get; set; }
         #endregion Employee Time Tracking / Sales & Invoicing
 
-        #endregion Main Application Schema
-
-        #region Persisted Grants for Identity Server
-        /// <summary>
-        /// Gets or sets the <see cref="DbSet{PersistedGrant}"/>.
-        /// </summary>
-        public DbSet<PersistedGrant> PersistedGrants { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="DbSet{DeviceFlowCodes}"/>.
-        /// </summary>
-        public DbSet<DeviceFlowCodes> DeviceFlowCodes { get; set; }
-        #endregion Persisted Grants for Identity Server
-
-        Task<int> IPersistedGrantDbContext.SaveChangesAsync() => base.SaveChangesAsync();
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            // Persisted Grants for Identity Server
-            builder.ConfigurePersistedGrantContext(_operationalStoreOptions.Value);
-
-            // Main Application Schema (Indexes and Such)
             #region Accounting
             builder.Entity<AccountType>()
                 .HasIndex(at => at.Name)
@@ -447,7 +414,7 @@ namespace DashAccountingSystemV2.Data
             #endregion Employee Time Tracking / Sales & Invoicing
         }
 
-        private const string GENERATE_GUID = "uuid_in(overlay(overlay(md5(random()::text || ':' || clock_timestamp()::text) placing '4' from 13) placing to_hex(floor(random()*(11-8+1) + 8)::int)::text from 17)::cstring)";
+        private const string GENERATE_GUID = "gen_random_uuid()";
         private const string GET_UTC_TIMESTAMP = "now() AT TIME ZONE 'UTC'";
     }
 }

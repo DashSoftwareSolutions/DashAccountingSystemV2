@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DashAccountingSystemV2.Models
 {
@@ -21,7 +20,7 @@ namespace DashAccountingSystemV2.Models
         public decimal Amount { get; set; }
 
         public Guid? ReconciliationReportId { get; set; }
-        public ReconciliationReport ReconciliationReport { get; set; }
+        public ReconciliationReport? ReconciliationReport { get; set; }
 
         public bool Reconciled => ReconciliationReportId.HasValue;
 
@@ -48,7 +47,7 @@ namespace DashAccountingSystemV2.Models
             return (JournalEntryAccount)MemberwiseClone();
         }
 
-        public bool Equals(JournalEntryAccount other)
+        public bool Equals(JournalEntryAccount? other)
         {
             if (other == null)
                 return false;
@@ -57,7 +56,7 @@ namespace DashAccountingSystemV2.Models
                 AccountId == other.AccountId;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is JournalEntryAccount other)
                 return Equals(other);

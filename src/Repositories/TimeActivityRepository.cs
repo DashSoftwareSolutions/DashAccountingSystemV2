@@ -202,7 +202,7 @@ ORDER BY c.""DisplayName""
                 timeActivityToUpdate.HourlyBillingRate = timeActivity.HourlyBillingRate;
                 timeActivityToUpdate.IsBillable = timeActivity.IsBillable;
 
-                timeActivityToUpdate.Updated = DateTime.UtcNow;
+                timeActivityToUpdate.Updated = DateTime.UtcNow.Unkind();
                 timeActivityToUpdate.UpdatedById = contextUserId;
 
                 await _db.SaveChangesAsync();

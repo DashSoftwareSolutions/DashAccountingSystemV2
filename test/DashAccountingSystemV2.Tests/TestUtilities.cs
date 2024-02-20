@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
-using IdentityServer4.EntityFramework.Options;
 using Moq;
 using Npgsql;
 using DashAccountingSystemV2.Data;
@@ -59,14 +54,11 @@ namespace DashAccountingSystemV2.Tests
 
             var dbOptions = dbCtxOptionsBuilder.Options;
 
-            var operationalStoreOptions = new OperationalStoreOptions();
-            var wrappedOperationalStoreOptions = new OptionsWrapper<OperationalStoreOptions>(operationalStoreOptions);
+            ApplicationDbContext appDbContext = new ApplicationDbContext(dbOptions);
 
-            ApplicationDbContext appDbContext = new ApplicationDbContext(dbOptions, wrappedOperationalStoreOptions);
-            
             await appDbContext.Database.EnsureCreatedAsync();
             await appDbContext.Database.MigrateAsync();
-            
+
             return appDbContext;
         }
 

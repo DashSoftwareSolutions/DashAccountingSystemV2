@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DashAccountingSystemV2.Models
+﻿namespace DashAccountingSystemV2.Models
 {
     public class BalanceSheetReportDto
     {

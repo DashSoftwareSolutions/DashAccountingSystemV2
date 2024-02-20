@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Identity;
 using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.Security.Authorization

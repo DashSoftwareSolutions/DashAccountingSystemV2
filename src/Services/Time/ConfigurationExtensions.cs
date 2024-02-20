@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace DashAccountingSystemV2.Services.Time
+﻿namespace DashAccountingSystemV2.Services.Time
 {
     public static class ConfigurationExtensions
     {

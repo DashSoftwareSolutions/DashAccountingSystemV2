@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DashAccountingSystemV2.Models
@@ -15,14 +14,14 @@ namespace DashAccountingSystemV2.Models
         public string Name { get; set; }
 
         [MaxLength(1024)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [MaxLength(4)]
-        public string Symbol { get; set; }
+        public string? Symbol { get; set; }
 
         public AssetType() { }
 
-        public AssetType(string name, string symbol = null)
+        public AssetType(string name, string? symbol = null)
         {
             Name = name;
             Symbol = symbol;
@@ -34,7 +33,7 @@ namespace DashAccountingSystemV2.Models
             Id = id;
         }
 
-        public bool Equals(AssetType other)
+        public bool Equals(AssetType? other)
         {
             if (other == null)
                 return false;
@@ -42,7 +41,7 @@ namespace DashAccountingSystemV2.Models
             return Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is AssetType other)
             {

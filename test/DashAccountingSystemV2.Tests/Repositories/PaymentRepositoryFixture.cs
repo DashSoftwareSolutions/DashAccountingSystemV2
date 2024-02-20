@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
-using Xunit;
 using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Repositories;
+using DashAccountingSystemV2.Extensions;
 
 namespace DashAccountingSystemV2.Tests.Repositories
 {
@@ -45,7 +42,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     DepositAccountId = _cashOperatingAccount.Id,
                     RevenueAccountId = _revenueAccount.Id,
                     PaymentMethodId = _paymentMethodCheck.Id,
-                    Date = new DateTime(2022, 2, 27, 0, 0, 0, DateTimeKind.Utc),
+                    Date = new DateTime(2022, 2, 27, 0, 0, 0, DateTimeKind.Utc).Unkind(),
                     Amount = _invoice.Total,
                     AssetTypeId = _assetTypeUSD.Id,
                     CheckNumber = 12345,
@@ -271,9 +268,9 @@ namespace DashAccountingSystemV2.Tests.Repositories
             using (var connection = new NpgsqlConnection(connString))
             {
                 // Make a Tenant
-                _tenantId = connection.QueryFirstOrDefault<Guid>($@"
-                    INSERT INTO ""Tenant"" ( ""Name"" )
-                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
+                _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
+                    INSERT INTO ""Tenant"" ( ""Name"", ""DefaultAssetTypeId"" )
+                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.', 1 )
                     RETURNING ""Id"";");
 
                 // Get a User to use
@@ -423,7 +420,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product2.Id,
-                Date = _timeActivitiesDate,
+                Date = _timeActivitiesDate.Unkind(),
                 StartTime = new TimeSpan(6, 0, 0),
                 EndTime = new TimeSpan(8, 0, 0),
                 TimeZone = "Australia/Sydney",
@@ -441,7 +438,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product3.Id,
-                Date = _timeActivitiesDate,
+                Date = _timeActivitiesDate.Unkind(),
                 StartTime = new TimeSpan(9, 0, 0),
                 EndTime = new TimeSpan(10, 0, 0),
                 TimeZone = "Australia/Sydney",
@@ -459,7 +456,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 CustomerId = _customer.EntityId,
                 EmployeeId = _employee.EntityId,
                 ProductId = _product1.Id,
-                Date = _timeActivitiesDate,
+                Date = _timeActivitiesDate.Unkind(),
                 StartTime = new TimeSpan(13, 0, 0),
                 EndTime = new TimeSpan(16, 0, 0),
                 TimeZone = "Australia/Sydney",
@@ -506,7 +503,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
             var journalEntry = new JournalEntry(
                 _tenantId,
-                entryDate,
+                entryDate.Unkind(),
                 null,
                 $"Payment for Invoice # {_invoice.InvoiceNumber}",
                 null,

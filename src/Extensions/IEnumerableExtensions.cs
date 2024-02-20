@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace DashAccountingSystemV2.Extensions
+﻿namespace DashAccountingSystemV2.Extensions
 {
     public static class IEnumerableExtensions
     {
@@ -16,7 +12,7 @@ namespace DashAccountingSystemV2.Extensions
         /// ex: the SQL would end up like: <code>[some_column_you_are_filtering_by] = ANY('{}')</code>
         /// which will return 0 results!
         /// </returns>
-        public static TElement[] AsArrayOrNull<TElement>(this IEnumerable<TElement> source)
+        public static TElement[]? AsArrayOrNull<TElement>(this IEnumerable<TElement> source)
         {
             if (!source.HasAny())
                 return null;

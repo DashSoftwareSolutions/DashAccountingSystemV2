@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NodaTime;
 
@@ -18,6 +15,7 @@ namespace DashAccountingSystemV2.Models
         public Tenant Tenant { get; private set; }
 
         [Required]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Date { get; set; }
 
         [Required]
@@ -44,6 +42,7 @@ namespace DashAccountingSystemV2.Models
 
         public TimeSpan? Break { get; set; }
 
+        [Required(AllowEmptyStrings = false)]
         public string TimeZone { get; set; }
 
         private TimeSpan? _totalTime = null;
@@ -116,12 +115,14 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Created { get; private set; }
 
         [Required]
         public Guid CreatedById { get; set; }
         public ApplicationUser CreatedBy { get; set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? Updated { get; set; }
 
         public Guid? UpdatedById { get; set; }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 
 namespace DashAccountingSystemV2.Extensions
@@ -23,7 +21,7 @@ namespace DashAccountingSystemV2.Extensions
             var openGeneric = typeof(ObjectExtCache<,>);
             var closedGeneric = openGeneric.MakeGenericType(type, type);
             var method = closedGeneric.GetMethod("Clone", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod);
-            
+
             return method.Invoke(null, new object[] { obj }) as TResult;
         }
 

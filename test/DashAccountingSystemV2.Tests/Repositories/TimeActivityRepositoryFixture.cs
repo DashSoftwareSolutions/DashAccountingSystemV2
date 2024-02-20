@@ -32,7 +32,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     CustomerId = _customer.EntityId,
                     EmployeeId = _employee.EntityId,
                     ProductId = _product.Id,
-                    Date = new DateTime(2021, 7, 14, 0, 0, 0, DateTimeKind.Utc),
+                    Date = new DateTime(2021, 7, 14, 0, 0, 0, DateTimeKind.Utc).Unkind(),
                     StartTime = new TimeSpan(9, 0, 0),
                     EndTime = new TimeSpan(16, 0, 0),
                     Break = new TimeSpan(2, 0, 0),
@@ -84,7 +84,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     CustomerId = _customer.EntityId,
                     EmployeeId = _employee.EntityId,
                     ProductId = _product.Id,
-                    Date = new DateTime(2021, 7, 14, 0, 0, 0, DateTimeKind.Utc),
+                    Date = new DateTime(2021, 7, 14, 0, 0, 0, DateTimeKind.Utc).Unkind(),
                     StartTime = new TimeSpan(9, 0, 0),
                     EndTime = new TimeSpan(16, 0, 0),
                     Break = new TimeSpan(2, 0, 0),
@@ -132,7 +132,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     CustomerId = _customer.EntityId,
                     EmployeeId = _employee.EntityId,
                     ProductId = _product.Id,
-                    Date = new DateTime(2021, 7, 14, 0, 0, 0, DateTimeKind.Utc),
+                    Date = new DateTime(2021, 7, 14, 0, 0, 0, DateTimeKind.Utc).Unkind(),
                     StartTime = new TimeSpan(9, 0, 0),
                     EndTime = new TimeSpan(16, 0, 0),
                     Break = new TimeSpan(2, 0, 0),
@@ -209,9 +209,9 @@ namespace DashAccountingSystemV2.Tests.Repositories
             using (var connection = new NpgsqlConnection(connString))
             {
                 // Make a Tenant
-                _tenantId = connection.QueryFirstOrDefault<Guid>($@"
-                    INSERT INTO ""Tenant"" ( ""Name"" )
-                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
+                _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
+                    INSERT INTO ""Tenant"" ( ""Name"", ""DefaultAssetTypeId"" )
+                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.', 1 )
                     RETURNING ""Id"";");
 
                 // Get a User to use

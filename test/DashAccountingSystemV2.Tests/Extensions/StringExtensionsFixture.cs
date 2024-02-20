@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-using DashAccountingSystemV2.Extensions;
+﻿using DashAccountingSystemV2.Extensions;
 
 namespace DashAccountingSystemV2.Tests.Extensions
 {

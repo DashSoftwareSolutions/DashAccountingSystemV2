@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DashAccountingSystemV2.Models
@@ -21,7 +19,7 @@ namespace DashAccountingSystemV2.Models
 
         [EmailAddress]
         [MaxLength(256)]
-        public string ContactEmailAddress { get; set; }
+        public string? ContactEmailAddress { get; set; }
         
         [NotMapped]
         public Address MailingAddress { get; set; }

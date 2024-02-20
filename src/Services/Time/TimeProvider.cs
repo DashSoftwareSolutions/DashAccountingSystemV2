@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DashAccountingSystemV2.Services.Time
+﻿namespace DashAccountingSystemV2.Services.Time
 {
     public class TimeProvider : ITimeProvider
     {

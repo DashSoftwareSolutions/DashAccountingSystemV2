@@ -19,24 +19,24 @@ namespace DashAccountingSystemV2.Models
 
         #region Base Person Properties
         [MaxLength(10)]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(100)]
         public string FirstName { get; set; }
 
         [MaxLength(100)]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(100)]
         public string LastName { get; set; }
 
         [MaxLength(100)]
-        public string NickName { get; set; }
+        public string? NickName { get; set; }
 
         [MaxLength(10)]
-        public string Suffix { get; set; }
+        public string? Suffix { get; set; }
 
         [Required]
         [MaxLength(256)]
@@ -58,6 +58,7 @@ namespace DashAccountingSystemV2.Models
         [NotMapped]
         public Gender Gender { get; set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? DateOfBirth { get; set; }
 
         public Guid MailingAddressId { get; set; }
@@ -65,15 +66,15 @@ namespace DashAccountingSystemV2.Models
 
         [EmailAddress]
         [MaxLength(256)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Phone]
         [MaxLength(32)]
-        public string HomePhoneNumber { get; set; }
+        public string? HomePhoneNumber { get; set; }
 
         [Phone]
         [MaxLength(32)]
-        public string MobilePhoneNumber { get; set; }
+        public string? MobilePhoneNumber { get; set; }
 
         /// <summary>
         /// User associated to this Person (i.e. an Employee, Contractor etc. who is also a User of the system)
@@ -91,15 +92,17 @@ namespace DashAccountingSystemV2.Models
         public string JobTitle { get; set; }
 
         [Required]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime HireDate { get; set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? ReleaseDate { get; set; }
 
         public decimal? HourlyBillingRate { get; set; }
 
         public bool IsBillableByDefault { get; set; }
 
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         #endregion Employee Properties
     }
 }

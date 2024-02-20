@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using IdentityModel;
+using System.Security.Claims;
 using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.Security.Authorization
@@ -21,23 +18,33 @@ namespace DashAccountingSystemV2.Security.Authorization
         public async override Task<ClaimsPrincipal> CreateAsync(ApplicationUser user)
         {
             var principal = await base.CreateAsync(user);
-            var identity = (ClaimsIdentity)principal.Identity;
-            
+            var identity = principal.Identity as ClaimsIdentity;
+
+            if (identity == null)
+                return principal;
+
             var claims = new List<Claim>();
 
             var hasFirstName = !string.IsNullOrWhiteSpace(user.FirstName);
             var hasLastName = !string.IsNullOrWhiteSpace(user.LastName);
 
             if (hasFirstName)
-                claims.Add(new Claim(JwtClaimTypes.GivenName, user.FirstName));
+                claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName!));
 
             if (hasLastName)
-                claims.Add(new Claim(JwtClaimTypes.FamilyName, user.LastName));
-
-            if (hasFirstName && hasLastName)
-                claims.Add(new Claim(JwtClaimTypes.Name, $"{user.FirstName} {user.LastName}"));
+                claims.Add(new Claim(ClaimTypes.Surname, user.LastName!));
 
             identity.AddClaims(claims);
+
+            if (hasFirstName && hasLastName)
+            {
+                var existingNameClaim = identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+
+                if (existingNameClaim != null)
+                    identity.RemoveClaim(existingNameClaim);
+
+                identity.AddClaim(new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"));
+            }
 
             return principal;
         }

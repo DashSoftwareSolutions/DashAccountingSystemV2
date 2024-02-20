@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using DashAccountingSystemV2.Extensions;
 
@@ -18,6 +15,7 @@ namespace DashAccountingSystemV2.Models
         public Account Account { get; private set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Created { get; private set; }
 
         [Required]
@@ -25,6 +23,7 @@ namespace DashAccountingSystemV2.Models
         public ApplicationUser CreatedBy { get; private set; }
 
         [Required]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime ClosingDate { get; set; }
 
         [Required]

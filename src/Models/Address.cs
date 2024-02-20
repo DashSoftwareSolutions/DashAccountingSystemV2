@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DashAccountingSystemV2.Models
@@ -26,7 +25,7 @@ namespace DashAccountingSystemV2.Models
         public string StreetAddress1 { get; set; }
 
         [MaxLength(128)]
-        public string StreetAddress2 { get; set; }
+        public string? StreetAddress2 { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(64)]
@@ -40,16 +39,18 @@ namespace DashAccountingSystemV2.Models
         public Country Country { get; set; }
 
         [MaxLength(16)]
-        public string PostalCode { get; set; }
+        public string? PostalCode { get; set; }
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Created { get; private set; }
 
         [Required]
         public Guid CreatedById { get; set; }
         public ApplicationUser CreatedBy { get; private set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? Updated { get; set; }
 
         public Guid? UpdatedById { get; set; }

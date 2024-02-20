@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using DashAccountingSystemV2.Extensions;
 
@@ -21,8 +18,10 @@ namespace DashAccountingSystemV2.Models
         public uint EntryId { get; set; }
 
         [Required]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime EntryDate { get; set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? PostDate { get; set; }
 
         [Required]
@@ -34,7 +33,7 @@ namespace DashAccountingSystemV2.Models
 
         public uint? CheckNumber { get; set; }
 
-        public string Note { get; set; }
+        public string? Note { get; set; }
 
         public ICollection<JournalEntryAccount> Accounts { get; set; } = new List<JournalEntryAccount>();
 
@@ -51,12 +50,14 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Created { get; private set; }
 
         [Required]
         public Guid CreatedById { get; private set; }
         public ApplicationUser CreatedBy { get; private set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? Updated { get; set; }
 
         public Guid? UpdatedById { get; set; }

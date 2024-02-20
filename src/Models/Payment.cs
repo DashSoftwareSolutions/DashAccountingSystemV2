@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DashAccountingSystemV2.Models
@@ -34,6 +32,7 @@ namespace DashAccountingSystemV2.Models
         public uint? CheckNumber { get; set; }
 
         [Required]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Date { get; set; }
 
         [Required]
@@ -49,12 +48,14 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Created { get; private set; }
 
         [Required]
         public Guid CreatedById { get; set; }
         public ApplicationUser CreatedBy { get; private set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? Updated { get; set; }
 
         public Guid? UpdatedById { get; set; }

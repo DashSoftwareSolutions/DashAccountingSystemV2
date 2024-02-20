@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DashAccountingSystemV2.Extensions
+﻿namespace DashAccountingSystemV2.Extensions
 {
     public static class TimeSpanExtensions
     {

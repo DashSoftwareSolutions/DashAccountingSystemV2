@@ -336,7 +336,7 @@ ORDER BY inv.""IssueDate"" DESC
                     invoiceToUpdate.IssueDate = invoice.IssueDate;
                     invoiceToUpdate.InvoiceTermsId = invoice.InvoiceTermsId;
                     invoiceToUpdate.Message = invoice.Message;
-                    invoiceToUpdate.Updated = DateTime.UtcNow;
+                    invoiceToUpdate.Updated = DateTime.UtcNow.Unkind();
                     invoiceToUpdate.UpdatedById = contextUserId;
                     invoiceToUpdate.LineItems = invoice.LineItems; // TODO: Might need more specific logic here, to handle audit properties!
 
@@ -364,7 +364,7 @@ ORDER BY inv.""IssueDate"" DESC
                 return null;
 
             invoiceToUpdate.Status = newStatus;
-            invoiceToUpdate.Updated = DateTime.UtcNow;
+            invoiceToUpdate.Updated = DateTime.UtcNow.Unkind();
             invoiceToUpdate.UpdatedById = contextUserId;
 
             await _db.SaveChangesAsync();
@@ -386,7 +386,7 @@ ORDER BY inv.""IssueDate"" DESC
                 return null;
 
             invoiceToUpdate.Status = newStatus;
-            invoiceToUpdate.Updated = DateTime.UtcNow;
+            invoiceToUpdate.Updated = DateTime.UtcNow.Unkind();
             invoiceToUpdate.UpdatedById = contextUserId;
 
             await _db.SaveChangesAsync();

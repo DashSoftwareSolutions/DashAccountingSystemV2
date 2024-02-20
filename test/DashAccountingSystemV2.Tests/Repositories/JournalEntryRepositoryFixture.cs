@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
-using Xunit;
 using DashAccountingSystemV2.Models;
 using DashAccountingSystemV2.Repositories;
+using DashAccountingSystemV2.Extensions;
 
 namespace DashAccountingSystemV2.Tests.Repositories
 {
@@ -48,8 +45,8 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
-                    entryDate,
-                    postDate,
+                    entryDate.Unkind(),
+                    postDate.Unkind(),
                     "Payment for Invoice #1001",
                     null,
                     _userId,
@@ -109,7 +106,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
-                    entryDate,
+                    entryDate.Unkind(),
                     null,
                     "Payment for Invoice #1001",
                     null,
@@ -188,8 +185,8 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
-                    entryDate,
-                    postDate,
+                    entryDate.Unkind(),
+                    postDate.Unkind(),
                     "Payment for Invoice #1001",
                     null,
                     _userId,
@@ -267,7 +264,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
-                    entryDate,
+                    entryDate.Unkind(),
                     null,
                     "Payment for Invoice #1001",
                     null,
@@ -364,7 +361,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
-                    entryDate,
+                    entryDate.Unkind(),
                     null,
                     "Payment for Invoice #1001",
                     null,
@@ -458,7 +455,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
-                    entryDate,
+                    entryDate.Unkind(),
                     null,
                     "Payment for Invoice #1001",
                     null,
@@ -551,8 +548,8 @@ namespace DashAccountingSystemV2.Tests.Repositories
             {
                 // Make a Tenant
                 _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
-                    INSERT INTO ""Tenant"" ( ""Name"" )
-                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
+                    INSERT INTO ""Tenant"" ( ""Name"", ""DefaultAssetTypeId"" )
+                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.', 1 )
                     RETURNING ""Id"";");
 
                 // Get a User to use

@@ -108,14 +108,21 @@ namespace DashAccountingSystemV2.Repositories
                 .SingleOrDefaultAsync();
         }
 
-        public Task<PagedResult<JournalEntry>> GetJournalEntriesAsync(Guid tenantId, DateTime dateRangeStart, DateTime dateRangeEnd, Pagination pagination)
+        public Task<PagedResult<JournalEntry>> GetJournalEntriesAsync(
+            Guid tenantId,
+            DateTime dateRangeStart,
+            DateTime dateRangeEnd,
+            Pagination pagination)
         {
+            var dateRangeStartWithoutKind = dateRangeStart.Unkind();
+            var dateRangeEndWithoutKind = dateRangeEnd.Unkind();
+
             return _db
                 .JournalEntry
                 .Where(je =>
                     je.TenantId == tenantId &&
-                    (je.PostDate ?? je.EntryDate) >= dateRangeStart &&
-                    (je.PostDate ?? je.EntryDate) <= dateRangeEnd
+                    (je.PostDate ?? je.EntryDate) >= dateRangeStartWithoutKind &&
+                    (je.PostDate ?? je.EntryDate) <= dateRangeEndWithoutKind
                 )
                 .OrderByDescending(je => je.PostDate ?? je.EntryDate) // TODO: Honor other sorting options if needed
                 .ThenBy(je => je.EntryId)
@@ -133,14 +140,17 @@ namespace DashAccountingSystemV2.Repositories
             DateTime dateRangeStart,
             DateTime dateRangeEnd)
         {
+            var dateRangeStartWithoutKind = dateRangeStart.Unkind();
+            var dateRangeEndWithoutKind = dateRangeEnd.Unkind();
+
             return await _db
                 .JournalEntryAccount
                 .Include(jeAcct => jeAcct.JournalEntry)
                 .Include(jeAcct => jeAcct.Account)
                 .Where(jeAcct =>
                     jeAcct.JournalEntry.TenantId == tenantId &&
-                    (jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate) >= dateRangeStart &&
-                    (jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate) <= dateRangeEnd)
+                    (jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate) >= dateRangeStartWithoutKind &&
+                    (jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate) <= dateRangeEndWithoutKind)
                 .OrderBy(jeAcct => jeAcct.Account.AccountTypeId)
                 .ThenBy(jeAcct => jeAcct.JournalEntry.Status != TransactionStatus.Pending ? 1 : 2)
                 .ThenBy(jeAcct => jeAcct.JournalEntry.PostDate ?? jeAcct.JournalEntry.EntryDate)
@@ -215,10 +225,10 @@ namespace DashAccountingSystemV2.Repositories
             if (entry == null)
                 return null;
 
-            entry.PostDate = postDate;
+            entry.PostDate = postDate.Unkind();
             entry.PostedById = postedByUserId;
             entry.Status = TransactionStatus.Posted;
-            entry.Updated = DateTime.UtcNow;
+            entry.Updated = DateTime.UtcNow.Unkind();
             entry.UpdatedById = postedByUserId;
 
             if (!string.IsNullOrWhiteSpace(note) && !string.Equals(note, entry.Note))
@@ -252,7 +262,7 @@ namespace DashAccountingSystemV2.Repositories
                     existingEntry.Description = journalEntry.Description;
                     existingEntry.CheckNumber = journalEntry.CheckNumber;
                     existingEntry.Note = journalEntry.Note;
-                    existingEntry.Updated = DateTime.UtcNow;
+                    existingEntry.Updated = DateTime.UtcNow.Unkind();
                     existingEntry.UpdatedById = contextUserId;
                     existingEntry.Accounts = journalEntry.Accounts;
 
@@ -300,7 +310,7 @@ namespace DashAccountingSystemV2.Repositories
             existingEntry.Description = journalEntry.Description;
             existingEntry.CheckNumber = journalEntry.CheckNumber;
             existingEntry.Note = journalEntry.Note;
-            existingEntry.Updated = DateTime.UtcNow;
+            existingEntry.Updated = DateTime.UtcNow.Unkind();
             existingEntry.UpdatedById = contextUserId;
 
             await _db.SaveChangesAsync();

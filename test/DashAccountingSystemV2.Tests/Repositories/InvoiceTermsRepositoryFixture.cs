@@ -109,8 +109,8 @@ namespace DashAccountingSystemV2.Tests.Repositories
             {
                 // Make a Tenant
                 _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
-                    INSERT INTO ""Tenant"" ( ""Name"" )
-                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
+                    INSERT INTO ""Tenant"" ( ""Name"", ""DefaultAssetTypeId"" )
+                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.', 1 )
                     RETURNING ""Id"";");
 
                 // Get a User to use

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DashAccountingSystemV2.Models
@@ -27,7 +26,7 @@ namespace DashAccountingSystemV2.Models
         /// <remarks>
         /// EF is LAME and cannot allow UPPER() or LOWER() in index expression
         /// </remarks>
-        public string NormalizedCustomerNumber
+        public string? NormalizedCustomerNumber
         {
             get { return CustomerNumber?.ToUpperInvariant(); }
             set { }
@@ -43,7 +42,7 @@ namespace DashAccountingSystemV2.Models
         /// <remarks>
         /// EF is LAME and cannot allow UPPER() or LOWER() in index expression
         /// </remarks>
-        public string NormalizedCompanyName
+        public string? NormalizedCompanyName
         {
             get { return CompanyName?.ToUpperInvariant(); }
             set { }
@@ -55,24 +54,24 @@ namespace DashAccountingSystemV2.Models
 
         #region Contact Person Properties
         [MaxLength(10)]
-        public string ContactPersonTitle { get; set; }
+        public string? ContactPersonTitle { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(100)]
         public string ContactPersonFirstName { get; set; }
 
         [MaxLength(100)]
-        public string ContactPersonMiddleName { get; set; }
+        public string? ContactPersonMiddleName { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(100)]
         public string ContactPersonLastName { get; set; }
 
         [MaxLength(100)]
-        public string ContactPersonNickName { get; set; }
+        public string? ContactPersonNickName { get; set; }
 
         [MaxLength(10)]
-        public string ContactPersonSuffix { get; set; }
+        public string? ContactPersonSuffix { get; set; }
         #endregion Person Properties
 
         public Guid BillingAddressId { get; set; }
@@ -86,28 +85,28 @@ namespace DashAccountingSystemV2.Models
 
         [EmailAddress]
         [MaxLength(256)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Phone]
         [MaxLength(32)]
-        public string WorkPhoneNumber { get; set; }
+        public string? WorkPhoneNumber { get; set; }
 
         [Phone]
         [MaxLength(32)]
-        public string MobilePhoneNumber { get; set; }
+        public string? MobilePhoneNumber { get; set; }
 
         [Phone]
         [MaxLength(32)]
-        public string FaxNumber { get; set; }
+        public string? FaxNumber { get; set; }
 
         [Phone]
         [MaxLength(32)]
-        public string OtherPhoneNumber { get; set; }
+        public string? OtherPhoneNumber { get; set; }
 
         [Url]
         [MaxLength(2048)]
-        public string Website { get; set; }
+        public string? Website { get; set; }
 
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
     }
 }

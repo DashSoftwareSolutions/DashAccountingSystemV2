@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DashAccountingSystemV2.Models
@@ -28,23 +25,25 @@ namespace DashAccountingSystemV2.Models
 
         [EmailAddress]
         [MaxLength(256)]
-        public string CustomerEmail { get; set; }
+        public string? CustomerEmail { get; set; }
 
         [MaxLength(2048)]
-        public string CustomerAddress { get; set; }
+        public string? CustomerAddress { get; set; }
 
         [Required]
         public Guid InvoiceTermsId { get; set; }
         public InvoiceTerms InvoiceTerms { get; set; }
 
         [Required]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime IssueDate { get; set; }
 
         [Required]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime DueDate { get; set; }
 
         [MaxLength(2048)]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public ICollection<InvoiceLineItem> LineItems { get; set; } = new List<InvoiceLineItem>();
 
@@ -65,12 +64,14 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Created { get; private set; }
 
         [Required]
         public Guid CreatedById { get; set; }
         public ApplicationUser CreatedBy { get; private set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? Updated { get; set; }
 
         public Guid? UpdatedById { get; set; }

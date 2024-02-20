@@ -12,7 +12,7 @@ namespace DashAccountingSystemV2.Models
         /// <summary>
         /// What "kind" of region this is, e.g. "State", "Province", etc.
         /// </summary>
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(128)]

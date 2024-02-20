@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DashAccountingSystemV2.Models
@@ -31,14 +30,14 @@ namespace DashAccountingSystemV2.Models
         /// <remarks>
         /// EF is LAME and cannot allow UPPER() or LOWER() in index expression
         /// </remarks>
-        public string NormalizedName
+        public string? NormalizedName
         {
             get { return Name?.ToUpperInvariant(); }
             set { }
         }
 
         [MaxLength(256)]
-        public string SKU { get; set; }
+        public string? SKU { get; set; }
 
         /// <summary>
         /// For unique index on Name
@@ -46,14 +45,14 @@ namespace DashAccountingSystemV2.Models
         /// <remarks>
         /// EF is LAME and cannot allow UPPER() or LOWER() in index expression
         /// </remarks>
-        public string NormalizedSKU
+        public string? NormalizedSKU
         {
             get { return SKU?.ToUpperInvariant(); }
             set { }
         }
 
         [MaxLength(2048)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public decimal? SalesPriceOrRate { get; set; }
 
@@ -62,12 +61,14 @@ namespace DashAccountingSystemV2.Models
 
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime Created { get; private set; }
 
         [Required]
         public Guid CreatedById { get; set; }
         public ApplicationUser CreatedBy { get; private set; }
 
+        [Column(TypeName = "TIMESTAMP")]
         public DateTime? Updated { get; set; }
 
         public Guid? UpdatedById { get; set; }

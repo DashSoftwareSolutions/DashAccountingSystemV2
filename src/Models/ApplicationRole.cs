@@ -1,10 +1,9 @@
-﻿using System;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace DashAccountingSystemV2.Models
 {
     public class ApplicationRole : IdentityRole<Guid>
     {
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }

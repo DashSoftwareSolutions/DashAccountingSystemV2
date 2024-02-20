@@ -1,5 +1,4 @@
-﻿using Xunit;
-using DashAccountingSystemV2.Extensions;
+﻿using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.Tests.Extensions
