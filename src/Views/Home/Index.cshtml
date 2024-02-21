@@ -1,8 +1,30 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using DashAccountingSystemV2.Models
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
     ViewData["Title"] = "Home Page";
+
+    var appLink = SignInManager.IsSignedIn(User) ?
+        "/app" :
+        "/Identity/Account/Login?returnUrl=%2Fapp";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row mt-4">
+    <div class="col">
+        <img src="/images/dash-hero-image.jpeg" alt="Dash!" />
+    </div>
+    <div class="col">
+        <h4>Welcome to</h4>
+        <h1>Dash Accounting System v2.0</h1>
+        <p>Built with:</p>
+        <ul>
+            <li><a href="https://get.asp.net/">ASP.NET Core</a> and <a href="https://learn.microsoft.com/en-us/dotnet/csharp/">C#</a> for cross-platform server-side code</li>
+            <li><a href="https://react.dev/">React</a> and <a href="https://redux.js.org/">Redux</a> for client-side code</li>
+            <li><a href='http://getbootstrap.com/'>Bootstrap</a> for layout and styling</li>
+        </ul>
+
+        <a class="btn btn-primary btn-lg mt-4" href="@appLink" role="button">Go to the Application</a>
+    </div>
 </div>

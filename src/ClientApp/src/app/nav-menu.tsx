@@ -22,7 +22,7 @@ function NavMenu() {
     return (
         <header>
             <Navbar className="navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" light>
-                <NavbarBrand to="/">Dash Accounting System v2.0</NavbarBrand>
+                <NavbarBrand href="/">Dash Accounting System v2.0</NavbarBrand>
                 <NavbarToggler onClick={toggleNavMenu} />
                 <Collapse className="d-sm-inline-flex justify-content-between" isOpen={isOpen} navbar>
                     <ul className="navbar-nav flex-grow-1">
@@ -39,9 +39,7 @@ function NavMenu() {
                             <NavLink className="text-dark" href="/Identity/Account/Manage">Hello User</NavLink>
                         </NavItem>
                         <NavItem>
-                            <form className="form-inline" id="logoutForm" action="/Identity/Account/Logout" method="POST">
-                                <button id="logout" type="submit" className="nav-link btn btn-link text-dark border-0">Logout</button>
-                            </form>
+                            <NavLink className="text-dark" href="/Identity/Account/Logout">Logout</NavLink>
                         </NavItem>
                     </ul>
                 </Collapse>
