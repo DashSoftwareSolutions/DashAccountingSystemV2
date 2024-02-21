@@ -46,7 +46,7 @@
                     &copy; @DateTime.Today.Year - Dash Software Solutions, Inc. - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                 </div>
                 <div class="col-sm-6 text-right">
-                    <span>@(Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion)</span>
+                    <span>@(Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion)</span>
                 </div>
             </div>
         </div>

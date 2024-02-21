@@ -1,0 +1,191 @@
+/* Provide sufficient contrast against white background */
+a {
+    color: #0366d6;
+}
+
+body {
+    overflow-y: scroll;
+}
+
+code {
+    color: #E01A76;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+/* "Hoverable Links" - text is regular color but changes to link color when hovered - used on Ledger Report */
+a.hoverable-link {
+    color: #212529;
+}
+
+    a.hoverable-link:hover {
+        color: #0366d6;
+    }
+
+/* Link Buttons - Uses <button> element but looks like a hyperlink */
+.btn.btn-link {
+    color: #0366d6;
+    line-height: 1;
+    padding-top: 0;
+    padding-bottom: 0;
+    vertical-align: unset;
+}
+
+    .btn.btn-link.btn-link-report-item {
+        color: #212529;
+        font-size: 0.9em;
+        line-height: 1.5;
+        padding: 0;
+        text-align: left;
+    }
+
+        .btn.btn-link.btn-link-report-item:hover {
+            color: #0366d6;
+        }
+
+/* Sticky Table Header Borders */
+th.sticky-border:after,
+th.sticky-border:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+}
+
+th.sticky-border:before {
+    top: -1px;
+    border-top: 1px solid #dee2e6;
+}
+
+th.sticky-border:after {
+    bottom: -1px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Report Table Styling */
+.report-table {
+    font-size: 0.8em;
+    width: 100%;
+}
+
+.report-section-header td {
+    border-top: none;
+    font-weight: bold;
+    padding-top: 11px;
+}
+
+.report-total-row td {
+    border-top-color: #212529;
+    border-top-width: 2px;
+    border-bottom-style: double;
+    font-weight: bold;
+}
+
+.report-grand-total-row td {
+    border-bottom: 3px double #212529;
+    font-weight: bold;
+    padding-top: 22px;
+}
+
+.report-table td.account-name {
+    padding-left: 22px;
+}
+
+/* Badge for Pending Transactions (not Posted Yet) */
+.pending-badge {
+    background-color: #fff3cd;
+    border: solid 1px #e2c45d;
+    color: #856404;
+    font-weight: 600;
+    margin-top: 2px;
+    vertical-align: text-top;
+}
+
+/* Time Activity Entry Modal Dialog */
+.time_activity_entry_modal--modal_header .modal-title {
+    width: 100%;
+}
+
+.time_activity_entry_modal textarea {
+    resize: none;
+    height: 96px;
+    width: 100%;
+}
+
+/* Create Invoice Page */
+.add_invoice_page--add_unbilled_time_button {
+    margin-top: 32px;
+}
+
+.add_invoice_page--balance_due_container {
+    text-align: right;
+}
+
+.add_invoice_page--balance_due_label {
+    color: #6c757d;
+}
+
+.add_invoice_page--balance_due_amount {
+    font-size: 1.75rem;
+    font-weight: bold;
+}
+
+.add_invoice_page--second_row {
+    margin-top: 22px;
+}
+
+#add_invoice_page--customer_address_textarea,
+#add_invoice_page--invoice_message_textarea {
+    resize: none;
+    height: 120px;
+    width: 100%;
+}
+
+.add_invoice_page--line_items_table_container {
+    margin-top: 22px;
+}
+
+.add_invoice_page--bottom_row {
+    margin-bottom: 22px;
+}
+
+.select_time_activities_for_invoicing_modal--modal_header .modal-title {
+    width: 100%;
+}
+
+.select_time_activities_for_invoicing_modal--main_content_container {
+    margin-top: 22px;
+    height: 400px;
+    overflow-y: auto; /* TODO: Might want to get custom scrollbars */
+}
+
+    .select_time_activities_for_invoicing_modal--main_content_container p {
+        margin-top: 176px; /* Trying to roughtly center vertically ... 176px = 200px - 24px content height */
+    }
+
+/* Receive Payments Modal Dialog */
+.receive_payment_modal--modal_header .modal-title {
+    width: 100%;
+}
+
+#receive_payment_modal--is_posted_button_group {
+    width: 100%;
+}
+
+#receive_payment_modal--description_textarea {
+    resize: none;
+    height: 60px;
+    width: 100%;
+}
+
+.receive_payment_modal--invoices_table_container {
+    margin-top: 11px;
+}
+
+.receive_payment_modal--invoices_table_row td {
+    vertical-align: middle;
+}

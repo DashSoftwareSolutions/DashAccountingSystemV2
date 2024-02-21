@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 using Npgsql;
 using Serilog;
 using DashAccountingSystemV2.Data;
@@ -21,7 +24,11 @@ try
     builder.Services.AddControllers();
     builder.Services.AddControllersWithViews();
 
-    // TODO: SPA (Single Page Application) - Front-End
+    // SPA (Single Page Application) - Front-End
+    builder.Services.AddSpaStaticFiles(configuration =>
+    {
+        configuration.RootPath = "ClientApp/dist";
+    });
 
     // Build Connection String by including DbPassword from User Secrets
     var connectionStringBuilder = new NpgsqlConnectionStringBuilder(
@@ -57,6 +64,13 @@ try
 
     builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
+    // Logging
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .WriteTo.Console());
+
     // TODO: Other application services (repositories, business logic, services, etc.)
 
     var app = builder.Build();
@@ -76,13 +90,55 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
+    // ASP.NET MVC
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 
     app.MapRazorPages();
 
-    // TODO: SPA (Single Page Application) - Front-End
+    // SPA (Single Page Application) - Front-End
+    var spaPath = "/app";
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapWhen(y => y.Request.Path.StartsWithSegments(spaPath), client =>
+        {
+            client.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+                spa.Options.DevServerPort = 6363;
+                spa.UseReactDevelopmentServer(npmScript: "start");
+            });
+        });
+    }
+    else
+    {
+        app.Map(new PathString(spaPath), client =>
+        {
+            client.UseSpaStaticFiles();
+            client.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                // adds no-store header to index page to prevent deployment issues (prevent linking to old .js files)
+                // .js and other static resources are still cached by the browser
+                spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions
+                {
+                    OnPrepareResponse = ctx =>
+                    {
+                        ResponseHeaders headers = ctx.Context.Response.GetTypedHeaders();
+                        headers.CacheControl = new CacheControlHeaderValue
+                        {
+                            NoCache = true,
+                            NoStore = true,
+                            MustRevalidate = true
+                        };
+                    }
+                };
+            });
+        });
+    }
 
     app.Run();
 }

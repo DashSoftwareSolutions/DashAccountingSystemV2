@@ -43,6 +43,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ClientApp\src\common\" />
+    <Folder Include="ClientApp\src\features\accounting\balance-sheet\" />
+    <Folder Include="ClientApp\src\features\accounting\general-ledger\" />
+    <Folder Include="ClientApp\src\features\accounting\profit-and-loss\" />
+    <Folder Include="ClientApp\src\features\invoicing\" />
+    <Folder Include="ClientApp\src\features\time-tracking\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="Data\Scripts\" />
     <Folder Include="Repositories\" />
