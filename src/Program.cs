@@ -5,11 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Npgsql;
 using Serilog;
+using DashAccountingSystemV2.BusinessLogic;
 using DashAccountingSystemV2.Data;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
+using DashAccountingSystemV2.Repositories;
 using DashAccountingSystemV2.Security.Authentication;
 using DashAccountingSystemV2.Security.Authorization;
+using DashAccountingSystemV2.Services.Time;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -64,14 +67,17 @@ try
 
     builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
+    // TODO: Other application services (repositories, business logic, services, etc.)
+    builder.Services.AddTimeProvider();
+    builder.Services.AddRepositories();
+    builder.Services.AddBusinessLogic();
+
     // Logging
     builder.Host.UseSerilog((context, services, configuration) => configuration
         .ReadFrom.Configuration(context.Configuration)
         .ReadFrom.Services(services)
         .Enrich.FromLogContext()
         .WriteTo.Console());
-
-    // TODO: Other application services (repositories, business logic, services, etc.)
 
     var app = builder.Build();
 

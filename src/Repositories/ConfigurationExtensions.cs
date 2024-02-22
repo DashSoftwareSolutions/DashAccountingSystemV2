@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace DashAccountingSystemV2.Repositories
+﻿namespace DashAccountingSystemV2.Repositories
 {
     public static class ConfigurationExtensions
     {
