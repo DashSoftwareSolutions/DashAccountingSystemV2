@@ -7,6 +7,7 @@ import DashboardPage from '../features/dashboard/dashboard-page';
 import Layout from './layout';
 import SelectTenantPage from './select-tenant-page';
 
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 
 function App() {

@@ -22,7 +22,11 @@ function NavMenu() {
     return (
         <header>
             <Navbar className="navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" light>
-                <NavbarBrand href="/">Dash Accounting System v2.0</NavbarBrand>
+                <NavbarBrand href="/">
+                    Dash Accounting System v2.0
+                    {'\u00a0\u00a0\u00a0'}
+                    <span className="badge pending-badge">.NET 8</span>
+                </NavbarBrand>
                 <NavbarToggler onClick={toggleNavMenu} />
                 <Collapse className="d-sm-inline-flex justify-content-between" isOpen={isOpen} navbar>
                     <ul className="navbar-nav flex-grow-1">
