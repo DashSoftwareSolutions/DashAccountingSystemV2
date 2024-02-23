@@ -11,8 +11,9 @@ import {
     NavLink,
 } from 'reactstrap';
 import './nav-menu.css';
+import { UserLite } from '../common/models';
 
-function NavMenu() {
+function NavMenu({ userInfo }: { userInfo?: UserLite }) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const toggleNavMenu = useCallback(() => {
@@ -24,7 +25,7 @@ function NavMenu() {
             <Navbar className="navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" light>
                 <NavbarBrand href="/">
                     Dash Accounting System v2.0
-                    {'\u00a0\u00a0\u00a0'}
+                    {'\u00a0'}
                     <span className="badge pending-badge">.NET 8</span>
                 </NavbarBrand>
                 <NavbarToggler onClick={toggleNavMenu} />
@@ -40,7 +41,7 @@ function NavMenu() {
                     <ul className="navbar-nav">
                         <NavItem>
                             {/* TODO: Get the user's name! */}
-                            <NavLink className="text-dark" href="/Identity/Account/Manage">Hello User</NavLink>
+                            <NavLink className="text-dark" href="/Identity/Account/Manage">{`Hello ${userInfo ? (userInfo.firstName + ' ' + userInfo.lastName) : 'User'}`}</NavLink>
                         </NavItem>
                         <NavItem>
                             <NavLink className="text-dark" href="/Identity/Account/Logout">Logout</NavLink>
