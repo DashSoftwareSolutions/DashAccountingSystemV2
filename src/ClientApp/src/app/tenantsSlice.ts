@@ -42,7 +42,7 @@ const slice = createSlice({
                 state.tenants = action.payload;
                 state.isLoading = false;
             })
-            .addMatcher(api.endpoints.getTenants.matchRejected, (_state, action) => {
+            .addMatcher(api.endpoints.getTenants.matchRejected, (state, action) => {
                 logger.info('Error fetching the Tenants', action);
                 state.isLoading = false;
             });
