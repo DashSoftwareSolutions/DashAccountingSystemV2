@@ -10,7 +10,7 @@ import {
     NavItem,
     NavLink,
 } from 'reactstrap';
-import './nav-menu.css';
+import './navMenu.css';
 import { UserLite } from '../common/models';
 
 function NavMenu({ userInfo }: { userInfo?: UserLite }) {

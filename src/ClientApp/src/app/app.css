@@ -17,6 +17,19 @@ code {
     border-color: #1861ac;
 }
 
+.page_header {
+    background-color: #e9ecef;
+    border-radius: 0.3rem;
+    margin-top: 11px;
+    margin-bottom: 22px;
+    padding: 22px 2rem 0;
+}
+
+.page_header--subtitle {
+    font-size: 1.25rem;
+    font-weight: 300;
+}
+
 /* "Hoverable Links" - text is regular color but changes to link color when hovered - used on Ledger Report */
 a.hoverable-link {
     color: #212529;

@@ -2,7 +2,7 @@
 
   <PropertyGroup Label="Package">
     <PackageId>DashAccountingSystemV2</PackageId>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Geoffrey Roberts</Authors>
     <Company>Dash Software Solutions, Inc.</Company>
     <Copyright>Copyright (C) 2022 - 2024 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
@@ -43,12 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ClientApp\src\common\" />
-    <Folder Include="ClientApp\src\features\accounting\balance-sheet\" />
-    <Folder Include="ClientApp\src\features\accounting\general-ledger\" />
-    <Folder Include="ClientApp\src\features\accounting\profit-and-loss\" />
-    <Folder Include="ClientApp\src\features\invoicing\" />
-    <Folder Include="ClientApp\src\features\time-tracking\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="Data\Scripts\" />
     <Folder Include="Repositories\" />

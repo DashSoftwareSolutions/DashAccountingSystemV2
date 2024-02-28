@@ -4,12 +4,12 @@ import {
     useGetTenantsQuery,
     useGetUserInfoQuery,
 } from './api';
-import NavMenu from './nav-menu';
+import NavMenu from './navMenu';
 import {
     ILogger,
     Logger
 } from '../common/logging';
-import SystemNotificationsArea from './system-notifications-area';
+import SystemNotificationsArea from './systemNotificationsArea';
 
 const logger: ILogger = new Logger('Layout');
 
@@ -32,8 +32,6 @@ function Layout() {
     logger.info('User info:', userInfo);
 
     const isLoading = isFetchingUserInfo || isFetchingTenants;
-
-
 
     return (
         <>
