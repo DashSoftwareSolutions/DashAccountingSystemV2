@@ -16,15 +16,10 @@ const logger: ILogger = new Logger('Layout');
 function Layout() {
     const {
         data: userInfo,
-        //error: userInfoFetchError,
-        //isError: hasUserInfoError,
         isFetching: isFetchingUserInfo,
     } = useGetUserInfoQuery();
 
     const {
-        //data: tenants,
-        //error: tenantsFetchError,
-        //isError: hasTenantsError,
         isFetching: isFetchingTenants,
     } = useGetTenantsQuery();
 

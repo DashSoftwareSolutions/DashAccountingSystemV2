@@ -8,6 +8,7 @@ import {
     useSelector,
 } from 'react-redux';
 import { api } from './api';
+import accounts from '../features/accounting/accountsSlice';
 import tenants from './tenantsSlice';
 
 export const createStore = (
@@ -16,6 +17,7 @@ export const createStore = (
     configureStore({
         reducer: {
             [api.reducerPath]: api.reducer,
+            accounts,
             tenants,
         },
         middleware: (getDefaultMiddleware) =>
