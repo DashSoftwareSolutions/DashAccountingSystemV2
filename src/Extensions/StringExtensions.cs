@@ -428,7 +428,7 @@ namespace DashAccountingSystemV2.Extensions
             return s;
         }
 
-        public static DateTime? TryParseAsDateTime(this string viewModelDateTime, bool isUtc = false)
+        public static DateTime? TryParseAsDateTime(this string? viewModelDateTime, bool isUtc = false)
         {
             if (string.IsNullOrWhiteSpace(viewModelDateTime)) return null;
 
