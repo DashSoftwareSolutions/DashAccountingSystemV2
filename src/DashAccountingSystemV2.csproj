@@ -42,11 +42,4 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Migrations\" />
-    <Folder Include="Data\Scripts\" />
-    <Folder Include="Repositories\" />
-    <Folder Include="Services\Time\" />
-  </ItemGroup>
-
 </Project>

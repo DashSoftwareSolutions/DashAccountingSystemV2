@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DashAccountingSystemV2.Migrations
+namespace DashAccountingSystemV2.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class DaSchema : Migration
+    public partial class FullSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

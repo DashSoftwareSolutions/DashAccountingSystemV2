@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DashAccountingSystemV2.Migrations
+namespace DashAccountingSystemV2.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240220221538_DaSchema")]
-    partial class DaSchema
+    [Migration("20240228182722_FullSchema")]
+    partial class FullSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
