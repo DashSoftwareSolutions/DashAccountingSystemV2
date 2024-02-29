@@ -34,7 +34,7 @@ const initialState: SliceState = {
 };
 
 const slice = createSlice({
-    name: 'Accounts',
+    name: 'accounts',
     initialState,
     reducers: (create) => ({
         setSelectedAccount: create.reducer((state, action: PayloadAction<Account>) => {

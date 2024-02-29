@@ -2,6 +2,7 @@ import {
     Route,
     Routes
 } from 'react-router-dom';
+import AccountDetailsPage from '../features/accounting/chart-of-accounts/accountDetailsPage';
 import BalanceSheetPage from '../features/accounting/balance-sheet/balanceSheetPage';
 import ChartOfAccountsPage from '../features/accounting/chart-of-accounts/chartOfAccountsPage';
 import DashboardPage from '../features/dashboard/dashboardPage';
@@ -20,6 +21,7 @@ function App() {
         <Routes>
             <Route path="/" element={<Layout />}>
                 <Route index element={<SelectTenantPage />} />
+                <Route path='/account-details' element={<AccountDetailsPage />} />
                 <Route path='/balance-sheet' element={<BalanceSheetPage />} />
                 <Route path='/chart-of-accounts' element={<ChartOfAccountsPage />} />
                 <Route path='/dashboard' element={<DashboardPage />} />

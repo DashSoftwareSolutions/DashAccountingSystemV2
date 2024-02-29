@@ -1,8 +1,5 @@
 ﻿import { isNil } from 'lodash';
-import {
-    useCallback,
-    useEffect,
-} from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Col,
@@ -18,9 +15,7 @@ import NavigationSection from '../../../app/navigationSection';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import { selectSelectedTenant } from '../../../app/tenantsSlice';
 import { setSelectedAccount } from '../accountsSlice';
-import {
-    useGetAccountsQuery,
-} from '../api';
+import { useGetAccountsQuery } from '../api';
 import {
     useAppDispatch,
     useTypedSelector,
@@ -44,16 +39,18 @@ function ChartOfAccountsPage() {
         selectedTenant,
     ]);
 
-    const onAccountSelected = useCallback((account: Account) => {
+    const onAccountSelected = (account: Account) => {
         logger.info(`Selected Account ${account.accountNumber} - ${account.name}`);
         dispatch(setSelectedAccount(account));
-        // TODO: Navigate to Account details page
-    }, []);
+        navigate('/account-details');
+    };
 
     const {
         data: accounts,
         isFetching,
-    } = useGetAccountsQuery(selectedTenant?.id ?? ''); // TODO: Better handling of nullish selectedTenant
+    } = useGetAccountsQuery(selectedTenant?.id ?? '', {
+        skip: isNil(selectedTenant),
+    });
 
     return (
         <>
