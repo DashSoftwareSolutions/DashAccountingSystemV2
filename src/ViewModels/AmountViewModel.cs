@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System.Text.Json.Serialization;
 using DashAccountingSystemV2.Models;
 
 namespace DashAccountingSystemV2.ViewModels
@@ -11,7 +10,7 @@ namespace DashAccountingSystemV2.ViewModels
         public decimal? Amount { get; set; }
         public AssetTypeViewModel? AssetType { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter<AmountType>))]
         public AmountType AmountType
         {
             get

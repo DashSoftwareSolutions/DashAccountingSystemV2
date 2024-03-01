@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System.Text.Json.Serialization;
 using DashAccountingSystemV2.Extensions;
 using DashAccountingSystemV2.Models;
 
@@ -21,7 +20,7 @@ namespace DashAccountingSystemV2.ViewModels
 
         public AssetTypeViewModel AssetType { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter<AmountType>))]
         public AmountType NormalBalanceType { get; set; }
 
         public DateTime Created { get; set; }

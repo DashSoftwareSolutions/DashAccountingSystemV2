@@ -7,7 +7,8 @@
             // Business Logic layer objects
             services
                 .AddScoped<ITenantBusinessLogic, TenantBusinessLogic>()
-                .AddScoped<IAccountBusinessLogic, AccountBusinessLogic>();
+                .AddScoped<IAccountBusinessLogic, AccountBusinessLogic>()
+                .AddScoped<ILedgerBusinessLogic, LedgerBusinessLogic>();
 
             return services;
         }
