@@ -8,7 +8,8 @@ import {
     useSelector,
 } from 'react-redux';
 import { api } from './api';
-import accounts from '../features/accounting/accountsSlice';
+import accounts from '../features/accounting/chart-of-accounts/accountsSlice';
+import ledger from '../features/accounting/general-ledger/ledgerSlice';
 import tenants from './tenantsSlice';
 
 export const createStore = (
@@ -18,6 +19,7 @@ export const createStore = (
         reducer: {
             [api.reducerPath]: api.reducer,
             accounts,
+            ledger,
             tenants,
         },
         middleware: (getDefaultMiddleware) =>

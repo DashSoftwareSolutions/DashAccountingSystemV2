@@ -14,7 +14,7 @@ import {
 import AmountDisplay from '../../../common/components/amountDisplay';
 import NavigationSection from '../../../app/navigationSection';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
-import { selectSelectedAccount } from '../accountsSlice';
+import { selectSelectedAccount } from './accountsSlice';
 import { selectSelectedTenant } from '../../../app/tenantsSlice';
 import {
     useTypedSelector,

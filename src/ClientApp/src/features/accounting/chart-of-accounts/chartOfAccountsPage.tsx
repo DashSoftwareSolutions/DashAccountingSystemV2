@@ -14,7 +14,7 @@ import AmountDisplay from '../../../common/components/amountDisplay';
 import NavigationSection from '../../../app/navigationSection';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import { selectSelectedTenant } from '../../../app/tenantsSlice';
-import { setSelectedAccount } from '../accountsSlice';
+import { setSelectedAccount } from './accountsSlice';
 import { useGetAccountsQuery } from '../api';
 import {
     useAppDispatch,

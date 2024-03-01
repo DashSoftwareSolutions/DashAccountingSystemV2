@@ -33,10 +33,12 @@ code {
 /* "Hoverable Links" - text is regular color but changes to link color when hovered - used on Ledger Report */
 a.hoverable-link {
     color: #212529;
+    text-decoration: none;
 }
 
     a.hoverable-link:hover {
         color: #0366d6;
+        text-decoration: underline;
     }
 
 /* Link Buttons - Uses <button> element but looks like a hyperlink */

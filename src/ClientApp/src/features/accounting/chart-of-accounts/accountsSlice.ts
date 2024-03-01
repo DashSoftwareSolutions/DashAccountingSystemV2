@@ -9,13 +9,13 @@ import {
 import {
     ILogger,
     Logger
-} from '../../common/logging';
+} from '../../../common/logging';
 import {
     Account,
     AccountCategoryList,
     AccountSelectOption,
-} from './models';
-import { accountingApi } from './api';
+} from '../models';
+import { accountingApi } from '../api';
 
 const logger: ILogger = new Logger('Accounting Slice');
 
