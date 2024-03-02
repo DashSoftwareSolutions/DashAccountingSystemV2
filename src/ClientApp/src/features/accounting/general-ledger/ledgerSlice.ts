@@ -7,6 +7,7 @@ import {
     ILogger,
     Logger
 } from '../../../common/logging';
+import { DateRange } from '../../../common/models';
 import { LedgerAccount } from '../models';
 import { accountingApi } from '../api';
 import { isNil } from 'lodash';
@@ -49,6 +50,10 @@ const slice = createSlice({
     name: 'ledger',
     initialState,
     reducers: (create) => ({
+        setDateRange: create.reducer((state, action: PayloadAction<DateRange>) => {
+            state.dateRangeStart = action.payload.dateRangeStart;
+            state.dateRangeEnd = action.payload.dateRangeEnd;
+        }),
         setDateRangeStart: create.reducer((state, action: PayloadAction<string>) => {
             state.dateRangeStart = action.payload;
         }),
@@ -83,6 +88,7 @@ const slice = createSlice({
 export default slice.reducer;
 
 export const {
+    setDateRange,
     setDateRangeStart,
     setDateRangeEnd,
 } = slice.actions;

@@ -16,6 +16,7 @@ import {
 import {
     Amount,
     AmountType,
+    DateRange,
 } from '../../../common/models';
 import {
     ILogger,
@@ -29,8 +30,7 @@ import { selectSelectedTenant } from '../../../app/tenantsSlice';
 import {
     selectLedgerReportDateRangeStart,
     selectLedgerReportDateRangeEnd,
-    setDateRangeEnd,
-    setDateRangeStart,
+    setDateRange,
 } from './ledgerSlice';
 import { TransactionStatus } from '../models';
 import {
@@ -55,16 +55,8 @@ function GeneralLedgerPage() {
         logger.info('New Journal Entry button clicked!');
     };
 
-    const onDateRangeEndChanged = (newEndDate: string) => {
-        dispatch(setDateRangeEnd(newEndDate));
-    };
-
-    const onDateRangeStartChanged = (newStartDate: string) => {
-        dispatch(setDateRangeStart(newStartDate));
-    };
-
-    const onRunReport = () => {
-        logger.info('Run Report button was clicked!');
+    const onRunReport = (newDateRange: DateRange) => {
+        dispatch(setDateRange(newDateRange));
     };
 
     useEffect(() => {
@@ -83,9 +75,6 @@ function GeneralLedgerPage() {
     } = useGetLedgerReportQuery({ tenantId: selectedTenant?.id ?? '', dateRangeStart, dateRangeEnd }, {
         skip: isNil(selectedTenant),
     });
-
-    logger.info('Is fetching Ledger Report:', isFetching);
-    logger.info('Ledger Accounts:', accounts);
 
     return (
         <>
@@ -108,8 +97,6 @@ function GeneralLedgerPage() {
                     bemBlockName={bemBlockName}
                     dateRangeEnd={dateRangeEnd ?? null}
                     dateRangeStart={dateRangeStart ?? null}
-                    onDateRangeEndChanged={onDateRangeEndChanged}
-                    onDateRangeStartChanged={onDateRangeStartChanged}
                     onRunReport={onRunReport}
                 />
                 <div className={`${bemBlockName}--report_container`}>

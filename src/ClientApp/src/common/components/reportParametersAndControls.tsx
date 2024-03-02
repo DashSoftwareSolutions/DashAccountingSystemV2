@@ -23,8 +23,6 @@ function ReportParametersAndControls({
     dateRangeStart,
     defaultDateRangeMacro,
     isRequestingExcelDownload,
-    onDateRangeEndChanged,
-    onDateRangeStartChanged,
     onDownloadExcel,
     onRunReport,
     showDownloadExcelButton,
@@ -34,10 +32,8 @@ function ReportParametersAndControls({
     dateRangeStart: string | null; // Date in YYYY-MM-DD
     defaultDateRangeMacro?: DateRangeMacroType,
     isRequestingExcelDownload?: boolean;
-    onDateRangeEndChanged: (newDate: string) => void;
-    onDateRangeStartChanged: (newDate: string) => void;
     onDownloadExcel?: () => void;
-    onRunReport: () => void;
+    onRunReport: (dateRange: DateRange) => void;
     showDownloadExcelButton?: boolean;
 }) {
     const onDownloadExcelSafe = onDownloadExcel ?? noop;
@@ -45,9 +41,11 @@ function ReportParametersAndControls({
     const isRequestingExcelDownloadSafe = isRequestingExcelDownload ?? false;
 
     const [selectedDateRangeMacro, setSelectedDateRangeMacro] = useState(defaultDateRangeMacro ?? DateRangeMacroType.Custom);
+    const [currentDateRangeStart, setCurrentDateRangeStart] = useState(dateRangeStart);
+    const [currentDateRangeEnd, setCurrentDateRangeEnd] = useState(dateRangeEnd);
 
     const onDateRangeEndInputChanged = (event: FormEvent<HTMLInputElement>) => {
-        onDateRangeEndChanged(event.currentTarget.value);
+        setCurrentDateRangeEnd(event.currentTarget.value);
 
         if (selectedDateRangeMacro !== DateRangeMacroType.Custom) {
             setSelectedDateRangeMacro(DateRangeMacroType.Custom);
@@ -55,7 +53,7 @@ function ReportParametersAndControls({
     };
 
     const onDateRangeStartInputChanged = (event: FormEvent<HTMLInputElement>) => {
-        onDateRangeStartChanged(event.currentTarget.value);
+        setCurrentDateRangeStart(event.currentTarget.value);
 
         if (selectedDateRangeMacro !== DateRangeMacroType.Custom) {
             setSelectedDateRangeMacro(DateRangeMacroType.Custom);
@@ -69,13 +67,13 @@ function ReportParametersAndControls({
 
     const onRunReportButtonClicked = (event: MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        onRunReport();
+        onRunReport({ dateRangeStart: currentDateRangeStart ?? '', dateRangeEnd: currentDateRangeEnd ?? '' });
     };
 
     const onDateRangeMacroSelectionChanged = (selectedMacro: DateRangeMacroType, dateRange: DateRange) => {
         setSelectedDateRangeMacro(selectedMacro);
-        onDateRangeStartChanged(dateRange.dateRangeStart);
-        onDateRangeEndChanged(dateRange.dateRangeEnd);
+        setCurrentDateRangeStart(dateRange.dateRangeStart);
+        setCurrentDateRangeEnd(dateRange.dateRangeEnd);
     };
 
     return (
@@ -94,7 +92,7 @@ function ReportParametersAndControls({
                         name="date_range_start_input"
                         onChange={onDateRangeStartInputChanged}
                         type="date"
-                        value={dateRangeStart ?? ''}
+                        value={currentDateRangeStart ?? ''}
                     />
                 </Col>
                 <Col className="align-self-center no-gutters text-center" md={1} style={{ flex: '0 1 22px' }}>
@@ -106,7 +104,7 @@ function ReportParametersAndControls({
                         name="date_range_end_input"
                         onChange={onDateRangeEndInputChanged}
                         type="date"
-                        value={dateRangeEnd ?? ''}
+                        value={currentDateRangeEnd ?? ''}
                     />
                 </Col>
                 <Col md={4}>
