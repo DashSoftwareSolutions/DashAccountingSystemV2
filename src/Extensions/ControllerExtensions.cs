@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using DashAccountingSystemV2.BusinessLogic;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DashAccountingSystemV2.Extensions
 {
@@ -22,6 +23,17 @@ namespace DashAccountingSystemV2.Extensions
                 status,
                 "Error", // TODO: Have a way to customize this 
                 $"https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{status}");
+        }
+
+        public static IActionResult ErrorResponse(this ControllerBase controller, ModelStateDictionary modelState, int status = StatusCodes.Status400BadRequest)
+        {
+            return controller.ValidationProblem(
+                "One or more validation errors has occurred",
+                controller.HttpContext.Request.GetEncodedPathAndQuery(),
+                status,
+                "Invalid Request",
+                $"https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{status}",
+                modelState);
         }
 
         public static IActionResult ErrorResponse(this ControllerBase controller, BusinessLogicResponse bizLogicResponse)

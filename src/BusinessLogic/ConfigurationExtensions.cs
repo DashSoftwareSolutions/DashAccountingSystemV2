@@ -8,7 +8,8 @@
             services
                 .AddScoped<ITenantBusinessLogic, TenantBusinessLogic>()
                 .AddScoped<IAccountBusinessLogic, AccountBusinessLogic>()
-                .AddScoped<ILedgerBusinessLogic, LedgerBusinessLogic>();
+                .AddScoped<ILedgerBusinessLogic, LedgerBusinessLogic>()
+                .AddScoped<IJournalEntryBusinessLogic, JournalEntryBusinessLogic>();
 
             return services;
         }
