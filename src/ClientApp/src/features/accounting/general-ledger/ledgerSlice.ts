@@ -2,10 +2,7 @@
     createSlice,
     PayloadAction,
 } from '@reduxjs/toolkit';
-import {
-    DateTime,
-    Duration,
-} from 'luxon';
+import { DateTime } from 'luxon';
 import {
     ILogger,
     Logger
@@ -25,7 +22,7 @@ type SliceState = {
 
 const getDefaultDateRangeStart = (): string => {
     const today = DateTime.now();
-    let startDate = DateTime.now().startOf('quarter');
+    let startDate = today.startOf('quarter');
     logger.info('Start of Quarter:', startDate.toISODate());
 
     // If start of quarter is less than a month before today, back it up one month
@@ -34,7 +31,7 @@ const getDefaultDateRangeStart = (): string => {
     logger.info('Difference between today and start of the current quarter in months:', differenceInMonths);
 
     if (isNil(differenceInMonths) || differenceInMonths < 1) {
-        startDate = startDate.minus(Duration.fromObject({ months: 1 }));
+        startDate = startDate.minus({ months: 1 });
         logger.info('Updated Start Date:', startDate.toISODate());
     }
 

@@ -2,7 +2,6 @@
 import { DateTime } from 'luxon';
 import { isNil } from 'lodash';
 import {
-    useCallback,
     useEffect,
 } from 'react';
 import {
@@ -24,14 +23,18 @@ import {
 } from '../../../common/logging';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import NavigationSection from '../../../app/navigationSection';
+import ReportParametersAndControls from '../../../common/components/reportParametersAndControls';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import { selectSelectedTenant } from '../../../app/tenantsSlice';
 import {
     selectLedgerReportDateRangeStart,
     selectLedgerReportDateRangeEnd,
+    setDateRangeEnd,
+    setDateRangeStart,
 } from './ledgerSlice';
 import { TransactionStatus } from '../models';
 import {
+    useAppDispatch,
     useTypedSelector,
 } from '../../../app/store';
 import {
@@ -42,14 +45,27 @@ const logger: ILogger = new Logger('General Ledger Page');
 const bemBlockName: string = 'general_ledger_page';
 
 function GeneralLedgerPage() {
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const selectedTenant = useTypedSelector(selectSelectedTenant);
     const dateRangeStart = useTypedSelector(selectLedgerReportDateRangeStart);
     const dateRangeEnd = useTypedSelector(selectLedgerReportDateRangeEnd);
 
-    const onClickNewJournalEntry = useCallback(() => {
+    const onClickNewJournalEntry = () => {
         logger.info('New Journal Entry button clicked!');
-    }, []);
+    };
+
+    const onDateRangeEndChanged = (newEndDate: string) => {
+        dispatch(setDateRangeEnd(newEndDate));
+    };
+
+    const onDateRangeStartChanged = (newStartDate: string) => {
+        dispatch(setDateRangeStart(newStartDate));
+    };
+
+    const onRunReport = () => {
+        logger.info('Run Report button was clicked!');
+    };
 
     useEffect(() => {
         if (isNil(selectedTenant)) {
@@ -88,6 +104,15 @@ function GeneralLedgerPage() {
                 </Row>
             </div>
             <div id={`${bemBlockName}--content`}>
+                <ReportParametersAndControls
+                    bemBlockName={bemBlockName}
+                    dateRangeEnd={dateRangeEnd ?? null}
+                    dateRangeStart={dateRangeStart ?? null}
+                    onDateRangeEndChanged={onDateRangeEndChanged}
+                    onDateRangeStartChanged={onDateRangeStartChanged}
+                    onRunReport={onRunReport}
+                />
+                <div className={`${bemBlockName}--report_container`}>
                 {isFetching ? (
                     <div>Loading ...</div>
                 ) : (
@@ -203,6 +228,7 @@ function GeneralLedgerPage() {
                         </tbody>
                     </table>
                 )}
+                </div>
             </div>
         </>
     );
