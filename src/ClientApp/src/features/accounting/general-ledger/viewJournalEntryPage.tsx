@@ -2,11 +2,18 @@
     isFinite,
     isNil,
 } from 'lodash';
-import { useEffect } from 'react';
+import {
+    useEffect,
+    useState,
+} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     Button,
     Col,
+    Modal,
+    ModalBody,
+    ModalHeader,
+    ModalFooter,
     Row,
 } from 'reactstrap';
 import {
@@ -15,6 +22,7 @@ import {
 } from '../../../common/logging';
 import JournalEntryDetails from './journalEntryDetails';
 import NavigationSection from '../../../app/navigationSection';
+import PostJournalEntryModalDialog from './postJournalEntryModalDialog';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import { TransactionStatus } from '../models';
 import { selectSelectedTenant } from '../../../app/tenantsSlice';
@@ -27,6 +35,9 @@ const logger: ILogger = new Logger('View Journal Entry Page');
 const bemBlockName: string = 'view_journal_entry_page';
 
 function ViewJournalEntryPage() {
+    const [isDeleteEntryModalOpen, setIsDeleteEntryModalOpen] = useState<boolean>(false);
+    const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false);
+
     const navigate = useNavigate();
     const selectedTenant = useTypedSelector(selectSelectedTenant);
     const { entryId: entryIdParam } = useParams();
@@ -49,7 +60,7 @@ function ViewJournalEntryPage() {
     };
 
     const onClickDeleteJournalEntry = () => {
-        logger.info('Delete Journal Entry...');
+        setIsDeleteEntryModalOpen(true);
     };
 
     const onClickEditJournalEntry = () => {
@@ -57,7 +68,19 @@ function ViewJournalEntryPage() {
     };
 
     const onClickPostJournalEntry = () => {
-        logger.info('Post Journal Entry...');
+        setIsPostModalOpen(true);
+    };
+
+    const onClosePostEntryDialog = () => {
+        setIsPostModalOpen(false);
+    };
+
+    const onDeleteJournalEntryConfirmed = () => {
+        logger.info('Deleting the Journal Entry...');
+    };
+
+    const onDeleteJournalEntryDeclined = () => {
+        setIsDeleteEntryModalOpen(false);
     };
 
     const { isFetching, data: journalEntry } = useGetJournalEntryQuery({ tenantId: selectedTenant?.id ?? '', entryId }, {
@@ -124,6 +147,37 @@ function ViewJournalEntryPage() {
                 ): (
                     <JournalEntryDetails bemBlockName={bemBlockName} journalEntry={journalEntry} />
                 )}
+
+                <PostJournalEntryModalDialog isOpen={isPostModalOpen} onClose={onClosePostEntryDialog} />
+
+                <Modal
+                    backdrop="static"
+                    id={`${bemBlockName}--delete_confirm_modal`}
+                    isOpen={isDeleteEntryModalOpen}
+                    toggle={onDeleteJournalEntryDeclined}
+                >
+                    <ModalHeader toggle={onDeleteJournalEntryDeclined}>Delete Journal Entry</ModalHeader>
+                    <ModalBody>
+                        This action cannot be undone.  Are you sure?
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button
+                            color="danger"
+                            //disabled={isDeleting}
+                            onClick={onDeleteJournalEntryConfirmed}
+                        >
+                            {/*isDeleting ? 'Deleting...' : */'Yes, Delete It'}
+                        </Button>
+                        {' '}
+                        <Button
+                            color="secondary"
+                            //disabled={isDeleting}
+                            onClick={onDeleteJournalEntryDeclined}
+                        >
+                            No, Cancel
+                        </Button>
+                    </ModalFooter>
+                </Modal>
             </div>
         </>
     );
