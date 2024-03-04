@@ -16,6 +16,7 @@ import {
 import JournalEntryDetails from './journalEntryDetails';
 import NavigationSection from '../../../app/navigationSection';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
+import { TransactionStatus } from '../models';
 import { selectSelectedTenant } from '../../../app/tenantsSlice';
 import { useGetJournalEntryQuery } from '../api';
 import {
@@ -47,6 +48,18 @@ function ViewJournalEntryPage() {
         navigate(-1);
     };
 
+    const onClickDeleteJournalEntry = () => {
+        logger.info('Delete Journal Entry...');
+    };
+
+    const onClickEditJournalEntry = () => {
+        logger.info('Edit Journal Entry...');
+    };
+
+    const onClickPostJournalEntry = () => {
+        logger.info('Post Journal Entry...');
+    };
+
     const { isFetching, data: journalEntry } = useGetJournalEntryQuery({ tenantId: selectedTenant?.id ?? '', entryId }, {
         skip: isNil(selectedTenant) || !hasValidEntryId,
     });
@@ -68,6 +81,39 @@ function ViewJournalEntryPage() {
                             style={{ marginRight: 22, width: 120 }}
                         >
                             Back
+                        </Button>
+
+                        {journalEntry?.status === TransactionStatus.Pending ? (
+                            <>
+                                <Button
+                                    color="danger"
+                                    id={`${bemBlockName}--delete_entry_button`}
+                                    onClick={onClickDeleteJournalEntry}
+                                    style={{ marginRight: 22, width: 120 }}
+                                >
+                                    Delete Entry
+                                </Button>
+
+                                <Button
+                                    color="success"
+                                    id={`${bemBlockName}--post_entry_button`}
+                                    onClick={onClickPostJournalEntry}
+                                    style={{ marginRight: 22, width: 120 }}
+                                >
+                                    Post Entry
+                                </Button>
+                            </>
+                        ) : (
+                            <></>
+                        )}
+
+                        <Button
+                            color="primary"
+                            id={`${bemBlockName}--edit_entry_button`}
+                            onClick={onClickEditJournalEntry}
+                            style={{ width: 120 }}
+                        >
+                            Edit Entry
                         </Button>
                     </Col>
                 </Row>
