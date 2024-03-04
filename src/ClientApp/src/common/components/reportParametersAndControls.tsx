@@ -78,7 +78,7 @@ function ReportParametersAndControls({
 
     return (
         <Form style={{ marginBottom: 22 }}>
-            <Row form>
+            <Row className="g-2">
                 <Col md={3}>
                     <DateRangeMacroSelector
                         id={`${bemBlockName}--date_range_macro_select`}
