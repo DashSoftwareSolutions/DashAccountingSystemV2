@@ -55,6 +55,10 @@ function ViewJournalEntryPage() {
         selectedTenant,
     ]);
 
+    const { isFetching, data: journalEntry } = useGetJournalEntryQuery({ tenantId: selectedTenant?.id ?? '', entryId }, {
+        skip: isNil(selectedTenant) || !hasValidEntryId,
+    });
+
     const onClickBack = () => {
         navigate(-1);
     };
@@ -64,7 +68,8 @@ function ViewJournalEntryPage() {
     };
 
     const onClickEditJournalEntry = () => {
-        logger.info('Edit Journal Entry...');
+        // TODO: Dispatch necessary action creator to initialize Redux Journal Entry Editor state
+        navigate(`/journal-entry/edit/${entryId}`);
     };
 
     const onClickPostJournalEntry = () => {
@@ -82,10 +87,6 @@ function ViewJournalEntryPage() {
     const onDeleteJournalEntryDeclined = () => {
         setIsDeleteEntryModalOpen(false);
     };
-
-    const { isFetching, data: journalEntry } = useGetJournalEntryQuery({ tenantId: selectedTenant?.id ?? '', entryId }, {
-        skip: isNil(selectedTenant) || !hasValidEntryId,
-    });
 
     return (
         <>

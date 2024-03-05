@@ -52,7 +52,7 @@ function GeneralLedgerPage() {
     const dateRangeEnd = useTypedSelector(selectLedgerReportDateRangeEnd);
 
     const onClickNewJournalEntry = () => {
-        logger.info('New Journal Entry button clicked!');
+        navigate('/journal-entry/new');
     };
 
     const onRunReport = (newDateRange: DateRange) => {
