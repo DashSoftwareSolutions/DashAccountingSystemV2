@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 // using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using Npgsql;
 using Serilog;
 using DashAccountingSystemV2.BusinessLogic;
@@ -164,6 +166,22 @@ namespace DashAccountingSystemV2
                 if (env.IsDevelopment())
                 {
                     spa.UseReactDevelopmentServer(npmScript: "start");
+                }
+                else
+                {
+                    spa.Options.DefaultPageStaticFileOptions = new StaticFileOptions()
+                    {
+                        OnPrepareResponse = ctx =>
+                        {
+                            var headers = ctx.Context.Response.GetTypedHeaders();
+                            headers.CacheControl = new CacheControlHeaderValue()
+                            {
+                                NoCache = true,
+                                NoStore = true,
+                                MustRevalidate = true,
+                            };
+                        }
+                    };
                 }
             });
         }
