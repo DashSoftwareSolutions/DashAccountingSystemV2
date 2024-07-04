@@ -5,7 +5,7 @@
 
 # Custom Additions
 # Proprietary/confidential data scripts
-src/Data/Scripts/Dash
+src/BackEnd/Data/Scripts/Dash
 # UI built files
 *.min.css
 *.min.js
