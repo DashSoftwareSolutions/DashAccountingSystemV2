@@ -8,11 +8,7 @@ import {
     ILogger,
     Logger
 } from '../../../common/logging';
-import {
-    Account,
-    AccountCategoryList,
-    AccountSelectOption,
-} from '../models';
+import { Account } from '../models';
 import { KnownAction } from './accounts.actions';
 
 const logger: ILogger = new Logger('Account Actions');

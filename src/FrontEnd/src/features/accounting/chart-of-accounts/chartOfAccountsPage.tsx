@@ -30,7 +30,6 @@ const bemBlockName: string = 'chart_of_accounts_page';
 const mapStateToProps = (state: ApplicationState) => ({
     accounts: state.accounts.accounts,
     isFetching: state.accounts.isFetching,
-    selectedAccount: state.accounts.selectedAccount,
     selectedTenant: state.bootstrap.selectedTenant,
 });
 
@@ -51,7 +50,6 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
         isFetching,
         requestAccounts,
         selectAccount,
-        selectedAccount,
         selectedTenant,
     } = props;
 
