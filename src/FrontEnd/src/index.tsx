@@ -2,8 +2,9 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Provider } from 'react-redux';
+import { ConnectedRouter } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
+import { Provider } from 'react-redux';
 import configureStore from './app/store/configureStore';
 import App from './app';
 import reportWebVitals from './reportWebVitals';
@@ -22,7 +23,9 @@ const root = ReactDOM.createRoot(
 root.render(
     <React.StrictMode>
         <Provider store={store}>
-            <App />
+            <ConnectedRouter history={history}>
+                <App />
+            </ConnectedRouter>
         </Provider>
     </React.StrictMode>
 );

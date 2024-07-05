@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
     useEffect,
     useState,
 } from 'react';
@@ -49,7 +49,7 @@ function Layout(props: { children?: React.ReactNode }) {
     logger.info('Bootstrap info in state:', bootstrapInfo);
 
     return (
-        <>
+        <React.Fragment>
             {isFetching ? (
                 <div id="app_loading_spinner" className="align-items-center justify-content-center" style={{ display: 'flex', height: 'calc(100vh - 250px)' }} >
                     <div className="spinner-border" role="status" style={{ width: '5rem', height: '5rem' }}>
@@ -57,15 +57,15 @@ function Layout(props: { children?: React.ReactNode }) {
                     </div>
                 </div>
             ): (
-                <>
+                <React.Fragment>
                     <NavMenu userInfo = {bootstrapInfo?.userInfo} />
                     <Container>
                         <SystemNotificationsArea />
                         {props.children}
                     </Container>
-                </>
+                </React.Fragment>
             )}
-        </>
+        </React.Fragment>
     );
 }
 
