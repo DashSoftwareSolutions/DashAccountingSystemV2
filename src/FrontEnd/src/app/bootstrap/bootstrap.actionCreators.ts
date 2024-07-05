@@ -14,7 +14,7 @@ import {
 } from '../../common/models';
 import { KnownAction } from './bootstrap.actions';
 
-const logger: ILogger = new Logger('Bootstrap Action');
+const logger: ILogger = new Logger('Bootstrap Actions');
 
 const actionCreators = {
     requestBootstrapInfo: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {

@@ -1,5 +1,6 @@
 import { useDispatch } from 'react-redux';
 import IAction from './iaction.interface';
+import * as Accounts from '../../features/accounting/data';
 import * as Bootstrap from '../bootstrap'
 import * as SystemNotifications from '../notifications';
 
@@ -7,6 +8,7 @@ import * as SystemNotifications from '../notifications';
  * Redux state tree for the entire application
  */
 export interface ApplicationState {
+    accounts: Accounts.state,
     bootstrap: Bootstrap.state,
     systemNotifications: SystemNotifications.state;
 }
@@ -15,6 +17,7 @@ export interface ApplicationState {
  * All Redux Reducers
  */
 export const reducers = {
+    accounts: Accounts.reducer,
     bootstrap: Bootstrap.reducer,
     systemNotifications: SystemNotifications.reducer,
 };
