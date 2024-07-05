@@ -3,6 +3,7 @@ import './app.css';
 import React from 'react';
 import { Route } from 'react-router';
 import Layout from './layout';
+import AccountDetailsPage from '../features/accounting/chart-of-accounts/accountDetailsPage';
 import BalanceSheetPage from '../features/accounting/balance-sheet/balanceSheetPage';
 import ChartOfAccountsPage from '../features/accounting/chart-of-accounts/chartOfAccountsPage';
 import DashboardPage from '../features/dashboard/dashboardPage';
@@ -16,6 +17,7 @@ function App() {
     return (
         <Layout>
             <Route exact path="/" component={SelectTenantPage} />
+            <Route exact path="/account-details" component={AccountDetailsPage} />
             <Route exact path="/balance-sheet" component={BalanceSheetPage} />
             <Route exact path="/chart-of-accounts" component={ChartOfAccountsPage} />
             <Route exact path="/dashboard" component={DashboardPage} />
