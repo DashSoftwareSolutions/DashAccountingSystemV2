@@ -1,56 +1,55 @@
-import React, {
-    useEffect,
-    useState,
-} from 'react';
+import React, { useEffect } from 'react';
+import {
+    ConnectedProps,
+    connect,
+} from 'react-redux';
 import { Container } from 'reactstrap';
 import NavMenu from './navMenu';
 import {
     ILogger,
     Logger
 } from '../common/logging';
+import { ApplicationState } from './store';
 import SystemNotificationsArea from './systemNotificationsArea';
-import { BootstrapInfo } from '../common/models';
+import { actionCreators as bootstrapActionCreators } from './bootstrap';
 
 const logger: ILogger = new Logger('Layout');
 
-function Layout(props: { children?: React.ReactNode }) {
-    const [isFetching, setIsFetching] = useState<boolean>();
-    const [bootstrapInfo, setBootstrapInfo] = useState<BootstrapInfo | null>(null);
+interface LayoutOwnProps {
+    children?: React.ReactNode;
+}
+
+const mapStateToProps = (state: ApplicationState) => ({
+    bootstrapInfo: state.bootstrap,
+});
+
+const mapDispatchToProps = {
+    requestBootstrapInfo: bootstrapActionCreators.requestBootstrapInfo,
+};
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+type LayoutRedexProps = ConnectedProps<typeof connector>;
+
+type LayoutProps = LayoutOwnProps & LayoutRedexProps;
+
+function Layout(props: LayoutProps) {
+    const {
+        bootstrapInfo,
+        children,
+        requestBootstrapInfo,
+    } = props;
 
     useEffect(() => {
-        async function fetchBootstrap() {
-            try {
-                const response = await fetch('/api/bootstrap');
-
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`);
-                }
-
-                const data = await response.json() as BootstrapInfo;
-                logger.info('Boostrap Response:', data);
-                setBootstrapInfo(data);
-            } catch (error: any) {
-                logger.error(error?.message ?? 'Error calling API');
-            }
-        }
-
-        setIsFetching(true);
-
-        fetchBootstrap()
-            .catch((error: Error) => {
-                logger.error(error.message);
-            })
-            .finally(() => {
-                setIsFetching(false);
-            });
+        logger.info('Layout - useEffect w/ empty dependencies...');
+        requestBootstrapInfo();
+        // Suppressing "react-hooks/exhaustive-deps" to use an empty dependencies array for "component did mount" type semantics
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    logger.info('Is fetching:', isFetching);
-    logger.info('Bootstrap info in state:', bootstrapInfo);
 
     return (
         <React.Fragment>
-            {isFetching ? (
+            {bootstrapInfo.isFetching ? (
                 <div id="app_loading_spinner" className="align-items-center justify-content-center" style={{ display: 'flex', height: 'calc(100vh - 250px)' }} >
                     <div className="spinner-border" role="status" style={{ width: '5rem', height: '5rem' }}>
                         <span className="visually-hidden">Loading...</span>
@@ -61,7 +60,7 @@ function Layout(props: { children?: React.ReactNode }) {
                     <NavMenu userInfo = {bootstrapInfo?.userInfo} />
                     <Container>
                         <SystemNotificationsArea />
-                        {props.children}
+                        {children}
                     </Container>
                 </React.Fragment>
             )}
@@ -69,4 +68,4 @@ function Layout(props: { children?: React.ReactNode }) {
     );
 }
 
-export default Layout;
+export default connector(Layout);

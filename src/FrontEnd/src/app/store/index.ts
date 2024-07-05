@@ -1,10 +1,13 @@
+import { useDispatch } from 'react-redux';
 import IAction from './iaction.interface';
+import * as Bootstrap from '../bootstrap'
 import * as SystemNotifications from '../notifications';
 
 /**
  * Redux state tree for the entire application
  */
 export interface ApplicationState {
+    bootstrap: Bootstrap.state,
     systemNotifications: SystemNotifications.state;
 }
 
@@ -12,6 +15,7 @@ export interface ApplicationState {
  * All Redux Reducers
  */
 export const reducers = {
+    bootstrap: Bootstrap.reducer,
     systemNotifications: SystemNotifications.reducer,
 };
 
@@ -22,3 +26,8 @@ export const reducers = {
 export interface AppThunkAction<TAction extends IAction> {
     (dispatch: (action: TAction) => void, getState: () => ApplicationState): void;
 }
+
+/**
+ * Custom hook for using application Redux dispatch
+ */
+export const useAppDispatch = () => useDispatch<AppThunkAction<IAction>>();
