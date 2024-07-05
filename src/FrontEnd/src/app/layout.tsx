@@ -5,15 +5,9 @@ import {
 } from 'react-redux';
 import { Container } from 'reactstrap';
 import NavMenu from './navMenu';
-import {
-    ILogger,
-    Logger
-} from '../common/logging';
 import { ApplicationState } from './store';
 import SystemNotificationsArea from './systemNotificationsArea';
 import { actionCreators as bootstrapActionCreators } from './bootstrap';
-
-const logger: ILogger = new Logger('Layout');
 
 interface LayoutOwnProps {
     children?: React.ReactNode;
@@ -41,7 +35,6 @@ function Layout(props: LayoutProps) {
     } = props;
 
     useEffect(() => {
-        logger.info('Layout - useEffect w/ empty dependencies...');
         requestBootstrapInfo();
         // Suppressing "react-hooks/exhaustive-deps" to use an empty dependencies array for "component did mount" type semantics
         // eslint-disable-next-line react-hooks/exhaustive-deps
