@@ -4,10 +4,11 @@ import {
     connect,
 } from 'react-redux';
 import { Container } from 'reactstrap';
+import { actionCreators as bootstrapActionCreators } from './bootstrap';
 import NavMenu from './navMenu';
 import { ApplicationState } from './store';
 import SystemNotificationsArea from './systemNotificationsArea';
-import { actionCreators as bootstrapActionCreators } from './bootstrap';
+import Loader from '../common/components/loader';
 
 interface LayoutOwnProps {
     children?: React.ReactNode;
@@ -43,11 +44,7 @@ function Layout(props: LayoutProps) {
     return (
         <React.Fragment>
             {bootstrapInfo.isFetching ? (
-                <div id="app_loading_spinner" className="align-items-center justify-content-center" style={{ display: 'flex', height: 'calc(100vh - 250px)' }} >
-                    <div className="spinner-border" role="status" style={{ width: '5rem', height: '5rem' }}>
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+                <Loader />
             ): (
                 <React.Fragment>
                     <NavMenu userInfo = {bootstrapInfo?.userInfo} />

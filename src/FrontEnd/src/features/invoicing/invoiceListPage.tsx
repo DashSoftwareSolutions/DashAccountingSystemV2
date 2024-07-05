@@ -20,8 +20,8 @@ import {
     Logger,
 } from '../../common/logging';
 
-const logger: ILogger = new Logger('Dashboard Page');
-const bemBlockName: string = 'dashboard_page';
+const logger: ILogger = new Logger('Invoice List Page');
+const bemBlockName: string = 'invoice_list_page';
 
 const mapStateToProps = (state: ApplicationState) => ({
     selectedTenant: state.bootstrap.selectedTenant,
@@ -29,11 +29,11 @@ const mapStateToProps = (state: ApplicationState) => ({
 
 const connector = connect(mapStateToProps);
 
-type DashboardPageReduxProps = ConnectedProps<typeof connector>;
+type InvoiceListPageReduxProps = ConnectedProps<typeof connector>;
 
-type DashboardPageProps = DashboardPageReduxProps & RouteComponentProps;
+type InvoiceListPageProps = InvoiceListPageReduxProps & RouteComponentProps;
 
-function DashboardPage(props: DashboardPageProps) {
+function InvoiceListPage(props: InvoiceListPageProps) {
     const {
         history,
         selectedTenant,
@@ -51,20 +51,20 @@ function DashboardPage(props: DashboardPageProps) {
 
     return (
         <React.Fragment>
-            <TenantSubNavigation activeSection={NavigationSection.Dashboard} />
+            <TenantSubNavigation activeSection={NavigationSection.Invoicing} />
             <div className="page_header" id={`${bemBlockName}--header`}>
                 <Row>
                     <Col>
-                        <h1>{selectedTenant?.name}</h1>
-                        <p className="page_header--subtitle">Dashboard</p>
+                        <h1>Invoices</h1>
+                        <p className="page_header--subtitle">{selectedTenant?.name}</p>
                     </Col>
                 </Row>
             </div>
             <div id={`${bemBlockName}--content`}>
-                <p>Coming soon...</p>
+                TODO: Invoice List Page content
             </div>
         </React.Fragment>
     );
 }
 
-export default withRouter(connector(DashboardPage));
+export default withRouter(connector(InvoiceListPage));

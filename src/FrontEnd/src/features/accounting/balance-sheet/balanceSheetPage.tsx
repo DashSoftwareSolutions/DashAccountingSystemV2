@@ -12,16 +12,16 @@ import {
     RouteComponentProps,
     withRouter,
 } from 'react-router';
-import { ApplicationState } from '../../app/store';
-import NavigationSection from '../../app/navigationSection';
-import TenantSubNavigation from '../../app/tenantSubNavigation';
+import { ApplicationState } from '../../../app/store';
+import NavigationSection from '../../../app/navigationSection';
+import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import {
     ILogger,
     Logger,
-} from '../../common/logging';
+} from '../../../common/logging';
 
-const logger: ILogger = new Logger('Dashboard Page');
-const bemBlockName: string = 'dashboard_page';
+const logger: ILogger = new Logger('Balance Sheet Page');
+const bemBlockName: string = 'balance_sheet_page';
 
 const mapStateToProps = (state: ApplicationState) => ({
     selectedTenant: state.bootstrap.selectedTenant,
@@ -29,11 +29,11 @@ const mapStateToProps = (state: ApplicationState) => ({
 
 const connector = connect(mapStateToProps);
 
-type DashboardPageReduxProps = ConnectedProps<typeof connector>;
+type BalanceSheetPageReduxProps = ConnectedProps<typeof connector>;
 
-type DashboardPageProps = DashboardPageReduxProps & RouteComponentProps;
+type BalanceSheetPageProps = BalanceSheetPageReduxProps & RouteComponentProps;
 
-function DashboardPage(props: DashboardPageProps) {
+function BalanceSheetPage(props: BalanceSheetPageProps) {
     const {
         history,
         selectedTenant,
@@ -51,20 +51,20 @@ function DashboardPage(props: DashboardPageProps) {
 
     return (
         <React.Fragment>
-            <TenantSubNavigation activeSection={NavigationSection.Dashboard} />
+            <TenantSubNavigation activeSection={NavigationSection.BalanceSheet} />
             <div className="page_header" id={`${bemBlockName}--header`}>
                 <Row>
                     <Col>
-                        <h1>{selectedTenant?.name}</h1>
-                        <p className="page_header--subtitle">Dashboard</p>
+                        <h1>Balance Sheet</h1>
+                        <p className="page_header--subtitle">{selectedTenant?.name}</p>
                     </Col>
                 </Row>
             </div>
             <div id={`${bemBlockName}--content`}>
-                <p>Coming soon...</p>
+                TODO: Balance Sheet
             </div>
         </React.Fragment>
     );
 }
 
-export default withRouter(connector(DashboardPage));
+export default withRouter(connector(BalanceSheetPage));

@@ -103,13 +103,15 @@ try
     var spaApplicationUrlPathPrefix = "/app";
     var spaStaticFilesPathPrefix = "/static";
     var spaHotReloadWebSocketPathPrefix = "/ws";
+    var spaApplicationManifestFile = "/manifest.json";
 
     if (app.Environment.IsDevelopment())
     {
         app.MapWhen(y =>
             y.Request.Path.StartsWithSegments(spaApplicationUrlPathPrefix) ||
             y.Request.Path.StartsWithSegments(spaStaticFilesPathPrefix) ||
-            y.Request.Path.StartsWithSegments(spaHotReloadWebSocketPathPrefix),
+            y.Request.Path == spaHotReloadWebSocketPathPrefix ||
+            y.Request.Path == spaApplicationManifestFile,
             client =>
             {
                 client.UseSpa(spa =>
