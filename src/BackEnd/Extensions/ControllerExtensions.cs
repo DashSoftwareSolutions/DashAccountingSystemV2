@@ -18,22 +18,20 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
         public static IActionResult ErrorResponse(this ControllerBase controller, string errorMessage, int status = StatusCodes.Status400BadRequest)
         {
             return controller.Problem(
-                errorMessage,
-                controller.HttpContext.Request.GetEncodedPathAndQuery(),
-                status,
-                "Error", // TODO: Have a way to customize this 
-                $"https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{status}");
+                detail: errorMessage,
+                instance: controller.HttpContext.Request.GetEncodedPathAndQuery(),
+                statusCode: status,
+                title: "Error");
         }
 
         public static IActionResult ErrorResponse(this ControllerBase controller, ModelStateDictionary modelState, int status = StatusCodes.Status400BadRequest)
         {
             return controller.ValidationProblem(
-                "One or more validation errors has occurred",
-                controller.HttpContext.Request.GetEncodedPathAndQuery(),
-                status,
-                "Invalid Request",
-                $"https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{status}",
-                modelState);
+                detail: "One or more validation errors has occurred.",
+                instance: controller.HttpContext.Request.GetEncodedPathAndQuery(),
+                statusCode: status,
+                title: "Invalid Request",
+                modelStateDictionary: modelState);
         }
 
         public static IActionResult ErrorResponse(this ControllerBase controller, BusinessLogicResponse bizLogicResponse)

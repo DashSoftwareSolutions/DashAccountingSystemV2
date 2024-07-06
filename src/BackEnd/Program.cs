@@ -82,6 +82,9 @@ try
     app.UseAuthorization();
     app.MapControllers();
 
+    // Global exception handler
+    app.UseExceptionHandler("/api/error");
+
     app.Run();
 }
 catch (HostAbortedException)
