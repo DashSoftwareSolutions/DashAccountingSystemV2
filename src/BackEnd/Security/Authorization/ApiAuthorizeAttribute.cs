@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http;
+using System.Diagnostics;
 
 namespace DashAccountingSystemV2.BackEnd.Security.Authorization
 {
@@ -39,12 +41,13 @@ namespace DashAccountingSystemV2.BackEnd.Security.Authorization
                 context.Result = new JsonResult(
                     new
                     {
-                        Type = "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401",
+                        Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2",
                         Title = "Unauthorized",
                         Status = StatusCodes.Status401Unauthorized,
                         Detail = "You must be logged in to make this request.",
                         Instance = context.HttpContext.Request.GetEncodedPathAndQuery(),
-                    })
+                        TraceId = Activity.Current?.Id ?? context.HttpContext?.TraceIdentifier,
+            })
                 {
                     StatusCode = StatusCodes.Status401Unauthorized
                 };

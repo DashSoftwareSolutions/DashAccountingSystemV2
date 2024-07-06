@@ -3,16 +3,16 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
-    useEffect(() => {
-        fetch('/api/weather-forecast'/*, {
-            headers: {
-                Accept: 'application/json',
-            },
-        }*/)
-            .then((response) => {
-                console.log('API response:', response);
-            });
-    }, []);
+    //useEffect(() => {
+    //    fetch('/api/weather-forecast'/*, {
+    //        headers: {
+    //            Accept: 'application/json',
+    //        },
+    //    }*/)
+    //        .then((response) => {
+    //            console.log('API response:', response);
+    //        });
+    //}, []);
 
   return (
     <div className="App">

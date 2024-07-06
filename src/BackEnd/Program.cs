@@ -45,6 +45,10 @@ try
     });
 
     // Authorization/Identity services
+    builder.Services
+        .AddAuthentication(IdentityConstants.BearerScheme)
+        .AddBearerToken(IdentityConstants.BearerScheme);
+
     builder.Services.AddAuthorization();
 
     builder.Services

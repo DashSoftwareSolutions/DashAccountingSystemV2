@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using DashAccountingSystemV2.BackEnd.Security.Authorization;
 
 namespace DashAccountingSystemV2.BackEnd.Controllers
 {
     [ApiController]
+    [ApiAuthorize]
     [Route("/api/weather-forecast")]
     public class WeatherForecastController : ControllerBase
     {
