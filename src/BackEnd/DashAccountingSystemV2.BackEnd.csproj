@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup Label="Package">
 	<PackageId>DashAccountingSystemV2.BackEnd</PackageId>
@@ -12,6 +12,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	<UserSecretsId>2b3006e2-bf37-4b89-badd-06c844ef21cf</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Label="Front-End Single Page Application (SPA) Proxy Support">
@@ -26,9 +27,25 @@
 	</ProjectReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  <ItemGroup Label="Package References">
+	<PackageReference Include="Dapper" Version="2.1.35" />
+	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
 	<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.6" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
+	  <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
+	<PackageReference Include="NodaTime" Version="3.1.11" />
+	<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+	<PackageReference Include="Serilog" Version="4.0.0" />
+	<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+	<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
 </Project>
