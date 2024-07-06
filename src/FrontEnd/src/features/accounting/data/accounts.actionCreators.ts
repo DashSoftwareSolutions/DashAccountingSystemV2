@@ -2,14 +2,17 @@ import {
     isEmpty,
     isNil,
 } from 'lodash';
-import ActionType from '../../../app/store/actionType';
+import { Dispatch } from 'redux';
 import { AppThunkAction } from '../../../app/store';
+import ActionType from '../../../app/store/actionType';
+import IAction from '../../../app/store/iaction.interface';
 import {
     ILogger,
     Logger
 } from '../../../common/logging';
 import { Account } from '../models';
 import { KnownAction } from './accounts.actions';
+import { apiErrorHandler } from '../../../common/utilities/errorHandling';
 
 const logger: ILogger = new Logger('Account Actions');
 
@@ -26,7 +29,7 @@ const actionCreators = {
             fetch(`/api/ledger/${tenantId}/accounts`)
                 .then(response => {
                     if (!response.ok) {
-                        logger.error(`API Response status: ${response.status}`);
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>)
                         return null;
                     }
 

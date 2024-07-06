@@ -2,17 +2,14 @@ import {
     isEmpty,
     isNil,
 } from 'lodash';
-import ActionType from '../../../../app/store/actionType';
+import { Dispatch } from 'redux';
 import { AppThunkAction } from '../../../../app/store';
-import {
-    ILogger,
-    Logger
-} from '../../../../common/logging';
+import ActionType from '../../../../app/store/actionType';
+import IAction from '../../../../app/store/iaction.interface';
 import { LedgerAccount } from '../../models';
 import { KnownAction } from './ledger.actions';
 import { DateRange } from '../../../../common/models';
-
-const logger: ILogger = new Logger('Account Ledger');
+import { apiErrorHandler } from '../../../../common/utilities/errorHandling';
 
 const actionCreators = {
     requestLedgerReportData: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
@@ -29,7 +26,7 @@ const actionCreators = {
             fetch(`/api/ledger/${tenantId}/report?dateRangeStart=${dateRangeStart}&dateRangeEnd=${dateRangeEnd}`)
                 .then((response) => {
                     if (!response.ok) {
-                        logger.error(`API Response status: ${response.status}`);
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>)
                         return null;
                     }
 

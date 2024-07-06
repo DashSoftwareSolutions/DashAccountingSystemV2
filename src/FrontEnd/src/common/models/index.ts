@@ -1,5 +1,6 @@
 export type { default as Amount } from './amount.model';
 export { default as AmountType } from './amountType.model';
+export type { default as ApiErrorResponse } from './apiErrorResponse.model';
 export type { default as AssetType } from './assetType.model';
 export type { default as BootstrapInfo } from './bootstrapInfo.model';
 export type { default as DateRange } from './dateRange.model';

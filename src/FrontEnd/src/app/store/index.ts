@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 import IAction from './iaction.interface';
 import * as Accounts from '../../features/accounting/data';
 import * as Bootstrap from '../bootstrap'
+import * as JournalEntry from '../../features/accounting/journal-entry/data';
 import * as Ledger from '../../features/accounting/general-ledger/data';
 import * as SystemNotifications from '../notifications';
 
@@ -11,6 +12,7 @@ import * as SystemNotifications from '../notifications';
 export interface ApplicationState {
     accounts: Accounts.state,
     bootstrap: Bootstrap.state,
+    journalEntry: JournalEntry.state,
     ledger: Ledger.state,
     systemNotifications: SystemNotifications.state;
 }
@@ -21,6 +23,7 @@ export interface ApplicationState {
 export const reducers = {
     accounts: Accounts.reducer,
     bootstrap: Bootstrap.reducer,
+    journalEntry: JournalEntry.reducer,
     ledger: Ledger.reducer,
     systemNotifications: SystemNotifications.reducer,
 };

@@ -2,19 +2,16 @@ import {
     isEmpty,
     isNil,
 } from 'lodash';
-import ActionType from '../store/actionType';
+import { Dispatch } from 'redux';
 import { AppThunkAction } from '../store';
-import {
-    ILogger,
-    Logger
-} from '../../common/logging';
+import ActionType from '../store/actionType';
+import IAction from '../store/iaction.interface';
 import {
     BootstrapInfo,
     Tenant,
 } from '../../common/models';
+import { apiErrorHandler } from '../../common/utilities/errorHandling';
 import { KnownAction } from './bootstrap.actions';
-
-const logger: ILogger = new Logger('Bootstrap Actions');
 
 const actionCreators = {
     requestBootstrapInfo: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
@@ -27,8 +24,7 @@ const actionCreators = {
             fetch('/api/bootstrap')
                 .then((response) => {
                     if (!response.ok) {
-                        logger.error(`API Response status: ${response.status}`);
-                        // TODO: Additional error handling actions
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
                         return null;
                     }
 
