@@ -1,4 +1,4 @@
-﻿import {
+import {
     isEmpty,
     isString,
 } from 'lodash';

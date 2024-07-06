@@ -1,4 +1,4 @@
-﻿const defaultPrecision = 0.001;
+const defaultPrecision = 0.001;
 
 /**
  * Helper function for checking two numbers for equality.
