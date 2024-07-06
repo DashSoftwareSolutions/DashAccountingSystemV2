@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Label="Package">
+	<PackageId>DashAccountingSystemV2.BackEnd</PackageId>
+	<Version>2.1.0</Version>
+	<Authors>Geoffrey Roberts</Authors>
+	<Company>Dash Software Solutions, Inc.</Company>
+	<Copyright>Copyright (C) 2022 - 2024 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
+  </PropertyGroup>
+	
+  <PropertyGroup Label="Build">
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Front-End Single Page Application (SPA) Proxy Support">
+	<SpaRoot>..\FrontEnd\build</SpaRoot>
+	<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
+	<SpaProxyServerUrl>https://localhost:3000</SpaProxyServerUrl>
+  </PropertyGroup>
+
+  <ItemGroup Label="Reference Front-End Project">
+	<ProjectReference Include="..\FrontEnd\DashAccountingSystemV2.FrontEnd.esproj">
+	  <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+	</ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+	<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.6" />
+  </ItemGroup>
+
+</Project>

@@ -5,15 +5,14 @@
 
 # Custom Additions
 # Proprietary/confidential data scripts
-src/Data/Scripts/Dash
+src/BackEnd/Data/Scripts/Dash
 # UI built files
 *.min.css
 *.min.js
 *.js.map
 *.js
-!src/ClientApp/src/components/api-authorization/*.js
-src/wwwroot/js/
-src/wwwroot/lib/
+# UI .env.local
+src/FrontEnd/.env.local
 
 # User-specific files
 *.rsuser
