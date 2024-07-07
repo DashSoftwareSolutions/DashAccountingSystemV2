@@ -1,0 +1,28 @@
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+}
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+.pending-badge {
+    background-color: #fff3cd;
+    border: solid 1px #e2c45d;
+    color: #856404;
+    font-weight: 600;
+    margin-top: 2px;
+    vertical-align: text-top;
+}
