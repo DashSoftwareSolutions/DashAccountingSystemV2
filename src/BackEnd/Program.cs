@@ -9,7 +9,6 @@ using DashAccountingSystemV2.BackEnd.Models;
 using DashAccountingSystemV2.BackEnd.Repositories;
 using DashAccountingSystemV2.BackEnd.Security.Authentication;
 using DashAccountingSystemV2.BackEnd.Security.Authorization;
-using DashAccountingSystemV2.BackEnd.Services.Time;
 
 try
 {
@@ -45,24 +44,19 @@ try
     });
 
     // Authorization/Identity services
-    builder.Services
-        .AddAuthentication(IdentityConstants.BearerScheme)
-        .AddBearerToken(IdentityConstants.BearerScheme);
-
     builder.Services.AddAuthorization();
 
+    // Register the https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-8.0#activate-identity-apis
     builder.Services
-        .AddIdentity<ApplicationUser, ApplicationRole>()
+        .AddIdentityApiEndpoints<ApplicationUser>()
         .AddRoles<ApplicationRole>()
         .AddRoleManager<ApplicationRoleManager>()
         .AddUserManager<ApplicationUserManager>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
 
-    builder.Services.AddSingleton<IEmailSender<ApplicationUser>, ApplicationNoOpEmailSender>();
     builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
     // Other application services (repositories, business logic, services, etc.)
-    builder.Services.AddTimeProvider();
     builder.Services.AddRepositories();
     builder.Services.AddBusinessLogic();
 

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using DashAccountingSystemV2.BackEnd.Models;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.Extensions.Options;
-using DashAccountingSystemV2.BackEnd.Services.Time;
 using DashAccountingSystemV2.BackEnd.Security.Authorization;
 
 namespace DashAccountingSystemV2.BackEnd.Controllers
@@ -18,13 +17,13 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
         private readonly BearerTokenOptions _bearerTokenOptions;
         private readonly ILogger<AuthenticationController> _logger;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ITimeProvider _timeProvider;
+        private readonly TimeProvider _timeProvider;
 
         public AuthenticationController(
             IOptions<BearerTokenOptions> bearerTokenOptions,
             ILogger<AuthenticationController> logger,
             SignInManager<ApplicationUser> signInManager,
-            ITimeProvider timeProvider)
+            TimeProvider timeProvider)
         {
             _bearerTokenOptions = bearerTokenOptions.Value;
             _logger = logger;
@@ -84,7 +83,7 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
 
             // Reject the /refresh attempt with a 401 if the token expired or the security stamp validation fails
             if (refreshTicket?.Properties?.ExpiresUtc is not { } expiresUtc ||
-                _timeProvider.UtcNow >= expiresUtc ||
+                _timeProvider.GetUtcNow() >= expiresUtc ||
                 await _signInManager.ValidateSecurityStampAsync(refreshTicket.Principal) is not ApplicationUser user)
 
             {
@@ -97,7 +96,7 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
 
         [ApiAuthorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout([FromBody] object _)
         {
             await _signInManager.SignOutAsync();
             return Ok();

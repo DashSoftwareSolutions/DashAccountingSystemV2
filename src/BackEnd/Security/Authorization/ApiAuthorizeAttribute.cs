@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Http;
-using System.Diagnostics;
 
 namespace DashAccountingSystemV2.BackEnd.Security.Authorization
 {
@@ -37,20 +36,18 @@ namespace DashAccountingSystemV2.BackEnd.Security.Authorization
 
             if (authorizeResult.Challenged)
             {
-                // Return custom 401 result
-                context.Result = new JsonResult(
-                    new
-                    {
-                        Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2",
-                        Title = "Unauthorized",
-                        Status = StatusCodes.Status401Unauthorized,
-                        Detail = "You must be logged in to make this request.",
-                        Instance = context.HttpContext.Request.GetEncodedPathAndQuery(),
-                        TraceId = Activity.Current?.Id ?? context.HttpContext?.TraceIdentifier,
-            })
+                var problem = new ProblemDetails()
                 {
-                    StatusCode = StatusCodes.Status401Unauthorized
+                    Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2",
+                    Title = "Unauthorized",
+                    Status = StatusCodes.Status401Unauthorized,
+                    Detail = "You must be logged in to make this request.",
+                    Instance = context.HttpContext.Request.GetEncodedPathAndQuery(),
                 };
+
+                problem.Extensions["traceId"] = Activity.Current?.Id ?? context.HttpContext?.TraceIdentifier;
+
+                context.Result = new UnauthorizedObjectResult(problem);
             }
         }
     }

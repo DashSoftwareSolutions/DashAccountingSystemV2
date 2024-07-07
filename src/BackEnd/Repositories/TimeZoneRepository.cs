@@ -1,9 +1,8 @@
 ﻿using System.Collections.Immutable;
 using NodaTime;
 using NodaTime.TimeZones;
-using TimeZone = DashAccountingSystemV2.BackEnd.Models.TimeZone;
-using DashAccountingSystemV2.BackEnd.Services.Time;
 using DashAccountingSystemV2.BackEnd.Extensions;
+using TimeZone = DashAccountingSystemV2.BackEnd.Models.TimeZone;
 
 namespace DashAccountingSystemV2.BackEnd.Repositories
 {
@@ -15,9 +14,9 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
         private static readonly string _BerlinTime = "Europe/Berlin";
         private static readonly string _HongKongTime = "Asia/Hong_Kong";
 
-        private readonly ITimeProvider _timeProvider = null;
+        private readonly TimeProvider _timeProvider;
 
-        public TimeZoneRepository(ITimeProvider timeProvider)
+        public TimeZoneRepository(TimeProvider timeProvider)
         {
             _timeProvider = timeProvider;
         }
@@ -40,7 +39,8 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
                           winTzId,
                           new TimeZoneDto(
                             windowsToIanaMap[winTzId],
-                            windowsTzSource.GetZoneOrNull(winTzId) as BclDateTimeZone)))
+                            windowsTzSource.GetZoneOrNull(winTzId) as BclDateTimeZone,
+                            _timeProvider)))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             var ianaToWindowsMap = windowsToIanaMap
@@ -84,7 +84,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
 
         internal class TimeZoneDto
         {
-            private readonly ITimeProvider _timeProvider = null;
+            private readonly TimeProvider _timeProvider;
 
             // Absolute Must haves (will be inherited from main TimeZone model)
             public string Id { get; set; }
@@ -111,7 +111,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
                 }
             }
 
-            public TimeZoneDto(ITimeProvider timeProvider)
+            public TimeZoneDto(TimeProvider timeProvider)
             {
                 _timeProvider = timeProvider;
             }
@@ -119,7 +119,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
             public TimeZoneDto(
                 string tzdbTimeZoneId,
                 string baseDisplayName,
-                ITimeProvider timeProvider)
+                TimeProvider timeProvider)
                 : this(timeProvider)
             {
                 var tzdbTimeZone = GetTzdbTimeZone(tzdbTimeZoneId);
@@ -128,7 +128,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
                     throw new ArgumentNullException(nameof(baseDisplayName));
 
                 var currentOffset = tzdbTimeZone
-                    .GetUtcOffset(Instant.FromDateTimeUtc(_timeProvider.UtcNow))
+                    .GetUtcOffset(Instant.FromDateTimeOffset(_timeProvider.GetUtcNow()))
                     .ToTimeSpan();
 
                 Id = tzdbTimeZoneId;
@@ -137,7 +137,8 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
                 MaxOffset = tzdbTimeZone.MaxOffset.ToTimeSpan();
             }
 
-            public TimeZoneDto(string tzdbTimeZoneId, BclDateTimeZone bclDateTimeZone)
+            public TimeZoneDto(string tzdbTimeZoneId, BclDateTimeZone bclDateTimeZone, TimeProvider timeProvider)
+                : this(timeProvider)
             {
                 var tzdbTimeZone = GetTzdbTimeZone(tzdbTimeZoneId);
 
@@ -154,7 +155,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
 
                 BaseUtcOffset = bclDateTimeZone.OriginalZone?.BaseUtcOffset
                     ?? tzdbTimeZone
-                        .GetUtcOffset(Instant.FromDateTimeUtc(_timeProvider.UtcNow))
+                        .GetUtcOffset(Instant.FromDateTimeOffset(_timeProvider.GetUtcNow()))
                         .ToTimeSpan();
 
                 SupportsDaylightSavingsTime = bclDateTimeZone.OriginalZone?.SupportsDaylightSavingTime ?? false;
