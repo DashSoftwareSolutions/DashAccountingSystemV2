@@ -15,21 +15,28 @@ import { KnownAction } from './bootstrap.actions';
 
 const actionCreators = {
     requestApplicationVersion: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
-        fetch('/api/application-version')
-            .then((response) => {
-                if (!response.ok) {
-                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
-                    return null;
-                }
+        const appState = getState();
 
-                response
-                    .json()
-                    .then((appVersionInfo) => {
-                        dispatch({ type: ActionType.RECEIVE_APPLICATION_VERSION, applicationVersion: appVersionInfo.version });
-                    });
-            });
+        if (!isNil(appState?.bootstrap) &&
+            isEmpty(appState.bootstrap.applicationVersion) &&
+            !appState.bootstrap.isFetchingVersion) {
 
-        dispatch({ type: ActionType.REQUEST_APPLICATION_VERSION });
+            fetch('/api/application-version')
+                .then((response) => {
+                    if (!response.ok) {
+                        apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                        return null;
+                    }
+
+                    response
+                        .json()
+                        .then((appVersionInfo) => {
+                            dispatch({ type: ActionType.RECEIVE_APPLICATION_VERSION, applicationVersion: appVersionInfo.version });
+                        });
+                });
+
+            dispatch({ type: ActionType.REQUEST_APPLICATION_VERSION });
+        }
     },
 
     requestBootstrapInfo: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {

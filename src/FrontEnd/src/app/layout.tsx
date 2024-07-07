@@ -9,6 +9,7 @@ import {
     ConnectedProps,
     connect,
 } from 'react-redux';
+import { Outlet } from 'react-router-dom';
 import {
     Col,
     Container,
@@ -28,10 +29,6 @@ import { isEmpty } from 'lodash';
 
 const logger: ILogger = new Logger('Master Page');
 
-interface LayoutOwnProps {
-    children?: React.ReactNode;
-}
-
 const mapStateToProps = (state: ApplicationState) => ({
     bootstrapInfo: state.bootstrap,
 });
@@ -45,58 +42,25 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type LayoutRedexProps = ConnectedProps<typeof connector>;
 
-type LayoutProps = LayoutOwnProps & LayoutRedexProps;
+type LayoutProps = LayoutRedexProps;
 
 function Layout(props: LayoutProps) {
     const {
         bootstrapInfo,
-        children,
         requestApplicationVersion,
         requestBootstrapInfo,
     } = props;
 
-    //useEffect(() => {
-    //    requestBootstrapInfo();
-    //    // Suppressing "react-hooks/exhaustive-deps" to use an empty dependencies array for "component did mount" type semantics
-    //    // eslint-disable-next-line react-hooks/exhaustive-deps
-    //}, []);
-
-    const appVersionRef = useRef<string>(bootstrapInfo.applicationVersion);
-    const [isFetching, setIsFetching] = useState<boolean>(isEmpty(bootstrapInfo.applicationVersion));
-    const [isFetchingAppVersion, setIsFetchingAppVersion] = useState<boolean>(false);
-    logger.info('Is Feching:', isFetching);
-
     // Fetch the Application version (for the footer) when we initially load the application
     useEffect(() => {
-        if (!isFetchingAppVersion && isEmpty(bootstrapInfo.applicationVersion)) {
-            logger.info('Fetching application version...');
-            setIsFetchingAppVersion(true);
-
-            setTimeout(() => {
-                requestApplicationVersion();
-            }, 3000); // NOTE: Timeout is so we don't try to call back-end before it's ready.
-        }
-    }, [
-        bootstrapInfo.applicationVersion,
-        isFetchingAppVersion,
-    ]);
-
-    useEffect(() => {
-        logger.info('\'did update\' useEffect() for application version');
-        logger.info('appVersionRef.current:', appVersionRef.current);
-        logger.info('bootstrapInfo.applicationVersion:', bootstrapInfo.applicationVersion);
-        if (isEmpty(appVersionRef.current) && !isEmpty(bootstrapInfo.applicationVersion)) {
-            setIsFetching(false);
-        }
-    }, [
-        bootstrapInfo.applicationVersion,
-    ]);
+        requestApplicationVersion();
+    }, []);
 
     const today = useMemo(() => DateTime.now(), []);
 
     return (
         <React.Fragment>
-            {isFetching ? (
+            {bootstrapInfo.isFetchingVersion ? (
                 <Loader />
             ): (
                 <React.Fragment>
@@ -104,7 +68,7 @@ function Layout(props: LayoutProps) {
 
                     <Container>
                         <SystemNotificationsArea />
-                        {children}
+                        <Outlet />
                     </Container>
 
                     <footer className="border-top footer text-muted">

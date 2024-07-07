@@ -12,11 +12,13 @@ import {
  */
 export interface BootstrapState extends BootstrapInfo {
     isFetching: boolean;
+    isFetchingVersion: boolean;
     selectedTenant: Tenant | null,
 }
 
 const unloadedState: BootstrapState = {
     isFetching: false,
+    isFetchingVersion: false,
     applicationVersion: '',
     selectedTenant: null,
     tenants: [],
@@ -36,10 +38,17 @@ const reducer: Reducer<BootstrapState> = (state: BootstrapState | undefined, inc
 
     if (!isNil(action)) {
         switch (action.type) {
+            case ActionType.REQUEST_APPLICATION_VERSION:
+                return {
+                    ...state,
+                    isFetchingVersion: true,
+                };
+
             case ActionType.RECEIVE_APPLICATION_VERSION:
                 return {
                     ...state,
                     applicationVersion: action.applicationVersion,
+                    isFetchingVersion: false,
                 };
 
             case ActionType.REQUEST_BOOTSTRAP_INFO:
