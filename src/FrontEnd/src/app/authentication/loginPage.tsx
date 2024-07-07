@@ -1,8 +1,16 @@
 import React, {
     useEffect,
+    useMemo,
     useState,
 } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+    ConnectedProps,
+    connect,
+} from 'react-redux';
+import {
+    useNavigate,
+    useSearchParams,
+} from 'react-router-dom';
 import {
     Button,
     Col,
@@ -13,24 +21,56 @@ import {
     Row,
 } from 'reactstrap';
 import dashHeroImage from '../../assets/dash-hero-image.jpeg';
+import { ApplicationState } from '../store';
 import {
     ILogger,
     Logger,
 } from '../../common/logging';
+import { actionCreators } from './data';
 
 const logger: ILogger = new Logger('Login Page');
 const bemBlockName: string = 'login_page';
 
-function LoginPage() {
-    const [username, setUsername] = useState<string>('');
+const mapStateToProps = (state: ApplicationState) => ({
+    isLoggedIn: state.authentication.isLoggedIn,
+    isLoggingIn: state.authentication.isLoggingIn,
+});
+
+const mapDispatchToProps = {
+    ...actionCreators,
+};
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+type PropTypes = ConnectedProps<typeof connector>;
+
+function LoginPage(props: PropTypes) {
+    const {
+        isLoggedIn,
+        isLoggingIn,
+        login,
+    } = props;
+
+    const navigate = useNavigate();
+    const [searchParams, _] = useSearchParams();
+    const returnUrl = useMemo(() => searchParams.get('returnUrl') ?? '/app', [searchParams]);
+
+    const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate(returnUrl, { replace: true });
+        }
+    }, [isLoggedIn]);
+    
+
     const onClickLogin = () => {
-        logger.info('Log me in!');
+        login(email, password);
     }
 
-    const onUsernameChanged = (e: React.FormEvent<HTMLInputElement>) => {
-        setUsername(e.currentTarget.value ?? '');
+    const onEmailChanged = (e: React.FormEvent<HTMLInputElement>) => {
+        setEmail(e.currentTarget.value ?? '');
     };
 
     const onPasswordChanged = (e: React.FormEvent<HTMLInputElement>) => {
@@ -55,8 +95,10 @@ function LoginPage() {
                             autoFocus
                             id={`${bemBlockName}--email_input`}
                             name="email"
+                            onChange={onEmailChanged}
                             tabIndex={0}
                             type="email"
+                            value={email}
                         />
                     </FormGroup>
 
@@ -67,22 +109,25 @@ function LoginPage() {
                         <Input
                             id={`${bemBlockName}--password_input`}
                             name="password"
+                            onChange={onPasswordChanged}
                             tabIndex={0}
                             type="password"
+                            value={password}
                         />
                     </FormGroup>
                 </Form>
 
                 <Button
-                    className="btn-primary mt-4"
+                    className="btn-lg btn-primary mt-4"
+                    disabled={isLoggingIn}
                     onClick={onClickLogin}
                     tabIndex={0}
                 >
-                    Log In
+                    {isLoggingIn ? 'Logging In...' : 'Log In'}
                 </Button>
             </Col>
         </Row>
     );
 }
 
-export default LoginPage;
+export default connector(LoginPage);

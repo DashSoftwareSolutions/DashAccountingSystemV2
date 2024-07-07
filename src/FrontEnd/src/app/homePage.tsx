@@ -38,7 +38,7 @@ function HomePage() {
                     <li><a href="http://getbootstrap.com" rel="external nofollow noreferrer" target="_blank">Bootstrap</a> for layout and styling</li>
                 </ul>
 
-                <Button className="btn-primary mt-4" onClick={onClickGoToAppButton}>Go to the Application</Button>
+                <Button className="btn-lg btn-primary mt-4" onClick={onClickGoToAppButton}>Go to the Application</Button>
             </Col>
         </Row>
     );

@@ -45,6 +45,8 @@ function SelectTenantPage(props: SelectTenantPageProps) {
 
     const prevSelectedTenant = useRef<Tenant | null>(selectedTenant ?? null);
 
+
+
     useEffect(() => {
         if (!isNil(selectedTenant)) {
             logger.info('Selected Tenant: ', selectedTenant);

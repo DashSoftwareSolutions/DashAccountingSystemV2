@@ -13,7 +13,7 @@ import ChartOfAccountsPage from '../features/accounting/chart-of-accounts/chartO
 import EditJournalEntryPage from '../features/accounting/journal-entry/editJournalEntryPage';
 import DashboardPage from '../features/dashboard/dashboardPage';
 import GeneralLedgerPage from '../features/accounting/general-ledger/generalLedgerPage';
-import HomePage from '../app/home';
+import HomePage from './homePage';
 import InvoiceListPage from '../features/invoicing/invoiceListPage';
 import LoginPage from './authentication/loginPage';
 import ProfitAndLossPage from '../features/accounting/profit-and-losss/profitAndLossPage';
