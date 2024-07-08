@@ -23,8 +23,14 @@ export interface ReceiveLogoutResponseAction extends IAction {
     type: ActionType.RECEIVE_LOGOUT_RESPONSE;
 }
 
+export interface SetExistingTokensAction extends IAction {
+    type: ActionType.SET_EXISTING_TOKENS_FROM_SESSION_STORAGE;
+    tokens: AccessTokenResponse;
+}
+
 export type KnownAction = RequestLoginAction |
     ReceiveFailedLoginResponseAction |
     ReceiveSuccessfulLoginResponseAction |
     RequestLogoutAction |
-    ReceiveLogoutResponseAction;
+    ReceiveLogoutResponseAction |
+    SetExistingTokensAction;

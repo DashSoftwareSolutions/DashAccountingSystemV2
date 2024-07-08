@@ -96,6 +96,11 @@ const reducer: Reducer<LedgerState> = (state: LedgerState | undefined, incomingA
         }
     }
 
+    // All stores should get reset to default state on logout
+    if (incomingAction.type === ActionType.RECEIVE_LOGOUT_RESPONSE) {
+        return unloadedState;
+    }
+
     return state;
 }
 

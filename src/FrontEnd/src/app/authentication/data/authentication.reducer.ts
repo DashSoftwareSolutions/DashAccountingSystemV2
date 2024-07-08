@@ -1,5 +1,8 @@
 import { isNil } from 'lodash';
-import { Action, Reducer } from 'redux';
+import {
+    Action,
+    Reducer,
+} from 'redux';
 import ActionType from '../../store/actionType';
 import { KnownAction } from './authentication.actions';
 import { AccessTokenResponse } from '../models';
@@ -49,6 +52,13 @@ const reducer: Reducer<AuthenticationState> = (state: AuthenticationState | unde
                     ...state,
                     hasLoginError: true,
                     isLoggingIn: false,
+                };
+
+            case ActionType.SET_EXISTING_TOKENS_FROM_SESSION_STORAGE:
+                return {
+                    ...state,
+                    isLoggedIn: true,
+                    tokens: action.tokens,
                 };
 
             case ActionType.REQUEST_LOGOUT:

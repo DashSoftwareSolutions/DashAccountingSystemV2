@@ -38,8 +38,3 @@ export const reducers = {
 export interface AppThunkAction<TAction extends IAction> {
     (dispatch: (action: TAction) => void, getState: () => ApplicationState): void;
 }
-
-/**
- * Custom hook for using application Redux dispatch
- */
-export const useAppDispatch = () => useDispatch<AppThunkAction<IAction>>();

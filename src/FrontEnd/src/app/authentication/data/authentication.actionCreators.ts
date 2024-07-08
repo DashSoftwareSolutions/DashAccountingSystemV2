@@ -2,13 +2,20 @@ import {
     isEmpty,
     isNil,
 } from 'lodash';
+import { DateTime } from 'luxon';
 import { Dispatch } from 'redux';
 import { AppThunkAction } from '../../store';
 import ActionType from '../../store/actionType';
 import IAction from '../../store/action.interface';
 import { KnownAction } from './authentication.actions';
 import { AccessTokenResponse } from '../models';
+import {
+    ILogger,
+    Logger,
+} from '../../../common/logging';
 import { apiErrorHandler } from '../../../common/utilities/errorHandling';
+
+const logger: ILogger = new Logger('Authentication Actions');
 
 const actionCreators = {
     login: (email: string, password: string): AppThunkAction<KnownAction> => async (dispatch) => {
@@ -39,6 +46,10 @@ const actionCreators = {
             })
             .then((accessTokenResponse) => {
                 if (!isNil(accessTokenResponse)) {
+                    const expires = DateTime.now().plus({ seconds: accessTokenResponse.expiresIn });
+                    logger.info('Tokens will expire at', expires.toISO());
+                    accessTokenResponse.expires = expires.toISO();
+
                     dispatch({ type: ActionType.RECEIVE_SUCCESSFUL_LOGIN_RESPONSE, accessTokenResponse });
                 }
             });
@@ -69,6 +80,10 @@ const actionCreators = {
         } else {
             dispatch({ type: ActionType.RECEIVE_LOGOUT_RESPONSE });
         }
+    },
+
+    setTokens: (tokens: AccessTokenResponse): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.SET_EXISTING_TOKENS_FROM_SESSION_STORAGE, tokens });
     },
 };
 

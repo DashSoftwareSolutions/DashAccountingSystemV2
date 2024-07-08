@@ -8,13 +8,11 @@ import {
 import {
     ConnectedProps,
     connect,
+    useDispatch,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Dispatch } from 'redux';
-import {
-    ApplicationState,
-    useAppDispatch,
-} from '../../app/store';
+import { ApplicationState } from '../../app/store';
 import IAction from '../../app/store/action.interface';
 import NavigationSection from '../../app/navigationSection';
 import TenantSubNavigation from '../../app/tenantSubNavigation';
@@ -43,7 +41,7 @@ function InvoiceListPage(props: InvoiceListPageProps) {
     } = props;
 
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (isNil(selectedTenant)) {

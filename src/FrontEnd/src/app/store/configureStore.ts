@@ -8,6 +8,7 @@ import thunk from 'redux-thunk';
 import { ApplicationState, reducers } from './';
 import ActionType from './actionType';
 import IAction from './action.interface';
+import sessionStorageMiddleware from './sessionStorageMiddleware';
 
 // Transform actions-type to a string if the action type is a
 // number and there's we defined an actiontype for that.
@@ -20,7 +21,7 @@ const actionTypeEnumToString = (action: IAction): any => (typeof action.type ===
 }) : action;
 
 export default function configureStore(initialState?: ApplicationState) {
-    const middleware = [thunk];
+    const middleware = [thunk, sessionStorageMiddleware];
 
     const rootReducer = combineReducers({
         ...reducers,

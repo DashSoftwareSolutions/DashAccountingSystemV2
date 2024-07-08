@@ -72,6 +72,11 @@ const reducer: Reducer<BootstrapState> = (state: BootstrapState | undefined, inc
         }
     }
 
+    // All stores should get reset to default state on logout
+    if (incomingAction.type === ActionType.RECEIVE_LOGOUT_RESPONSE) {
+        return unloadedState;
+    }
+
     return state;
 };
 

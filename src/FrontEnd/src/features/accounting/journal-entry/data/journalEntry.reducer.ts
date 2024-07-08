@@ -426,6 +426,11 @@ const reducer: Reducer<JournalEntryState> = (state: JournalEntryState | undefine
         }
     }
 
+    // All stores should get reset to default state on logout
+    if (incomingAction.type === ActionType.RECEIVE_LOGOUT_RESPONSE) {
+        return unloadedState;
+    }
+
     return state;
 }
 

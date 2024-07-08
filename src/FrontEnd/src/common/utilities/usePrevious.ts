@@ -1,3 +1,7 @@
+/**
+ * Borrowed from: https://github.com/sergeyleschev/react-custom-hooks/blob/main/src/hooks/usePrevious/usePrevious.js
+ */
+
 import { useRef } from 'react';
 
 export default function usePrevious<T>(value: T) {

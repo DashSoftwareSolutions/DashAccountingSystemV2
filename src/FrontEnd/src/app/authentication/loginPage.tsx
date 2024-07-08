@@ -70,7 +70,7 @@ function LoginPage(props: PropTypes) {
 
     useEffect(() => {
         if (!wasLoggedIn && isLoggedIn) {
-            logger.info('We just successfully logged.');
+            logger.info('We just successfully logged in.');
             requestBootstrapInfo();
         }
     }, [isLoggedIn]);

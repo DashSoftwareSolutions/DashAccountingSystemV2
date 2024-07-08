@@ -1,3 +1,4 @@
+import { isNil } from 'lodash';
 import React, {
     useEffect,
     useMemo,
@@ -16,15 +17,19 @@ import {
     Container,
     Row,
 } from 'reactstrap';
+import { actionCreators as authenticationActionCreators } from './authentication/data';
 import { actionCreators as bootstrapActionCreators } from './bootstrap';
 import NavMenu from './navMenu';
+import { AccessTokenResponse } from './authentication/models';
 import { ApplicationState } from './store';
 import SystemNotificationsArea from './systemNotificationsArea';
 import Loader from '../common/components/loader';
+import { AUTH_SESSION_STORAGE_KEY } from '../common/constants';
 import {
     ILogger,
     Logger,
 } from '../common/logging';
+import { decodeJsonObjectFromBase64 } from '../common/utilities/encoding';
 import usePrevious from '../common/utilities/usePrevious';
 
 const logger: ILogger = new Logger('Master Page');
@@ -37,6 +42,7 @@ const mapStateToProps = (state: ApplicationState) => ({
 const mapDispatchToProps = {
     requestApplicationVersion: bootstrapActionCreators.requestApplicationVersion,
     requestBootstrapInfo: bootstrapActionCreators.requestBootstrapInfo,
+    setTokens: authenticationActionCreators.setTokens,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -51,20 +57,38 @@ function Layout(props: LayoutProps) {
         bootstrapInfo,
         requestApplicationVersion,
         requestBootstrapInfo,
+        setTokens,
     } = props;
 
     const wasLoggedIn = usePrevious(isLoggedIn);
 
     // Fetch the Application version (for the footer) when we initially load the application
     useEffect(() => {
-        if (!isLoggedIn) {
-            logger.info('Not logged in; fetching application version only...');
-            requestApplicationVersion();
-        } else {
-            logger.info('Logged in; fetching bootstrap info...');
+        const authSessionData = window.sessionStorage.getItem(AUTH_SESSION_STORAGE_KEY);
+
+        if (!isNil(authSessionData)) {
+            const decodedTokenData = decodeJsonObjectFromBase64<AccessTokenResponse>(authSessionData);
+
+            if (!isNil(decodedTokenData) &&
+                !isNil(decodedTokenData.expires)) {
+                const tokenExpiry = DateTime.fromISO(decodedTokenData.expires);
+                const now = DateTime.now();
+                const isLoggedInBasedOnSessionData = tokenExpiry > now;
+
+                if (isLoggedInBasedOnSessionData) {
+                    setTokens(decodedTokenData);
+                }
+            }
+        }
+
+        requestApplicationVersion();
+    }, []);
+
+    useEffect(() => {
+        if (!wasLoggedIn && isLoggedIn) {
             requestBootstrapInfo();
         }
-    }, []);
+    }, [isLoggedIn]);
 
     const today = useMemo(() => DateTime.now(), []);
 

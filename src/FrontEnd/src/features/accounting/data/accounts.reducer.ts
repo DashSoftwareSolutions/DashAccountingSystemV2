@@ -76,6 +76,11 @@ const reducer: Reducer<AccountsState> = (state: AccountsState | undefined, incom
         }
     }
 
+    // All stores should get reset to default state on logout
+    if (incomingAction.type === ActionType.RECEIVE_LOGOUT_RESPONSE) {
+        return unloadedState;
+    }
+
     return state;
 }
 
