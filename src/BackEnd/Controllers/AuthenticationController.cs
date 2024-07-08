@@ -1,4 +1,4 @@
-﻿// Adapted from: https://github.com/dotnet/aspnetcore/blob/v8.0.6/src/Identity/Core/src/IdentityApiEndpointRouteBuilderExtensions.cs
+// Adapted from: https://github.com/dotnet/aspnetcore/blob/v8.0.6/src/Identity/Core/src/IdentityApiEndpointRouteBuilderExtensions.cs
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -14,18 +14,18 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
     [Route("api/authentication")]
     public class AuthenticationController : ControllerBase
     {
-        private readonly BearerTokenOptions _bearerTokenOptions;
+        private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
         private readonly ILogger<AuthenticationController> _logger;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly TimeProvider _timeProvider;
 
         public AuthenticationController(
-            IOptions<BearerTokenOptions> bearerTokenOptions,
+            IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
             ILogger<AuthenticationController> logger,
             SignInManager<ApplicationUser> signInManager,
             TimeProvider timeProvider)
         {
-            _bearerTokenOptions = bearerTokenOptions.Value;
+            _bearerTokenOptions = bearerTokenOptions;
             _logger = logger;
             _signInManager = signInManager;
             _signInManager.AuthenticationScheme = IdentityConstants.BearerScheme;
@@ -78,7 +78,7 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RefreshAccessToken([FromBody] RefreshRequest refreshRequest)
         {
-            var refreshTokenProtector = _bearerTokenOptions.RefreshTokenProtector;
+            var refreshTokenProtector = _bearerTokenOptions.Get(IdentityConstants.BearerScheme).RefreshTokenProtector;
             var refreshTicket = refreshTokenProtector.Unprotect(refreshRequest.RefreshToken);
 
             // Reject the /refresh attempt with a 401 if the token expired or the security stamp validation fails
@@ -87,7 +87,9 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
                 await _signInManager.ValidateSecurityStampAsync(refreshTicket.Principal) is not ApplicationUser user)
 
             {
-                return Challenge();
+                return Problem(
+                    detail: $"The token refresh attempt was not successful.",
+                    statusCode: StatusCodes.Status401Unauthorized);
             }
 
             var newPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
