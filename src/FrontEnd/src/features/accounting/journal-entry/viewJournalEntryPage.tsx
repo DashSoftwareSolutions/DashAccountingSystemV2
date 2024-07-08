@@ -30,6 +30,7 @@ import {
     ILogger,
     Logger,
 } from '../../../common/logging';
+import usePrevious from '../../../common/utilities/usePrevious';
 import JournalEntryDetails from './journalEntryDetails';
 import PostJournalEntryModalDialog from './postJournalEntryModalDialog';
 import { TransactionStatus } from '../models';
@@ -78,8 +79,8 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
         showAlert,
     } = props;
 
-    const wasSaving = useRef<boolean>(isSaving);
-    const wasDeleting = useRef<boolean>(isDeleting);
+    const wasSaving = usePrevious(isSaving);
+    const wasDeleting = usePrevious(isDeleting);
 
     const [isDeleteEntryModalOpen, setIsDeleteEntryModalOpen] = useState<boolean>(false);
     const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false);
@@ -109,7 +110,7 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
 
     // "component did update" for saving action from Post Journal Entry
     useEffect(() => {
-        if (wasSaving.current &&
+        if (wasSaving &&
             !isSaving &&
             !isNil(journalEntry)) {
             logger.info('Just finished posting the journal entry.');
@@ -129,7 +130,7 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
 
     // "component did update" for deletion action
     useEffect(() => {
-        if (wasDeleting.current &&
+        if (wasDeleting &&
             !isDeleting) {
             setIsDeleteEntryModalOpen(false);
             logger.info('Just finished deleting the journal entry.');

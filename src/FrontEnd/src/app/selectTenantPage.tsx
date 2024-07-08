@@ -43,10 +43,6 @@ function SelectTenantPage(props: SelectTenantPageProps) {
 
     const navigate = useNavigate();
 
-    const prevSelectedTenant = useRef<Tenant | null>(selectedTenant ?? null);
-
-
-
     useEffect(() => {
         if (!isNil(selectedTenant)) {
             logger.info('Selected Tenant: ', selectedTenant);
@@ -54,7 +50,6 @@ function SelectTenantPage(props: SelectTenantPageProps) {
         }
     }, [
         history,
-        prevSelectedTenant,
         selectedTenant,
     ]);
 

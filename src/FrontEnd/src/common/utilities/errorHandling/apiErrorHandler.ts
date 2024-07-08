@@ -26,7 +26,7 @@ class ApiErrorHandler implements IApiErrorHandler {
 
         if (errorResponse.status === 401) { // 401 Unauthorized
             logger.info('Received 401 Unauthorized from the API.  Redirecting to login page...');
-            window.location.href = `${window.location.origin}/Identity/Account/Login?returnUrl=${encodeURIComponent(window.location.href)}`;
+            window.location.href = `${window.location.origin}/login?returnUrl=${encodeURIComponent(window.location.href)}`;
         } else {
             switch (errorResponse.status) {
                 case 403: // Forbidden - Likely a Permissions issue

@@ -1,15 +1,16 @@
 import React, {
     useEffect,
     useMemo,
-    useRef,
-    useState,
 } from 'react';
 import { DateTime } from 'luxon';
 import {
     ConnectedProps,
     connect,
 } from 'react-redux';
-import { Outlet } from 'react-router-dom';
+import {
+    Link,
+    Outlet,
+} from 'react-router-dom';
 import {
     Col,
     Container,
@@ -24,12 +25,12 @@ import {
     ILogger,
     Logger,
 } from '../common/logging';
-import { Link } from 'react-router-dom';
-import { isEmpty } from 'lodash';
+import usePrevious from '../common/utilities/usePrevious';
 
 const logger: ILogger = new Logger('Master Page');
 
 const mapStateToProps = (state: ApplicationState) => ({
+    isLoggedIn: state.authentication.isLoggedIn,
     bootstrapInfo: state.bootstrap,
 });
 
@@ -46,14 +47,23 @@ type LayoutProps = LayoutRedexProps;
 
 function Layout(props: LayoutProps) {
     const {
+        isLoggedIn,
         bootstrapInfo,
         requestApplicationVersion,
         requestBootstrapInfo,
     } = props;
 
+    const wasLoggedIn = usePrevious(isLoggedIn);
+
     // Fetch the Application version (for the footer) when we initially load the application
     useEffect(() => {
-        requestApplicationVersion();
+        if (!isLoggedIn) {
+            logger.info('Not logged in; fetching application version only...');
+            requestApplicationVersion();
+        } else {
+            logger.info('Logged in; fetching bootstrap info...');
+            requestBootstrapInfo();
+        }
     }, []);
 
     const today = useMemo(() => DateTime.now(), []);

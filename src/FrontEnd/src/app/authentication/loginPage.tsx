@@ -26,18 +26,23 @@ import {
     ILogger,
     Logger,
 } from '../../common/logging';
-import { actionCreators } from './data';
+import { actionCreators as bootstrapActionCreators } from '../bootstrap';
+import { actionCreators as loginActionCreators } from './data';
+import Loader from '../../common/components/loader';
+import usePrevious from '../../common/utilities/usePrevious';
 
 const logger: ILogger = new Logger('Login Page');
 const bemBlockName: string = 'login_page';
 
 const mapStateToProps = (state: ApplicationState) => ({
+    isFetchingBootrap: state.bootstrap.isFetching,
     isLoggedIn: state.authentication.isLoggedIn,
     isLoggingIn: state.authentication.isLoggingIn,
 });
 
 const mapDispatchToProps = {
-    ...actionCreators,
+    login: loginActionCreators.login,
+    requestBootstrapInfo: bootstrapActionCreators.requestBootstrapInfo,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -46,9 +51,11 @@ type PropTypes = ConnectedProps<typeof connector>;
 
 function LoginPage(props: PropTypes) {
     const {
+        isFetchingBootrap,
         isLoggedIn,
         isLoggingIn,
         login,
+        requestBootstrapInfo,
     } = props;
 
     const navigate = useNavigate();
@@ -58,12 +65,22 @@ function LoginPage(props: PropTypes) {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
+    const wasLoggedIn = usePrevious(isLoggedIn);
+    const wasFetchingBootstrap = usePrevious(isFetchingBootrap);
+
     useEffect(() => {
-        if (isLoggedIn) {
-            navigate(returnUrl, { replace: true });
+        if (!wasLoggedIn && isLoggedIn) {
+            logger.info('We just successfully logged.');
+            requestBootstrapInfo();
         }
     }, [isLoggedIn]);
-    
+
+    useEffect(() => {
+        if (wasFetchingBootstrap && !isFetchingBootrap) {
+            logger.info('We just finished fetching the bootrap info.');
+            navigate(returnUrl, { replace: true });
+        }
+    });
 
     const onClickLogin = () => {
         login(email, password);
@@ -77,10 +94,14 @@ function LoginPage(props: PropTypes) {
         setPassword(e.currentTarget.value ?? '');
     };
 
+    if (isFetchingBootrap) {
+        return (<Loader />);
+    }
+
     return (
-        <Row className="mt-4">
+        <Row className = "mt-4">
             <Col>
-                <img src={dashHeroImage} alt="Dash!" />
+                <img src = { dashHeroImage } alt = "Dash!" />
             </Col>
 
             <Col>
@@ -126,7 +147,7 @@ function LoginPage(props: PropTypes) {
                     {isLoggingIn ? 'Logging In...' : 'Log In'}
                 </Button>
             </Col>
-        </Row>
+        </Row >
     );
 }
 

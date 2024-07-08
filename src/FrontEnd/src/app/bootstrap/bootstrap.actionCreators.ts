@@ -44,9 +44,16 @@ const actionCreators = {
 
         if (!isNil(appState?.bootstrap) &&
             !appState.bootstrap.isFetching &&
-            isEmpty(appState.bootstrap.tenants)) {
+            isEmpty(appState.bootstrap.tenants) &&
+            !isEmpty(appState.authentication.tokens?.accessToken)) {
 
-            fetch('/api/bootstrap')
+            const accessToken = appState.authentication.tokens?.accessToken;
+
+            fetch('/api/bootstrap', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
                 .then((response) => {
                     if (!response.ok) {
                         apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);

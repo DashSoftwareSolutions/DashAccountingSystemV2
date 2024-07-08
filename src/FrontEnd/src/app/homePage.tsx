@@ -1,14 +1,16 @@
-import React, {
-    useEffect,
-    useState,
-} from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+    ConnectedProps,
+    connect,
+} from 'react-redux';
 import {
     Button,
     Col,
     Row,
 } from 'reactstrap';
 import dashHeroImage from '../assets/dash-hero-image.jpeg';
+import { ApplicationState } from './store';
 import {
     ILogger,
     Logger,
@@ -16,12 +18,25 @@ import {
 
 const logger: ILogger = new Logger('Home Page');
 
-function HomePage() {
+const mapStateToProps = (state: ApplicationState) => ({
+    isLoggedIn: state.authentication.isLoggedIn,
+});
+
+const connector = connect(mapStateToProps);
+
+type PropTypes = ConnectedProps<typeof connector>;
+
+function HomePage(props: PropTypes) {
+    const { isLoggedIn } = props;
     const navigate = useNavigate();
 
-    const onClickGoToAppButton = (() => {
-        logger.info('Let\'s go!');
-    });
+    const onClickGoToAppButton = useCallback(() => {
+        if (isLoggedIn) {
+            navigate('/app');
+        } else {
+            navigate(`/login?returnUrl=${encodeURIComponent('/app')}`);
+        }
+    }, [isLoggedIn]);
 
     return (
         <Row className="mt-4">
@@ -44,4 +59,4 @@ function HomePage() {
     );
 }
 
-export default HomePage;
+export default connector(HomePage);
