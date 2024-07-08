@@ -11,6 +11,10 @@ code {
     color: #E01A76;
 }
 
+.main-content-container {
+    min-height: 780px;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -36,6 +40,11 @@ code {
 .page_header--subtitle {
     font-size: 1.25rem;
     font-weight: 300;
+}
+
+.scrollable-content-container {
+    padding-left: 11px;
+    padding-right: 22px;
 }
 
 /* "Hoverable Links" - text is regular color but changes to link color when hovered - used on Ledger Report */

@@ -72,14 +72,15 @@ function Layout(props: LayoutProps) {
         <React.Fragment>
             {bootstrapInfo.isFetchingVersion ? (
                 <Loader />
-            ): (
+            ) : (
                 <React.Fragment>
-                    <NavMenu userInfo = {bootstrapInfo?.userInfo} />
+                    <NavMenu userInfo={bootstrapInfo?.userInfo} />
 
-                    <Container>
-                        <SystemNotificationsArea />
+                    <Container className="main-content-container">
                         <Outlet />
                     </Container>
+
+                    <SystemNotificationsArea />
 
                     <footer className="border-top footer text-muted">
                         <Container>

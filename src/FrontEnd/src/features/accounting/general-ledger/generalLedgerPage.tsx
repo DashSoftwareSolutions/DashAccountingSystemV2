@@ -19,6 +19,7 @@ import NavigationSection from '../../../app/navigationSection';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
+import ScrollableContent from '../../../common/components/scrollableContent';
 import ReportParametersAndControls from '../../../common/components/reportParametersAndControls';
 import {
     ILogger,
@@ -96,6 +97,7 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
     return (
         <React.Fragment>
             <TenantSubNavigation activeSection={NavigationSection.Ledger} />
+
             <div className="page_header" id={`${bemBlockName}--header`}>
                 <Row>
                     <Col md={6}>
@@ -111,18 +113,19 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
             </div>
 
             <div id={`${bemBlockName}--content`}>
-                <ReportParametersAndControls
-                    bemBlockName={bemBlockName}
-                    dateRangeEnd={dateRangeEnd ?? null}
-                    dateRangeStart={dateRangeStart ?? null}
-                    onRunReport={onRunReport}
-                />
+                <ScrollableContent>
+                    <ReportParametersAndControls
+                        bemBlockName={bemBlockName}
+                        dateRangeEnd={dateRangeEnd ?? null}
+                        dateRangeStart={dateRangeStart ?? null}
+                        onRunReport={onRunReport}
+                    />
 
-                <div className={`${bemBlockName}--report_container`}>
-                    {isFetching ? (
-                        <Loader />
-                    ) : (
-                        <table className="table table-hover table-sm report-table">
+                    <div className={`${bemBlockName}--report_container`}>
+                        {isFetching ? (
+                            <Loader />
+                        ) : (
+                            <table className="table table-hover table-sm report-table">
                                 <thead>
                                     <tr>
                                         <th className="col-md-1 bg-white sticky-top sticky-border">Date</th>
@@ -232,9 +235,10 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
                                         );
                                     })}
                                 </tbody>
-                        </table>
-                    )}
-                </div>
+                            </table>
+                        )}
+                    </div>
+                </ScrollableContent>
             </div>
         </React.Fragment>
     );

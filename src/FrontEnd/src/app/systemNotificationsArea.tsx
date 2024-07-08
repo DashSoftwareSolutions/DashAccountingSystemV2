@@ -1,9 +1,12 @@
 import React, {
     useCallback,
     useEffect,
-    useRef,
 } from 'react';
-import { Alert } from 'reactstrap';
+import {
+    Toast,
+    ToastBody,
+    ToastHeader,
+} from 'reactstrap';
 import {
     isNil,
     isNumber,
@@ -14,7 +17,9 @@ import {
 } from 'react-redux';
 import { ApplicationState } from '../app/store';
 import { DEFAULT_SYSTEM_NOTIFICATION_ALERT_TIMEOUT } from '../common/constants';
+import usePrevious from '../common/utilities/usePrevious';
 import { actionCreators as notificationActionCreators } from './notifications';
+import NotificationLevel from './notifications/notificationLevel';
 
 const mapStateToProps = (state: ApplicationState) => ({
     alertAutoDismiss: state.systemNotifications?.alertAutoDismiss ?? false,
@@ -42,11 +47,11 @@ function SystemNotificationsArea(props: SystemNotificationsAreaProps) {
         dismissAlert,
     } = props;
 
-    const prevAlertId = useRef<string | null>(alertId);
+    const prevAlertId = usePrevious<string | null>(alertId);
 
     useEffect(() => {
         if (!isNil(alertId) &&
-            alertId !== prevAlertId.current &&
+            alertId !== prevAlertId &&
             !isNil(alertAutoDismiss) &&
             !!alertAutoDismiss) {
             const autoDismissTimeout = isNumber(alertAutoDismiss) ?
@@ -62,7 +67,7 @@ function SystemNotificationsArea(props: SystemNotificationsAreaProps) {
         prevAlertId,
     ]);
 
-    const onDismissAlertClick = useCallback(() => {
+    const onDismissToastClick = useCallback(() => {
         if (!isNil(alertId)) {
             dismissAlert(alertId);
         }
@@ -71,27 +76,37 @@ function SystemNotificationsArea(props: SystemNotificationsAreaProps) {
         dismissAlert,
     ]);
 
-    const alertMarkup = !isNil(alertColor) &&
-        !isNil(alertContent) ? (
-        <Alert
-            color={alertColor}
-            isOpen={alertIsVisible}
-            toggle={onDismissAlertClick}
-        >
-            {alertContent}
-        </Alert>
-    ) : null;
+    let title: string = '';
+
+    switch (alertColor) {
+        case NotificationLevel.Danger:
+        case NotificationLevel.Warning:
+            title = 'Error';
+            break;
+        case NotificationLevel.Info:
+            title = 'Info';
+            break;
+        case NotificationLevel.Success:
+            title = 'Success';
+            break;
+        default:
+    }
 
     return (
-        <div
-            id="system_notifications_area"
-            style={{
-                height: 48,
-                marginBottom: 22,
-                marginTop: 11
-            }}
-        >
-            {alertMarkup}
+        <div aria-live="polite" aria-atomic="true" className="position-relative">
+            <div className="toast-container position-absolute bottom-0 end-0 p-3">
+                <Toast isOpen={alertIsVisible}>
+                    <ToastHeader
+                        icon={alertColor}
+                        toggle={onDismissToastClick}
+                    >
+                        {title}
+                    </ToastHeader>
+                    <ToastBody>
+                        {alertContent}
+                    </ToastBody>
+                </Toast>
+            </div>
         </div>
     );
 }

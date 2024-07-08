@@ -1,6 +1,7 @@
 import { isNil } from 'lodash';
 import React, { useEffect } from 'react';
 import {
+    Button,
     Col,
     Row,
 } from 'reactstrap';
@@ -9,13 +10,19 @@ import {
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ApplicationState } from '../../app/store';
+import { Dispatch } from 'redux';
+import {
+    ApplicationState,
+    useAppDispatch,
+} from '../../app/store';
+import IAction from '../../app/store/action.interface';
 import NavigationSection from '../../app/navigationSection';
 import TenantSubNavigation from '../../app/tenantSubNavigation';
 import {
     ILogger,
     Logger,
 } from '../../common/logging';
+import { apiErrorHandler } from '../../common/utilities/errorHandling';
 
 const logger: ILogger = new Logger('Invoice List Page');
 const bemBlockName: string = 'invoice_list_page';
@@ -36,6 +43,7 @@ function InvoiceListPage(props: InvoiceListPageProps) {
     } = props;
 
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         if (isNil(selectedTenant)) {
@@ -43,6 +51,15 @@ function InvoiceListPage(props: InvoiceListPageProps) {
             navigate('/app');
         }
     }, [selectedTenant]);
+
+    const onClick = (() => {
+        fetch('/api/test-errors/problem-500')
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                }
+            });
+    });
 
     return (
         <React.Fragment>
@@ -56,7 +73,8 @@ function InvoiceListPage(props: InvoiceListPageProps) {
                 </Row>
             </div>
             <div id={`${bemBlockName}--content`}>
-                TODO: Invoice List Page content
+                <p>TODO: Invoice List Page content</p>
+                <Button onClick={onClick}>Test Error Toast</Button>
             </div>
         </React.Fragment>
     );

@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { ApplicationState } from '../../../app/store';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
+import ScrollableContent from '../../../common/components/scrollableContent';
 import NavigationSection from '../../../app/navigationSection';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import {
@@ -75,6 +76,7 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
     return (
         <React.Fragment>
             <TenantSubNavigation activeSection={NavigationSection.ChartOfAccounts} />
+
             <div className="page_header" id={`${bemBlockName}--header`}>
                 <Row>
                     <Col>
@@ -83,10 +85,12 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
                     </Col>
                 </Row>
             </div>
+
             <div id={`${bemBlockName}--content`}>
                 {isFetching ? (
                     <Loader />
                 ) : (
+                    <ScrollableContent>
                         <table className="table table-hover">
                             <thead>
                                 <tr>
@@ -115,6 +119,7 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
                                 )}
                             </tbody>
                         </table>
+                    </ScrollableContent>
                 )}
             </div>
         </React.Fragment>
