@@ -2,8 +2,9 @@ import { isNil } from 'lodash';
 import React, {
     useEffect,
     useMemo,
+    useRef,
 } from 'react';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import {
     ConnectedProps,
     connect,
@@ -32,14 +33,23 @@ import {
 import { decodeJsonObjectFromBase64 } from '../common/utilities/encoding';
 import usePrevious from '../common/utilities/usePrevious';
 
+/**
+ * How frequently we poll the remaining lifetime of the current access token.
+ * Also used to determine if we attempt to refresh the token (i.e. if we're
+ * within this amount of time of the upcoming expiry).
+ */
+const TOKEN_LIFETIME_MONITOR_INTERVAL_MS = 300000;  // 300,000 ms => 5 minutes
+
 const logger: ILogger = new Logger('Master Page');
 
 const mapStateToProps = (state: ApplicationState) => ({
     isLoggedIn: state.authentication.isLoggedIn,
+    tokenExpires: state.authentication.tokens?.expires,
     bootstrapInfo: state.bootstrap,
 });
 
 const mapDispatchToProps = {
+    refreshTokens: authenticationActionCreators.refreshTokens,
     requestApplicationVersion: bootstrapActionCreators.requestApplicationVersion,
     requestBootstrapInfo: bootstrapActionCreators.requestBootstrapInfo,
     setTokens: authenticationActionCreators.setTokens,
@@ -55,14 +65,18 @@ function Layout(props: LayoutProps) {
     const {
         isLoggedIn,
         bootstrapInfo,
+        refreshTokens,
         requestApplicationVersion,
         requestBootstrapInfo,
         setTokens,
+        tokenExpires,
     } = props;
 
+    const today = useMemo(() => DateTime.now(), []);
     const wasLoggedIn = usePrevious(isLoggedIn);
+    const checkForExpiringTokenIntervalRef = useRef<NodeJS.Timer>();
 
-    // Fetch the Application version (for the footer) when we initially load the application
+    // One-time ("component did mount") operations (NOTE: Runs twice in development mode; see https://react.dev/learn/synchronizing-with-effects#step-3-add-cleanup-if-needed)
     useEffect(() => {
         const authSessionData = window.sessionStorage.getItem(AUTH_SESSION_STORAGE_KEY);
 
@@ -84,13 +98,47 @@ function Layout(props: LayoutProps) {
         requestApplicationVersion();
     }, []);
 
+    // Setup an interval to monitor access token lifetime
+    useEffect(() => {
+        if (!isNil(tokenExpires)) {
+            const tokenExpirationPollingFrequency = Duration.fromMillis(TOKEN_LIFETIME_MONITOR_INTERVAL_MS);
+            logger.info(`Initializing interval to monitor access token lifetime (polling interval ${tokenExpirationPollingFrequency.rescale().toHuman({ unitDisplay: 'short'  })})...`);
+
+            const intervalId = setInterval(() => {
+                const now = DateTime.now();
+                const tokenExpirationDate = DateTime.fromISO(tokenExpires);
+
+                if (tokenExpirationDate > now) {
+                    const remainingTime = tokenExpirationDate.diff(now);
+                    logger.info(`Token expiration will happen in ${remainingTime.rescale().toHuman({ unitDisplay: 'short' })} (at ${tokenExpires})`);
+
+                    if (remainingTime <= tokenExpirationPollingFrequency) {
+                        logger.info('Attempting token refresh...');
+                        refreshTokens();
+                    }
+                } else {
+                    logger.warn('Token is already expired!  It exired at:', tokenExpires);
+                }
+            }, TOKEN_LIFETIME_MONITOR_INTERVAL_MS);
+
+            checkForExpiringTokenIntervalRef.current = intervalId;
+        }
+
+        return () => {
+            if (checkForExpiringTokenIntervalRef.current) {
+                logger.info('Clearing access token lifetime monitoring interval');
+                clearInterval(checkForExpiringTokenIntervalRef.current);
+            }
+        };
+    }, [tokenExpires]);
+
+    // If we just got logged in we will need to fetch the bootstrap info (user info and authorized tenants)
+    // Also we will setup an interval to check for expiring access tokens and refresh them
     useEffect(() => {
         if (!wasLoggedIn && isLoggedIn) {
             requestBootstrapInfo();
         }
     }, [isLoggedIn]);
-
-    const today = useMemo(() => DateTime.now(), []);
 
     return (
         <React.Fragment>

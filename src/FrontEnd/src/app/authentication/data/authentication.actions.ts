@@ -23,6 +23,19 @@ export interface ReceiveLogoutResponseAction extends IAction {
     type: ActionType.RECEIVE_LOGOUT_RESPONSE;
 }
 
+export interface RequestTokenRefreshAction extends IAction {
+    type: ActionType.REQUEST_TOKEN_REFRESH;
+}
+
+export interface ReceiveUpdatedTokensAction extends IAction {
+    type: ActionType.RECEIVE_UPDATED_TOKENS;
+    accessTokenResponse: AccessTokenResponse;
+}
+
+export interface TokenRefreshFailedAction extends IAction {
+    type: ActionType.TOKEN_REFRESH_FAILED;
+}
+
 export interface SetExistingTokensAction extends IAction {
     type: ActionType.SET_EXISTING_TOKENS_FROM_SESSION_STORAGE;
     tokens: AccessTokenResponse;
@@ -33,4 +46,7 @@ export type KnownAction = RequestLoginAction |
     ReceiveSuccessfulLoginResponseAction |
     RequestLogoutAction |
     ReceiveLogoutResponseAction |
+    RequestTokenRefreshAction |
+    ReceiveUpdatedTokensAction |
+    TokenRefreshFailedAction |
     SetExistingTokensAction;

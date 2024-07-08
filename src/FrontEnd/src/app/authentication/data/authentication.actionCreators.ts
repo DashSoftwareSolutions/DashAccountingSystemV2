@@ -47,7 +47,7 @@ const actionCreators = {
             .then((accessTokenResponse) => {
                 if (!isNil(accessTokenResponse)) {
                     const expires = DateTime.now().plus({ seconds: accessTokenResponse.expiresIn });
-                    logger.info('Tokens will expire at', expires.toISO());
+                    logger.info('Login Tokens received.  Current access token will expire at', expires.toISO());
                     accessTokenResponse.expires = expires.toISO();
 
                     dispatch({ type: ActionType.RECEIVE_SUCCESSFUL_LOGIN_RESPONSE, accessTokenResponse });
@@ -79,6 +79,47 @@ const actionCreators = {
             dispatch({ type: ActionType.REQUEST_LOGOUT });
         } else {
             dispatch({ type: ActionType.RECEIVE_LOGOUT_RESPONSE });
+        }
+    },
+
+    refreshTokens: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const refreshToken = appState.authentication.tokens?.refreshToken;
+
+        if (!isEmpty(refreshToken)) {
+            const requestOptions = {
+                method: 'POST',
+                body: JSON.stringify({ refreshToken }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+
+            fetch('/api/authentication/refresh-token', requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            dispatch({ type: ActionType.TOKEN_REFRESH_FAILED });
+                        } else {
+                            apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                        }
+
+                        return null;
+                    }
+
+                    return response.json() as Promise<AccessTokenResponse>;
+                })
+                .then((accessTokenResponse) => {
+                    if (!isNil(accessTokenResponse)) {
+                        const expires = DateTime.now().plus({ seconds: accessTokenResponse.expiresIn });
+                        logger.info('Updated Tokens from successful refresh operation received.  Current access token will expire at', expires.toISO());
+                        accessTokenResponse.expires = expires.toISO();
+
+                        dispatch({ type: ActionType.RECEIVE_UPDATED_TOKENS, accessTokenResponse });
+                    }
+                });
+
+            dispatch({ type: ActionType.REQUEST_TOKEN_REFRESH });
         }
     },
 

@@ -6,7 +6,7 @@ import {
     Toast,
     ToastBody,
     ToastHeader,
-} from 'reactstrap';
+} from 'reactstrap'; // TODO/FIXME: current version of Reactstrap gives us this warning for <Toast> component (which internally uses <Fade> component): Warning: Fade: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.
 import {
     isNil,
     isNumber,

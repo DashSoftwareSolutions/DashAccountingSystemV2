@@ -15,7 +15,7 @@ const authenticationSessionStorageMiddleware: Middleware<
 > = storeApi => next => action => {
     switch (action.type) {
         case ActionType.RECEIVE_SUCCESSFUL_LOGIN_RESPONSE:
-            // TODO: Add case for successfully refreshing the tokens
+        case ActionType.RECEIVE_UPDATED_TOKENS:
             window.sessionStorage.setItem(AUTH_SESSION_STORAGE_KEY, encodeJsonObjectAsBase64(action.accessTokenResponse));
             break;
 

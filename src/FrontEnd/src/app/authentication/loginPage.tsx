@@ -12,6 +12,7 @@ import {
     useSearchParams,
 } from 'react-router-dom';
 import {
+    Alert,
     Button,
     Col,
     Form,
@@ -35,6 +36,7 @@ const logger: ILogger = new Logger('Login Page');
 const bemBlockName: string = 'login_page';
 
 const mapStateToProps = (state: ApplicationState) => ({
+    hasLoginError: state.authentication.hasLoginError,
     isFetchingBootrap: state.bootstrap.isFetching,
     isLoggedIn: state.authentication.isLoggedIn,
     isLoggingIn: state.authentication.isLoggingIn,
@@ -51,6 +53,7 @@ type PropTypes = ConnectedProps<typeof connector>;
 
 function LoginPage(props: PropTypes) {
     const {
+        hasLoginError,
         isFetchingBootrap,
         isLoggedIn,
         isLoggingIn,
@@ -77,7 +80,7 @@ function LoginPage(props: PropTypes) {
 
     useEffect(() => {
         if (wasFetchingBootstrap && !isFetchingBootrap) {
-            logger.info('We just finished fetching the bootrap info.');
+            logger.info('We just finished fetching the bootstrap info.');
             navigate(returnUrl, { replace: true });
         }
     });
@@ -119,6 +122,7 @@ function LoginPage(props: PropTypes) {
                             Email
                         </Label>
                         <Input
+                            autoComplete="username"
                             autoFocus
                             id={`${bemBlockName}--email_input`}
                             name="email"
@@ -134,6 +138,7 @@ function LoginPage(props: PropTypes) {
                             Password
                         </Label>
                         <Input
+                            autoComplete="current-password"
                             id={`${bemBlockName}--password_input`}
                             name="password"
                             onChange={onPasswordChanged}
@@ -153,6 +158,17 @@ function LoginPage(props: PropTypes) {
                 >
                     {isLoggingIn ? 'Logging In...' : 'Log In'}
                 </Button>
+
+                {hasLoginError && (
+                    <Alert color="danger" className="mt-5">
+                        <h4 className="alert-heading">
+                            Login Failed
+                        </h4>
+                        <p>
+                            Your username (email) or password was incorrect.  Please correct them and try again.
+                        </p>
+                    </Alert>
+                )}
             </Col>
         </Row >
     );

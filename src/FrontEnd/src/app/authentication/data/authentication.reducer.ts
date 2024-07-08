@@ -12,6 +12,7 @@ export interface AuthenticationState {
     isLoggedIn: boolean;
     isLoggingIn: boolean;
     isLoggingOut: boolean;
+    isRefreshingTokens: boolean;
     tokens: AccessTokenResponse | null;
 }
 
@@ -20,6 +21,7 @@ const unloadedState: AuthenticationState = {
     isLoggedIn: false,
     isLoggingIn: false,
     isLoggingOut: false,
+    isRefreshingTokens: false,
     tokens: null,
 };
 
@@ -73,6 +75,25 @@ const reducer: Reducer<AuthenticationState> = (state: AuthenticationState | unde
                     isLoggedIn: false,
                     isLoggingOut: false,
                     tokens: null,
+                };
+
+            case ActionType.REQUEST_TOKEN_REFRESH:
+                return {
+                    ...state,
+                    isRefreshingTokens: true,
+                };
+
+            case ActionType.TOKEN_REFRESH_FAILED:
+                return {
+                    ...state,
+                    isRefreshingTokens: false,
+                };
+
+            case ActionType.RECEIVE_UPDATED_TOKENS:
+                return {
+                    ...state,
+                    isRefreshingTokens: false,
+                    tokens: action.accessTokenResponse,
                 };
         }
     }
