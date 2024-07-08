@@ -45,6 +45,31 @@ const actionCreators = {
 
         dispatch({ type: ActionType.REQUEST_LOGIN });
     },
+
+    logout: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+        const appState = getState();
+        const accessToken = appState.authentication.tokens?.accessToken;
+
+        if (!isEmpty(accessToken)) {
+            const requestOptions = {
+                method: 'POST',
+                body: '{}',
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+            };
+
+            fetch('/api/authentication/logout', requestOptions)
+                .then(() => {
+                    dispatch({ type: ActionType.RECEIVE_LOGOUT_RESPONSE });
+                });
+
+            dispatch({ type: ActionType.REQUEST_LOGOUT });
+        } else {
+            dispatch({ type: ActionType.RECEIVE_LOGOUT_RESPONSE });
+        }
+    },
 };
 
 export default actionCreators;

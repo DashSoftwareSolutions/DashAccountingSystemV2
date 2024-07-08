@@ -94,6 +94,12 @@ function LoginPage(props: PropTypes) {
         setPassword(e.currentTarget.value ?? '');
     };
 
+    const onPasswordKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+        if (e.key === 'Enter') {
+            login(email, password);
+        }
+    };
+
     if (isFetchingBootrap) {
         return (<Loader />);
     }
@@ -131,6 +137,7 @@ function LoginPage(props: PropTypes) {
                             id={`${bemBlockName}--password_input`}
                             name="password"
                             onChange={onPasswordChanged}
+                            onKeyDown={onPasswordKeyDown}
                             tabIndex={0}
                             type="password"
                             value={password}

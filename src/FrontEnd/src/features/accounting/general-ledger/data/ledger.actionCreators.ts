@@ -18,12 +18,18 @@ const actionCreators = {
         if (!isNil(appState?.ledger) &&
             !isNil(appState?.bootstrap?.selectedTenant) &&
             !appState.ledger.isFetching &&
-            isEmpty(appState.ledger.accounts)) {
+            isEmpty(appState.ledger.accounts) &&
+            !isEmpty(appState.authentication.tokens?.accessToken)) {
+            const accessToken = appState.authentication.tokens?.accessToken;
             const tenantId = appState?.bootstrap?.selectedTenant?.id;
             const dateRangeStart = appState.ledger.dateRangeStart;
             const dateRangeEnd = appState.ledger.dateRangeEnd;
 
-            fetch(`/api/ledger/${tenantId}/report?dateRangeStart=${dateRangeStart}&dateRangeEnd=${dateRangeEnd}`)
+            fetch(`/api/ledger/${tenantId}/report?dateRangeStart=${dateRangeStart}&dateRangeEnd=${dateRangeEnd}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
                 .then((response) => {
                     if (!response.ok) {
                         apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>)

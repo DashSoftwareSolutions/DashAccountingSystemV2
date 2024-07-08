@@ -16,6 +16,7 @@ import GeneralLedgerPage from '../features/accounting/general-ledger/generalLedg
 import HomePage from './homePage';
 import InvoiceListPage from '../features/invoicing/invoiceListPage';
 import LoginPage from './authentication/loginPage';
+import LogoutPage from './authentication/logoutPage';
 import ProfitAndLossPage from '../features/accounting/profit-and-losss/profitAndLossPage';
 import PrivacyPage from '../app/privacyPage';
 import SelectTenantPage from './selectTenantPage';
@@ -30,6 +31,7 @@ function App() {
                 <Route index element={<HomePage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/logout" element={<LogoutPage />} />
                 <Route path="/app" element={<SelectTenantPage />} />
                 <Route path='/app/account-details' element={<AccountDetailsPage />} />
                 <Route path='/app/balance-sheet' element={<BalanceSheetPage />} />

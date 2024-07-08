@@ -8,6 +8,7 @@ export interface AuthenticationState {
     hasLoginError: boolean;
     isLoggedIn: boolean;
     isLoggingIn: boolean;
+    isLoggingOut: boolean;
     tokens: AccessTokenResponse | null;
 }
 
@@ -15,6 +16,7 @@ const unloadedState: AuthenticationState = {
     hasLoginError: false,
     isLoggedIn: false,
     isLoggingIn: false,
+    isLoggingOut: false,
     tokens: null,
 };
 
@@ -47,6 +49,20 @@ const reducer: Reducer<AuthenticationState> = (state: AuthenticationState | unde
                     ...state,
                     hasLoginError: true,
                     isLoggingIn: false,
+                };
+
+            case ActionType.REQUEST_LOGOUT:
+                return {
+                    ...state,
+                    isLoggingOut: true,
+                };
+
+            case ActionType.RECEIVE_LOGOUT_RESPONSE:
+                return {
+                    ...state,
+                    isLoggedIn: false,
+                    isLoggingOut: false,
+                    tokens: null,
                 };
         }
     }

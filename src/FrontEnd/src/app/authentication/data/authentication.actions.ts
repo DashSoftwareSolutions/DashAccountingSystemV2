@@ -15,6 +15,16 @@ export interface ReceiveSuccessfulLoginResponseAction extends IAction {
     accessTokenResponse: AccessTokenResponse;
 }
 
+export interface RequestLogoutAction extends IAction {
+    type: ActionType.REQUEST_LOGOUT;
+}
+
+export interface ReceiveLogoutResponseAction extends IAction {
+    type: ActionType.RECEIVE_LOGOUT_RESPONSE;
+}
+
 export type KnownAction = RequestLoginAction |
     ReceiveFailedLoginResponseAction |
-    ReceiveSuccessfulLoginResponseAction;
+    ReceiveSuccessfulLoginResponseAction |
+    RequestLogoutAction |
+    ReceiveLogoutResponseAction;

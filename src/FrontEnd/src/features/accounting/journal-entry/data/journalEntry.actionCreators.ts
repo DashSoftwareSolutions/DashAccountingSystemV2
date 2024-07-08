@@ -74,6 +74,7 @@ const actionCreators = {
 
     saveNewJournalEntry: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
+        const accessToken = appState.authentication.tokens?.accessToken;
         const entryToSave = appState.journalEntry?.dirtyEntry;
 
         if (isNil(entryToSave)) {
@@ -85,6 +86,7 @@ const actionCreators = {
             method: 'POST',
             body: JSON.stringify(entryToSave),
             headers: {
+                Authorization: `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
             },
         };
@@ -113,6 +115,7 @@ const actionCreators = {
 
     postJournalEntry: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
+        const accessToken = appState.authentication.tokens?.accessToken;
         const tenantId = appState.bootstrap?.selectedTenant?.id;
         const entryToSave = appState.journalEntry?.dirtyEntry;
 
@@ -130,6 +133,7 @@ const actionCreators = {
             method: 'PUT',
             body: JSON.stringify(putBody),
             headers: {
+                Authorization: `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
             },
         };
@@ -154,6 +158,7 @@ const actionCreators = {
 
     updateJournalEntry: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
+        const accessToken = appState.authentication.tokens?.accessToken;
         const tenantId = appState.bootstrap?.selectedTenant?.id;
         const entryToSave = appState.journalEntry?.dirtyEntry;
 
@@ -166,6 +171,7 @@ const actionCreators = {
             method: 'PUT',
             body: JSON.stringify(entryToSave),
             headers: {
+                Authorization: `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
             },
         };
@@ -190,11 +196,13 @@ const actionCreators = {
 
     deleteJournalEntry: (entryId: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
+        const accessToken = appState.authentication.tokens?.accessToken;
         const tenantId = appState.bootstrap?.selectedTenant?.id;
 
         const requestOptions = {
             method: 'DELETE',
             headers: {
+                Authorization: `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
             },
         };

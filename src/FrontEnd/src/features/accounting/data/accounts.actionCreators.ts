@@ -17,10 +17,16 @@ const actionCreators = {
         if (!isNil(appState?.accounts) &&
             !isNil(appState?.bootstrap?.selectedTenant) &&
             !appState.accounts.isFetching &&
-            isEmpty(appState.accounts.accounts)) {
+            isEmpty(appState.accounts.accounts) &&
+            !isEmpty(appState.authentication.tokens?.accessToken)) {
+            const accessToken = appState.authentication.tokens?.accessToken;
             const tenantId = appState?.bootstrap?.selectedTenant?.id;
 
-            fetch(`/api/ledger/${tenantId}/accounts`)
+            fetch(`/api/ledger/${tenantId}/accounts`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                }
+            })
                 .then(response => {
                     if (!response.ok) {
                         apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>)
