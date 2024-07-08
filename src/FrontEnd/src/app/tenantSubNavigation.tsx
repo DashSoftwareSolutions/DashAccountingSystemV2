@@ -4,7 +4,7 @@ import {
     NavItem,
     NavLink,
 } from 'reactstrap';
-import NavigationSection from './navigationSection';
+import NavigationSection from '../common/models/navigationSection.model';
 
 function TenantSubNavigation({
     activeSection,

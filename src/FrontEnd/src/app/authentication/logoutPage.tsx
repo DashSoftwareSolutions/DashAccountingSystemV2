@@ -10,17 +10,17 @@ import {
     Row,
 } from 'reactstrap';
 import dashHeroImage from '../../assets/dash-hero-image.jpeg';
-import { ApplicationState } from '../store';
+import { RootState } from '../globalReduxStore';
 import {
     ILogger,
     Logger,
 } from '../../common/logging';
 import usePrevious from '../../common/utilities/usePrevious';
-import { actionCreators } from './data';
+import { actionCreators } from './redux';
 
 const logger: ILogger = new Logger('Logout Page');
 
-const mapStateToProps = (state: ApplicationState) => ({
+const mapStateToProps = (state: RootState) => ({
     isLoggedIn: state.authentication.isLoggedIn,
     isLoggingOut: state.authentication.isLoggingOut,
 });

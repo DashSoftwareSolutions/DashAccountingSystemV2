@@ -14,8 +14,8 @@ import {
     Link,
     useNavigate,
 } from 'react-router-dom';
-import { ApplicationState } from '../../../app/store';
-import NavigationSection from '../../../app/navigationSection';
+import { RootState } from '../../../app/globalReduxStore';
+import NavigationSection from '../../../common/models/navigationSection.model';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
@@ -29,19 +29,19 @@ import {
     Amount,
     AmountType,
     DateRange,
+    TransactionStatus,
 } from '../../../common/models';
-import { TransactionStatus } from '../models';
-import ledgerActions from './data/ledger.actionCreators';
+import ledgerActions from './redux/ledger.actionCreators';
 
 const logger: ILogger = new Logger('General Ledger Page');
 const bemBlockName: string = 'general_ledger_page';
 
-const mapStateToProps = (state: ApplicationState) => ({
+const mapStateToProps = (state: RootState) => ({
     accounts: state.ledger.accounts,
     dateRangeEnd: state.ledger.dateRangeEnd,
     dateRangeStart: state.ledger.dateRangeStart,
     isFetching: state.ledger.isFetching,
-    selectedTenant: state.bootstrap.selectedTenant,
+    selectedTenant: state.application.selectedTenant,
 });
 
 const mapDispatchToProps = {

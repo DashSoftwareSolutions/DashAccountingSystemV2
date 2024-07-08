@@ -9,8 +9,8 @@ import {
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ApplicationState } from '../../../app/store';
-import NavigationSection from '../../../app/navigationSection';
+import { RootState } from '../../../app/globalReduxStore';
+import NavigationSection from '../../../common/models/navigationSection.model';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import {
@@ -21,9 +21,9 @@ import {
 const logger: ILogger = new Logger('Account Details Page');
 const bemBlockName: string = 'account_details_page';
 
-const mapStateToProps = (state: ApplicationState) => ({
-    selectedAccount: state.accounts.selectedAccount,
-    selectedTenant: state.bootstrap.selectedTenant,
+const mapStateToProps = (state: RootState) => ({
+    selectedAccount: state.chartOfAccounts.selectedAccount,
+    selectedTenant: state.application.selectedTenant,
 });
 
 const connector = connect(mapStateToProps);

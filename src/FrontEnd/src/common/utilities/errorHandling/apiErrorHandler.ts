@@ -6,7 +6,7 @@ import {
     bindActionCreators,
     Dispatch,
 } from 'redux';
-import IAction from "../../../app/store/action.interface";
+import IAction from "../../../app/globalReduxStore/action.interface";
 import IApiErrorHandler from './apiErrorHandler.interface';
 import { ApiErrorResponse } from '../../models';
 import * as SystemNotifications from '../../../app/notifications';

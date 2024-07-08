@@ -13,15 +13,15 @@ import {
     ILogger,
     Logger,
 } from '../common/logging';
-import { actionCreators as bootstrapActionCreators } from './bootstrap';
-import { ApplicationState } from './store';
+import { actionCreators as bootstrapActionCreators } from './applicationRedux';
+import { RootState } from './globalReduxStore';
 import { Tenant } from '../common/models';
 
 const logger: ILogger = new Logger('Select Tenant Page');
 
-const mapStateToProps = (state: ApplicationState) => ({
-    selectedTenant: state.bootstrap.selectedTenant,
-    tenants: state.bootstrap.tenants,
+const mapStateToProps = (state: RootState) => ({
+    selectedTenant: state.application.selectedTenant,
+    tenants: state.application.tenants,
 });
 
 const mapDispatchToProps = {

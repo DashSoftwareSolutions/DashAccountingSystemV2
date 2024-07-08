@@ -7,5 +7,7 @@ export type { default as DateRange } from './dateRange.model';
 export { default as DateRangeMacroType } from './dateRangeMacroType.model';
 export type { default as DateTimeString } from './dateTimeString.model';
 export type { default as LookupValue } from './lookupValue.model';
+export { default as NavigationSection } from './navigationSection.model';
 export type { default as Tenant } from './tenant.model';
+export { default as TransactionStatus } from './transactionStatus.model';
 export type { default as UserLite } from './userLite.model';

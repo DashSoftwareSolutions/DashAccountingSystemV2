@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import IAction from "../../../app/store/action.interface";
+import IAction from "../../../app/globalReduxStore/action.interface";
 
 /**
  * Interface for a Redux based API Error Handler

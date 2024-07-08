@@ -15,13 +15,13 @@ import {
     ConnectedProps,
     connect
 } from 'react-redux';
-import { ApplicationState } from '../app/store';
+import { RootState } from '../app/globalReduxStore';
 import { DEFAULT_SYSTEM_NOTIFICATION_ALERT_TIMEOUT } from '../common/constants';
 import usePrevious from '../common/utilities/usePrevious';
 import { actionCreators as notificationActionCreators } from './notifications';
 import NotificationLevel from './notifications/notificationLevel';
 
-const mapStateToProps = (state: ApplicationState) => ({
+const mapStateToProps = (state: RootState) => ({
     alertAutoDismiss: state.systemNotifications?.alertAutoDismiss ?? false,
     alertColor: state.systemNotifications?.alertColor ?? null,
     alertContent: state.systemNotifications?.alertContent ?? null,

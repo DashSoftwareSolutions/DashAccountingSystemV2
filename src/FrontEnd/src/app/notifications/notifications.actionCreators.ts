@@ -1,5 +1,5 @@
-import ActionType from '../store/actionType';
-import { AppThunkAction } from '../store';
+import ActionType from '../globalReduxStore/actionType';
+import { AppThunkAction } from '../globalReduxStore';
 import {
     DismissAlertAction,
     ShowAlertAction

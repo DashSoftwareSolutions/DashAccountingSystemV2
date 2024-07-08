@@ -3,7 +3,7 @@ import {
     uniqueId,
 } from 'lodash';
 import { Action, Reducer } from 'redux';
-import ActionType from '../store/actionType';
+import ActionType from '../globalReduxStore/actionType';
 import { KnownAction } from './notifications.actions';
 import NotificationLevel from './notificationLevel';
 

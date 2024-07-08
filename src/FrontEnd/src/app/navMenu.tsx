@@ -1,22 +1,41 @@
+import './navMenu.css';
+
 import React, {
     useCallback,
-    useState,
 } from 'react';
 import { isEmpty } from 'lodash';
+import {
+    ConnectedProps,
+    connect,
+} from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
     Collapse,
     Navbar,
-    NavbarBrand,
     NavbarToggler,
     NavItem,
     NavLink,
 } from 'reactstrap';
-import './navMenu.css';
+import { RootState } from './globalReduxStore';
 import { UserLite } from '../common/models';
+import useNamedState from '../common/utilities/useNamedState';
 
-function NavMenu({ userInfo }: { userInfo?: UserLite }) {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+const mapStateToProps = (state: RootState) => ({
+    isLoggedIn: state.authentication.isLoggedIn,
+
+    selectedTenant: state.application.selectedTenant,
+    userInfo: state.application.userInfo,
+});
+
+const connector = connect(mapStateToProps);
+
+type PropTypes = ConnectedProps<typeof connector>;
+
+function NavMenu({
+    userInfo,
+    selectedTenant,
+}: PropTypes) {
+    const [isOpen, setIsOpen] = useNamedState<boolean>('isOpen', false);
 
     const toggleNavMenu = useCallback(() => {
         setIsOpen(!isOpen);
@@ -25,21 +44,30 @@ function NavMenu({ userInfo }: { userInfo?: UserLite }) {
     return (
         <header>
             <Navbar className="navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" light>
-                <NavbarBrand href="/">
+                <Link className="navbar-brand" to="/">
                     Dash Accounting System v2.0
                     {'\u00a0'}
                     <span className="badge pending-badge">.NET 8</span>
-                </NavbarBrand>
+                </Link>
+
+
                 <NavbarToggler onClick={toggleNavMenu} />
+
                 <Collapse className="d-sm-inline-flex justify-content-between" isOpen={isOpen} navbar>
-                    <ul className="navbar-nav flex-grow-1">
-                        <NavItem>
-                            <NavLink className="text-dark" tag={Link} to="/">Home</NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink className="text-dark" tag={Link} to="/privacy">Privacy</NavLink>
-                        </NavItem>
-                    </ul>
+                    {/* Left-aligned navigation menu items */}
+                    {/*<ul className="navbar-nav flex-grow-1">*/}
+                    {/*    <NavItem>*/}
+                    {/*        <NavLink className="text-dark" tag={Link} to="/">Home</NavLink>*/}
+                    {/*    </NavItem>*/}
+                    {/*    <NavItem>*/}
+                    {/*        <NavLink className="text-dark" tag={Link} to="/privacy">Privacy</NavLink>*/}
+                    {/*    </NavItem>*/}
+                    {/*</ul>*/}
+                    <div className="flex-grow-1">
+                        
+                    </div>
+
+                    {/* Right-aligned navigation menu items (Login/Logout/User Profile, etc.) */}
                     <ul className="navbar-nav">
                         {!isEmpty(userInfo?.id) ? (
                             <React.Fragment>
@@ -64,4 +92,4 @@ function NavMenu({ userInfo }: { userInfo?: UserLite }) {
     );
 }
 
-export default NavMenu;
+export default connector(NavMenu);

@@ -9,8 +9,8 @@ import {
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ApplicationState } from '../../../app/store';
-import NavigationSection from '../../../app/navigationSection';
+import { RootState } from '../../../app/globalReduxStore';
+import NavigationSection from '../../../common/models/navigationSection.model';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import {
     ILogger,
@@ -20,8 +20,8 @@ import {
 const logger: ILogger = new Logger('Balance Sheet Page');
 const bemBlockName: string = 'balance_sheet_page';
 
-const mapStateToProps = (state: ApplicationState) => ({
-    selectedTenant: state.bootstrap.selectedTenant,
+const mapStateToProps = (state: RootState) => ({
+    selectedTenant: state.application.selectedTenant,
 });
 
 const connector = connect(mapStateToProps);

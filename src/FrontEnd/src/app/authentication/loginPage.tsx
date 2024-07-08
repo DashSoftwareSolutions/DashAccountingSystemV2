@@ -22,22 +22,22 @@ import {
     Row,
 } from 'reactstrap';
 import dashHeroImage from '../../assets/dash-hero-image.jpeg';
-import { ApplicationState } from '../store';
+import { RootState } from '../globalReduxStore';
 import {
     ILogger,
     Logger,
 } from '../../common/logging';
-import { actionCreators as bootstrapActionCreators } from '../bootstrap';
-import { actionCreators as loginActionCreators } from './data';
+import { actionCreators as bootstrapActionCreators } from '../applicationRedux';
+import { actionCreators as loginActionCreators } from './redux';
 import Loader from '../../common/components/loader';
 import usePrevious from '../../common/utilities/usePrevious';
 
 const logger: ILogger = new Logger('Login Page');
 const bemBlockName: string = 'login_page';
 
-const mapStateToProps = (state: ApplicationState) => ({
+const mapStateToProps = (state: RootState) => ({
     hasLoginError: state.authentication.hasLoginError,
-    isFetchingBootrap: state.bootstrap.isFetching,
+    isFetchingBootstrap: state.application.isFetchingBootstrap,
     isLoggedIn: state.authentication.isLoggedIn,
     isLoggingIn: state.authentication.isLoggingIn,
 });
@@ -54,7 +54,7 @@ type PropTypes = ConnectedProps<typeof connector>;
 function LoginPage(props: PropTypes) {
     const {
         hasLoginError,
-        isFetchingBootrap,
+        isFetchingBootstrap,
         isLoggedIn,
         isLoggingIn,
         login,
@@ -69,7 +69,7 @@ function LoginPage(props: PropTypes) {
     const [password, setPassword] = useState<string>('');
 
     const wasLoggedIn = usePrevious(isLoggedIn);
-    const wasFetchingBootstrap = usePrevious(isFetchingBootrap);
+    const wasFetchingBootstrap = usePrevious(isFetchingBootstrap);
 
     useEffect(() => {
         if (!wasLoggedIn && isLoggedIn) {
@@ -79,7 +79,7 @@ function LoginPage(props: PropTypes) {
     }, [isLoggedIn]);
 
     useEffect(() => {
-        if (wasFetchingBootstrap && !isFetchingBootrap) {
+        if (wasFetchingBootstrap && !isFetchingBootstrap) {
             logger.info('We just finished fetching the bootstrap info.');
             navigate(returnUrl, { replace: true });
         }
@@ -103,7 +103,7 @@ function LoginPage(props: PropTypes) {
         }
     };
 
-    if (isFetchingBootrap) {
+    if (isFetchingBootstrap) {
         return (<Loader />);
     }
 
@@ -164,8 +164,9 @@ function LoginPage(props: PropTypes) {
                         <h4 className="alert-heading">
                             Login Failed
                         </h4>
-                        <p>
-                            Your username (email) or password was incorrect.  Please correct them and try again.
+                        <p className="mb-0">
+                            Email (username) and/or password was incorrect.<br />
+                            Please recheck them and try again.
                         </p>
                     </Alert>
                 )}

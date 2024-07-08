@@ -7,22 +7,21 @@ import {
 } from 'react-router';
 import Layout from './layout';
 import AccountDetailsPage from '../features/accounting/chart-of-accounts/accountDetailsPage';
-import AddJournalEntryPage from '../features/accounting/journal-entry/addJournalEntryPage';
+import AddJournalEntryPage from '../features/accounting/journal/addJournalEntryPage';
 import BalanceSheetPage from '../features/accounting/balance-sheet/balanceSheetPage';
 import ChartOfAccountsPage from '../features/accounting/chart-of-accounts/chartOfAccountsPage';
-import EditJournalEntryPage from '../features/accounting/journal-entry/editJournalEntryPage';
 import DashboardPage from '../features/dashboard/dashboardPage';
+import EditJournalEntryPage from '../features/accounting/journal/editJournalEntryPage';
 import GeneralLedgerPage from '../features/accounting/general-ledger/generalLedgerPage';
 import HomePage from './homePage';
 import InvoiceListPage from '../features/invoicing/invoiceListPage';
 import LoginPage from './authentication/loginPage';
 import LogoutPage from './authentication/logoutPage';
-import ProfitAndLossPage from '../features/accounting/profit-and-losss/profitAndLossPage';
 import PrivacyPage from '../app/privacyPage';
+import ProfitAndLossPage from '../features/accounting/profit-and-losss/profitAndLossPage';
 import SelectTenantPage from './selectTenantPage';
 import TimeTrackingPage from '../features/time-tracking/timeTrackingPage';
-import ViewJournalEntryPage from '../features/accounting/journal-entry/viewJournalEntryPage';
-
+import ViewJournalEntryPage from '../features/accounting/journal/viewJournalEntryPage';
 
 function App() {
     return (

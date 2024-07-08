@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import App from './app';
-import configureStore from './app/store/configureStore';
+import configureStore from './app/globalReduxStore/configureStore';
 import reportWebVitals from './reportWebVitals';
 
 // Get the application-wide store instance, pre-populating with state from the server where available.

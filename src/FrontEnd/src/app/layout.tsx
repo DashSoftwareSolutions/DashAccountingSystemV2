@@ -18,11 +18,11 @@ import {
     Container,
     Row,
 } from 'reactstrap';
-import { actionCreators as authenticationActionCreators } from './authentication/data';
-import { actionCreators as bootstrapActionCreators } from './bootstrap';
+import { actionCreators as authenticationActionCreators } from './authentication/redux';
+import { actionCreators as bootstrapActionCreators } from './applicationRedux';
 import NavMenu from './navMenu';
 import { AccessTokenResponse } from './authentication/models';
-import { ApplicationState } from './store';
+import { RootState } from './globalReduxStore';
 import SystemNotificationsArea from './systemNotificationsArea';
 import Loader from '../common/components/loader';
 import { AUTH_SESSION_STORAGE_KEY } from '../common/constants';
@@ -42,10 +42,10 @@ const TOKEN_LIFETIME_MONITOR_INTERVAL_MS = 300000;  // 300,000 ms => 5 minutes
 
 const logger: ILogger = new Logger('Master Page');
 
-const mapStateToProps = (state: ApplicationState) => ({
+const mapStateToProps = (state: RootState) => ({
+    application: state.application,
     isLoggedIn: state.authentication.isLoggedIn,
     tokenExpires: state.authentication.tokens?.expires,
-    bootstrapInfo: state.bootstrap,
 });
 
 const mapDispatchToProps = {
@@ -63,8 +63,8 @@ type LayoutProps = LayoutRedexProps;
 
 function Layout(props: LayoutProps) {
     const {
+        application,
         isLoggedIn,
-        bootstrapInfo,
         refreshTokens,
         requestApplicationVersion,
         requestBootstrapInfo,
@@ -102,7 +102,7 @@ function Layout(props: LayoutProps) {
     useEffect(() => {
         if (!isNil(tokenExpires)) {
             const tokenExpirationPollingFrequency = Duration.fromMillis(TOKEN_LIFETIME_MONITOR_INTERVAL_MS);
-            logger.info(`Initializing interval to monitor access token lifetime (polling interval ${tokenExpirationPollingFrequency.rescale().toHuman({ unitDisplay: 'short'  })})...`);
+            logger.info(`Initializing interval to monitor access token lifetime (polling interval ${tokenExpirationPollingFrequency.rescale().toHuman({ unitDisplay: 'short' })}) ...`);
 
             const intervalId = setInterval(() => {
                 const now = DateTime.now();
@@ -110,14 +110,14 @@ function Layout(props: LayoutProps) {
 
                 if (tokenExpirationDate > now) {
                     const remainingTime = tokenExpirationDate.diff(now);
-                    logger.info(`Token expiration will happen in ${remainingTime.rescale().toHuman({ unitDisplay: 'short' })} (at ${tokenExpires})`);
+                    logger.info(`Token expiration will happen in ${remainingTime.rescale().toHuman({ unitDisplay: 'short' })}`);
 
                     if (remainingTime <= tokenExpirationPollingFrequency) {
-                        logger.info('Attempting token refresh...');
+                        logger.info('Attempting token refresh ...');
                         refreshTokens();
                     }
                 } else {
-                    logger.warn('Token is already expired!  It exired at:', tokenExpires);
+                    logger.warn('Token is already expired!  It expired at:', tokenExpires);
                 }
             }, TOKEN_LIFETIME_MONITOR_INTERVAL_MS);
 
@@ -142,11 +142,11 @@ function Layout(props: LayoutProps) {
 
     return (
         <React.Fragment>
-            {bootstrapInfo.isFetchingVersion ? (
+            {application.isFetchingVersion ? (
                 <Loader />
             ) : (
                 <React.Fragment>
-                    <NavMenu userInfo={bootstrapInfo?.userInfo} />
+                    <NavMenu />
 
                     <Container className="main-content-container">
                         <Outlet />
@@ -163,7 +163,7 @@ function Layout(props: LayoutProps) {
                                     <Link to="/privacy">Privacy</Link>
                                 </Col>
                                 <Col sm="6" className="text-right">
-                                    {bootstrapInfo.applicationVersion}
+                                    {application.applicationVersion}
                                 </Col>
                             </Row>
                         </Container>

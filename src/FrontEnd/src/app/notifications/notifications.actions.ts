@@ -1,5 +1,5 @@
-import ActionType from '../store/actionType';
-import IAction from '../store/action.interface';
+import ActionType from '../globalReduxStore/actionType';
+import IAction from '../globalReduxStore/action.interface';
 import NotificationLevel from './notificationLevel';
 
 /**

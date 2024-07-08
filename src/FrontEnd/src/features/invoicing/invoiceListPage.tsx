@@ -12,9 +12,9 @@ import {
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Dispatch } from 'redux';
-import { ApplicationState } from '../../app/store';
-import IAction from '../../app/store/action.interface';
-import NavigationSection from '../../app/navigationSection';
+import { RootState } from '../../app/globalReduxStore';
+import IAction from '../../app/globalReduxStore/action.interface';
+import NavigationSection from '../../common/models/navigationSection.model';
 import TenantSubNavigation from '../../app/tenantSubNavigation';
 import {
     ILogger,
@@ -25,8 +25,8 @@ import { apiErrorHandler } from '../../common/utilities/errorHandling';
 const logger: ILogger = new Logger('Invoice List Page');
 const bemBlockName: string = 'invoice_list_page';
 
-const mapStateToProps = (state: ApplicationState) => ({
-    selectedTenant: state.bootstrap.selectedTenant,
+const mapStateToProps = (state: RootState) => ({
+    selectedTenant: state.application.selectedTenant,
 });
 
 const connector = connect(mapStateToProps);

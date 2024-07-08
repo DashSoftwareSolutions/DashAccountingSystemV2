@@ -9,26 +9,26 @@ import {
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ApplicationState } from '../../../app/store';
+import { RootState } from '../../../app/globalReduxStore';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
 import ScrollableContent from '../../../common/components/scrollableContent';
-import NavigationSection from '../../../app/navigationSection';
+import NavigationSection from '../../../common/models/navigationSection.model';
 import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import {
     ILogger,
     Logger,
 } from '../../../common/logging';
-import accountsActions from '../data/accounts.actionCreators';
-import { Account } from '../models';
+import accountsActions from './redux/accounts.actionCreators';
+import { Account } from './models';
 
 const logger: ILogger = new Logger('Chart of Accounts Page');
 const bemBlockName: string = 'chart_of_accounts_page';
 
-const mapStateToProps = (state: ApplicationState) => ({
-    accounts: state.accounts.accounts,
-    isFetching: state.accounts.isFetching,
-    selectedTenant: state.bootstrap.selectedTenant,
+const mapStateToProps = (state: RootState) => ({
+    accounts: state.chartOfAccounts.accounts,
+    isFetching: state.chartOfAccounts.isFetching,
+    selectedTenant: state.application.selectedTenant,
 });
 
 const mapDispatchToProps = {
