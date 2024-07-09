@@ -15,8 +15,6 @@ import {
     useNavigate,
 } from 'react-router-dom';
 import { RootState } from '../../../app/globalReduxStore';
-import NavigationSection from '../../../common/models/navigationSection.model';
-import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
 import ScrollableContent from '../../../common/components/scrollableContent';
@@ -96,8 +94,6 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
 
     return (
         <React.Fragment>
-            <TenantSubNavigation activeSection={NavigationSection.Ledger} />
-
             <div className="page_header" id={`${bemBlockName}--header`}>
                 <Row>
                     <Col md={6}>
@@ -168,7 +164,7 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
                                                     </td>
                                                 </tr>
                                                 {account.transactions.map((transaction) => {
-                                                    const journalEntryViewRoute = `/journal-entry/view/${transaction.entryId}`;
+                                                    const journalEntryViewRoute = `/app/journal-entry/view/${transaction.entryId}`;
 
                                                     const checkNumberSuffix = !isNil(transaction.checkNumber) ?
                                                         ` (Check #${transaction.checkNumber})` :

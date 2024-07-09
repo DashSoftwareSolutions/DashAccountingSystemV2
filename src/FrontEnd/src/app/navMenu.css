@@ -26,3 +26,9 @@ html {
     margin-top: 2px;
     vertical-align: text-top;
 }
+
+.app-nav-link {
+    border-radius: 0px;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}

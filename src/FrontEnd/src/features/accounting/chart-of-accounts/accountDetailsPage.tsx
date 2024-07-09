@@ -10,8 +10,6 @@ import {
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../../app/globalReduxStore';
-import NavigationSection from '../../../common/models/navigationSection.model';
-import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import {
     ILogger,
@@ -59,7 +57,6 @@ function AccountDetailsPage(props: AccountDetailsPageProps) {
 
     return (
         <React.Fragment>
-            <TenantSubNavigation activeSection={NavigationSection.Ledger} />
             <div className="page_header" id={`${bemBlockName}--header`}>
                 {isNil(selectedAccount) ? (<></>) : (
                     <Row>

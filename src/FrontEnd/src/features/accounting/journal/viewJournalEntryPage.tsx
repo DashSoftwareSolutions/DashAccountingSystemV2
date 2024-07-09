@@ -22,9 +22,7 @@ import {
     useParams,
 } from 'react-router-dom';
 import { RootState } from '../../../app/globalReduxStore';
-import NavigationSection from '../../../common/models/navigationSection.model';
 import NotificationLevel from '../../../app/notifications/notificationLevel';
-import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import Loader from '../../../common/components/loader';
 import {
     ILogger,
@@ -186,8 +184,6 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
 
     return (
         <React.Fragment>
-            <TenantSubNavigation activeSection={NavigationSection.Ledger} />
-
             <div className="page_header" id={`${bemBlockName}--header`}>
                 <Row>
                     <Col md={5}>

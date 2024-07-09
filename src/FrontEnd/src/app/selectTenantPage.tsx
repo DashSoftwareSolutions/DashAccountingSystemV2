@@ -13,9 +13,9 @@ import {
     ILogger,
     Logger,
 } from '../common/logging';
-import { actionCreators as bootstrapActionCreators } from './applicationRedux';
+import { actionCreators } from './applicationRedux';
 import { RootState } from './globalReduxStore';
-import { Tenant } from '../common/models';
+import { NavigationSection, Tenant } from '../common/models';
 
 const logger: ILogger = new Logger('Select Tenant Page');
 
@@ -25,7 +25,8 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = {
-    selectTenant: bootstrapActionCreators.selectTenant,
+    selectTenant: actionCreators.selectTenant,
+    setNavigationSection: actionCreators.setNavigationSection,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -38,6 +39,7 @@ function SelectTenantPage(props: SelectTenantPageProps) {
     const {
         selectTenant,
         selectedTenant,
+        setNavigationSection,
         tenants,
     } = props;
 
@@ -46,6 +48,7 @@ function SelectTenantPage(props: SelectTenantPageProps) {
     useEffect(() => {
         if (!isNil(selectedTenant)) {
             logger.info('Selected Tenant: ', selectedTenant);
+            setNavigationSection(NavigationSection.Dashboard);
             navigate('/app/dashboard');
         }
     }, [

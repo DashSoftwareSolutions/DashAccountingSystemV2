@@ -72,6 +72,13 @@ const reducer: Reducer<ApplicationState> = (state: ApplicationState | undefined,
                     ...state,
                     selectedTenant: action.tenant,
                 };
+
+            case ActionType.SET_NAVIGATION_SECTION: {
+                return {
+                    ...state,
+                    selectedNavigationSection: action.navigationSection,
+                };
+            }
         }
     }
 

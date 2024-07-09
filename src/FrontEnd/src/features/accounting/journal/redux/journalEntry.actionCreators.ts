@@ -40,6 +40,7 @@ const actionCreators = {
     requestJournalEntry: (entryId: number): AppThunkAction<KnownAction> => async (dispatch, getState) => {
         const appState = getState();
         const tenantId = appState.application?.selectedTenant?.id;
+        const accessToken = appState.authentication.tokens?.accessToken;
 
         if (isNil(tenantId)) {
             logger.warn('No selected Tenant.  Cannot fetch Journal Entry');
@@ -50,7 +51,11 @@ const actionCreators = {
         const isFetching = appState.journal?.isFetching ?? false;
 
         if (!isFetching && (isNil(existingEntry) || existingEntry?.entryId !== entryId)) {
-            fetch(`/api/journal/${tenantId}/entry/${entryId}`)
+            fetch(`/api/journal/${tenantId}/entry/${entryId}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
                 .then(response => {
                     if (!response.ok) {
                         apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>)

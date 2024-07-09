@@ -4,7 +4,7 @@ import { Scrollbars } from 'react-custom-scrollbars';
 function ScrollableContent({
     autoHide = true,
     children,
-    height = 580,
+    height = 630,
 }: {
     autoHide?: boolean;
     children: React.ReactNode;

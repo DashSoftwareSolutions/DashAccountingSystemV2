@@ -10,8 +10,6 @@ import {
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../../app/globalReduxStore';
-import NavigationSection from '../../../common/models/navigationSection.model';
-import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import {
     ILogger,
     Logger,
@@ -46,7 +44,6 @@ function EditJournalEntryPage(props: EditJournalEntryPageProps) {
 
     return (
         <React.Fragment>
-            <TenantSubNavigation activeSection={NavigationSection.Ledger} />
             <div className="page_header" id={`${bemBlockName}--header`}>
                 <Row>
                     <Col>

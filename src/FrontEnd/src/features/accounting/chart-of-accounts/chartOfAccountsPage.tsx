@@ -13,8 +13,6 @@ import { RootState } from '../../../app/globalReduxStore';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
 import ScrollableContent from '../../../common/components/scrollableContent';
-import NavigationSection from '../../../common/models/navigationSection.model';
-import TenantSubNavigation from '../../../app/tenantSubNavigation';
 import {
     ILogger,
     Logger,
@@ -75,8 +73,6 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
 
     return (
         <React.Fragment>
-            <TenantSubNavigation activeSection={NavigationSection.ChartOfAccounts} />
-
             <div className="page_header" id={`${bemBlockName}--header`}>
                 <Row>
                     <Col>
