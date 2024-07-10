@@ -37,7 +37,6 @@ class ApiErrorHandler implements IApiErrorHandler {
 
                 default:
                     {
-                        const responseLevel = Math.floor(errorResponse.status / 100);
                         const structuredApiErrorResponse = await (errorResponse.json() as Promise<ApiErrorResponse>);
                         let errorMessage: string = 'An unexpected error occurred.';
                         let errorToastJsx: React.ReactNode;
@@ -73,7 +72,10 @@ class ApiErrorHandler implements IApiErrorHandler {
                             </React.Fragment>
                         );
 
-                        showAlert(responseLevel === 4 ? NotificationLevel.Warning : NotificationLevel.Danger, errorToastJsx, false);
+                        showAlert(
+                            Math.floor(errorResponse.status / 100) === 4 ? NotificationLevel.Warning : NotificationLevel.Danger,
+                            errorToastJsx,
+                            false);
 
                         break;
                     }
