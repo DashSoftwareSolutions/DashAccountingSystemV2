@@ -81,6 +81,10 @@ const actionCreators = {
         dispatch({ type: ActionType.SELECT_TENANT, tenant });
     },
 
+    setMainContentContainerHeight: (height: number): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({ type: ActionType.SET_MAIN_CONTENT_CONTAINER_HEIGHT, height });
+    },
+
     setNavigationSection: (navigationSection: NavigationSection | null): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({ type: ActionType.SET_NAVIGATION_SECTION, navigationSection });
     },

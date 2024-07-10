@@ -29,6 +29,11 @@ export interface SelectTenantAction extends IAction {
     tenant: Tenant;
 }
 
+export interface SetMainContentContainerHeightAction extends IAction {
+    type: ActionType.SET_MAIN_CONTENT_CONTAINER_HEIGHT;
+    height: number;
+}
+
 export interface SetNavigationSectionAction extends IAction {
     type: ActionType.SET_NAVIGATION_SECTION;
     navigationSection: NavigationSection | null;
@@ -40,4 +45,5 @@ export type KnownAction =
     RequestBootstrapInfoAction |
     ReceiveBootstrapInfoAction |
     SelectTenantAction |
+    SetMainContentContainerHeightAction |
     SetNavigationSectionAction;

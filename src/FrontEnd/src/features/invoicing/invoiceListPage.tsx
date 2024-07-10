@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { RootState } from '../../app/globalReduxStore';
 import IAction from '../../app/globalReduxStore/action.interface';
+import MainPageContent from '../../common/components/mainPageContent';
 import {
     ILogger,
     Logger,
@@ -84,13 +85,14 @@ function InvoiceListPage(props: InvoiceListPageProps) {
                     </Col>
                 </Row>
             </div>
-            <div id={`${bemBlockName}--content`}>
+
+            <MainPageContent id={`${bemBlockName}--content`}>
                 <p>TODO: Invoice List Page content</p>
                 <Button color="danger" onClick={onClick500}>Test 500 Error Toast</Button>
                 <br />
                 <br />
                 <Button color="warning" onClick={oncClick400}>Test Validation Error Toast</Button>
-            </div>
+            </MainPageContent>
         </React.Fragment>
     );
 }

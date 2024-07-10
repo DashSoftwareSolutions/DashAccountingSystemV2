@@ -24,6 +24,7 @@ import {
 import { RootState } from '../../../app/globalReduxStore';
 import NotificationLevel from '../../../app/notifications/notificationLevel';
 import Loader from '../../../common/components/loader';
+import MainPageContent from '../../../common/components/mainPageContent';
 import {
     ILogger,
     Logger,
@@ -236,7 +237,7 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
                 </Row>
             </div>
 
-            <div id={`${bemBlockName}--content`}>
+            <MainPageContent id={`${bemBlockName}--content`}>
                 {isFetching && (<Loader />)}
 
                 {!isFetching && !hasJournalEntry && (
@@ -283,7 +284,7 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
                         </Button>
                     </ModalFooter>
                 </Modal>
-            </div>
+            </MainPageContent>
         </React.Fragment>
     );
 }

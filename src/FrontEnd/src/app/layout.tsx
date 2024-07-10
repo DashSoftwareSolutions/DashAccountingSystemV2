@@ -20,6 +20,7 @@ import {
 } from 'reactstrap';
 import { actionCreators as authenticationActionCreators } from './authentication/redux';
 import { actionCreators as bootstrapActionCreators } from './applicationRedux';
+import MainContent from './mainContent';
 import NavMenu from './navMenu';
 import { AccessTokenResponse } from './authentication/models';
 import { RootState } from './globalReduxStore';
@@ -133,7 +134,6 @@ function Layout(props: LayoutProps) {
     }, [tokenExpires]);
 
     // If we just got logged in we will need to fetch the bootstrap info (user info and authorized tenants)
-    // Also we will setup an interval to check for expiring access tokens and refresh them
     useEffect(() => {
         if (!wasLoggedIn && isLoggedIn) {
             requestBootstrapInfo();
@@ -148,9 +148,9 @@ function Layout(props: LayoutProps) {
                 <React.Fragment>
                     <NavMenu />
 
-                    <Container className="main-content-container">
+                    <MainContent>
                         <Outlet />
-                    </Container>
+                    </MainContent>
 
                     <SystemNotificationsArea />
 

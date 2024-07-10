@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../../app/globalReduxStore';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
-import ScrollableContent from '../../../common/components/scrollableContent';
+import MainPageContent from '../../../common/components/mainPageContent';
 import {
     ILogger,
     Logger,
@@ -82,42 +82,40 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
                 </Row>
             </div>
 
-            <div id={`${bemBlockName}--content`}>
+            <MainPageContent id={`${bemBlockName}--content`}>
                 {isFetching ? (
                     <Loader />
                 ) : (
-                    <ScrollableContent>
-                        <table className="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th className="bg-white sticky-top sticky-border">#</th>
-                                    <th className="bg-white sticky-top sticky-border">Name</th>
-                                    <th className="bg-white sticky-top sticky-border">Type</th>
-                                    <th className="bg-white sticky-top sticky-border">Detailed Type</th>
-                                    <th className="bg-white sticky-top sticky-border text-end">Balance</th>
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th className="bg-white sticky-top sticky-border">#</th>
+                                <th className="bg-white sticky-top sticky-border">Name</th>
+                                <th className="bg-white sticky-top sticky-border">Type</th>
+                                <th className="bg-white sticky-top sticky-border">Detailed Type</th>
+                                <th className="bg-white sticky-top sticky-border text-end">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {accounts?.map((account: Account) =>
+                                <tr key={account.accountNumber} onClick={() => onAccountSelected(account)} style={{ cursor: 'pointer' }}>
+                                    <td>{account.accountNumber}</td>
+                                    <td>{account.name}</td>
+                                    <td>{account.accountType.name}</td>
+                                    <td>{account.accountSubType.name}</td>
+                                    <td style={{ textAlign: 'right' }}>
+                                        <AmountDisplay
+                                            amount={account.balance}
+                                            normalBalanceType={account.normalBalanceType}
+                                            showCurrency
+                                        />
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {accounts?.map((account: Account) =>
-                                    <tr key={account.accountNumber} onClick={() => onAccountSelected(account)} style={{ cursor: 'pointer' }}>
-                                        <td>{account.accountNumber}</td>
-                                        <td>{account.name}</td>
-                                        <td>{account.accountType.name}</td>
-                                        <td>{account.accountSubType.name}</td>
-                                        <td style={{ textAlign: 'right' }}>
-                                            <AmountDisplay
-                                                amount={account.balance}
-                                                normalBalanceType={account.normalBalanceType}
-                                                showCurrency
-                                            />
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </ScrollableContent>
+                            )}
+                        </tbody>
+                    </table>
                 )}
-            </div>
+            </MainPageContent>
         </React.Fragment>
     );
 }

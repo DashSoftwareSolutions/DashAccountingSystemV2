@@ -17,7 +17,8 @@ enum ActionType {
     SET_EXISTING_TOKENS_FROM_SESSION_STORAGE = 'SET_EXISTING_TOKENS_FROM_SESSION_STORAGE',
     TOKEN_REFRESH_FAILED = 'TOKEN_REFRESH_FAILED',
 
-    // Common - Application Navigation
+    // Common - Application infrastructure
+    SET_MAIN_CONTENT_CONTAINER_HEIGHT = 'SET_MAIN_CONTENT_CONTAINER_HEIGHT',
     SET_NAVIGATION_SECTION = 'SET_NAVIGATION_SECTION',
 
     // Common - System Notifications

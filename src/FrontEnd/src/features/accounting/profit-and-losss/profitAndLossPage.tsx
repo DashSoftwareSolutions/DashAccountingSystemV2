@@ -10,6 +10,7 @@ import {
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../../app/globalReduxStore';
+import MainPageContent from '../../../common/components/mainPageContent';
 import {
     ILogger,
     Logger,
@@ -52,9 +53,10 @@ function ProfitAndLossPage(props: ProfitAndLossPageProps) {
                     </Col>
                 </Row>
             </div>
-            <div id={`${bemBlockName}--content`}>
+
+            <MainPageContent id={`${bemBlockName}--content`}>
                 TODO: Profit &amp; Loss
-            </div>
+            </MainPageContent>
         </React.Fragment>
     );
 }

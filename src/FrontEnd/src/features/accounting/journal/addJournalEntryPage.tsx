@@ -15,6 +15,7 @@ import {
     actionCreators as notificationActionCreators,
     NotificationLevel,
 } from '../../../app/notifications';
+import MainPageContent from '../../../common/components/mainPageContent';
 import {
     ILogger,
     Logger,
@@ -79,7 +80,7 @@ function AddJournalEntryPage(props: AddJournalEntryPageProps) {
             showAlert(NotificationLevel.Success, `Successfully created Journal Entry ID ${savedEntry.entryId}`, true);
             resetDirtyEditorState();
             resetLedgerReportData();
-            navigate('/ledger');
+            navigate('/app/ledger');
         }
     }, [
         isSaving,
@@ -88,7 +89,7 @@ function AddJournalEntryPage(props: AddJournalEntryPageProps) {
 
     const onClickCancel = () => {
         resetDirtyEditorState();
-        navigate('/ledger');
+        navigate('/app/ledger');
     };
 
     const onClickSave = () => {
@@ -125,9 +126,10 @@ function AddJournalEntryPage(props: AddJournalEntryPageProps) {
                     </Col>
                 </Row>
             </div>
-            <div id={`${bemBlockName}--content`}>
+
+            <MainPageContent id={`${bemBlockName}--content`}>
                 <JournalEntryEditor mode={Mode.Add} />
-            </div>
+            </MainPageContent>
         </React.Fragment>
     );
 }

@@ -14,6 +14,7 @@ import {
 export interface ApplicationState extends BootstrapInfo {
     isFetchingBootstrap: boolean;
     isFetchingVersion: boolean;
+    mainContentContainerHeight: number;
     selectedNavigationSection: NavigationSection | null;
     selectedTenant: Tenant | null,
 }
@@ -22,6 +23,7 @@ const unloadedState: ApplicationState = {
     isFetchingBootstrap: false,
     isFetchingVersion: false,
     applicationVersion: '',
+    mainContentContainerHeight: 0,
     selectedNavigationSection: null,
     selectedTenant: null,
     tenants: [],
@@ -71,6 +73,12 @@ const reducer: Reducer<ApplicationState> = (state: ApplicationState | undefined,
                 return {
                     ...state,
                     selectedTenant: action.tenant,
+                };
+
+            case ActionType.SET_MAIN_CONTENT_CONTAINER_HEIGHT:
+                return {
+                    ...state,
+                    mainContentContainerHeight: action.height,
                 };
 
             case ActionType.SET_NAVIGATION_SECTION: {

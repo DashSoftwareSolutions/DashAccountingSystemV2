@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using DashAccountingSystemV2.BackEnd.ViewModels.Serialization;
@@ -23,14 +23,14 @@ namespace DashAccountingSystemV2.BackEnd.ViewModels
 
         [MaxLength(2048)]
         [Required(AllowEmptyStrings = false)]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
-        public string Note { get; set; }
+        public string? Note { get; set; }
 
         public uint? CheckNumber { get; set; }
 
         [Required]
-        public IEnumerable<JournalEntryAccountCreateRequestViewModel> Accounts { get; set; }
+        public IEnumerable<JournalEntryAccountCreateRequestViewModel> Accounts { get; set; } = [];
 
         public bool Validate(ModelStateDictionary modelState)
         {

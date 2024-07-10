@@ -1,10 +1,22 @@
-/* Provide sufficient contrast against white background */
-a {
-    color: #0366d6;
+html {
+    font-size: 14px;
+    height: 100vh;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
     overflow-y: scroll;
+    height: 100%;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+    color: #0366d6;
 }
 
 code {
@@ -12,7 +24,10 @@ code {
 }
 
 .main-content-container {
-    min-height: 780px;
+    height: calc(100vh - 118px);
+    margin-top: -17px;
+    padding-top: 17px;
+    --bs-gutter-x: 0;
 }
 
 .btn-primary {

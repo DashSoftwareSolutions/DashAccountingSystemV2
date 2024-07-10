@@ -11,6 +11,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../../app/globalReduxStore';
 import AmountDisplay from '../../../common/components/amountDisplay';
+import MainPageContent from '../../../common/components/mainPageContent';
 import {
     ILogger,
     Logger,
@@ -74,9 +75,10 @@ function AccountDetailsPage(props: AccountDetailsPageProps) {
                     </Row>
                 )}
             </div>
-            <div id={`${bemBlockName}--content`}>
+
+            <MainPageContent id={`${bemBlockName}--content`}>
                 <p>Coming soon...</p>
-            </div>
+            </MainPageContent>
         </React.Fragment>
     );
 }
