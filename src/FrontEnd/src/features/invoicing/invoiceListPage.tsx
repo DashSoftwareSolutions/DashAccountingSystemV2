@@ -48,8 +48,25 @@ function InvoiceListPage(props: InvoiceListPageProps) {
         }
     }, [selectedTenant]);
 
-    const onClick = (() => {
+    const onClick500 = (() => {
         fetch('/api/test-errors/problem-500')
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                }
+            });
+    });
+
+    const oncClick400 = (() => {
+        const requestOptions = {
+            method: 'POST',
+            body: JSON.stringify({}),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch('/api/test-errors/request-validation', requestOptions)
             .then((response) => {
                 if (!response.ok) {
                     apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
@@ -69,7 +86,10 @@ function InvoiceListPage(props: InvoiceListPageProps) {
             </div>
             <div id={`${bemBlockName}--content`}>
                 <p>TODO: Invoice List Page content</p>
-                <Button onClick={onClick}>Test Error Toast</Button>
+                <Button color="danger" onClick={onClick500}>Test 500 Error Toast</Button>
+                <br />
+                <br />
+                <Button color="warning" onClick={oncClick400}>Test Validation Error Toast</Button>
             </div>
         </React.Fragment>
     );

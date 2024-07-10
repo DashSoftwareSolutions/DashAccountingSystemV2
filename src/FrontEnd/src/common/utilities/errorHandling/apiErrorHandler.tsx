@@ -1,7 +1,8 @@
+import React from 'react';
 import {
     isEmpty,
     isNil,
-    trim,
+    uniqueId,
 } from 'lodash';
 import {
     bindActionCreators,
@@ -34,24 +35,48 @@ class ApiErrorHandler implements IApiErrorHandler {
                     showAlert(NotificationLevel.Warning, 'You do not have permission for this operation', false);
                     break;
 
-                case 400: // 400 Bad Request
-                case 409: // 409 Conflict
+                default:
                     {
+                        const responseLevel = Math.floor(errorResponse.status / 100);
                         const structuredApiErrorResponse = await (errorResponse.json() as Promise<ApiErrorResponse>);
-                        const errorMessage = trim(`${structuredApiErrorResponse.detail ?? structuredApiErrorResponse.title ?? ''}\n${httpStatus}`);
-
-                        // TODO: There might be validation errors or other things that need to go into detailed error messages
+                        let errorMessage: string = 'An unexpected error occurred.';
+                        let errorToastJsx: React.ReactNode;
+                        let validationErrorDetails: React.ReactNode;
 
                         if (!isNil(structuredApiErrorResponse)) {
-                            showAlert(NotificationLevel.Warning, errorMessage, false);
+                            errorMessage = structuredApiErrorResponse.detail ?? structuredApiErrorResponse.title ?? errorMessage;
+
+                            if (!isEmpty(structuredApiErrorResponse.errors)) {
+                                validationErrorDetails = (
+                                    <ul>
+                                        {Object.values(structuredApiErrorResponse.errors).flatMap((e) => (<li key={`error-${uniqueId}`}>{e}</li>))}
+                                    </ul>
+                                );
+                            }
                         }
+
+                        errorToastJsx = (
+                            <React.Fragment>
+                                <p>{errorMessage}</p>
+
+                                {!isNil(validationErrorDetails) && (
+                                    <React.Fragment>
+                                        {validationErrorDetails}
+                                    </React.Fragment>
+                                )}
+
+                                <hr className="mb-1" />
+
+                                <p className="fst-italic mt-0 mb-0 text-secondary">
+                                    {httpStatus}
+                                </p>
+                            </React.Fragment>
+                        );
+
+                        showAlert(responseLevel === 4 ? NotificationLevel.Warning : NotificationLevel.Danger, errorToastJsx, false);
 
                         break;
                     }
-
-                default:
-                    showAlert(NotificationLevel.Danger, `Received an error from the API.  ${httpStatus}`, false);
-
             }
         }
     }
