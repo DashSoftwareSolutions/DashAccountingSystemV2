@@ -85,8 +85,8 @@ namespace DashAccountingSystemV2.BackEnd.ViewModels
 
             var result = new JournalEntry(
                 viewModel.TenantId,
-                viewModel.EntryDate.AsUtc(),
-                viewModel.PostDate.AsUtc(),
+                viewModel.EntryDate,
+                viewModel.PostDate,
                 viewModel.Description,
                 viewModel.CheckNumber,
                 contextUserId,
