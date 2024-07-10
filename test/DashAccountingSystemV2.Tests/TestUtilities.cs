@@ -47,10 +47,6 @@ namespace DashAccountingSystemV2.Tests
 
         internal static async Task<ApplicationDbContext> GetDatabaseContextAsync()
         {
-            // Tell Npgsql to stop driving me insane about Date Time Kind!
-            // https://www.npgsql.org/doc/types/datetime.html#timestamps-and-timezones
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
             var connectionString = GetConnectionString();
 
             var dbCtxOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
