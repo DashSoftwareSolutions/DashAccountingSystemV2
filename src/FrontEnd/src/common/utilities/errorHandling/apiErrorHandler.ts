@@ -1,6 +1,7 @@
 import {
     isEmpty,
     isNil,
+    trim,
 } from 'lodash';
 import {
     bindActionCreators,
@@ -37,7 +38,7 @@ class ApiErrorHandler implements IApiErrorHandler {
                 case 409: // 409 Conflict
                     {
                         const structuredApiErrorResponse = await (errorResponse.json() as Promise<ApiErrorResponse>);
-                        const errorMessage = `${structuredApiErrorResponse.detail} (${httpStatus})`;
+                        const errorMessage = trim(`${structuredApiErrorResponse.detail ?? structuredApiErrorResponse.title ?? ''}\n${httpStatus}`);
 
                         // TODO: There might be validation errors or other things that need to go into detailed error messages
 

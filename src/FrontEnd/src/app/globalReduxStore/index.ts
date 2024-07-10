@@ -5,6 +5,7 @@ import * as Authentication from '../authentication/redux';
 import * as ChartOfAccounts from '../../features/accounting/chart-of-accounts/redux';
 import * as Journal from '../../features/accounting/journal/redux';
 import * as Ledger from '../../features/accounting/general-ledger/redux';
+import * as Lookups from '../lookupValues';
 import * as SystemNotifications from '../notifications';
 
 /**
@@ -16,6 +17,7 @@ export interface RootState {
     chartOfAccounts: ChartOfAccounts.state,
     journal: Journal.state,
     ledger: Ledger.state,
+    lookups: Lookups.state,
     systemNotifications: SystemNotifications.state;
 }
 
@@ -28,6 +30,7 @@ export const reducers = {
     authentication: Authentication.reducer,
     journal: Journal.reducer,
     ledger: Ledger.reducer,
+    lookups: Lookups.reducer,
     systemNotifications: SystemNotifications.reducer,
 };
 

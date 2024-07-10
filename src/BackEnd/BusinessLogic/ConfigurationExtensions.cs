@@ -1,15 +1,15 @@
-﻿namespace DashAccountingSystemV2.BackEnd.BusinessLogic
+namespace DashAccountingSystemV2.BackEnd.BusinessLogic
 {
     public static class ConfigurationExtensions
     {
         public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
         {
-            // Business Logic layer objects
             services
                 .AddScoped<ITenantBusinessLogic, TenantBusinessLogic>()
                 .AddScoped<IAccountBusinessLogic, AccountBusinessLogic>()
                 .AddScoped<ILedgerBusinessLogic, LedgerBusinessLogic>()
-                .AddScoped<IJournalEntryBusinessLogic, JournalEntryBusinessLogic>();
+                .AddScoped<IJournalEntryBusinessLogic, JournalEntryBusinessLogic>()
+                .AddScoped<ITimeZoneBusinessLogic, TimeZoneBusinessLogic>();
 
             return services;
         }

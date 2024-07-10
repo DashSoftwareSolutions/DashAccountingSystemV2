@@ -1,7 +1,3 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
-
 namespace DashAccountingSystemV2.BackEnd.Models
 {
     public class Pagination : PaginationBase
@@ -13,19 +9,16 @@ namespace DashAccountingSystemV2.BackEnd.Models
         /// to sort by.  To specify sorting by descending order, the value should be prefixed with a "-".
         /// Otherwise it represents an ascending sort.
         /// </summary>
-        [JsonIgnore]
         public string SortBy { get; set; }
 
         /// <summary>
         /// Sort Columns that are translated from the SortingQuery
         /// </summary>
-        [JsonIgnore]
         public List<Sorting> SortColumns { get; set; }
 
         /// <summary>
         /// Gets the first sort column.
         /// </summary>
-        [JsonIgnore]
         public string SortColumn
         {
             get { return SortColumns?.FirstOrDefault()?.SortColumn; }
@@ -49,7 +42,6 @@ namespace DashAccountingSystemV2.BackEnd.Models
         /// <summary>
         /// Gets whether the sort is descending.
         /// </summary>
-        [JsonIgnore]
         public bool IsDescendingSort
         {
             get { return SortColumns?.FirstOrDefault()?.SortDirection == SortDirection.Descending; }
@@ -74,10 +66,8 @@ namespace DashAccountingSystemV2.BackEnd.Models
         // TODO: PageSize should be limited to some reasonable value (e.g., see PaginationValidationFilterAttribute.cs)
 
         #region - DB related -
-        [JsonIgnore]
         public int Offset => PageSize.HasValue ? ((PageNumber ?? 1) - 1) * PageSize.Value : 0; /* Using 1-based page numbers  */
 
-        [JsonIgnore]
         public int Limit => PageSize ?? DefaultPageSize;
 
         /// <summary>
@@ -87,7 +77,6 @@ namespace DashAccountingSystemV2.BackEnd.Models
         /// but the Npgsql/Dapper powered queries will fail with the error message
         /// "PostgresException: 42804: argument of LIMIT must be type bigint, not type text".  ¯\_(ツ)_/¯
         /// </summary>
-        [JsonIgnore]
         public string DBLimit => Limit == DefaultPageSize ? "ALL" : Limit.ToString();
         #endregion - DB related -
 

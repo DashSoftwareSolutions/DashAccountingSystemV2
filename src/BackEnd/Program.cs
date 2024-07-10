@@ -9,6 +9,7 @@ using DashAccountingSystemV2.BackEnd.Models;
 using DashAccountingSystemV2.BackEnd.Repositories;
 using DashAccountingSystemV2.BackEnd.Security.Authentication;
 using DashAccountingSystemV2.BackEnd.Security.Authorization;
+using DashAccountingSystemV2.BackEnd.Services.Caching;
 
 try
 {
@@ -57,6 +58,7 @@ try
     builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
     // Other application services (repositories, business logic, services, etc.)
+    builder.Services.AddCaching();
     builder.Services.AddRepositories();
     builder.Services.AddBusinessLogic();
 
