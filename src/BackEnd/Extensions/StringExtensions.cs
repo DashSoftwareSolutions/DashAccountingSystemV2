@@ -1,22 +1,22 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DashAccountingSystemV2.BackEnd.Extensions
 {
-    public static class StringExtensions
+    public static partial class StringExtensions
     {
         public static string EnsureTrailingSlash(this string str)
         {
             if (string.IsNullOrWhiteSpace(str))
                 return str;
 
-            return !str.EndsWith("/") ? str + "/" : str;
+            return !str.EndsWith('/') ? $"{str}/" : str;
         }
 
-        public static string GetConnectionStringComponent(this string fullConnectionString, string component)
+        public static string? GetConnectionStringComponent(this string fullConnectionString, string component)
         {
-            return fullConnectionString.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+            return fullConnectionString.Split([';'], StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => s.StartsWith(component, StringComparison.OrdinalIgnoreCase))
                 .Select(s => s.Replace($"{component}=", string.Empty, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
@@ -24,12 +24,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
 
         public static string GetTrimmedOrEmptyString(this string input)
         {
-            return input.HasValue() ? input.Trim() : string.Empty;
-        }
-
-        public static bool HasValue(this string str)
-        {
-            return !string.IsNullOrEmpty(str);
+            return !string.IsNullOrWhiteSpace(input) ? input.Trim() : string.Empty;
         }
 
         public static string MaskPassword(
@@ -46,7 +41,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
                 return connectionString;
 
             var passwordClause = passwordClauseMatch.Value;
-            var passwordClauseParts = passwordClause.Split(new char[] { '=' });
+            var passwordClauseParts = passwordClause.Split(['=']);
             var updatedPasswordClause = string.Join("=",
                 passwordClauseParts[0],
                 passwordClauseParts[1].MaskSecretValue(numTrailingCharactersToReveal, maskCharacter));
@@ -87,73 +82,16 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
             return new string(allChars);
         }
 
-        private static readonly Regex s_passwordClausePattern =
-            new Regex("password\\s*=\\s*([^,;]*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        [GeneratedRegex("password\\s*=\\s*([^,;]*)", RegexOptions.IgnoreCase | RegexOptions.Compiled, "en-US")]
+        private static partial Regex ConnectionStringPasswordRegex();
 
-        public static IEnumerable<TEnum> ParseCommaSeparatedEnumValues<TEnum>(this string commaSeparatedEnumList) where TEnum : struct
-        {
-            if (string.IsNullOrWhiteSpace(commaSeparatedEnumList))
-                return null;
-
-            return commaSeparatedEnumList
-                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(s =>
-                {
-                    if (Enum.TryParse<TEnum>(s, out var res))
-                        return (Parsed: true, Value: res);
-
-                    return (Parsed: false, Value: res);
-                })
-                .Where(s => s.Parsed)
-                .Select(s => s.Value);
-        }
-
-        public static IEnumerable<Guid> ParseCommaSeparatedGuids(this string commaSeparatedGuidList)
-        {
-            if (string.IsNullOrWhiteSpace(commaSeparatedGuidList))
-                return null;
-
-            return commaSeparatedGuidList
-                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(s => Guid.TryParse(s, out Guid parsed) ? parsed : (Guid?)null)
-                .Where(theGuid => theGuid.HasValue)
-                .Select(theGuid => theGuid.Value);
-        }
-
-        public static IEnumerable<uint> ParseCommaSeparatedIntegers(this string commaSeparatedIntegerList)
-        {
-            if (string.IsNullOrWhiteSpace(commaSeparatedIntegerList))
-                return null;
-
-            return commaSeparatedIntegerList
-                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(s => uint.TryParse(s, out uint parsed) ? parsed : (uint?)null)
-                .Where(theInt => theInt.HasValue)
-                .Select(theInt => theInt.Value);
-        }
-
-        public static IEnumerable<uint> ParseCommaSeparatedIntegers(this IEnumerable<string> commaSeparatedIntegerLists)
-        {
-            return string.Join(",", commaSeparatedIntegerLists ?? Enumerable.Empty<string>()).ParseCommaSeparatedIntegers();
-        }
-
-        /// <summary>
-        /// Returns string Enumerable from CSV string parameter 
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static IEnumerable<string> ParseCommaSeparatedValues(this string str)
-        {
-            return string.IsNullOrWhiteSpace(str)
-                ? Enumerable.Empty<string>()
-                : str.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-        }
+        private static readonly Regex s_passwordClausePattern = ConnectionStringPasswordRegex();
 
         /// <summary>
         /// Performs Unicode Normalization
         /// </summary>
         /// <remarks>
-        /// The commented out live implementation can be problematic, especially in cross-platform sceanrios (or at least it was as of a few years ago).
+        /// The commented out live implementation can be problematic, especially in cross-platform scenarios (or at least it was as of a few years ago).
         /// For now, <see cref="ReplaceKnownUnicodeLigatures(string)"/> is doing all the work for a Poor Man's version.
         /// </remarks>
         /// <param name="input"></param>
@@ -185,6 +123,69 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
             //}
 
             //return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        public static IEnumerable<TEnum> ParseCommaSeparatedEnumValues<TEnum>(this string commaSeparatedEnumList) where TEnum : struct
+        {
+            if (string.IsNullOrWhiteSpace(commaSeparatedEnumList))
+                return [];
+
+            return commaSeparatedEnumList
+                .Split([','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(s =>
+                {
+                    if (Enum.TryParse<TEnum>(s, out var res))
+                        return (Parsed: true, Value: res);
+
+                    return (Parsed: false, Value: res);
+                })
+                .Where(s => s.Parsed)
+                .Select(s => s.Value);
+        }
+
+        public static IEnumerable<Guid> ParseCommaSeparatedGuids(this string commaSeparatedGuidList)
+        {
+            if (string.IsNullOrWhiteSpace(commaSeparatedGuidList))
+                return [];
+
+#pragma warning disable CS8629 // Nullable value type may be null.
+            return commaSeparatedGuidList
+                .Split([','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(s => Guid.TryParse(s, out Guid parsed) ? parsed : (Guid?)null)
+                .Where(theGuid => theGuid.HasValue)
+                .Select(theGuid => theGuid.Value); // we already filtered to the ones that have a value, so we're good here! =)
+#pragma warning restore CS8629 // Nullable value type may be null.
+        }
+
+        public static IEnumerable<uint> ParseCommaSeparatedIntegers(this string commaSeparatedIntegerList)
+        {
+            if (string.IsNullOrWhiteSpace(commaSeparatedIntegerList))
+                return [];
+
+#pragma warning disable CS8629 // Nullable value type may be null.
+            return commaSeparatedIntegerList
+                .Split([','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(s => uint.TryParse(s, out uint parsed) ? parsed : (uint?)null)
+                .Where(theInt => theInt.HasValue)
+                .Select(theInt => theInt.Value); // we already filtered to the ones that have a value, so we're good here! =)
+#pragma warning restore CS8629 // Nullable value type may be null.
+        }
+
+        public static IEnumerable<uint> ParseCommaSeparatedIntegers(this IEnumerable<string> commaSeparatedIntegerLists)
+        {
+            return string.Join(",", commaSeparatedIntegerLists ?? Enumerable.Empty<string>()).ParseCommaSeparatedIntegers();
+        }
+
+        /// <summary>
+        /// Returns string Enumerable from CSV string parameter 
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> ParseCommaSeparatedValues(this string str)
+        {
+            return string.IsNullOrWhiteSpace(str)
+                ? Enumerable.Empty<string>()
+                : str.Split([','], StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>
@@ -243,11 +244,11 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
             while ((foundAt = str.IndexOf(oldValue, startSearchFromIndex, comparisonType)) != valueNotFound)
             {
                 // Append all characters until the found replacement.
-                int @charsUntilReplacment = foundAt - startSearchFromIndex;
-                bool isNothingToAppend = @charsUntilReplacment == 0;
+                int charsUntilReplacement = foundAt - startSearchFromIndex;
+                bool isNothingToAppend = charsUntilReplacement == 0;
                 if (!isNothingToAppend)
                 {
-                    resultStringBuilder.Append(str, startSearchFromIndex, @charsUntilReplacment);
+                    resultStringBuilder.Append(str, startSearchFromIndex, charsUntilReplacement);
                 }
 
 
@@ -282,7 +283,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
         /// <summary>
         /// Poor Man's handling of certain Unicode ligatures and diacritics that have multi-letter replacements,
         /// e.g. German vowels with umlauts, etc.
-        /// Not 100% fool-proof ... it does not seem to be the case that all such characters have one unambigous replacement!
+        /// Not 100% fool-proof ... it does not seem to be the case that all such characters have one unambiguous replacement!
         /// Seems to depend on the particular word and the target locale (language and culture):
         /// https://en.wikipedia.org/wiki/List_of_words_that_may_be_spelled_with_a_ligature
         /// 
@@ -299,7 +300,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
         /// <returns></returns>
         public static string ReplaceKnownUnicodeLigatures(this string input)
         {
-            if (input == null) return null;
+            ArgumentNullException.ThrowIfNull(input);
 
             return input.Aggregate(
               new StringBuilder(),
@@ -385,7 +386,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
         };
 
         /// <summary>
-        /// Converts a string into a URL "slug" or other programatically valid identifier
+        /// Converts a string into a URL "slug" or other programmatically valid identifier
         /// e.g.
         ///     Dash Software Solutions, Inc. => dash-software-solutions-inc
         /// </summary>
@@ -397,7 +398,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
             bool forceLowercase = true,
             string delimiter = "-")
         {
-            if (input == null) return null;
+            ArgumentNullException.ThrowIfNull(input);
 
             var escapedDelimiter = Regex.Escape(delimiter);
 
@@ -417,16 +418,19 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
             s = Regex.Replace(s, pattern, string.Empty);
 
             // reduce multiple spaces into one space
-            s = Regex.Replace(s, @"[\s]+", " ").Trim();
+            s = MultipleSpacesRegex().Replace(s, " ").Trim();
 
             // replace multiple delimiters with a space
             s = Regex.Replace(s, $"{escapedDelimiter}+", " ").Trim();
 
             // replace any remaining whitespace with delimiters
-            s = Regex.Replace(s, @"\s+", delimiter);
+            s = MultipleSpacesRegex().Replace(s, delimiter);
 
             return s;
         }
+
+        [GeneratedRegex(@"[\s]+")]
+        private static partial Regex MultipleSpacesRegex();
 
         public static DateTime? TryParseAsDateTime(this string? viewModelDateTime, bool isUtc = false)
         {

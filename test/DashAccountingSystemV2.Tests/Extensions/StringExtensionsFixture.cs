@@ -1,4 +1,4 @@
-﻿using DashAccountingSystemV2.BackEnd.Extensions;
+using DashAccountingSystemV2.BackEnd.Extensions;
 
 namespace DashAccountingSystemV2.Tests.Extensions
 {
@@ -122,10 +122,10 @@ namespace DashAccountingSystemV2.Tests.Extensions
         [InlineData("Dash Software Solutions, Inc.", "Dash_Software_Solutions_Inc", false, "_")]
         [InlineData("Können Sie mir behilflich sein?", "koennen-sie-mir-behilflich-sein")]
         [InlineData("Ich weiß nicht", "ich-weiss-nicht")]
-        public void Slugify_Ok(string originalInput, string expectedResult, bool? forceLowerCase = true, string delimiter = null)
+        public void Slugify_Ok(string originalInput, string expectedResult, bool? forceLowerCase = true, string? delimiter = null)
         {
             var forceLowercaseSpecified = forceLowerCase.HasValue;
-            var delimiterSpecified = delimiter.HasValue();
+            var delimiterSpecified = !string.IsNullOrEmpty(delimiter);
 
             string actualResult = null;
 

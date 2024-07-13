@@ -1,36 +1,30 @@
-﻿using NodaTime;
+using NodaTime;
 
 namespace DashAccountingSystemV2.BackEnd.Extensions
 {
     public static class DateTimeExtensions
     {
         /// <summary>
-        /// This method will produce a DateTime with .Kind set to DateTimeKind.Utc.  If the input DateTimeKind is Unspecified, then
-        /// it will assume Utc and merely set .Kind.  If it is Local, then it will convert to the Utc timezone.  If Utc is already set
-        /// then it will do nothing.
+        /// This method will produce a DateTime with <c>.Kind</c> set to <c>DateTimeKind.Utc.</c><br />
+        /// * If the input's <c>.Kind</c> is <c>Unspecified</c>, then it will assume UTC and merely set <c>.Kind</c>.<br />
+        /// * If it is <c>Local</c>, then it will convert to the UTC time zone.<br />
+        /// * If <c>Utc</c> is already set then it will do nothing.
         /// </summary>
-        public static DateTime AsUtc(this DateTime d)
-        {
-            switch (d.Kind)
+        public static DateTime AsUtc(this DateTime d) =>
+            d.Kind switch
             {
-                case DateTimeKind.Local:
-                    return TimeZoneInfo.ConvertTime(d, TimeZoneInfo.FindSystemTimeZoneById("UTC"));
-                case DateTimeKind.Unspecified:
-                    return DateTime.SpecifyKind(d, DateTimeKind.Utc);
-                default:
-                    return d;
-            }
-        }
+                DateTimeKind.Local => TimeZoneInfo.ConvertTime(d, TimeZoneInfo.FindSystemTimeZoneById("UTC")),
+                DateTimeKind.Unspecified => DateTime.SpecifyKind(d, DateTimeKind.Utc),
+                _ => d,
+            };
 
         /// <summary>
-        /// This method will produce a DateTime with .Kind set to DateTimeKind.Utc.  If the input DateTimeKind is Unspecified, then
-        /// it will assume Utc and merely set .Kind.  If it is Local, then it will convert to the Utc timezone.  If Utc is already set
-        /// or if d is null, then it will do nothing.
+        /// This method will produce a DateTime with <c>.Kind</c> set to <c>DateTimeKind.Utc.</c><br />
+        /// * If the input's <c>.Kind</c> is <c>Unspecified</c>, then it will assume UTC and merely set <c>.Kind</c>.<br />
+        /// * If it is <c>Local</c>, then it will convert to the UTC time zone.<br />
+        /// * If <c>Utc</c> is already set then it will do nothing.
         /// </summary>
-        public static DateTime? AsUtc(this DateTime? d)
-        {
-            return d.HasValue ? d.Value.AsUtc() : d;
-        }
+        public static DateTime? AsUtc(this DateTime? d) => d.HasValue ? d.Value.AsUtc() : d;
 
         /// <summary>
         /// This method will produce a DateTime object with d.Kind set to DateTimeKind.Unspecified from a long that represents a Unix timestamp.
@@ -55,31 +49,19 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
             var isNegative = timespan.Ticks < 0;
             var sign = isNegative ? "-" : "+";
             var actualTimeSpan = isNegative ? timespan.Negate() : timespan;
-            return $"{sign}{actualTimeSpan.Hours.ToString("00")}:{actualTimeSpan.Minutes.ToString("00")}";
+            return $"{sign}{actualTimeSpan.Hours:00}:{actualTimeSpan.Minutes:00}";
         }
 
         /// <summary>
-        /// This method will not do a converstion for you, and d.Kind must be DateTimeKind.Utc or it will throw ArgumentException.
+        /// Shifts a UTC Date/Time into the specified Time Zone
         /// </summary>
-        public static long ToUnixTimestamp(this DateTime d, bool milliseconds = false)
-        {
-            if (d.Kind != DateTimeKind.Utc)
-                throw new ArgumentException("We don't serve your kind here!");
-
-            var elapsedSinceEpoch = d - Constants.UnixEpochUtc;
-            return (long)(milliseconds ? elapsedSinceEpoch.TotalMilliseconds : elapsedSinceEpoch.TotalSeconds);
-        }
-
-        /// <summary>
-        /// This method will not do a converstion for you, and d.Kind must be DateTimeKind.Utc or it will throw ArgumentException.
-        /// </summary>
-        public static long? ToUnixTimestamp(this DateTime? d, bool milliseconds = false)
-        {
-            if (d.HasValue) return d.Value.ToUnixTimestamp(milliseconds);
-
-            return null;
-        }
-
+        /// <param name="utcDateTime">UTC <see cref="DateTime"/></param>
+        /// <param name="tzdbTimeZoneId">
+        /// <see href="https://en.wikipedia.org/wiki/Tz_database">IANA / Olson / TZDB</see> ID for the Time Zone (e.g. <b><c>America/Los_Angeles</c></b> for U.S. Pacific Time)
+        /// </param>
+        /// <returns><see cref="DateTime"/> in the target time zone (with its <c>.Kind</c> property set to <c><see cref="DateTimeKind.Unspecified"/></c>)</returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public static DateTime WithTimeZone(this DateTime utcDateTime, string tzdbTimeZoneId)
         {
             if (utcDateTime.Kind != DateTimeKind.Utc)
@@ -87,16 +69,15 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
 
             var timeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(tzdbTimeZoneId);
 
-            if (timeZone == null)
-                throw new ArgumentException(
+            return timeZone == null
+                ? throw new ArgumentException(
                     $"'{tzdbTimeZoneId}' is not a valid IANA Time Zone Database ID",
-                    nameof(tzdbTimeZoneId));
-
-            return LocalDateTime
-                .FromDateTime(utcDateTime)
-                .InZoneStrictly(DateTimeZone.Utc)
-                .WithZone(timeZone)
-                .ToDateTimeUnspecified();
+                    nameof(tzdbTimeZoneId))
+                : LocalDateTime
+                    .FromDateTime(utcDateTime)
+                    .InZoneStrictly(DateTimeZone.Utc)
+                    .WithZone(timeZone)
+                    .ToDateTimeUnspecified();
         }
 
         /// <summary>

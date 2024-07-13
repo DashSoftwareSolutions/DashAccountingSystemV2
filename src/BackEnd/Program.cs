@@ -9,7 +9,10 @@ using DashAccountingSystemV2.BackEnd.Models;
 using DashAccountingSystemV2.BackEnd.Repositories;
 using DashAccountingSystemV2.BackEnd.Security.Authentication;
 using DashAccountingSystemV2.BackEnd.Security.Authorization;
+using DashAccountingSystemV2.BackEnd.Security.ExportDownloads;
 using DashAccountingSystemV2.BackEnd.Services.Caching;
+using DashAccountingSystemV2.BackEnd.Services.Export;
+using static DashAccountingSystemV2.BackEnd.Security.Constants;
 
 try
 {
@@ -45,9 +48,15 @@ try
     });
 
     // Authorization/Identity services
-    builder.Services.AddAuthorization();
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy(ExportDownloadAuthorizationPolicy, policy =>
+        {
+            policy.AuthenticationSchemes.Add(ExportDownloadAuthenticationScheme);
+            policy.RequireAuthenticatedUser();
+        });
 
-    // Register the https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-8.0#activate-identity-apis
+    // Register ASP.NET Identity, including the needed infrastructure for the Identity API endpoints
+    // See: https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-8.0#activate-identity-apis
     builder.Services
         .AddIdentityApiEndpoints<ApplicationUser>()
         .AddRoles<ApplicationRole>()
@@ -55,12 +64,16 @@ try
         .AddUserManager<ApplicationUserManager>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
 
+    builder.Services.AddAuthentication().AddExportDownloadToken();
+
     builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
     // Other application services (repositories, business logic, services, etc.)
     builder.Services.AddCaching();
     builder.Services.AddRepositories();
     builder.Services.AddBusinessLogic();
+    builder.Services.AddExportDownloadSecurityTokenService();
+    builder.Services.AddExportService();
 
     // Logging
     builder.Host.UseSerilog((context, services, configuration) => configuration

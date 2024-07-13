@@ -7,6 +7,7 @@ namespace DashAccountingSystemV2.BackEnd.BusinessLogic
             services
                 .AddScoped<ITenantBusinessLogic, TenantBusinessLogic>()
                 .AddScoped<IAccountBusinessLogic, AccountBusinessLogic>()
+                .AddScoped<IAccountingReportBusinessLogic, AccountingReportBusinessLogic>()
                 .AddScoped<ILedgerBusinessLogic, LedgerBusinessLogic>()
                 .AddScoped<IJournalEntryBusinessLogic, JournalEntryBusinessLogic>()
                 .AddScoped<ITimeZoneBusinessLogic, TimeZoneBusinessLogic>();
