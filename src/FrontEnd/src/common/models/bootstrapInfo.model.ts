@@ -1,4 +1,4 @@
-﻿import Tenant from './tenant.model';
+import Tenant from './tenant.model';
 import UserLite from './userLite.model';
 
 export default interface BootstrapInfo {

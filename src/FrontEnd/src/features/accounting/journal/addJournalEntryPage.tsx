@@ -69,7 +69,10 @@ function AddJournalEntryPage(props: AddJournalEntryPageProps) {
             logger.info(`No Tenant has been selected.  Navigating to home page...`);
             navigate('/app');
         }
-    }, [selectedTenant]);
+    }, [
+        navigate,
+        selectedTenant,
+    ]);
 
     useEffect(() => {
         if (wasSaving &&
@@ -84,7 +87,12 @@ function AddJournalEntryPage(props: AddJournalEntryPageProps) {
         }
     }, [
         isSaving,
+        navigate,
+        resetDirtyEditorState,
+        resetLedgerReportData,
         savedEntry,
+        showAlert,
+        wasSaving,
     ]);
 
     const onClickCancel = () => {

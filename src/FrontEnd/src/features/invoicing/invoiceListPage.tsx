@@ -47,7 +47,10 @@ function InvoiceListPage(props: InvoiceListPageProps) {
             logger.info(`No Tenant has been selected.  Navigating to home page...`);
             navigate('/app');
         }
-    }, [selectedTenant]);
+    }, [
+        navigate,
+        selectedTenant,
+    ]);
 
     const onClick500 = (() => {
         fetch('/api/test-errors/problem-500')

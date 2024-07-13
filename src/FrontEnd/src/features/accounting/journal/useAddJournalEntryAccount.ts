@@ -29,7 +29,7 @@ function useAddJournalEntryAccount(defaultAssetType?: AssetType | null): ReturnT
         creditAsString: null,
         debit: null,
         debitAsString: null,
-    }), []);
+    }), []); /* deliberately not depending on `defaultAssetType` here; not sure if that's correct or not.  Not a big deal right now since everything is in default USD anyhow. */ // eslint-disable-line react-hooks/exhaustive-deps
 
     const [journalEntryAccount, setJournalEntryAccount] = useNamedState<DraftJournalEntryAccount>(
         'JournalEntryAccount',

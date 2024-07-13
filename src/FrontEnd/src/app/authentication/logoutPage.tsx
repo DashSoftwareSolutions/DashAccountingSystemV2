@@ -48,7 +48,11 @@ function LogoutPage(props: PropTypes) {
             logger.info('We just finished logging out');
             navigate('/');
         }
-    }, [isLoggingOut]);
+    }, [
+        isLoggingOut,
+        navigate,
+        wasLoggingOut,
+    ]);
 
     const onClickLogout = () => {
         logout();

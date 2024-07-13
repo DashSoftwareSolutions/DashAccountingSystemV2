@@ -9,7 +9,6 @@ import {
     Input,
 } from 'reactstrap';
 import {
-    find,
     isEmpty,
     isFinite,
     isNil,
@@ -109,7 +108,7 @@ function JournalEntryAccountsEditor(props: PropTypes) {
 
     const defaultAssetType = useMemo(() => (!isEmpty(journalEntryAccounts) ?
         journalEntryAccounts[0]?.amount?.assetType ?? DEFAULT_ASSET_TYPE :
-        DEFAULT_ASSET_TYPE), []);
+        DEFAULT_ASSET_TYPE), []); /* deliberately not depending on `journalEntryAccounts` here; not sure if that's correct or not.  Not a big deal right now since everything is in default USD anyhow. */ // eslint-disable-line react-hooks/exhaustive-deps
 
     const [
         newJournalEntryAccount,
@@ -134,6 +133,12 @@ function JournalEntryAccountsEditor(props: PropTypes) {
             logger.info('Hey ma, we just received the asset types!');
             setAssetType(assetTypes[0]);
         }
+
+        // Possible TODO/FIXME: We cannot currently depend on setAssetType() as it's not stable, and depending on it causes an infinite loop
+        // Likely we should use useCallback() in the custom hook
+        // But that does have to depend on the state, which is going to change, so ... ¯\_(ツ)_/¯
+        // Anyhow, not 100% sure and ignoring this issue for now.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         assetTypes,
         prevAssetTypes,
@@ -145,7 +150,10 @@ function JournalEntryAccountsEditor(props: PropTypes) {
             null;
 
         setAccount(selectedAccount);
-    }, [setAccount]);
+    }, [
+        accounts,
+        setAccount,
+    ]);
 
     const onAddClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
@@ -160,6 +168,8 @@ function JournalEntryAccountsEditor(props: PropTypes) {
     }, [
         isNewJournalEntryAccountComplete,
         newJournalEntryAccount,
+        onAccountAdded,
+        resetNewJournalEntryAccount,
     ]);
 
     const onAddCreditAmountChanged = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {

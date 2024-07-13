@@ -1,4 +1,4 @@
-﻿import AmountType from './amountType.model';
+import AmountType from './amountType.model';
 import AssetType from './assetType.model';
 
 export default interface Amount {

@@ -25,7 +25,6 @@ import {
 import NavMenuItem from './navMenuItem';
 import { actionCreators } from './applicationRedux';
 import { RootState } from './globalReduxStore';
-import LinkButton from '../common/components/linkButton';
 import { NavigationSection } from '../common/models';
 import useNamedState from '../common/utilities/useNamedState';
 
@@ -55,7 +54,10 @@ function NavMenu({
 
     const toggleNavMenu = useCallback(() => {
         setIsOpen(!isOpen);
-    }, [isOpen]);
+    }, [
+        isOpen,
+        setIsOpen,
+    ]);
 
     const goToPage = (navigationSection: NavigationSection, path: string) => {
         setNavigationSection(navigationSection);

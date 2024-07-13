@@ -1,7 +1,6 @@
 import { isNil } from 'lodash';
 import React, {
     useEffect,
-    useRef,
     useState,
 } from 'react';
 import {
@@ -93,7 +92,10 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
             logger.info(`No Tenant has been selected.  Navigating to home page...`);
             navigate('/app');
         }
-    }, [selectedTenant]);
+    }, [
+        navigate,
+        selectedTenant,
+    ]);
 
     const { entryId: entryIdParam } = useParams();
     const entryId = parseInt(entryIdParam ?? '', 10);
@@ -140,10 +142,11 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
         }
     }, [
         entryId,
-        history,
         isDeleting,
+        navigate,
         resetLedgerReportData,
         showAlert,
+        wasDeleting,
     ]);
 
     const onClickBack = () => { navigate(-1); };

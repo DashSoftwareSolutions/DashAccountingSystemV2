@@ -1,4 +1,4 @@
-﻿import { Amount } from '../../../../common/models';
+import { Amount } from '../../../../common/models';
 
 export default interface JournalEntryAccount {
     accountId: string | null;

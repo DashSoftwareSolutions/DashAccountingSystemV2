@@ -97,6 +97,8 @@ function Layout(props: LayoutProps) {
         }
 
         requestApplicationVersion();
+        // Suppressing "react-hooks/exhaustive-deps" to use an empty dependencies array for "component did mount" type semantics
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Setup an interval to monitor access token lifetime
@@ -131,14 +133,21 @@ function Layout(props: LayoutProps) {
                 clearInterval(checkForExpiringTokenIntervalRef.current);
             }
         };
-    }, [tokenExpires]);
+    }, [
+        refreshTokens,
+        tokenExpires,
+    ]);
 
     // If we just got logged in we will need to fetch the bootstrap info (user info and authorized tenants)
     useEffect(() => {
         if (!wasLoggedIn && isLoggedIn) {
             requestBootstrapInfo();
         }
-    }, [isLoggedIn]);
+    }, [
+        isLoggedIn,
+        requestBootstrapInfo,
+        wasLoggedIn,
+    ]);
 
     return (
         <React.Fragment>

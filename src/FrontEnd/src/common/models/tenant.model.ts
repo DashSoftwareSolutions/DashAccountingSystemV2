@@ -1,4 +1,4 @@
-﻿import AssetType from './assetType.model';
+import AssetType from './assetType.model';
 
 export default interface Tenant {
     id: string; // GUID

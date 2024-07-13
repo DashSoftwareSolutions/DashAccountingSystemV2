@@ -1,4 +1,4 @@
-﻿export default interface ILogger {
+export default interface ILogger {
     trace(format: string, ...args: unknown[]): void;
     debug(format: string, ...args: unknown[]): void;
     info(format: string, ...args: unknown[]): void;

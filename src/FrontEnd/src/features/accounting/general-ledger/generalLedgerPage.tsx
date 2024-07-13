@@ -72,7 +72,7 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
             navigate('/app');
         }
     }, [
-        history,
+        navigate,
         selectedTenant,
     ]);
 

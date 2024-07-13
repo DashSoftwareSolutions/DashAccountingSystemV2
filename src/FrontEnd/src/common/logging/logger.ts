@@ -1,4 +1,4 @@
-﻿import type ILogger from './logger.interface';
+import type ILogger from './logger.interface';
 
 export default class Logger implements ILogger {
     private name: string;

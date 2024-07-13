@@ -52,6 +52,7 @@ function AccountDetailsPage(props: AccountDetailsPageProps) {
         }
 
     }, [
+        navigate,
         selectedAccount,
         selectedTenant,
     ]);

@@ -62,7 +62,7 @@ function LoginPage(props: PropTypes) {
     } = props;
 
     const navigate = useNavigate();
-    const [searchParams, _] = useSearchParams();
+    const [searchParams, _] = useSearchParams(); // eslint-disable-line @typescript-eslint/no-unused-vars
     const returnUrl = useMemo(() => searchParams.get('returnUrl') ?? '/app', [searchParams]);
 
     const [email, setEmail] = useState<string>('');
@@ -76,7 +76,11 @@ function LoginPage(props: PropTypes) {
             logger.info('We just successfully logged in.');
             requestBootstrapInfo();
         }
-    }, [isLoggedIn]);
+    }, [
+        isLoggedIn,
+        requestBootstrapInfo,
+        wasLoggedIn,
+    ]);
 
     useEffect(() => {
         if (wasFetchingBootstrap && !isFetchingBootstrap) {

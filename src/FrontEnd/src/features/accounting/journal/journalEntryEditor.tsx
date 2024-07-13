@@ -117,7 +117,10 @@ function JournalEntryEditor(props: JournalEntryEditorProps) {
             logger.info('Initializing a new Journal Entry ...');
             initializeNewJournalEntry();
         }
-    }, [mode]);
+
+        // Suppressing "react-hooks/exhaustive-deps" to use an empty dependencies array for "component did mount" type semantics
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // event handler functions
     const onAccountAdded = (account: JournalEntryAccount) => {

@@ -6,6 +6,8 @@ export type { default as BootstrapInfo } from './bootstrapInfo.model';
 export type { default as DateRange } from './dateRange.model';
 export { default as DateRangeMacroType } from './dateRangeMacroType.model';
 export type { default as DateTimeString } from './dateTimeString.model';
+export { default as ExportFormat } from './exportFormat.model';
+export type { default as ExportDownloadInfo } from './exportDownloadInfo.model';
 export type { default as LookupValue } from './lookupValue.model';
 export { default as Mode } from './mode.model';
 export { default as NavigationSection } from './navigationSection.model';

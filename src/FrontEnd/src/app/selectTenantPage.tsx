@@ -1,7 +1,6 @@
 import React, {
     useCallback,
     useEffect,
-    useRef,
 } from 'react';
 import { isNil } from 'lodash';
 import {
@@ -52,8 +51,9 @@ function SelectTenantPage(props: SelectTenantPageProps) {
             navigate('/app/dashboard');
         }
     }, [
-        history,
+        navigate,
         selectedTenant,
+        setNavigationSection,
     ]);
 
     const onClickTenant = useCallback((tenant: Tenant) => {

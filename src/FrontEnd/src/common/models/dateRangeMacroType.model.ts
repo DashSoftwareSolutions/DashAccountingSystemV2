@@ -1,4 +1,4 @@
-﻿enum DateRangeMacroType {
+enum DateRangeMacroType {
     All = 1,
     Custom = 2,
     Today = 3,

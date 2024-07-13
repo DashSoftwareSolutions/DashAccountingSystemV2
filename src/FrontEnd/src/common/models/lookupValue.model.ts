@@ -1,4 +1,4 @@
-﻿export default interface LookupValue {
+export default interface LookupValue {
     id: number;
     name: string;
 };

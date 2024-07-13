@@ -56,6 +56,7 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
             navigate('/app');
         }
     }, [
+        navigate,
         selectedTenant,
     ]);
 

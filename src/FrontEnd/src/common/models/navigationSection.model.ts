@@ -1,4 +1,4 @@
-﻿enum NavigationSection {
+enum NavigationSection {
     ChartOfAccounts,
     Dashboard,
     Ledger,

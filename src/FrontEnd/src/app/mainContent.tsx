@@ -1,7 +1,6 @@
 import React, {
     useEffect,
     useRef,
-    useState,
 } from 'react';
 import {
     ConnectedProps,
@@ -43,7 +42,9 @@ function MainContent({
 
     useEffect(() => {
         const handleResize = () => {
-            setHeight(elementRef.current?.offsetHeight ?? 0);
+            const newHeight = elementRef.current?.offsetHeight ?? 0;
+            logger.debug('Resizing to height:', newHeight);
+            setHeight(newHeight);
         };
 
         handleResize();
@@ -52,9 +53,10 @@ function MainContent({
         return () => {
             window.removeEventListener('resize', handleResize);
         }
-    }, []);
 
-    logger.info('Height:', height);
+        // Suppressing "react-hooks/exhaustive-deps" to use an empty dependencies array for "component did mount" type semantics
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="container main-content-container" ref={elementRef}>

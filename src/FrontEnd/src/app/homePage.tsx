@@ -11,12 +11,6 @@ import {
 } from 'reactstrap';
 import dashHeroImage from '../assets/dash-hero-image.jpeg';
 import { RootState } from './globalReduxStore';
-import {
-    ILogger,
-    Logger,
-} from '../common/logging';
-
-const logger: ILogger = new Logger('Home Page');
 
 const mapStateToProps = (state: RootState) => ({
     isLoggedIn: state.authentication.isLoggedIn,
@@ -36,7 +30,10 @@ function HomePage(props: PropTypes) {
         } else {
             navigate(`/login?returnUrl=${encodeURIComponent('/app')}`);
         }
-    }, [isLoggedIn]);
+    }, [
+        isLoggedIn,
+        navigate,
+    ]);
 
     return (
         <Row className="mt-4">

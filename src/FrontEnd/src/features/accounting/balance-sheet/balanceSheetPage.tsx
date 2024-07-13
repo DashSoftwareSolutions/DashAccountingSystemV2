@@ -41,7 +41,10 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
             logger.info(`No Tenant has been selected.  Navigating to home page...`);
             navigate('/app');
         }
-    }, [selectedTenant]);
+    }, [
+        navigate,
+        selectedTenant,
+    ]);
 
     return (
         <React.Fragment>
