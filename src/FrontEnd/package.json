@@ -59,6 +59,47 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "*.ts",
+          "*.tsx"
+        ],
+        "rules": {
+          "import/order": [
+            "error",
+            {
+              "groups": [
+                [
+                  "builtin",
+                  "external"
+                ],
+                "internal",
+                [
+                  "parent",
+                  "sibling",
+                  "index"
+                ]
+              ],
+              "alphabetize": {
+                "order": "asc",
+                "caseInsensitive": true
+              },
+              "pathGroups": [
+                {
+                  "pattern": "react",
+                  "group": "external",
+                  "position": "before"
+                }
+              ],
+              "pathGroupsExcludedImportTypes": [
+                "internal"
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   "browserslist": {
