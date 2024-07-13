@@ -1,14 +1,14 @@
-import { isNil } from 'lodash';
 import React, { useEffect } from 'react';
-import {
-    Col,
-    Row,
-} from 'reactstrap';
+import { isNil } from 'lodash';
 import {
     ConnectedProps,
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import {
+    Col,
+    Row,
+} from 'reactstrap';
 import { RootState } from '../../app/globalReduxStore';
 import {
     ILogger,
@@ -40,7 +40,10 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
             logger.info(`No Tenant has been selected.  Navigating to home page...`);
             navigate('/app');
         }
-    }, [selectedTenant]);
+    }, [
+        navigate,
+        selectedTenant,
+    ]);
 
     return (
         <React.Fragment>

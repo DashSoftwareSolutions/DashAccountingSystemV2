@@ -5,23 +5,23 @@ import {
     Routes,
     Route,
 } from 'react-router';
-import Layout from './layout';
-import AccountDetailsPage from '../features/accounting/chart-of-accounts/accountDetailsPage';
-import AddJournalEntryPage from '../features/accounting/journal/addJournalEntryPage';
-import BalanceSheetPage from '../features/accounting/balance-sheet/balanceSheetPage';
-import ChartOfAccountsPage from '../features/accounting/chart-of-accounts/chartOfAccountsPage';
-import DashboardPage from '../features/dashboard/dashboardPage';
-import EditJournalEntryPage from '../features/accounting/journal/editJournalEntryPage';
-import GeneralLedgerPage from '../features/accounting/general-ledger/generalLedgerPage';
-import HomePage from './homePage';
-import InvoiceListPage from '../features/invoicing/invoiceListPage';
 import LoginPage from './authentication/loginPage';
 import LogoutPage from './authentication/logoutPage';
-import PrivacyPage from '../app/privacyPage';
-import ProfitAndLossPage from '../features/accounting/profit-and-losss/profitAndLossPage';
+import HomePage from './homePage';
+import Layout from './layout';
 import SelectTenantPage from './selectTenantPage';
-import TimeTrackingPage from '../features/time-tracking/timeTrackingPage';
+import PrivacyPage from '../app/privacyPage';
+import BalanceSheetPage from '../features/accounting/balance-sheet/balanceSheetPage';
+import AccountDetailsPage from '../features/accounting/chart-of-accounts/accountDetailsPage';
+import ChartOfAccountsPage from '../features/accounting/chart-of-accounts/chartOfAccountsPage';
+import GeneralLedgerPage from '../features/accounting/general-ledger/generalLedgerPage';
+import AddJournalEntryPage from '../features/accounting/journal/addJournalEntryPage';
+import EditJournalEntryPage from '../features/accounting/journal/editJournalEntryPage';
 import ViewJournalEntryPage from '../features/accounting/journal/viewJournalEntryPage';
+import ProfitAndLossPage from '../features/accounting/profit-and-losss/profitAndLossPage';
+import DashboardPage from '../features/dashboard/dashboardPage';
+import InvoiceListPage from '../features/invoicing/invoiceListPage';
+import TimeTrackingPage from '../features/time-tracking/timeTrackingPage';
 
 function App() {
     return (

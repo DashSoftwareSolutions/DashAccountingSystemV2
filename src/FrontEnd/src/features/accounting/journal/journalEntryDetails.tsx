@@ -5,22 +5,22 @@ import {
     sortBy,
     trim,
 } from 'lodash';
+import { DateTime } from 'luxon';
 import {
     Col,
     ListGroup,
     ListGroupItem,
     Row,
 } from 'reactstrap';
-import { DateTime } from 'luxon';
+import { JournalEntry } from './models';
+import AmountDisplay from '../../../common/components/amountDisplay';
+import TransactionStatusLabel from '../../../common/components/transactionStatusLabel';
+import { DEFAULT_ASSET_TYPE } from '../../../common/constants';
 import {
     Amount,
     AmountType,
     TransactionStatus,
 } from '../../../common/models';
-import AmountDisplay from '../../../common/components/amountDisplay';
-import TransactionStatusLabel from '../../../common/components/transactionStatusLabel';
-import { DEFAULT_ASSET_TYPE } from '../../../common/constants';
-import { JournalEntry } from './models';
 
 function JournalEntryDetails({
     bemBlockName,

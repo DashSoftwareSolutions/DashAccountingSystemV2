@@ -6,8 +6,8 @@ import {
     ConnectedProps,
     connect,
 } from 'react-redux';
-import { RootState } from './globalReduxStore';
 import { actionCreators } from './applicationRedux';
+import { RootState } from './globalReduxStore';
 import {
     ILogger,
     Logger,

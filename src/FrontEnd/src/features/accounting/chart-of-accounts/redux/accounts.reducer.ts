@@ -7,8 +7,8 @@ import {
     Action,
     Reducer,
 } from 'redux';
-import ActionType from '../../../../app/globalReduxStore/actionType';
 import { KnownAction } from './accounts.actions';
+import ActionType from '../../../../app/globalReduxStore/actionType';
 import {
     Account,
     AccountCategoryList,

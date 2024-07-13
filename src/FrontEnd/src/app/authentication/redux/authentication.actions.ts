@@ -1,5 +1,5 @@
-import ActionType from '../../globalReduxStore/actionType';
 import IAction from '../../globalReduxStore/action.interface';
+import ActionType from '../../globalReduxStore/actionType';
 import { AccessTokenResponse } from '../models';
 
 export interface RequestLoginAction extends IAction {

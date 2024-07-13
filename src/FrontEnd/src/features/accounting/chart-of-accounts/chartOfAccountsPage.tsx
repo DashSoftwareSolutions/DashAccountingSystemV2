@@ -1,14 +1,16 @@
-import { isNil } from 'lodash';
 import React, { useEffect } from 'react';
-import {
-    Col,
-    Row,
-} from 'reactstrap';
+import { isNil } from 'lodash';
 import {
     ConnectedProps,
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import {
+    Col,
+    Row,
+} from 'reactstrap';
+import { Account } from './models';
+import accountsActions from './redux/accounts.actionCreators';
 import { RootState } from '../../../app/globalReduxStore';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
@@ -17,8 +19,6 @@ import {
     ILogger,
     Logger,
 } from '../../../common/logging';
-import accountsActions from './redux/accounts.actionCreators';
-import { Account } from './models';
 
 const logger: ILogger = new Logger('Chart of Accounts Page');
 const bemBlockName: string = 'chart_of_accounts_page';

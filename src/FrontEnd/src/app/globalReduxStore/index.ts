@@ -1,10 +1,11 @@
 import IAction from './action.interface';
+import * as BalanceSheet from '../../features/accounting/balance-sheet/redux';
+import * as ChartOfAccounts from '../../features/accounting/chart-of-accounts/redux';
+import * as Ledger from '../../features/accounting/general-ledger/redux';
+import * as Journal from '../../features/accounting/journal/redux';
 import * as Application from '../applicationRedux'
 import * as Authentication from '../authentication/redux';
-import * as ChartOfAccounts from '../../features/accounting/chart-of-accounts/redux';
 import * as ExportDownload from '../export';
-import * as Journal from '../../features/accounting/journal/redux';
-import * as Ledger from '../../features/accounting/general-ledger/redux';
 import * as Lookups from '../lookupValues';
 import * as SystemNotifications from '../notifications';
 
@@ -14,6 +15,7 @@ import * as SystemNotifications from '../notifications';
 export interface RootState {
     application: Application.state,
     authentication: Authentication.state,
+    balanceSheet: BalanceSheet.state,
     chartOfAccounts: ChartOfAccounts.state,
     exportDownload: ExportDownload.state,
     journal: Journal.state,
@@ -29,6 +31,7 @@ export const reducers = {
     chartOfAccounts: ChartOfAccounts.reducer,
     application: Application.reducer,
     authentication: Authentication.reducer,
+    balanceSheet: BalanceSheet.reducer,
     exportDownload: ExportDownload.reducer,
     journal: Journal.reducer,
     ledger: Ledger.reducer,

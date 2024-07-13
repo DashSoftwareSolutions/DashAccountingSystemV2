@@ -4,11 +4,6 @@ import React, {
     useMemo,
 } from 'react';
 import {
-    Alert,
-    Button,
-    Input,
-} from 'reactstrap';
-import {
     isEmpty,
     isFinite,
     isNil,
@@ -16,19 +11,19 @@ import {
     trim,
 } from 'lodash';
 import {
-    Account,
-    AccountCategoryList,
-    AccountSelectOption,
-} from '../chart-of-accounts/models';
+    Alert,
+    Button,
+    Input,
+} from 'reactstrap';
 import AccountSelector from './accountSelector';
 import AssetTypeSelector from './assetTypeSelector';
-import useAddJournalEntryAccount from './useAddJournalEntryAccount';
 import {
     DraftJournalEntryAccount,
     JournalEntryAccount,
 } from './models';
-import { DEFAULT_ASSET_TYPE } from '../../../common/constants';
+import useAddJournalEntryAccount from './useAddJournalEntryAccount';
 import AmountDisplay from '../../../common/components/amountDisplay';
+import { DEFAULT_ASSET_TYPE } from '../../../common/constants';
 import {
     ILogger,
     Logger,
@@ -41,6 +36,11 @@ import {
 } from '../../../common/models';
 import { isStringNullOrWhiteSpace } from '../../../common/utilities/stringUtils';
 import usePrevious from '../../../common/utilities/usePrevious';
+import {
+    Account,
+    AccountCategoryList,
+    AccountSelectOption,
+} from '../chart-of-accounts/models';
 
 type PropTypes = {
     accounts: Account[];

@@ -1,10 +1,10 @@
-import ActionType from '../globalReduxStore/actionType';
-import IAction from '../globalReduxStore/action.interface';
 import {
     BootstrapInfo,
     NavigationSection,
     Tenant,
 } from '../../common/models';
+import IAction from '../globalReduxStore/action.interface';
+import ActionType from '../globalReduxStore/actionType';
 
 export interface RequestApplicationVersionAction extends IAction {
     type: ActionType.REQUEST_APPLICATION_VERSION,

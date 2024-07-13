@@ -6,3 +6,4 @@ export type { default as AccountSubType } from './accountSubType.model';
 export type { default as AccountType } from './accountType.model';
 export { default as KnownAccountSubType } from './knownAccountSubType.model';
 export { default as KnownAccountType } from './knownAccountType.model';
+export type { default as ReportAccount } from './reportAccount.model';

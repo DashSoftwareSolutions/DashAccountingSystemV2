@@ -1,9 +1,9 @@
-import { isNil } from 'lodash';
 import React, {
     useEffect,
     useMemo,
     useRef,
 } from 'react';
+import { isNil } from 'lodash';
 import { DateTime, Duration } from 'luxon';
 import {
     ConnectedProps,
@@ -18,12 +18,12 @@ import {
     Container,
     Row,
 } from 'reactstrap';
-import { actionCreators as authenticationActionCreators } from './authentication/redux';
 import { actionCreators as bootstrapActionCreators } from './applicationRedux';
+import { AccessTokenResponse } from './authentication/models';
+import { actionCreators as authenticationActionCreators } from './authentication/redux';
+import { RootState } from './globalReduxStore';
 import MainContent from './mainContent';
 import NavMenu from './navMenu';
-import { AccessTokenResponse } from './authentication/models';
-import { RootState } from './globalReduxStore';
 import SystemNotificationsArea from './systemNotificationsArea';
 import Loader from '../common/components/loader';
 import { AUTH_SESSION_STORAGE_KEY } from '../common/constants';

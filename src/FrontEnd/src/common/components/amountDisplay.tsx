@@ -1,5 +1,5 @@
-import { isNil } from 'lodash';
 import ClassNames from 'classnames';
+import { isNil } from 'lodash';
 import {
     Amount,
     AmountType

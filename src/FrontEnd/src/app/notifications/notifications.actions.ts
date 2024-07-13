@@ -1,6 +1,6 @@
-import ActionType from '../globalReduxStore/actionType';
-import IAction from '../globalReduxStore/action.interface';
 import NotificationLevel from './notificationLevel';
+import IAction from '../globalReduxStore/action.interface';
+import ActionType from '../globalReduxStore/actionType';
 
 /**
  * Action to show an alert in the System Notifications area

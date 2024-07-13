@@ -1,5 +1,5 @@
-import ActionType from '../../../../app/globalReduxStore/actionType';
 import IAction from '../../../../app/globalReduxStore/action.interface';
+import ActionType from '../../../../app/globalReduxStore/actionType';
 import { Account } from '../models';
 
 interface RequestAccountsAction extends IAction {

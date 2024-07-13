@@ -1,12 +1,12 @@
-import { isNil } from 'lodash';
 import {
     useDebugValue,
     useMemo,
 } from 'react';
+import { isNil } from 'lodash';
 import { DraftJournalEntryAccount } from './models';
-import { Account } from '../chart-of-accounts/models';
 import { AssetType } from '../../../common/models';
 import useNamedState from '../../../common/utilities/useNamedState';
+import { Account } from '../chart-of-accounts/models';
 
 type ReturnType = [
     draft: DraftJournalEntryAccount,

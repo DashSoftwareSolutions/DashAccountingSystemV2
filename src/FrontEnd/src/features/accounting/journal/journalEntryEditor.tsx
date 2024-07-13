@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import {
-    ConnectedProps,
-    connect,
-} from 'react-redux';
-import {
     isFinite,
     isNil,
 } from 'lodash';
-import { RootState } from '../../../app/globalReduxStore';
+import {
+    ConnectedProps,
+    connect,
+} from 'react-redux';
 import {
     Col,
     Form,
@@ -17,19 +16,20 @@ import {
     Label,
     Row,
 } from 'reactstrap';
+import JournalEntryAccountsEditor from './journalEntryAccountsEditor';
+import { JournalEntryAccount } from './models';
+import {
+    actionCreators as journalEntryActionCreators,
+    JournalEntryAttributeValidationState,
+} from './redux';
+import { RootState } from '../../../app/globalReduxStore';
+import { actionCreators as lookupValueActionCreators } from '../../../app/lookupValues';
 import {
     ILogger,
     Logger,
 } from '../../../common/logging';
 import { Mode } from '../../../common/models';
-import { JournalEntryAccount } from './models';
-import JournalEntryAccountsEditor from './journalEntryAccountsEditor';
 import { actionCreators as accountActionCreators } from '../chart-of-accounts/redux';
-import {
-    actionCreators as journalEntryActionCreators,
-    JournalEntryAttributeValidationState,
-} from './redux';
-import { actionCreators as lookupValueActionCreators } from '../../../app/lookupValues';
 
 const logger: ILogger = new Logger('Journal Entry Editor');
 const bemBlockName: string = 'journal_entry_editor';

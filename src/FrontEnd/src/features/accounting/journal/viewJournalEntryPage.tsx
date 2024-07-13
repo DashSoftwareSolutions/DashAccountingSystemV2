@@ -1,8 +1,16 @@
-import { isNil } from 'lodash';
 import React, {
     useEffect,
     useState,
 } from 'react';
+import { isNil } from 'lodash';
+import {
+    ConnectedProps,
+    connect,
+} from 'react-redux';
+import {
+    useNavigate,
+    useParams,
+} from 'react-router-dom';
 import {
     Button,
     Col,
@@ -12,15 +20,11 @@ import {
     ModalFooter,
     Row,
 } from 'reactstrap';
-import {
-    ConnectedProps,
-    connect,
-} from 'react-redux';
-import {
-    useNavigate,
-    useParams,
-} from 'react-router-dom';
+import JournalEntryDetails from './journalEntryDetails';
+import PostJournalEntryModalDialog from './postJournalEntryModalDialog';
+import { actionCreators as journalEntryActionCreators } from './redux';
 import { RootState } from '../../../app/globalReduxStore';
+import { actionCreators as notificationActionCreators } from '../../../app/notifications';
 import NotificationLevel from '../../../app/notifications/notificationLevel';
 import Loader from '../../../common/components/loader';
 import MainPageContent from '../../../common/components/mainPageContent';
@@ -30,12 +34,8 @@ import {
 } from '../../../common/logging';
 import { TransactionStatus } from '../../../common/models';
 import usePrevious from '../../../common/utilities/usePrevious';
-import JournalEntryDetails from './journalEntryDetails';
-import PostJournalEntryModalDialog from './postJournalEntryModalDialog';
 
-import { actionCreators as journalEntryActionCreators } from './redux';
 import { actionCreators as ledgerActionCreators } from '../general-ledger/redux';
-import { actionCreators as notificationActionCreators } from '../../../app/notifications';
 
 const logger: ILogger = new Logger('View Journal Entry Page');
 const bemBlockName: string = 'view_journal_entry_page';

@@ -1,15 +1,17 @@
-import { isNil } from 'lodash';
 import React, { useEffect } from 'react';
-import {
-    Button,
-    Col,
-    Row,
-} from 'reactstrap';
+import { isNil } from 'lodash';
 import {
     ConnectedProps,
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import {
+    Button,
+    Col,
+    Row,
+} from 'reactstrap';
+import JournalEntryEditor from './journalEntryEditor';
+import { actionCreators as journalEntryActionCreators } from './redux';
 import { RootState } from '../../../app/globalReduxStore';
 import {
     actionCreators as notificationActionCreators,
@@ -22,9 +24,7 @@ import {
 } from '../../../common/logging';
 import { Mode } from '../../../common/models';
 import usePrevious from '../../../common/utilities/usePrevious';
-import { actionCreators as journalEntryActionCreators } from './redux';
 import { actionCreators as ledgerActionCreators } from '../general-ledger/redux';
-import JournalEntryEditor from './journalEntryEditor';
 
 const logger: ILogger = new Logger('Add Journal Entry Page');
 const bemBlockName: string = 'add_new_journal_entry_page';

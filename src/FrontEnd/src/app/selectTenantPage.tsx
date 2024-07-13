@@ -8,12 +8,12 @@ import {
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { actionCreators } from './applicationRedux';
+import { RootState } from './globalReduxStore';
 import {
     ILogger,
     Logger,
 } from '../common/logging';
-import { actionCreators } from './applicationRedux';
-import { RootState } from './globalReduxStore';
 import { NavigationSection, Tenant } from '../common/models';
 
 const logger: ILogger = new Logger('Select Tenant Page');

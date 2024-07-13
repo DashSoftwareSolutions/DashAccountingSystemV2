@@ -3,7 +3,7 @@ import {
     Action,
     Reducer,
 } from 'redux';
-import ActionType from '../globalReduxStore/actionType';
+import { KnownAction } from './lookupValues.actions';
 import {
     AssetType,
     TimeZone
@@ -13,7 +13,7 @@ import {
     AccountType,
 } from '../../features/accounting/chart-of-accounts/models';
 import { PaymentMethod } from '../../features/invoicing/models';
-import { KnownAction } from './lookupValues.actions';
+import ActionType from '../globalReduxStore/actionType';
 
 export interface LookupValuesState {
     isFetching: boolean;

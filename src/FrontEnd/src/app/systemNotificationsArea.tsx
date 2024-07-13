@@ -3,11 +3,6 @@ import React, {
     useEffect,
 } from 'react';
 import {
-    Toast,
-    ToastBody,
-    ToastHeader,
-} from 'reactstrap'; // TODO/FIXME: current version of Reactstrap gives us this warning for <Toast> component (which internally uses <Fade> component): Warning: Fade: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.
-import {
     isNil,
     isNumber,
 } from 'lodash';
@@ -15,11 +10,16 @@ import {
     ConnectedProps,
     connect
 } from 'react-redux';
+import {
+    Toast,
+    ToastBody,
+    ToastHeader,
+} from 'reactstrap'; // TODO/FIXME: current version of Reactstrap gives us this warning for <Toast> component (which internally uses <Fade> component): Warning: Fade: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.
+import { actionCreators as notificationActionCreators } from './notifications';
+import NotificationLevel from './notifications/notificationLevel';
 import { RootState } from '../app/globalReduxStore';
 import { DEFAULT_SYSTEM_NOTIFICATION_ALERT_TIMEOUT } from '../common/constants';
 import usePrevious from '../common/utilities/usePrevious';
-import { actionCreators as notificationActionCreators } from './notifications';
-import NotificationLevel from './notifications/notificationLevel';
 
 const mapStateToProps = (state: RootState) => ({
     alertAutoDismiss: state.systemNotifications?.alertAutoDismiss ?? false,

@@ -3,8 +3,8 @@ import {
     Middleware,
 } from 'redux';
 import { RootState } from '.';
-import ActionType from './actionType';
 import IAction from './action.interface';
+import ActionType from './actionType';
 import { AUTH_SESSION_STORAGE_KEY } from '../../common/constants';
 import { encodeJsonObjectAsBase64 } from '../../common/utilities/encoding';
 

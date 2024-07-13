@@ -2,8 +2,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import App from './app';
 import configureStore from './app/globalReduxStore/configureStore';
 import reportWebVitals from './reportWebVitals';

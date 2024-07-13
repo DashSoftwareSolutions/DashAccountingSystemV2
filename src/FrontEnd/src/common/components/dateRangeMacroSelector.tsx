@@ -1,12 +1,12 @@
 import { ChangeEvent } from 'react';
 import {
-    computeDateRangeFromMacro,
-    dateRangeMacroOptions,
-} from '../utilities/dateRangeMacros';
-import {
     DateRange,
     DateRangeMacroType,
 } from '../models';
+import {
+    computeDateRangeFromMacro,
+    dateRangeMacroOptions,
+} from '../utilities/dateRangeMacros';
 
 const getSelectedMacro = (value: string): DateRangeMacroType => {
     return parseInt(value, 10) as DateRangeMacroType;

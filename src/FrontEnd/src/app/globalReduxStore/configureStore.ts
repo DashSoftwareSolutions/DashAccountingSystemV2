@@ -6,8 +6,8 @@ import {
 } from 'redux';
 import thunk from 'redux-thunk';
 import { RootState, reducers } from './';
-import ActionType from './actionType';
 import IAction from './action.interface';
+import ActionType from './actionType';
 import sessionStorageMiddleware from './sessionStorageMiddleware';
 
 // Transform actions-type to a string if the action type is a

@@ -4,16 +4,16 @@ import {
 } from 'lodash';
 import { DateTime } from 'luxon';
 import { Dispatch } from 'redux';
-import { AppThunkAction } from '../../globalReduxStore';
-import ActionType from '../../globalReduxStore/actionType';
-import IAction from '../../globalReduxStore/action.interface';
 import { KnownAction } from './authentication.actions';
-import { AccessTokenResponse } from '../models';
 import {
     ILogger,
     Logger,
 } from '../../../common/logging';
 import { apiErrorHandler } from '../../../common/utilities/errorHandling';
+import { AppThunkAction } from '../../globalReduxStore';
+import IAction from '../../globalReduxStore/action.interface';
+import ActionType from '../../globalReduxStore/actionType';
+import { AccessTokenResponse } from '../models';
 
 const logger: ILogger = new Logger('Authentication Actions');
 

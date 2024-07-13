@@ -4,13 +4,13 @@ import {
     Action,
     Reducer,
 } from 'redux';
+import { KnownAction } from './ledger.actions';
+import ActionType from '../../../../app/globalReduxStore/actionType';
 import {
     ILogger,
     Logger
 } from '../../../../common/logging';
 import { DateTimeString } from '../../../../common/models';
-import ActionType from '../../../../app/globalReduxStore/actionType';
-import { KnownAction } from './ledger.actions';
 import { LedgerAccount } from '../models';
 
 const logger: ILogger = new Logger('Ledger Reducer');

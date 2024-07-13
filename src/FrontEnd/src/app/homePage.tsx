@@ -1,16 +1,16 @@
 import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     ConnectedProps,
     connect,
 } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
     Button,
     Col,
     Row,
 } from 'reactstrap';
-import dashHeroImage from '../assets/dash-hero-image.jpeg';
 import { RootState } from './globalReduxStore';
+import dashHeroImage from '../assets/dash-hero-image.jpeg';
 
 const mapStateToProps = (state: RootState) => ({
     isLoggedIn: state.authentication.isLoggedIn,

@@ -8,15 +8,15 @@ import {
     bindActionCreators,
     Dispatch,
 } from 'redux';
-import IAction from "../../../app/globalReduxStore/action.interface";
 import IApiErrorHandler from './apiErrorHandler.interface';
-import { ApiErrorResponse } from '../../models';
+import IAction from "../../../app/globalReduxStore/action.interface";
 import * as SystemNotifications from '../../../app/notifications';
+import NotificationLevel from '../../../app/notifications/notificationLevel';
 import {
     ILogger,
     Logger,
 } from '../../logging';
-import NotificationLevel from '../../../app/notifications/notificationLevel';
+import { ApiErrorResponse } from '../../models';
 
 const logger: ILogger = new Logger('API Error Handler');
 

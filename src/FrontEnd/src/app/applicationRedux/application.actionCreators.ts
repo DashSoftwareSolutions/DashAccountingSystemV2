@@ -3,16 +3,16 @@ import {
     isNil,
 } from 'lodash';
 import { Dispatch } from 'redux';
-import { AppThunkAction } from '../globalReduxStore';
-import ActionType from '../globalReduxStore/actionType';
-import IAction from '../globalReduxStore/action.interface';
+import { KnownAction } from './application.actions';
 import {
     BootstrapInfo,
     NavigationSection,
     Tenant,
 } from '../../common/models';
 import { apiErrorHandler } from '../../common/utilities/errorHandling';
-import { KnownAction } from './application.actions';
+import { AppThunkAction } from '../globalReduxStore';
+import IAction from '../globalReduxStore/action.interface';
+import ActionType from '../globalReduxStore/actionType';
 
 const actionCreators = {
     requestApplicationVersion: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {

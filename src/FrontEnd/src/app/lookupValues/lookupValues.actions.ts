@@ -1,5 +1,3 @@
-import ActionType from '../globalReduxStore/actionType';
-import IAction from '../globalReduxStore/action.interface';
 import {
     AssetType,
     TimeZone
@@ -9,6 +7,8 @@ import {
     AccountType,
 } from '../../features/accounting/chart-of-accounts/models';
 import { PaymentMethod } from '../../features/invoicing/models';
+import IAction from '../globalReduxStore/action.interface';
+import ActionType from '../globalReduxStore/actionType';
 
 export interface RequestLookupValuesAction extends IAction {
     type: ActionType.REQUEST_LOOKUPS;

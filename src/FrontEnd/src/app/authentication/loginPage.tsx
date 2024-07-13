@@ -21,16 +21,16 @@ import {
     Input,
     Row,
 } from 'reactstrap';
+import { actionCreators as loginActionCreators } from './redux';
 import dashHeroImage from '../../assets/dash-hero-image.jpeg';
-import { RootState } from '../globalReduxStore';
+import Loader from '../../common/components/loader';
 import {
     ILogger,
     Logger,
 } from '../../common/logging';
-import { actionCreators as bootstrapActionCreators } from '../applicationRedux';
-import { actionCreators as loginActionCreators } from './redux';
-import Loader from '../../common/components/loader';
 import usePrevious from '../../common/utilities/usePrevious';
+import { actionCreators as bootstrapActionCreators } from '../applicationRedux';
+import { RootState } from '../globalReduxStore';
 
 const logger: ILogger = new Logger('Login Page');
 const bemBlockName: string = 'login_page';

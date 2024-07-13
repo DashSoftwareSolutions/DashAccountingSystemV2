@@ -1,14 +1,14 @@
-import { isNil } from 'lodash';
 import React, { useEffect } from 'react';
-import {
-    Col,
-    Row,
-} from 'reactstrap';
+import { isNil } from 'lodash';
 import {
     ConnectedProps,
     connect,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import {
+    Col,
+    Row,
+} from 'reactstrap';
 import { RootState } from '../../../app/globalReduxStore';
 import MainPageContent from '../../../common/components/mainPageContent';
 import {

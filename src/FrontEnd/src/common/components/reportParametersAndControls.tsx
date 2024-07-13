@@ -3,6 +3,7 @@ import {
     MouseEvent,
     useState,
 } from 'react';
+import { noop } from 'lodash';
 import {
     Button,
     Col,
@@ -10,12 +11,11 @@ import {
     Input,
     Row,
 } from 'reactstrap';
-import { noop } from 'lodash';
+import DateRangeMacroSelector from './dateRangeMacroSelector';
 import {
     DateRange,
     DateRangeMacroType,
 } from '../models';
-import DateRangeMacroSelector from './dateRangeMacroSelector';
 
 function ReportParametersAndControls({
     bemBlockName,

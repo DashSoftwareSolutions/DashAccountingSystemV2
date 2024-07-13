@@ -3,16 +3,16 @@ import {
     trim,
 } from 'lodash';
 import { Dispatch } from 'redux';
+import { KnownAction } from './journalEntry.actions';
 import { AppThunkAction } from '../../../../app/globalReduxStore';
-import ActionType from '../../../../app/globalReduxStore/actionType';
 import IAction from '../../../../app/globalReduxStore/action.interface';
+import ActionType from '../../../../app/globalReduxStore/actionType';
 import {
     ILogger,
     Logger
 } from '../../../../common/logging';
 import { apiErrorHandler } from '../../../../common/utilities/errorHandling';
 import { isStringNullOrWhiteSpace } from '../../../../common/utilities/stringUtils';
-import { KnownAction } from './journalEntry.actions';
 import {
     JournalEntry,
     JournalEntryAccount,

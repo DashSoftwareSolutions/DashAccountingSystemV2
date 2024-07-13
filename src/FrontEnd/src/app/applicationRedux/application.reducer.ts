@@ -1,12 +1,12 @@
 import { isNil } from 'lodash';
 import { Action, Reducer } from 'redux';
-import ActionType from '../globalReduxStore/actionType';
 import { KnownAction } from './application.actions';
 import {
     BootstrapInfo,
     NavigationSection,
     Tenant,
 } from '../../common/models';
+import ActionType from '../globalReduxStore/actionType';
 
 /**
  * State for the Application Redux "slice"

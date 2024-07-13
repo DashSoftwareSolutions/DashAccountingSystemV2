@@ -17,12 +17,12 @@ import {
     ModalFooter,
     Row,
 } from 'reactstrap';
+import { actionCreators as journalEntryActionCreators } from './redux';
 import { RootState } from '../../../app/globalReduxStore';
 import {
     ILogger,
     Logger
 } from '../../../common/logging';
-import { actionCreators as journalEntryActionCreators } from './redux';
 
 const logger: ILogger = new Logger('Post Journal Entry Modal Dialog');
 const bemBlockName: string = 'post_journal_entry_modal';

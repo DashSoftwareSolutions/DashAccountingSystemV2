@@ -3,12 +3,12 @@ import {
     isNil,
 } from 'lodash';
 import { Dispatch } from 'redux';
-import { AppThunkAction } from '../../../../app/globalReduxStore';
-import ActionType from '../../../../app/globalReduxStore/actionType';
-import IAction from '../../../../app/globalReduxStore/action.interface';
-import { Account } from '../models';
 import { KnownAction } from './accounts.actions';
+import { AppThunkAction } from '../../../../app/globalReduxStore';
+import IAction from '../../../../app/globalReduxStore/action.interface';
+import ActionType from '../../../../app/globalReduxStore/actionType';
 import { apiErrorHandler } from '../../../../common/utilities/errorHandling';
+import { Account } from '../models';
 
 const actionCreators = {
     requestAccounts: (): AppThunkAction<KnownAction> => async (dispatch, getState) => {

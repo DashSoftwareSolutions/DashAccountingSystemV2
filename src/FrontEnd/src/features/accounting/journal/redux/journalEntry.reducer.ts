@@ -13,6 +13,8 @@ import {
     Action,
     Reducer,
 } from 'redux';
+import { KnownAction } from './journalEntry.actions';
+import ActionType from '../../../../app/globalReduxStore/actionType';
 import {
     ILogger,
     Logger
@@ -27,8 +29,6 @@ import {
     JournalEntry,
     JournalEntryAccount,
 } from '../models';
-import ActionType from '../../../../app/globalReduxStore/actionType';
-import { KnownAction } from './journalEntry.actions';
 
 export interface JournalEntryAccountsValidationState {
     error: string;

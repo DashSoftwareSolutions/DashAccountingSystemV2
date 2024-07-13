@@ -3,9 +3,9 @@ import {
     Action,
     Reducer,
 } from 'redux';
-import ActionType from '../globalReduxStore/actionType';
-import { ExportDownloadInfo } from '../../common/models';
 import { KnownAction } from './export.actions';
+import { ExportDownloadInfo } from '../../common/models';
+import ActionType from '../globalReduxStore/actionType';
 
 export interface ExportState {
     downloadInfo: ExportDownloadInfo | null;

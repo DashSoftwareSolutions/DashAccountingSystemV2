@@ -1,10 +1,10 @@
+import LedgerAccountTransaction from './ledgerAccountTransaction.model';
 import {
     Amount,
     AmountType,
     AssetType,
 } from '../../../../common/models';
 import { AccountType } from '../../chart-of-accounts/models';
-import LedgerAccountTransaction from './ledgerAccountTransaction.model';
 
 /**
  * Represents an Account on the General Ledger

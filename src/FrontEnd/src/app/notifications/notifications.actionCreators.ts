@@ -1,10 +1,10 @@
-import ActionType from '../globalReduxStore/actionType';
-import { AppThunkAction } from '../globalReduxStore';
+import NotificationLevel from './notificationLevel';
 import {
     DismissAlertAction,
     ShowAlertAction
 } from './notifications.actions';
-import NotificationLevel from './notificationLevel';
+import { AppThunkAction } from '../globalReduxStore';
+import ActionType from '../globalReduxStore/actionType';
 
 const actionCreators = {
     showAlert: (

@@ -3,8 +3,8 @@ import {
     Action,
     Reducer,
 } from 'redux';
-import ActionType from '../../globalReduxStore/actionType';
 import { KnownAction } from './authentication.actions';
+import ActionType from '../../globalReduxStore/actionType';
 import { AccessTokenResponse } from '../models';
 
 export interface AuthenticationState {

@@ -3,9 +3,9 @@ import {
     uniqueId,
 } from 'lodash';
 import { Action, Reducer } from 'redux';
-import ActionType from '../globalReduxStore/actionType';
-import { KnownAction } from './notifications.actions';
 import NotificationLevel from './notificationLevel';
+import { KnownAction } from './notifications.actions';
+import ActionType from '../globalReduxStore/actionType';
 
 /**
  * State for the System Notifications Redux "slice"

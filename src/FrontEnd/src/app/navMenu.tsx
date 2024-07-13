@@ -22,9 +22,9 @@ import {
     NavItem,
     NavLink,
 } from 'reactstrap';
-import NavMenuItem from './navMenuItem';
 import { actionCreators } from './applicationRedux';
 import { RootState } from './globalReduxStore';
+import NavMenuItem from './navMenuItem';
 import { NavigationSection } from '../common/models';
 import useNamedState from '../common/utilities/useNamedState';
 

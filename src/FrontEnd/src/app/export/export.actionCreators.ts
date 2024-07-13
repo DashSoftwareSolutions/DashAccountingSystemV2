@@ -1,6 +1,6 @@
+import { KnownAction } from './export.actions';
 import { AppThunkAction } from '../globalReduxStore';
 import ActionType from '../globalReduxStore/actionType';
-import { KnownAction } from './export.actions';
 
 const actionCreators = {
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {

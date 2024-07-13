@@ -2,11 +2,6 @@ import React, { useEffect } from 'react';
 import { isNil } from 'lodash';
 import { DateTime } from 'luxon';
 import {
-    Button,
-    Col,
-    Row,
-} from 'reactstrap';
-import {
     ConnectedProps,
     connect,
 } from 'react-redux';
@@ -14,6 +9,12 @@ import {
     Link,
     useNavigate,
 } from 'react-router-dom';
+import {
+    Button,
+    Col,
+    Row,
+} from 'reactstrap';
+import ledgerActions from './redux/ledger.actionCreators';
 import { RootState } from '../../../app/globalReduxStore';
 import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
@@ -29,7 +30,6 @@ import {
     DateRange,
     TransactionStatus,
 } from '../../../common/models';
-import ledgerActions from './redux/ledger.actionCreators';
 
 const logger: ILogger = new Logger('General Ledger Page');
 const bemBlockName: string = 'general_ledger_page';

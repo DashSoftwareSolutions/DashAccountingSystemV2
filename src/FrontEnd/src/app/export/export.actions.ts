@@ -1,6 +1,6 @@
-import ActionType from "../globalReduxStore/actionType";
-import IAction from '../globalReduxStore/action.interface';
 import { ExportDownloadInfo } from '../../common/models';
+import IAction from '../globalReduxStore/action.interface';
+import ActionType from "../globalReduxStore/actionType";
 
 // this is a common action type that other stores may dispatch to expose export/download functionality for their feature area
 export interface RequestDownloadAction extends IAction {

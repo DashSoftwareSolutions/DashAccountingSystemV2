@@ -1,22 +1,22 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     ConnectedProps,
     connect,
 } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
     Button,
     Col,
     Row,
 } from 'reactstrap';
+import { actionCreators } from './redux';
 import dashHeroImage from '../../assets/dash-hero-image.jpeg';
-import { RootState } from '../globalReduxStore';
 import {
     ILogger,
     Logger,
 } from '../../common/logging';
 import usePrevious from '../../common/utilities/usePrevious';
-import { actionCreators } from './redux';
+import { RootState } from '../globalReduxStore';
 
 const logger: ILogger = new Logger('Logout Page');
 

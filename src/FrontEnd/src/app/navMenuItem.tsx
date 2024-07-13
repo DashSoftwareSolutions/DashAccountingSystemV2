@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { NavItem } from 'reactstrap';
-import { NavigationSection } from '../common/models';
 import LinkButton from '../common/components/linkButton';
+import { NavigationSection } from '../common/models';
 
 type PropTypes = {
     children: React.ReactNode;
