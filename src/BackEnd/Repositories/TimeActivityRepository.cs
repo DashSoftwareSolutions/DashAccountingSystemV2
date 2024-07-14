@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
@@ -49,8 +45,8 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
             Guid tenantId,
             DateTime dateRangeStart,
             DateTime dateRangeEnd,
-            IEnumerable<Guid> includeCustomers = null,
-            IEnumerable<Guid> includeEmployees = null)
+            IEnumerable<Guid>? includeCustomers = null,
+            IEnumerable<Guid>? includeEmployees = null)
         {
             // EF has been less than awesome with filters and such; using Dapper for now
             /*return await _db.TimeActivity

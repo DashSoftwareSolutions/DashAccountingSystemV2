@@ -49,8 +49,8 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
             return connectionString.Replace(passwordClause, updatedPasswordClause);
         }
 
-        public static string MaskSecretValue(
-            this string secret,
+        public static string? MaskSecretValue(
+            this string? secret,
             int numTrailingCharactersToReveal = 4,
             char maskCharacter = '*')
         {
@@ -125,7 +125,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
             //return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
-        public static IEnumerable<TEnum> ParseCommaSeparatedEnumValues<TEnum>(this string commaSeparatedEnumList) where TEnum : struct
+        public static IEnumerable<TEnum> ParseCommaSeparatedEnumValues<TEnum>(this string? commaSeparatedEnumList) where TEnum : struct
         {
             if (string.IsNullOrWhiteSpace(commaSeparatedEnumList))
                 return [];
@@ -143,7 +143,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
                 .Select(s => s.Value);
         }
 
-        public static IEnumerable<Guid> ParseCommaSeparatedGuids(this string commaSeparatedGuidList)
+        public static IEnumerable<Guid> ParseCommaSeparatedGuids(this string? commaSeparatedGuidList)
         {
             if (string.IsNullOrWhiteSpace(commaSeparatedGuidList))
                 return [];
@@ -157,10 +157,10 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
 #pragma warning restore CS8629 // Nullable value type may be null.
         }
 
-        public static IEnumerable<uint> ParseCommaSeparatedIntegers(this string commaSeparatedIntegerList)
+        public static IEnumerable<uint>? ParseCommaSeparatedIntegers(this string? commaSeparatedIntegerList)
         {
             if (string.IsNullOrWhiteSpace(commaSeparatedIntegerList))
-                return [];
+                return null;
 
 #pragma warning disable CS8629 // Nullable value type may be null.
             return commaSeparatedIntegerList
@@ -171,17 +171,17 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
 #pragma warning restore CS8629 // Nullable value type may be null.
         }
 
-        public static IEnumerable<uint> ParseCommaSeparatedIntegers(this IEnumerable<string> commaSeparatedIntegerLists)
-        {
-            return string.Join(",", commaSeparatedIntegerLists ?? Enumerable.Empty<string>()).ParseCommaSeparatedIntegers();
-        }
+        public static IEnumerable<uint>? ParseCommaSeparatedIntegers(this IEnumerable<string>? commaSeparatedIntegerLists)
+            => commaSeparatedIntegerLists == null
+                ? null
+                : string.Join(",", commaSeparatedIntegerLists).ParseCommaSeparatedIntegers();
 
         /// <summary>
         /// Returns string Enumerable from CSV string parameter 
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static IEnumerable<string> ParseCommaSeparatedValues(this string str)
+        public static IEnumerable<string> ParseCommaSeparatedValues(this string? str)
         {
             return string.IsNullOrWhiteSpace(str)
                 ? Enumerable.Empty<string>()

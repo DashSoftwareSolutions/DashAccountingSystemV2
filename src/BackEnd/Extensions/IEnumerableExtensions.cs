@@ -1,4 +1,4 @@
-﻿namespace DashAccountingSystemV2.BackEnd.Extensions
+namespace DashAccountingSystemV2.BackEnd.Extensions
 {
     public static class IEnumerableExtensions
     {
@@ -12,7 +12,7 @@
         /// ex: the SQL would end up like: <code>[some_column_you_are_filtering_by] = ANY('{}')</code>
         /// which will return 0 results!
         /// </returns>
-        public static TElement[]? AsArrayOrNull<TElement>(this IEnumerable<TElement> source)
+        public static TElement[]? AsArrayOrNull<TElement>(this IEnumerable<TElement>? source)
         {
             if (!source.HasAny())
                 return null;
@@ -20,7 +20,7 @@
             if (source is TElement[] arraySource)
                 return arraySource;
 
-            return source.ToArray();
+            return source!.ToArray();
         }
 
         /// <summary>
@@ -40,7 +40,7 @@
         /// <typeparam name="T">the type of thing in the collection</typeparam>
         /// <param name="list">IEnumerable&lt;T&gt;</param>
         /// <returns>Boolean indicating the collection is not null and has at least one item in it</returns>
-        public static bool HasAny<T>(this IEnumerable<T> list)
+        public static bool HasAny<T>(this IEnumerable<T>? list)
         {
             return list != null && list.Any();
         }
@@ -52,7 +52,7 @@
         /// <param name="list">IEnumerable&lt;T&gt;</param>
         /// <param name="predicate">Func&lt;T, bool&lt;</param>
         /// <returns>Boolean indicating the collection is not null and has at least one item in it that matches the predicate</returns>
-        public static bool HasAny<T>(this IEnumerable<T> list, Func<T, bool> predicate)
+        public static bool HasAny<T>(this IEnumerable<T>? list, Func<T, bool> predicate)
         {
             return list != null && list.Any(predicate);
         }
@@ -63,7 +63,7 @@
         /// <typeparam name="T">the type of thing in the collection</typeparam>
         /// <param name="list">IEnumerable&lt;T&gt;</param>
         /// <returns>Boolean indicating the collection is null or has no items in it</returns>
-        public static bool IsEmpty<T>(this IEnumerable<T> list)
+        public static bool IsEmpty<T>(this IEnumerable<T>? list)
         {
             return !list.HasAny();
         }

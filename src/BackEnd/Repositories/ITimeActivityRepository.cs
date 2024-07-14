@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using DashAccountingSystemV2.BackEnd.Models;
 
 namespace DashAccountingSystemV2.BackEnd.Repositories
@@ -13,8 +10,8 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
             Guid tenantId,
             DateTime dateRangeStart,
             DateTime dateRangeEnd,
-            IEnumerable<Guid> includeCustomers = null,
-            IEnumerable<Guid> includeEmployees = null);
+            IEnumerable<Guid>? includeCustomers = null,
+            IEnumerable<Guid>? includeEmployees = null);
 
         Task<IEnumerable<TimeActivity>> GetUnbilledItemsForInvoicingAsync(
             Guid customerId,

@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
@@ -12,7 +8,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly ApplicationDbContext _db = null;
+        private readonly ApplicationDbContext _db;
 
         public EmployeeRepository(ApplicationDbContext applicationDbContext)
         {
@@ -81,7 +77,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
 
         public async Task<IEnumerable<Employee>> GetByTenantIdAsync(
             Guid tenantId,
-            IEnumerable<uint> employeeNumbers = null,
+            IEnumerable<uint>? employeeNumbers = null,
             bool onlyActive = true)
         {
             // EF is not handling filtering well; using Dapper...

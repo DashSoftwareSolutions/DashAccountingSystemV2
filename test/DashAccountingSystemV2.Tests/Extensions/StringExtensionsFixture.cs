@@ -31,7 +31,7 @@ namespace DashAccountingSystemV2.Tests.Extensions
         [InlineData("XY", "****XY", 3)]
         [InlineData("SuperSecretPassword", "****word")]
         [InlineData("SuperSecretPassword", "****Password", 8)]
-        public void MaskSecretValue_Ok(string originalInput, string expectedResult, int? numberOfCharactersToReveal = null)
+        public void MaskSecretValue_Ok(string? originalInput, string? expectedResult, int? numberOfCharactersToReveal = null)
         {
             var actualResult = numberOfCharactersToReveal.HasValue ?
                 originalInput.MaskSecretValue(numberOfCharactersToReveal.Value) :
@@ -43,7 +43,7 @@ namespace DashAccountingSystemV2.Tests.Extensions
         [Fact]
         public void ParseCommaSeparatedIntegers_Ok()
         {
-            string input = null;
+            string? input = null;
             var results = input.ParseCommaSeparatedIntegers();
             Assert.Null(results);
 
@@ -60,12 +60,12 @@ namespace DashAccountingSystemV2.Tests.Extensions
         public void ParseListOfCommaSeparatedIntegers_Ok()
         {
             // Case 1: Input is NULL
-            List<string> input = null;
+            List<string>? input = null;
             var results = input.ParseCommaSeparatedIntegers();
             Assert.Null(results);
 
             // Case 2: Input is Empty
-            input = new List<string>();
+            input = [];
             results = input.ParseCommaSeparatedIntegers();
             Assert.Null(results);
 
@@ -88,7 +88,7 @@ namespace DashAccountingSystemV2.Tests.Extensions
         [InlineData("Hablas Español?", "Hablas Espanol?")]
         [InlineData("Können Sie mir behilflich sein?", "Koennen Sie mir behilflich sein?")]
         [InlineData("Ich weiß nicht", "Ich weiss nicht")]
-        public void RemoveDiactricits_Ok(string originalInput, string expectedResult)
+        public void RemoveDiacritics_Ok(string originalInput, string expectedResult)
         {
             var actualResult = originalInput.RemoveDiacritics();
             Assert.Equal(expectedResult, actualResult);
@@ -127,14 +127,14 @@ namespace DashAccountingSystemV2.Tests.Extensions
             var forceLowercaseSpecified = forceLowerCase.HasValue;
             var delimiterSpecified = !string.IsNullOrEmpty(delimiter);
 
-            string actualResult = null;
+            string? actualResult = null;
 
             if (forceLowercaseSpecified && delimiterSpecified)
-                actualResult = originalInput.Slugify(forceLowerCase.Value, delimiter);
+                actualResult = originalInput.Slugify(forceLowerCase!.Value, delimiter!);
             else if (forceLowercaseSpecified)
-                actualResult = originalInput.Slugify(forceLowerCase.Value);
+                actualResult = originalInput.Slugify(forceLowerCase!.Value);
             else if (delimiterSpecified)
-                actualResult = originalInput.Slugify(delimiter: delimiter);
+                actualResult = originalInput.Slugify(delimiter: delimiter!);
 
             Assert.Equal(expectedResult, actualResult);
         }

@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
@@ -62,7 +58,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
 
         public async Task<IEnumerable<Customer>> GetByTenantIdAsync(
             Guid tenantId,
-            IEnumerable<string> customerNumbers = null,
+            IEnumerable<string>? customerNumbers = null,
             bool onlyActive = true)
         {
             // Not working so well :-(

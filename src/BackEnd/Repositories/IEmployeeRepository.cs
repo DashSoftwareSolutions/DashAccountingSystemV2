@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using DashAccountingSystemV2.BackEnd.Models;
 
 namespace DashAccountingSystemV2.BackEnd.Repositories
@@ -9,7 +6,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
     {
         Task<IEnumerable<Employee>> GetByTenantIdAsync(
             Guid tenantId,
-            IEnumerable<uint> employeeNumbers = null,
+            IEnumerable<uint>? employeeNumbers = null,
             bool onlyActive = true);
 
         Task<Employee> GetByEntityIdAsync(Guid entityId);

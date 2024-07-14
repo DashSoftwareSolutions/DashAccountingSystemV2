@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using DashAccountingSystemV2.BackEnd.Models;
 
 namespace DashAccountingSystemV2.BackEnd.Repositories
@@ -19,8 +16,8 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
             Guid tenantId,
             DateTime? dateRangeStart,
             DateTime? dateRangeEnd,
-            IEnumerable<Guid> includeCustomers,
-            IEnumerable<Guid> includeInvoices,
+            IEnumerable<Guid>? includeCustomers,
+            IEnumerable<Guid>? includeInvoices,
             Pagination pagination);
 
         Task<uint> GetNextInvoiceNumberAsync(Guid tenantId);

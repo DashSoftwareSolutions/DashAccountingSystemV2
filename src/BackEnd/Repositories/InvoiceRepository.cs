@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
@@ -13,7 +9,7 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
 {
     public class InvoiceRepository : IInvoiceRepository
     {
-        private readonly ApplicationDbContext _db = null;
+        private readonly ApplicationDbContext _db;
 
         public InvoiceRepository(ApplicationDbContext applicationDbContext)
         {
@@ -162,8 +158,8 @@ namespace DashAccountingSystemV2.BackEnd.Repositories
             Guid tenantId,
             DateTime? dateRangeStart,
             DateTime? dateRangeEnd,
-            IEnumerable<Guid> includeCustomers,
-            IEnumerable<Guid> includeInvoices,
+            IEnumerable<Guid>? includeCustomers,
+            IEnumerable<Guid>? includeInvoices,
             Pagination pagination)
         {
             // TODO: Implement support for other sorting options (per specification in the pagination parameters) if needed/wanted
