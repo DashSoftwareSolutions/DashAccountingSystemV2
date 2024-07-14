@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Mvc;
@@ -12,17 +12,19 @@ namespace DashAccountingSystemV2.BackEnd.Security.Authorization
     {
         public AuthorizationPolicy Policy { get; }
 
-        public ApiAuthorizeAttribute()
+        public ApiAuthorizeAttribute(string? requiredAuthenticationScheme = null)
         {
-            Policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+            Policy = string.IsNullOrEmpty(requiredAuthenticationScheme)
+                ? new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()
+                : new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(requiredAuthenticationScheme!)
+                    .RequireAuthenticatedUser()
+                    .Build();
         }
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            ArgumentNullException.ThrowIfNull(context);
 
             // Allow Anonymous skips all authorization
             if (context.Filters.Any(item => item is IAllowAnonymousFilter))
@@ -41,7 +43,7 @@ namespace DashAccountingSystemV2.BackEnd.Security.Authorization
                     Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2",
                     Title = "Unauthorized",
                     Status = StatusCodes.Status401Unauthorized,
-                    Detail = "You must be logged in to make this request.",
+                    Detail = "This request must include a valid export download token.  Either there was no token, it it was invalid (perhaps expired).",
                     Instance = context.HttpContext.Request.GetEncodedPathAndQuery(),
                 };
 

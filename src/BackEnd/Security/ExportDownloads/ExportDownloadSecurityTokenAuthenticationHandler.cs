@@ -7,7 +7,7 @@ using static DashAccountingSystemV2.BackEnd.Security.Constants;
 namespace DashAccountingSystemV2.BackEnd.Security.ExportDownloads
 {
     public class ExportDownloadSecurityTokenAuthenticationHandler
-        : AuthenticationHandler<ExportDownloadSecurityTokenAuthenticationHandlerOptions>
+        : SignInAuthenticationHandler<ExportDownloadSecurityTokenAuthenticationHandlerOptions>
     {
         private readonly IExportDownloadSecurityTokenService _securityTokenService;
         private readonly ILogger _logger;
@@ -28,7 +28,7 @@ namespace DashAccountingSystemV2.BackEnd.Security.ExportDownloads
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            string token = Request.Query["token"];
+            string? token = Request.Query["token"];
 
             if (string.IsNullOrEmpty(token))
             {
@@ -44,16 +44,20 @@ namespace DashAccountingSystemV2.BackEnd.Security.ExportDownloads
                 return AuthenticateResult.Fail("Export Download Token Not Valid; Unauthorized");
             }
 
-            var claims = new List<Claim>() {
-                new Claim(ClaimTypes.NameIdentifier, exportDownloadAuthenticationTicket.UserId.ToString()),
-                //new Claim(JwtClaimTypes.Subject, exportDownloadAuthenticationTicket.UserId.ToString()),
-                new Claim(DashClaimTypes.TenantId, exportDownloadAuthenticationTicket.TenantId.ToString()),
-                new Claim(DashClaimTypes.ExportType, exportDownloadAuthenticationTicket.ExportType.ToString()),
+            var claims = new List<Claim>()
+            {
+                new(ClaimTypes.NameIdentifier, exportDownloadAuthenticationTicket.UserId.ToString()),
+                new(DashClaimTypes.TenantId, exportDownloadAuthenticationTicket.TenantId.ToString()),
+                new(DashClaimTypes.ExportType, exportDownloadAuthenticationTicket.ExportType.ToString()),
             };
 
             var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, ExportDownloadAuthenticationScheme));
             var authenticationTicket = new AuthenticationTicket(principal, new AuthenticationProperties(), ExportDownloadAuthenticationScheme);
             return AuthenticateResult.Success(authenticationTicket);
         }
+
+        protected override Task HandleSignInAsync(ClaimsPrincipal user, AuthenticationProperties? properties) => Task.CompletedTask;
+
+        protected override Task HandleSignOutAsync(AuthenticationProperties? properties) => Task.CompletedTask;
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -27,9 +28,10 @@ try
 
     // Database
     var connectionStringBuilder = new NpgsqlConnectionStringBuilder(
-        builder.Configuration.GetConnectionString("DefaultConnection"));
-
-    connectionStringBuilder.Password = builder.Configuration["NewDbPassword"];
+        builder.Configuration.GetConnectionString("DefaultConnection"))
+    {
+        Password = builder.Configuration["NewDbPassword"]
+    };
 
     var connectionString = connectionStringBuilder.ConnectionString;
 
@@ -48,24 +50,40 @@ try
     });
 
     // Authorization/Identity services
-    builder.Services.AddAuthorizationBuilder()
+    builder.Services
+        .AddAuthorizationBuilder()
         .AddPolicy(ExportDownloadAuthorizationPolicy, policy =>
         {
             policy.AuthenticationSchemes.Add(ExportDownloadAuthenticationScheme);
             policy.RequireAuthenticatedUser();
         });
 
+    // Add Authentication
+    // Adds a "composite" handler that tries both bearer token and export download token
+    // Based on:
+    // https://github.com/dotnet/aspnetcore/blob/v8.0.7/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L134-L152
+    // https://github.com/dotnet/aspnetcore/blob/v8.0.7/src/Identity/Core/src/IdentityServiceCollectionExtensions.cs#L187-L213
+    builder.Services
+        .AddAuthentication(ApplicationAuthenticationScheme)
+        .AddScheme<AuthenticationSchemeOptions, ApplicationAuthenticationHandler>(ApplicationAuthenticationScheme, null, compositeOptions =>
+        {
+            compositeOptions.ForwardDefault = IdentityConstants.BearerScheme;
+            compositeOptions.ForwardAuthenticate = ApplicationAuthenticationScheme;
+        })
+        .AddBearerToken(IdentityConstants.BearerScheme)
+        .AddExportDownloadToken();
+
     // Register ASP.NET Identity, including the needed infrastructure for the Identity API endpoints
     // See: https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-8.0#activate-identity-apis
     builder.Services
-        .AddIdentityApiEndpoints<ApplicationUser>()
+        .AddIdentityCore<ApplicationUser>()
         .AddRoles<ApplicationRole>()
         .AddRoleManager<ApplicationRoleManager>()
         .AddUserManager<ApplicationUserManager>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
 
-    builder.Services.AddAuthentication().AddExportDownloadToken();
-
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<SignInManager<ApplicationUser>>();
     builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
     // Other application services (repositories, business logic, services, etc.)
