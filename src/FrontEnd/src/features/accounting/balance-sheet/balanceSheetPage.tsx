@@ -10,7 +10,8 @@ import {
     Row,
 } from 'reactstrap';
 import { BalanceSheetReport } from './models';
-import { actionCreators } from './redux';
+import { actionCreators as balanceSheetActionCreators } from './redux';
+import { actionCreators as exportActionCreators } from '../../../app/export';
 import { RootState } from '../../../app/globalReduxStore';
 import { actionCreators as notificationActionCreators } from '../../../app/notifications';
 import AmountDisplay from '../../../common/components/amountDisplay';
@@ -40,7 +41,8 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = {
-    ...actionCreators,
+    ...balanceSheetActionCreators,
+    reportDownloadError: exportActionCreators.reportError,
     showAlert: notificationActionCreators.showAlert,
 };
 
@@ -58,6 +60,7 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
         excelDownloadInfo,
         isDownloading,
         isFetching,
+        reportDownloadError,
         requestBalanceSheetReportData,
         requestBalanceSheetReportExcelExport,
         reset,
@@ -88,27 +91,37 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
     }, []);
 
     // handle download
-    // TODO: get it actually functional when appropriate
-    // First thing we want to verify is authentication via the download token
-    // Then we gotta wire up back-end to actually produce the excel file
     useEffect(() => {
         if (wasDownloading && !isDownloading) {
-            logger.info('Download completed');
-            logger.info('Download info:', excelDownloadInfo);
-
             if (!isNil(excelDownloadInfo)) {
                 fetch(`/api/export-download?filename=${excelDownloadInfo.fileName}&format=${excelDownloadInfo.format}&token=${excelDownloadInfo.token}`)
                     .then((response) => {
-                        if (response.ok) {
-                            logger.info('Yay!  It worked!');
+                        if (!response.ok) {
+                            reportDownloadError(response);
+                            setIsDownloadInProgress(false);
+                            return null;
                         } else {
-                            logger.error('Error:', response);
+                            return response.blob();
                         }
                     })
-                    .catch((error) => {
-                        logger.error('Error:', error);
+                    .then((blob) => {
+                        if (!isNil(blob)) {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = excelDownloadInfo.fileName;
+                            document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                            a.click();
+                            a.remove();  //afterwards we remove the element again
+
+                            // delay clearing `isDownloadInProgress` flag until save download window pops open
+                            setTimeout(() => {
+                                setIsDownloadInProgress(false);
+                            }, 750);
+                        }
                     })
-                    .finally(() => {
+                    .catch((error) => { //
+                        logger.error('Error:', error);
                         setIsDownloadInProgress(false);
                     });
             } else {
@@ -118,6 +131,7 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
     }, [
         excelDownloadInfo,
         isDownloading,
+        reportDownloadError,
         setIsDownloadInProgress,
         wasDownloading,
     ]);
