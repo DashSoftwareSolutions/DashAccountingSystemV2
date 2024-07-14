@@ -3,6 +3,7 @@ import * as BalanceSheet from '../../features/accounting/balance-sheet/redux';
 import * as ChartOfAccounts from '../../features/accounting/chart-of-accounts/redux';
 import * as Ledger from '../../features/accounting/general-ledger/redux';
 import * as Journal from '../../features/accounting/journal/redux';
+import * as ProfitAndLoss from '../../features/accounting/profit-and-loss/redux';
 import * as Application from '../applicationRedux'
 import * as Authentication from '../authentication/redux';
 import * as ExportDownload from '../export';
@@ -21,6 +22,7 @@ export interface RootState {
     journal: Journal.state;
     ledger: Ledger.state;
     lookups: Lookups.state;
+    profitAndLoss: ProfitAndLoss.state;
     systemNotifications: SystemNotifications.state;
 }
 
@@ -36,6 +38,7 @@ export const reducers = {
     journal: Journal.reducer,
     ledger: Ledger.reducer,
     lookups: Lookups.reducer,
+    profitAndLoss: ProfitAndLoss.reducer,
     systemNotifications: SystemNotifications.reducer,
 };
 

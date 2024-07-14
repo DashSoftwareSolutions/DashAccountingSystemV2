@@ -18,7 +18,7 @@ import GeneralLedgerPage from '../features/accounting/general-ledger/generalLedg
 import AddJournalEntryPage from '../features/accounting/journal/addJournalEntryPage';
 import EditJournalEntryPage from '../features/accounting/journal/editJournalEntryPage';
 import ViewJournalEntryPage from '../features/accounting/journal/viewJournalEntryPage';
-import ProfitAndLossPage from '../features/accounting/profit-and-losss/profitAndLossPage';
+import ProfitAndLossPage from '../features/accounting/profit-and-loss/profitAndLossPage';
 import DashboardPage from '../features/dashboard/dashboardPage';
 import InvoiceListPage from '../features/invoicing/invoiceListPage';
 import TimeTrackingPage from '../features/time-tracking/timeTrackingPage';

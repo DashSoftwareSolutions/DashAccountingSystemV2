@@ -9,7 +9,7 @@ import {
     Col,
     Row,
 } from 'reactstrap';
-import { actionCreators as balanceSheetActionCreators } from './redux';
+import { actionCreators as profitAndLossActionCreators } from './redux';
 import { actionCreators as exportActionCreators } from '../../../app/export';
 import { RootState } from '../../../app/globalReduxStore';
 import { actionCreators as notificationActionCreators } from '../../../app/notifications';
@@ -28,43 +28,43 @@ import {
 import useNamedState from '../../../common/utilities/useNamedState';
 import usePrevious from '../../../common/utilities/usePrevious';
 
-const logger: ILogger = new Logger('Balance Sheet Page');
-const bemBlockName: string = 'balance_sheet_page';
+const logger: ILogger = new Logger('Profit & Loss Page');
+const bemBlockName: string = 'profit_and_loss_page';
 
 const mapStateToProps = (state: RootState) => ({
-    balanceSheet: state.balanceSheet?.reportData ?? null,
-    dateRangeEnd: state?.balanceSheet?.dateRangeEnd,
-    dateRangeStart: state?.balanceSheet?.dateRangeStart,
+    profitAndLossReport: state.profitAndLoss?.reportData ?? null,
+    dateRangeEnd: state?.profitAndLoss?.dateRangeEnd,
+    dateRangeStart: state?.profitAndLoss?.dateRangeStart,
     excelDownloadError: state?.exportDownload?.error ?? null,
     excelDownloadInfo: state?.exportDownload?.downloadInfo ?? null,
     isDownloading: state?.exportDownload?.isFetching ?? false,
-    isFetching: state.balanceSheet?.isFetching ?? false,
+    isFetching: state.profitAndLoss?.isFetching ?? false,
     selectedTenant: state.application.selectedTenant,
 });
 
 const mapDispatchToProps = {
-    ...balanceSheetActionCreators,
+    ...profitAndLossActionCreators,
     reportDownloadError: exportActionCreators.reportError,
     showAlert: notificationActionCreators.showAlert,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type BalanceSheetPageReduxProps = ConnectedProps<typeof connector>;
+type ProfitAndLossPageReduxProps = ConnectedProps<typeof connector>;
 
-type BalanceSheetPageProps = BalanceSheetPageReduxProps;
+type ProfitAndLossPageProps = ProfitAndLossPageReduxProps;
 
-function BalanceSheetPage(props: BalanceSheetPageProps) {
+function ProfitAndLossPage(props: ProfitAndLossPageProps) {
     const {
-        balanceSheet,
+        profitAndLossReport,
         dateRangeStart,
         dateRangeEnd,
         excelDownloadInfo,
         isDownloading,
         isFetching,
         reportDownloadError,
-        requestBalanceSheetReportData,
-        requestBalanceSheetReportExcelExport,
+        requestProfitAndLossReportData,
+        requestProfitAndLossReportExcelExport,
         reset,
         selectedTenant,
         updateDateRange,
@@ -87,7 +87,7 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
 
     // component did mount - fetch the data
     useEffect(() => {
-        requestBalanceSheetReportData();
+        requestProfitAndLossReportData();
         // Suppressing "react-hooks/exhaustive-deps" to use an empty dependencies array for "component did mount" type semantics
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -144,15 +144,15 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
     const onRunReport = (newDateRange: DateRange) => {
         reset();
         updateDateRange(newDateRange);
-        requestBalanceSheetReportData();
+        requestProfitAndLossReportData();
     };
 
     const onDownloadExcel = () => {
-        requestBalanceSheetReportExcelExport();
+        requestProfitAndLossReportExcelExport();
         setIsDownloadInProgress(true);
     };
 
-    const hasBalanceSheetData = !isNil(balanceSheet);
+    const hasProfitAndLossData = !isNil(profitAndLossReport);
 
     return (
         <React.Fragment>
@@ -162,7 +162,7 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
             >
                 <Row>
                     <Col>
-                        <h1>Balance Sheet</h1>
+                        <h1>Profit &amp; Loss</h1>
                         <p className="page_header--subtitle">{selectedTenant?.name}</p>
                     </Col>
                 </Row>
@@ -183,113 +183,169 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
                     <Loader />
                 )}
 
-                {!isFetching && !hasBalanceSheetData && (
+                {!isFetching && !hasProfitAndLossData && (
                     <p>No data</p>
                 )}
 
-                {!isFetching && hasBalanceSheetData && (
+                {!isFetching && hasProfitAndLossData && (
                     <table className="table table-hover table-sm report-table">
                         <thead>
                             <tr>
                                 <th className="col-md-10 bg-white sticky-top sticky-border" />
-                                <th className="col-md-2 bg-white sticky-top sticky-border text-right">TOTAL</th>
+                                <th className="col-md-2 bg-white sticky-top sticky-border text-end">TOTAL</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             <tr className="report-section-header">
-                                <td colSpan={2}>ASSETS</td>
+                                <td colSpan={2}>
+                                    OPERATING INCOME
+                                </td>
                             </tr>
-                            {balanceSheet.assets.map((assetAccount) => ((
-                                <tr key={assetAccount.id}>
+
+                            {profitAndLossReport.operatingIncome.map((opIncomeAccount) => ((
+                                <tr key={opIncomeAccount.id}>
                                     <td className="account-name">
-                                        {`${assetAccount.accountNumber} - ${assetAccount.name}`}
+                                        {`${opIncomeAccount.accountNumber} - ${opIncomeAccount.name}`}
                                     </td>
                                     <td className="text-end">
                                         <AmountDisplay
-                                            amount={assetAccount.balance}
+                                            amount={opIncomeAccount.balance}
+                                            normalBalanceType={AmountType.Credit}
+                                        />
+                                    </td>
+                                </tr>
+                            )))}
+
+                            <tr className="report-total-row">
+                                <td>GROSS PROFIT</td>
+                                <td className="text-end">
+                                    <AmountDisplay
+                                        amount={profitAndLossReport.grossProfit}
+                                        normalBalanceType={AmountType.Credit}
+                                        showCurrency
+                                    />
+                                </td>
+                            </tr>
+
+                            <tr className="report-section-header">
+                                <td>OPERATING EXPENSES</td>
+                            </tr>
+
+                            {profitAndLossReport.operatingExpenses.map((opExpenseAccount) => ((
+                                <tr key={opExpenseAccount.id}>
+                                    <td className="account-name">
+                                        {`${opExpenseAccount.accountNumber} - ${opExpenseAccount.name}`}
+                                    </td>
+                                    <td className="text-end">
+                                        <AmountDisplay
+                                            amount={opExpenseAccount.balance}
                                             normalBalanceType={AmountType.Debit}
                                         />
                                     </td>
                                 </tr>
                             )))}
+
                             <tr className="report-total-row">
-                                <td>TOTAL ASSETS</td>
+                                <td>TOTAL OPERATING EXPENSES</td>
                                 <td className="text-end">
                                     <AmountDisplay
-                                        amount={balanceSheet.totalAssets}
+                                        amount={profitAndLossReport.totalOperatingExpenses}
                                         normalBalanceType={AmountType.Debit}
                                         showCurrency
                                     />
                                 </td>
                             </tr>
-                            <tr className="report-section-header">
-                                <td colSpan={2}>LIABILITIES</td>
-                            </tr>
-                            {balanceSheet.liabilities.map((liabilityAccount) => ((
-                                <tr key={liabilityAccount.id}>
-                                    <td className="account-name">
-                                        {`${liabilityAccount.accountNumber} - ${liabilityAccount.name}`}
-                                    </td>
-                                    <td className="text-end">
-                                        <AmountDisplay
-                                            amount={liabilityAccount.balance}
-                                            normalBalanceType={AmountType.Credit}
-                                        />
-                                    </td>
-                                </tr>
-                            )))}
-                            <tr className="report-total-row">
-                                <td>TOTAL LIABILITIES</td>
+
+                            <tr className="report-grand-total-row">
+                                <td>NET OPERATING INCOME</td>
                                 <td className="text-end">
                                     <AmountDisplay
-                                        amount={balanceSheet.totalLiabilities}
+                                        amount={profitAndLossReport.netOperatingIncome}
                                         normalBalanceType={AmountType.Credit}
                                         showCurrency
                                     />
                                 </td>
                             </tr>
+
                             <tr className="report-section-header">
-                                <td colSpan={2}>EQUITY</td>
+                                <td colSpan={2}>
+                                    OTHER INCOME
+                                </td>
                             </tr>
-                            {balanceSheet.equity.map((equityAccount) => ((
-                                <tr key={equityAccount.id}>
+
+                            {profitAndLossReport.otherIncome.map((otherIncomeAccount) => ((
+                                <tr key={otherIncomeAccount.id}>
                                     <td className="account-name">
-                                        {`${equityAccount.accountNumber} - ${equityAccount.name}`}
+                                        {`${otherIncomeAccount.accountNumber} - ${otherIncomeAccount.name}`}
                                     </td>
                                     <td className="text-end">
                                         <AmountDisplay
-                                            amount={equityAccount.balance}
+                                            amount={otherIncomeAccount.balance}
                                             normalBalanceType={AmountType.Credit}
                                         />
                                     </td>
                                 </tr>
                             )))}
-                            <tr>
-                                <td className="account-name">Net Income</td>
+
+                            <tr className="report-total-row">
+                                <td>TOTAL OTHER INCOME</td>
                                 <td className="text-end">
                                     <AmountDisplay
-                                        amount={balanceSheet.netIncome}
+                                        amount={profitAndLossReport.totalOtherIncome}
                                         normalBalanceType={AmountType.Credit}
+                                        showCurrency
                                     />
                                 </td>
                             </tr>
+
+                            <tr className="report-section-header">
+                                <td>OTHER EXPENSES</td>
+                            </tr>
+
+                            {profitAndLossReport.otherExpenses.map((otherExpenseAccount) => ((
+                                <tr key={otherExpenseAccount.id}>
+                                    <td className="account-name">
+                                        {`${otherExpenseAccount.accountNumber} - ${otherExpenseAccount.name}`}
+                                    </td>
+                                    <td className="text-end">
+                                        <AmountDisplay
+                                            amount={otherExpenseAccount.balance}
+                                            normalBalanceType={AmountType.Debit}
+                                        />
+                                    </td>
+                                </tr>
+                            )))}
+
                             <tr className="report-total-row">
-                                <td>TOTAL EQUITY</td>
+                                <td>TOTAL OTHER EXPENSES</td>
                                 <td className="text-end">
                                     <AmountDisplay
-                                        amount={balanceSheet.totalEquity}
+                                        amount={profitAndLossReport.totalOtherExpenses}
+                                        normalBalanceType={AmountType.Debit}
+                                        showCurrency
+                                    />
+                                </td>
+                            </tr>
+
+                            <tr className="report-grand-total-row">
+                                <td>NET OTHER INCOME</td>
+                                <td className="text-end">
+                                    <AmountDisplay
+                                        amount={profitAndLossReport.netOtherIncome}
                                         normalBalanceType={AmountType.Credit}
                                         showCurrency
                                     />
                                 </td>
                             </tr>
                         </tbody>
+
                         <tfoot>
                             <tr className="report-grand-total-row">
-                                <td>TOTAL LIABILITIES &amp; EQUITY</td>
+                                <td>NET INCOME</td>
                                 <td className="text-end">
                                     <AmountDisplay
-                                        amount={balanceSheet.totalLiabilitiesAndEquity}
+                                        amount={profitAndLossReport.netIncome}
                                         normalBalanceType={AmountType.Credit}
                                         showCurrency
                                     />
@@ -303,4 +359,4 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
     );
 }
 
-export default connector(BalanceSheetPage);
+export default connector(ProfitAndLossPage);

@@ -111,11 +111,19 @@
               }
             }
           ],
-          "react/jsx-indent": [ "error", 4 ],
-          "react/jsx-indent-props": [ "error", 4 ],
+          "react/jsx-indent": [
+            "error",
+            4
+          ],
+          "react/jsx-indent-props": [
+            "error",
+            4
+          ],
           "react/jsx-max-props-per-line": [
             "error",
-            { "maximum": 1 }
+            {
+              "maximum": 1
+            }
           ],
           "react/jsx-sort-props": [
             "error",
@@ -143,13 +151,18 @@
               }
             }
           ],
-          "object-curly-spacing": [ "error", "always" ],
+          "object-curly-spacing": [
+            "error",
+            "always"
+          ],
           "modules-newline/import-declaration-newline": "error",
           "modules-newline/export-declaration-newline": "error"
         }
       }
     ],
-    "plugins": ["modules-newline"]
+    "plugins": [
+      "modules-newline"
+    ]
   },
   "browserslist": {
     "production": [
