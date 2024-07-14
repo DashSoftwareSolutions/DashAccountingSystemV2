@@ -155,7 +155,10 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 <Row>
                     <Col>
                         <h1>Balance Sheet</h1>

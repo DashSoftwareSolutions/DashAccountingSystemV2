@@ -21,7 +21,10 @@ const actionCreators = {
     },
 
     dismissAlert: (alertId: string): AppThunkAction<DismissAlertAction> => (dispatch) => {
-        dispatch({ type: ActionType.DISMISS_ALERT, alertId });
+        dispatch({
+            type: ActionType.DISMISS_ALERT,
+            alertId,
+        });
     },
 };
 

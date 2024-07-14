@@ -94,14 +94,22 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 <Row>
                     <Col md={6}>
                         <h1>General Ledger</h1>
                         <p className="page_header--subtitle">{selectedTenant?.name}</p>
                     </Col>
-                    <Col md={6} style={{ textAlign: 'right' }}>
-                        <Button color="primary" onClick={onClickNewJournalEntry}>
+
+                    <Col
+                        md={6}
+                        style={{ textAlign: 'right' }}
+                    >
+                        <Button color="primary"
+                            onClick={onClickNewJournalEntry}>
                             New Journal Entry
                         </Button>
                     </Col>
@@ -149,19 +157,31 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
                                     return (
                                         <React.Fragment key={`acct-${account.accountNumber}`}>
                                             <tr>
-                                                <td className="col-md-12" colSpan={5}>
+                                                <td className="col-md-12"
+                                                    colSpan={5}>
                                                     <strong>{`${account.accountNumber} - ${account.name}`}</strong>
                                                 </td>
                                             </tr>
+
                                             <tr>
-                                                <td className="col-md-2" colSpan={2}>Beginning Balance</td>
-                                                <td className="col-md-10 text-end" colSpan={3}>
+                                                <td
+                                                    className="col-md-2"
+                                                    colSpan={2}
+                                                >
+                                                    Beginning Balance
+                                                </td>
+
+                                                <td
+                                                    className="col-md-10 text-end"
+                                                    colSpan={3}
+                                                >
                                                     <AmountDisplay
                                                         amount={account.startingBalance}
                                                         normalBalanceType={account.normalBalanceType}
                                                     />
                                                 </td>
                                             </tr>
+
                                             {account.transactions.map((transaction) => {
                                                 const journalEntryViewRoute = `/app/journal-entry/view/${transaction.entryId}`;
 
@@ -174,19 +194,34 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
                                                 return (
                                                     <tr key={`acct-${account.accountNumber}-entry-${transaction.entryId}`}>
                                                         <td className="col-md-1">
-                                                            <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                            <Link
+                                                                className="hoverable-link"
+                                                                to={journalEntryViewRoute}
+                                                            >
                                                                 {DateTime.fromISO(transaction.postDate ?? transaction.entryDate).toLocaleString(DateTime.DATE_SHORT)}
                                                             </Link>
                                                         </td>
+
                                                         <td className="col-md-1">
-                                                            <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                            <Link
+                                                                className="hoverable-link"
+                                                                to={journalEntryViewRoute}
+                                                            >
                                                                 {transaction.entryId}
                                                             </Link>
                                                         </td>
-                                                        <td className="col-md-7" style={{ wordWrap: 'break-word' }}>
-                                                            <Link className="hoverable-link" to={journalEntryViewRoute}>
+
+                                                        <td
+                                                            className="col-md-7"
+                                                            style={{ wordWrap: 'break-word' }}
+                                                        >
+                                                            <Link
+                                                                className="hoverable-link"
+                                                                to={journalEntryViewRoute}
+                                                            >
                                                                 {transactionDescription}
                                                             </Link>
+
                                                             {transaction.status === TransactionStatus.Pending ? (
                                                                 <React.Fragment>
                                                                     {'\u00a0\u00a0\u00a0'}
@@ -194,16 +229,24 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
                                                                 </React.Fragment>
                                                             ) : null}
                                                         </td>
+
                                                         <td className="col-md-1 text-end">
-                                                            <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                            <Link
+                                                                className="hoverable-link"
+                                                                to={journalEntryViewRoute}
+                                                            >
                                                                 <AmountDisplay
                                                                     amount={transaction.amount}
                                                                     normalBalanceType={account.normalBalanceType}
                                                                 />
                                                             </Link>
                                                         </td>
+
                                                         <td className="col-md-2 text-end">
-                                                            <Link className="hoverable-link" to={journalEntryViewRoute}>
+                                                            <Link
+                                                                className="hoverable-link"
+                                                                to={journalEntryViewRoute}
+                                                            >
                                                                 <AmountDisplay
                                                                     amount={transaction.updatedBalance}
                                                                     normalBalanceType={account.normalBalanceType}
@@ -213,10 +256,15 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
                                                     </tr>
                                                 );
                                             })}
+
                                             <tr>
-                                                <td className="col-md-8 fw-bold" colSpan={3}>
+                                                <td
+                                                    className="col-md-8 fw-bold"
+                                                    colSpan={3}
+                                                >
                                                     {`Total for ${account.accountNumber} - ${account.name}`}
                                                 </td>
+
                                                 <td className="col-md-2 fw-bold text-end">
                                                     <AmountDisplay
                                                         amount={totalAmount}
@@ -224,6 +272,7 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
                                                         showCurrency
                                                     />
                                                 </td>
+
                                                 <td className="col-md-2" />
                                             </tr>
                                         </React.Fragment>

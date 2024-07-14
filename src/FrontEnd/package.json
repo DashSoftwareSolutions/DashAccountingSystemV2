@@ -97,10 +97,59 @@
                 "internal"
               ]
             }
-          ]
+          ],
+          "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+              "multiline": {
+                "delimiter": "semi",
+                "requireLast": true
+              },
+              "singleline": {
+                "delimiter": "semi",
+                "requireLast": true
+              }
+            }
+          ],
+          "react/jsx-indent": [ "error", 4 ],
+          "react/jsx-indent-props": [ "error", 4 ],
+          "react/jsx-max-props-per-line": [
+            "error",
+            { "maximum": 1 }
+          ],
+          "react/jsx-sort-props": [
+            "error",
+            {
+              "ignoreCase": true,
+              "noSortAlphabetically": false
+            }
+          ],
+          "object-property-newline": [
+            "error",
+            {
+              "allowAllPropertiesOnSameLine": false
+            }
+          ],
+          "object-curly-newline": [
+            "error",
+            {
+              "ImportDeclaration": {
+                "multiline": true,
+                "minProperties": 2
+              },
+              "ExportDeclaration": {
+                "multiline": true,
+                "minProperties": 2
+              }
+            }
+          ],
+          "object-curly-spacing": [ "error", "always" ],
+          "modules-newline/import-declaration-newline": "error",
+          "modules-newline/export-declaration-newline": "error"
         }
       }
-    ]
+    ],
+    "plugins": ["modules-newline"]
   },
   "browserslist": {
     "production": [

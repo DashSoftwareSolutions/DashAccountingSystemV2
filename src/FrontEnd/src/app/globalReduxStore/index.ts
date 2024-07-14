@@ -13,14 +13,14 @@ import * as SystemNotifications from '../notifications';
  * Redux state tree for the entire application
  */
 export interface RootState {
-    application: Application.state,
-    authentication: Authentication.state,
-    balanceSheet: BalanceSheet.state,
-    chartOfAccounts: ChartOfAccounts.state,
-    exportDownload: ExportDownload.state,
-    journal: Journal.state,
-    ledger: Ledger.state,
-    lookups: Lookups.state,
+    application: Application.state;
+    authentication: Authentication.state;
+    balanceSheet: BalanceSheet.state;
+    chartOfAccounts: ChartOfAccounts.state;
+    exportDownload: ExportDownload.state;
+    journal: Journal.state;
+    ledger: Ledger.state;
+    lookups: Lookups.state;
     systemNotifications: SystemNotifications.state;
 }
 

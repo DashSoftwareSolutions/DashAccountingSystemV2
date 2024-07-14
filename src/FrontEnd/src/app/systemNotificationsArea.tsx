@@ -93,7 +93,11 @@ function SystemNotificationsArea(props: SystemNotificationsAreaProps) {
     }
 
     return (
-        <div aria-live="polite" aria-atomic="true" className="position-relative">
+        <div
+            aria-atomic="true"
+            aria-live="polite"
+            className="position-relative"
+        >
             <div className="toast-container position-absolute bottom-0 end-0 p-3">
                 <Toast isOpen={alertIsVisible}>
                     <ToastHeader
@@ -102,6 +106,7 @@ function SystemNotificationsArea(props: SystemNotificationsAreaProps) {
                     >
                         {title}
                     </ToastHeader>
+
                     <ToastBody>
                         {alertContent}
                     </ToastBody>

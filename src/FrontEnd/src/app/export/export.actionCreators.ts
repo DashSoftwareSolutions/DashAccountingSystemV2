@@ -8,7 +8,11 @@ import ActionType from '../globalReduxStore/actionType';
 const actionCreators = {
     reportError: (apiResponse: Response): AppThunkAction<KnownAction> => (dispatch) => {
         apiErrorHandler.handleError(apiResponse, dispatch as Dispatch<IAction>);
-        dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_ERROR, error: 'Error downloading requested data export' });
+
+        dispatch({
+            type: ActionType.RECEIVE_EXPORT_DOWNLOAD_ERROR,
+            error: 'Error downloading requested data export',
+        });
     },
 
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {

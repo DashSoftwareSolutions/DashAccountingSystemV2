@@ -188,18 +188,28 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 <Row>
                     <Col md={5}>
                         <h1>Journal Entry Details</h1>
                         <p className="page_header--subtitle">{selectedTenant?.name}</p>
                     </Col>
-                    <Col className="text-end" md={7}>
+
+                    <Col
+                        className="text-end"
+                        md={7}
+                    >
                         <Button
                             color="secondary"
                             id={`${bemBlockName}--back_button`}
                             onClick={onClickBack}
-                            style={{ marginRight: 22, width: 120 }}
+                            style={{
+                                marginRight: 22,
+                                width: 120,
+                            }}
                         >
                             Back
                         </Button>
@@ -210,7 +220,10 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
                                     color="danger"
                                     id={`${bemBlockName}--delete_entry_button`}
                                     onClick={onClickDeleteJournalEntry}
-                                    style={{ marginRight: 22, width: 120 }}
+                                    style={{
+                                        marginRight: 22,
+                                        width: 120
+                                    }}
                                 >
                                     Delete Entry
                                 </Button>
@@ -219,7 +232,10 @@ function ViewJournalEntryPage(props: ViewJournalEntryPageProps) {
                                     color="success"
                                     id={`${bemBlockName}--post_entry_button`}
                                     onClick={onClickPostJournalEntry}
-                                    style={{ marginRight: 22, width: 120 }}
+                                    style={{
+                                        marginRight: 22,
+                                        width: 120
+                                    }}
                                 >
                                     Post Entry
                                 </Button>

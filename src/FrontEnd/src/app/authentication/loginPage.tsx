@@ -114,7 +114,10 @@ function LoginPage(props: PropTypes) {
     return (
         <Row className = "mt-4">
             <Col>
-                <img src = { dashHeroImage } alt = "Dash!" />
+                <img
+                    alt="Dash!"
+                    src={dashHeroImage}
+                />
             </Col>
 
             <Col>
@@ -164,7 +167,10 @@ function LoginPage(props: PropTypes) {
                 </Button>
 
                 {hasLoginError && (
-                    <Alert color="danger" className="mt-5">
+                    <Alert
+                        className="mt-5"
+                        color="danger"
+                    >
                         <h4 className="alert-heading">
                             Login Failed
                         </h4>

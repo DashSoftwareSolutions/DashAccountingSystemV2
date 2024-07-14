@@ -30,7 +30,7 @@ function ReportParametersAndControls({
     bemBlockName: string;
     dateRangeEnd: string | null; // Date in YYYY-MM-DD
     dateRangeStart: string | null; // Date in YYYY-MM-DD
-    defaultDateRangeMacro?: DateRangeMacroType,
+    defaultDateRangeMacro?: DateRangeMacroType;
     isRequestingExcelDownload?: boolean;
     onDownloadExcel?: () => void;
     onRunReport: (dateRange: DateRange) => void;
@@ -67,7 +67,11 @@ function ReportParametersAndControls({
 
     const onRunReportButtonClicked = (event: MouseEvent<HTMLElement>) => {
         event.preventDefault();
-        onRunReport({ dateRangeStart: currentDateRangeStart ?? '', dateRangeEnd: currentDateRangeEnd ?? '' });
+
+        onRunReport({
+            dateRangeStart: currentDateRangeStart ?? '',
+            dateRangeEnd: currentDateRangeEnd ?? '',
+        });
     };
 
     const onDateRangeMacroSelectionChanged = (selectedMacro: DateRangeMacroType, dateRange: DateRange) => {
@@ -95,7 +99,9 @@ function ReportParametersAndControls({
                         value={currentDateRangeStart ?? ''}
                     />
                 </Col>
-                <Col className="align-self-center no-gutters text-center" md={1} style={{ flex: '0 1 22px' }}>
+                <Col className="align-self-center no-gutters text-center"
+                    md={1}
+                    style={{ flex: '0 1 22px' }}>
                     to
                 </Col>
                 <Col md={2}>
@@ -112,10 +118,18 @@ function ReportParametersAndControls({
                         color="success"
                         id={`${bemBlockName}--run_report_button`}
                         onClick={onRunReportButtonClicked}
-                        style={showDownloadExcelButtonSafe ? { marginRight: 11, width: 140 } : { width: 140 }}
+                        style={
+                            showDownloadExcelButtonSafe ? {
+                                marginRight: 11,
+                                width: 140,
+                            } : {
+                                width: 140,
+                            }
+                        }
                     >
                         Run Report
                     </Button>
+
                     {showDownloadExcelButtonSafe ? (
                         <Button
                             color="primary"

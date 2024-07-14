@@ -2,10 +2,10 @@ import React from 'react';
 import { Button } from 'reactstrap';
 
 type PropTypes = {
-    className?: string,
+    className?: string;
     onClick: React.MouseEventHandler<any>;
     children?: React.ReactNode;
-    style?: object,
+    style?: object;
 };
 
 function LinkButton({

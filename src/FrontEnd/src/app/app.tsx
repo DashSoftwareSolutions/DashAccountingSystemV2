@@ -23,6 +23,7 @@ import DashboardPage from '../features/dashboard/dashboardPage';
 import InvoiceListPage from '../features/invoicing/invoiceListPage';
 import TimeTrackingPage from '../features/time-tracking/timeTrackingPage';
 
+/* eslint-disable react/jsx-sort-props, react/jsx-max-props-per-line */
 function App() {
     return (
         <Routes>
@@ -47,5 +48,6 @@ function App() {
         </Routes>
     );
 }
+/* eslint-enable react/jsx-sort-props, react/jsx-max-props-per-line */
 
 export default App;

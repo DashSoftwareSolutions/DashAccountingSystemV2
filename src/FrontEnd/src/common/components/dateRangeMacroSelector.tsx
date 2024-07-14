@@ -39,7 +39,12 @@ function DateRangeMacroSelector({
             value={value} 
         >
             {Array.from(dateRangeMacroOptions.keys()).map((option) => ((
-                <option key={option} value={option}>{dateRangeMacroOptions.get(option)}</option>
+                <option
+                    key={option}
+                    value={option}
+                >
+                    {dateRangeMacroOptions.get(option)}
+                </option>
             )))}
         </select>
     );

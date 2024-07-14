@@ -14,7 +14,10 @@ import {
     ILogger,
     Logger,
 } from '../common/logging';
-import { NavigationSection, Tenant } from '../common/models';
+import {
+    NavigationSection,
+    Tenant,
+} from '../common/models';
 
 const logger: ILogger = new Logger('Select Tenant Page');
 
@@ -63,17 +66,27 @@ function SelectTenantPage(props: SelectTenantPageProps) {
     return (
         <React.Fragment>
             <h1 id="tabelLabel">Your Companies</h1>
+
             <p>Choose which company you would like to work with.</p>
-            <table className='table table-striped' aria-labelledby="tabelLabel">
+
+            <table
+                aria-labelledby="tabelLabel"
+                className='table table-striped'
+            >
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {tenants.map((tenant: Tenant) =>
-                        <tr key={tenant.id} onClick={() => onClickTenant(tenant)} style={{ cursor: 'pointer' }}>
+                        <tr
+                            key={tenant.id}
+                            onClick={() => onClickTenant(tenant)}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <td>{tenant.id}</td>
                             <td>{tenant.name}</td>
                         </tr>

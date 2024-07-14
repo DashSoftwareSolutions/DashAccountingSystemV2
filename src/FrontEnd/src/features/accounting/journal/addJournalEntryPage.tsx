@@ -107,21 +107,32 @@ function AddJournalEntryPage(props: AddJournalEntryPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 <Row>
                     <Col md={6}>
                         <h1>Add Journal Entry</h1>
                         <p className="page_header--subtitle">{selectedTenant?.name}</p>
                     </Col>
-                    <Col md={6} style={{ textAlign: 'right' }}>
+
+                    <Col
+                        md={6}
+                        style={{ textAlign: 'right' }}
+                    >
                         <Button
                             color="secondary"
                             id={`${bemBlockName}--cancel_button`}
                             onClick={onClickCancel}
-                            style={{ marginRight: 22, width: 88 }}
+                            style={{
+                                marginRight: 22,
+                                width: 88,
+                            }}
                         >
                             Cancel
                         </Button>
+
                         <Button
                             color="success"
                             disabled={isSaving || !canSaveJournalEntry}

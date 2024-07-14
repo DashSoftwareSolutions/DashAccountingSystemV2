@@ -7,11 +7,11 @@ import IAction from '../globalReduxStore/action.interface';
 import ActionType from '../globalReduxStore/actionType';
 
 export interface RequestApplicationVersionAction extends IAction {
-    type: ActionType.REQUEST_APPLICATION_VERSION,
+    type: ActionType.REQUEST_APPLICATION_VERSION;
 }
 
 export interface ReceiveApplicationVersionAction extends IAction {
-    type: ActionType.RECEIVE_APPLICATION_VERSION,
+    type: ActionType.RECEIVE_APPLICATION_VERSION;
     applicationVersion: string;
 }
 

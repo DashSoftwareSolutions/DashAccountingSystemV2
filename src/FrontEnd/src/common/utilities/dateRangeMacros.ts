@@ -1,7 +1,5 @@
 import { memoize } from 'lodash';
-import {
-    DateTime,
-} from 'luxon';
+import { DateTime, } from 'luxon';
 import {
     DateRange,
     DateRangeMacroType,
@@ -40,165 +38,275 @@ export const dateRangeMacroOptions = new Map<number, string>([
 ]);
 
 const today = DateTime.now();
-const todayFormatted = DateTime.now().toISODate();
+const todayFormatted = today.toISODate();
 const MONDAY = 1; // ISO Standard
 const SUNDAY = 7; // ISO Standard
 
 const _computeDateRangeFromMacro = (macro: DateRangeMacroType): DateRange => {
     switch (macro) {
         case DateRangeMacroType.Custom:
-            return { dateRangeStart: '', dateRangeEnd: '' };
+            return {
+                dateRangeStart: '',
+                dateRangeEnd: '',
+            };
 
         case DateRangeMacroType.Today:
-            return { dateRangeStart: todayFormatted, dateRangeEnd: todayFormatted };
+            return {
+                dateRangeStart: todayFormatted,
+                dateRangeEnd: todayFormatted,
+            };
 
         case DateRangeMacroType.ThisWeek: {
             const weekStart = today.set({ weekday: MONDAY });
             const weekEnd = today.set({ weekday: SUNDAY });
-            return { dateRangeStart: weekStart.toISODate(), dateRangeEnd: weekEnd.toISODate() };
+
+            return {
+                dateRangeStart: weekStart.toISODate(),
+                dateRangeEnd: weekEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.ThisWeekToDate: {
             const weekStart = today.set({ weekday: MONDAY });
-            return { dateRangeStart: weekStart.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: weekStart.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.ThisMonth: {
             const monthStart = today.startOf('month');
             const monthEnd = today.endOf('month');
-            return { dateRangeStart: monthStart.toISODate(), dateRangeEnd: monthEnd.toISODate() };
+
+            return {
+                dateRangeStart: monthStart.toISODate(),
+                dateRangeEnd: monthEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.ThisMonthToDate: {
             const monthStart = today.startOf('month');
-            return { dateRangeStart: monthStart.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: monthStart.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.ThisQuarter: {
             const quarterStart = today.startOf('quarter');
             const quarterEnd = today.endOf('quarter');
-            return { dateRangeStart: quarterStart.toISODate(), dateRangeEnd: quarterEnd.toISODate() };
+
+            return {
+                dateRangeStart: quarterStart.toISODate(),
+                dateRangeEnd: quarterEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.ThisQuarterToDate: {
             const quarterStart = today.startOf('quarter');
-            return { dateRangeStart: quarterStart.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: quarterStart.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.ThisYear: {
             const yearStart = today.startOf('year');
             const yearEnd = today.endOf('year');
-            return { dateRangeStart: yearStart.toISODate(), dateRangeEnd: yearEnd.toISODate() };
+
+            return {
+                dateRangeStart: yearStart.toISODate(),
+                dateRangeEnd: yearEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.ThisYearToDate: {
             const yearStart = today.startOf('year');
-            return { dateRangeStart: yearStart.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: yearStart.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.ThisYearToLastMonth: {
             const yearStart = today.startOf('year');
             const lastMonthEnd = today.startOf('month').minus({ days: 1 });
-            return { dateRangeStart: yearStart.toISODate(), dateRangeEnd: lastMonthEnd.toISODate() };
+
+            return {
+                dateRangeStart: yearStart.toISODate(),
+                dateRangeEnd: lastMonthEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.Yesterday: {
             const yesterday = today.minus({ days: 1 });
             const yesterdayFormatted = yesterday.toISODate();
-            return { dateRangeStart: yesterdayFormatted, dateRangeEnd: yesterdayFormatted };
+
+            return {
+                dateRangeStart: yesterdayFormatted,
+                dateRangeEnd: yesterdayFormatted,
+            };
         }
 
         case DateRangeMacroType.LastWeek: {
             const lastWeekStart = today.set({ weekday: MONDAY }).minus({ days: 7 });
             const lastWeekEnd = lastWeekStart.set({ weekday: SUNDAY });
-            return { dateRangeStart: lastWeekStart.toISODate(), dateRangeEnd: lastWeekEnd.toISODate() };
+
+            return {
+                dateRangeStart: lastWeekStart.toISODate(),
+                dateRangeEnd: lastWeekEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.LastWeekToDate: {
             const lastWeekStart = today.set({ weekday: MONDAY }).minus({ days: 7 });
-            return { dateRangeStart: lastWeekStart.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: lastWeekStart.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.LastMonth: {
             const lastMonthStart = today.startOf('month').minus({ months: 1 });
             const lastMonthEnd = lastMonthStart.endOf('month');
-            return { dateRangeStart: lastMonthStart.toISODate(), dateRangeEnd: lastMonthEnd.toISODate() };
+
+            return {
+                dateRangeStart: lastMonthStart.toISODate(),
+                dateRangeEnd: lastMonthEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.LastMonthToDate: {
             const lastMonthStart = today.startOf('month').minus({ months: 1 });
-            return { dateRangeStart: lastMonthStart.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: lastMonthStart.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.LastQuarter: {
             const lastQuarterStart = today.startOf('quarter').minus({ quarters: 1 });
             const lastQuarterEnd = lastQuarterStart.endOf('quarter');
-            return { dateRangeStart: lastQuarterStart.toISODate(), dateRangeEnd: lastQuarterEnd.toISODate() };
+
+            return {
+                dateRangeStart: lastQuarterStart.toISODate(),
+                dateRangeEnd: lastQuarterEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.LastQuarterToDate: {
             const lastQuarterStart = today.startOf('quarter').minus({ quarters: 1 });
-            return { dateRangeStart: lastQuarterStart.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: lastQuarterStart.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.LastYear: {
             const lastYearStart = today.startOf('year').minus({ years: 1 });
             const lastYearEnd = lastYearStart.endOf('year');
-            return { dateRangeStart: lastYearStart.toISODate(), dateRangeEnd: lastYearEnd.toISODate() };
+
+            return {
+                dateRangeStart: lastYearStart.toISODate(),
+                dateRangeEnd: lastYearEnd.toISODate(),
+            };
         }
 
         case DateRangeMacroType.LastYearToDate: {
             const lastYearStart = today.startOf('year').minus({ years: 1 });
-            return { dateRangeStart: lastYearStart.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: lastYearStart.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.Since30DaysAgo: {
             const dateRangeStartMoment = today.minus({ days: 30 });
-            return { dateRangeStart: dateRangeStartMoment.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: dateRangeStartMoment.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.Since60DaysAgo: {
             const dateRangeStartMoment = today.minus({ days: 60 });
-            return { dateRangeStart: dateRangeStartMoment.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: dateRangeStartMoment.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.Since90DaysAgo: {
             const dateRangeStartMoment = today.minus({ days: 90 });
-            return { dateRangeStart: dateRangeStartMoment.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: dateRangeStartMoment.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.Since365DaysAgo: {
             const dateRangeStartMoment = today.minus({ days: 365 });
-            return { dateRangeStart: dateRangeStartMoment.toISODate(), dateRangeEnd: todayFormatted };
+
+            return {
+                dateRangeStart: dateRangeStartMoment.toISODate(),
+                dateRangeEnd: todayFormatted,
+            };
         }
 
         case DateRangeMacroType.NextWeek: {
             const dateRangeStartMoment = today.set({ weekday: MONDAY }).plus({ days: 7 });
             const dateRangeEndMoment = dateRangeStartMoment.set({ weekday: SUNDAY });
-            return { dateRangeStart: dateRangeStartMoment.toISODate(), dateRangeEnd: dateRangeEndMoment.toISODate() };
+
+            return {
+                dateRangeStart: dateRangeStartMoment.toISODate(),
+                dateRangeEnd: dateRangeEndMoment.toISODate(),
+            };
         }
 
         case DateRangeMacroType.NextMonth: {
             const dateRangeStartMoment = today.endOf('month').plus({ days: 1 });
             const dateRangeEndMoment = dateRangeStartMoment.endOf('month');
-            return { dateRangeStart: dateRangeStartMoment.toISODate(), dateRangeEnd: dateRangeEndMoment.toISODate() };
+            return { dateRangeStart: dateRangeStartMoment.toISODate(),
+dateRangeEnd: dateRangeEndMoment.toISODate() };
         }
 
         case DateRangeMacroType.NextQuarter: {
             const dateRangeStartMoment = today.endOf('quarter').plus({ days: 1 });
             const dateRangeEndMoment = dateRangeStartMoment.endOf('quarter');
-            return { dateRangeStart: dateRangeStartMoment.toISODate(), dateRangeEnd: dateRangeEndMoment.toISODate() };
+
+            return {
+                dateRangeStart: dateRangeStartMoment.toISODate(),
+                dateRangeEnd: dateRangeEndMoment.toISODate(),
+            };
         }
 
         case DateRangeMacroType.NextYear: {
             const dateRangeStartMoment = today.endOf('year').plus({ days: 1 });
             const dateRangeEndMoment = dateRangeStartMoment.endOf('year');
-            return { dateRangeStart: dateRangeStartMoment.toISODate(), dateRangeEnd: dateRangeEndMoment.toISODate() };
+
+            return {
+                dateRangeStart: dateRangeStartMoment.toISODate(),
+                dateRangeEnd: dateRangeEndMoment.toISODate(),
+            };
         }
 
         case DateRangeMacroType.All:
         default:
-            return { dateRangeStart: '2018-01-01', dateRangeEnd: todayFormatted };
+            return {
+                dateRangeStart: '2018-01-01',
+                dateRangeEnd: todayFormatted,
+            };
     }
 };
 

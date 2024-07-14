@@ -80,7 +80,10 @@ function InvoiceListPage(props: InvoiceListPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 <Row>
                     <Col>
                         <h1>Invoices</h1>
@@ -91,10 +94,22 @@ function InvoiceListPage(props: InvoiceListPageProps) {
 
             <MainPageContent id={`${bemBlockName}--content`}>
                 <p>TODO: Invoice List Page content</p>
-                <Button color="danger" onClick={onClick500}>Test 500 Error Toast</Button>
+
+                <Button
+                    color="danger"
+                    onClick={onClick500}
+                >
+                    Test 500 Error Toast
+                </Button>
                 <br />
                 <br />
-                <Button color="warning" onClick={oncClick400}>Test Validation Error Toast</Button>
+
+                <Button
+                    color="warning"
+                    onClick={oncClick400}
+                >
+                    Test Validation Error Toast
+                </Button>
             </MainPageContent>
         </React.Fragment>
     );

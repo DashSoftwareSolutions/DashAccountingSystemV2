@@ -47,7 +47,10 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 <Row>
                     <Col>
                         <h1>Time Activities Report</h1>

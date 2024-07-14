@@ -164,7 +164,10 @@ function JournalEntryEditor(props: JournalEntryEditorProps) {
     return (
         <Form style={{ marginTop: 22 }}>
             <Row>
-                <Col sm={6} md={4}>
+                <Col
+                    md={4}
+                    sm={6}
+                >
                     <FormGroup>
                         <Label for={`${bemBlockName}--entry_date_input`}>Entry Date</Label>
                         <Input
@@ -179,7 +182,11 @@ function JournalEntryEditor(props: JournalEntryEditorProps) {
                         <FormFeedback>{safeAttributeValidation.get('entryDate')?.error}</FormFeedback>
                     </FormGroup>
                 </Col>
-                <Col sm={6} md={4}>
+
+                <Col
+                    md={4}
+                    sm={6}
+                >
                     <FormGroup>
                         <Label for={`${bemBlockName}--post_date_input`}>Post Date</Label>
                         <Input
@@ -194,7 +201,11 @@ function JournalEntryEditor(props: JournalEntryEditorProps) {
                         <FormFeedback>{safeAttributeValidation.get('postDate')?.error}</FormFeedback>
                     </FormGroup>
                 </Col>
-                <Col sm={6} md={4}>
+
+                <Col
+                    md={4}
+                    sm={6}
+                >
                     <FormGroup>
                         <Label for={`${bemBlockName}--check_number_input`}>Check Number</Label>
                         <Input
@@ -211,6 +222,7 @@ function JournalEntryEditor(props: JournalEntryEditorProps) {
                     </FormGroup>
                 </Col>
             </Row>
+
             <Row>
                 <Col md={6}>
                     <FormGroup>
@@ -231,6 +243,7 @@ function JournalEntryEditor(props: JournalEntryEditorProps) {
                         <FormFeedback>{safeAttributeValidation.get('description')?.error}</FormFeedback>
                     </FormGroup>
                 </Col>
+
                 <Col md={6}>
                     <FormGroup>
                         <Label for={`${bemBlockName}--note_textarea`}>Additional Note</Label>
@@ -238,8 +251,8 @@ function JournalEntryEditor(props: JournalEntryEditorProps) {
                             id={`addAccountbemBlockName}--note_textarea`}
                             invalid={safeAttributeValidation.get('note')?.invalid}
                             name="note_textarea"
-                            placeholder="Optional additional note on the transaction"
                             onChange={onNoteChanged}
+                            placeholder="Optional additional note on the transaction"
                             rows={3}
                             style={{ resize: 'none' }}
                             type="textarea"
@@ -250,6 +263,7 @@ function JournalEntryEditor(props: JournalEntryEditorProps) {
                     </FormGroup>
                 </Col>
             </Row>
+
             <Row>
                 <Col sm={12}>
                     <JournalEntryAccountsEditor

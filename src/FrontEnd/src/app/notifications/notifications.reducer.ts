@@ -2,7 +2,10 @@ import {
     isNil,
     uniqueId,
 } from 'lodash';
-import { Action, Reducer } from 'redux';
+import {
+    Action,
+    Reducer,
+} from 'redux';
 import NotificationLevel from './notificationLevel';
 import { KnownAction } from './notifications.actions';
 import ActionType from '../globalReduxStore/actionType';

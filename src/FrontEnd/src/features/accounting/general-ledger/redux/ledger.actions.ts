@@ -13,7 +13,7 @@ export interface ReceiveLedgerReportDataAction extends IAction {
 }
 
 export interface UpdateLedgerReportDateRangeAction extends IAction {
-    type: ActionType.UPDATE_LEDGER_REPORT_DATE_RANGE,
+    type: ActionType.UPDATE_LEDGER_REPORT_DATE_RANGE;
     dateRange: DateRange;
 }
 

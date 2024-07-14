@@ -1,8 +1,6 @@
 import './navMenu.css';
 
-import React, {
-    useCallback,
-} from 'react';
+import React, { useCallback, } from 'react';
 import {
     isEmpty,
     isNil,
@@ -69,8 +67,12 @@ function NavMenu({
 
     return (
         <header>
-            <Navbar className="navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" light>
-                <Link className="navbar-brand" to="/">
+            <Navbar
+                className="navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
+                light
+            >
+                <Link className="navbar-brand"
+                    to="/">
                     Dash Accounting System v2.0
                     {'\u00a0'}
                     <span className="badge pending-badge">.NET 8</span>
@@ -79,7 +81,11 @@ function NavMenu({
 
                 <NavbarToggler onClick={toggleNavMenu} />
 
-                <Collapse className="d-sm-inline-flex justify-content-between" isOpen={isOpen} navbar>
+                <Collapse
+                    className="d-sm-inline-flex justify-content-between"
+                    isOpen={isOpen}
+                    navbar
+                >
                     {hasSelectedTenant ? (
                         <ul className="navbar-nav nav-underline flex-grow-1">
                             <NavMenuItem
@@ -126,7 +132,7 @@ function NavMenu({
                             >
                                 Profit &amp; Loss
                             </NavMenuItem>
-                            
+
                             <NavMenuItem
                                 currentlyActiveSection={selectedNavigationSection}
                                 onClick={goToPage}
@@ -154,16 +160,34 @@ function NavMenu({
                         {hasUser ? (
                             <React.Fragment>
                                 <NavItem>
-                                    <NavLink className="text-dark" tag={Link} to="/manage-user-account">{`Hello ${userInfo ? (userInfo.firstName + ' ' + userInfo.lastName) : 'User'}`}</NavLink>
+                                    <NavLink
+                                        className="text-dark"
+                                        tag={Link}
+                                        to="/manage-user-account"
+                                    >
+                                        {`Hello ${userInfo ? (userInfo.firstName + ' ' + userInfo.lastName) : 'User'}`}
+                                    </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink className="text-dark" tag={Link} to="/logout">Logout</NavLink>
+                                    <NavLink
+                                        className="text-dark"
+                                        tag={Link}
+                                        to="/logout"
+                                    >
+                                        Logout
+                                    </NavLink>
                                 </NavItem>
                             </React.Fragment>
-                        ): (
+                        ) : (
                             <React.Fragment>
                                 <NavItem>
-                                    <NavLink className="text-dark" tag={Link} to="/login">Login</NavLink>
+                                    <NavLink
+                                        className="text-dark"
+                                        tag={Link}
+                                        to="/login"
+                                    >
+                                        Login
+                                    </NavLink>
                                 </NavItem>
                             </React.Fragment>
                         )}

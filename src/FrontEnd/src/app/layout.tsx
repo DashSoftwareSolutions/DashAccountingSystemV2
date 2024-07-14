@@ -4,7 +4,10 @@ import React, {
     useRef,
 } from 'react';
 import { isNil } from 'lodash';
-import { DateTime, Duration } from 'luxon';
+import {
+    DateTime,
+    Duration,
+} from 'luxon';
 import {
     ConnectedProps,
     connect,
@@ -73,7 +76,7 @@ function Layout(props: LayoutProps) {
         tokenExpires,
     } = props;
 
-    const today = useMemo(() => DateTime.now(), []);
+    const thisYear = useMemo(() => DateTime.now().year, []);
     const wasLoggedIn = usePrevious(isLoggedIn);
     const checkForExpiringTokenIntervalRef = useRef<NodeJS.Timer>();
 
@@ -167,11 +170,15 @@ function Layout(props: LayoutProps) {
                         <Container>
                             <Row>
                                 <Col sm="6">
-                                    &copy; 2022 - {today.year} - Dash Software Solutions, Inc. -
+                                    &copy; 2022 - {thisYear} - Dash Software Solutions, Inc. -
                                     {' '}
                                     <Link to="/privacy">Privacy</Link>
                                 </Col>
-                                <Col sm="6" className="text-right">
+
+                                <Col
+                                    className="text-right"
+                                    sm="6"
+                                >
                                     {application.applicationVersion}
                                 </Col>
                             </Row>

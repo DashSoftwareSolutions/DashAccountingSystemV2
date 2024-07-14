@@ -27,7 +27,7 @@ function JournalEntryDetails({
     journalEntry
 }: {
     bemBlockName: string;
-    journalEntry?: JournalEntry
+    journalEntry?: JournalEntry;
 }) {
     if (isNil(journalEntry)) {
         return (<React.Fragment></React.Fragment>);
@@ -89,7 +89,8 @@ function JournalEntryDetails({
                 </ListGroupItem>
                 <ListGroupItem>
                     <Row>
-                        <Col md={2} style={{ paddingTop: 4 }}><strong>Status</strong></Col>
+                        <Col md={2}
+                            style={{ paddingTop: 4 }}><strong>Status</strong></Col>
                         <Col md={4}>
                             <TransactionStatusLabel status={journalEntry.status ?? TransactionStatus.Pending} />
                         </Col>
@@ -110,15 +111,33 @@ function JournalEntryDetails({
                     </Row>
                 </ListGroupItem>
             </ListGroup>
-            <table className="table" id={`${bemBlockName}--accounts_table`}>
+
+            <table
+                className="table"
+                id={`${bemBlockName}--accounts_table`}
+            >
                 <thead>
                     <tr>
                         <th className="col-md-6">Account</th>
+
                         <th className="col-md-2">Asset Type</th>
-                        <th className="col-md-2" style={{ textAlign: 'right' }}>Debit</th>
-                        <th className="col-md-2" style={{ textAlign: 'right' }}>Credit</th>
+
+                        <th
+                            className="col-md-2"
+                            style={{ textAlign: 'right' }}
+                        >
+                            Debit
+                        </th>
+
+                        <th
+                            className="col-md-2"
+                            style={{ textAlign: 'right' }}
+                        >
+                            Credit
+                        </th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {sortBy(
                         journalEntry.accounts,
@@ -168,6 +187,7 @@ function JournalEntryDetails({
                         );
                     })}
                 </tbody>
+
                 <tfoot>
                     <tr>
                         <td className="col-md-6">

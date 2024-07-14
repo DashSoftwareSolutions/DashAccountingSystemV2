@@ -48,7 +48,10 @@ function ProfitAndLossPage(props: ProfitAndLossPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 <Row>
                     <Col>
                         <h1>Profit &amp; Loss</h1>

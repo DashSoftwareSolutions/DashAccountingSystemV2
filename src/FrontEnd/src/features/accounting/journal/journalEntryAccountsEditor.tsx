@@ -233,17 +233,28 @@ function JournalEntryAccountsEditor(props: PropTypes) {
 
     return (
         <div id={bemBlockName}>
-            <div className="row" style={{ minHeight: '66px' }}>
+            <div
+                className="row"
+                style={{ minHeight: '66px' }}
+            >
                 <div className="col-md-6">
                     <h4>Journal Entry Account Details</h4>
                 </div>
+
                 <div className="col-md-6">
-                    <Alert color="warning" isOpen={hasProblem}>
+                    <Alert
+                        color="warning"
+                        isOpen={hasProblem}
+                    >
                         {problemDescription}
                     </Alert>
                 </div>
             </div>
-            <table className="table" id={`${bemBlockName}--accounts_table`}>
+
+            <table
+                className="table"
+                id={`${bemBlockName}--accounts_table`}
+            >
                 <thead>
                     <tr>
                         <th className="col-md-5">Account</th>
@@ -253,6 +264,7 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                         <th className="col-md-1"></th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {map(journalEntryAccounts, (account) => {
                         const {
@@ -274,22 +286,36 @@ function JournalEntryAccountsEditor(props: PropTypes) {
 
                         return (
                             <tr key={safeAccountId}>
-                                <td className="col-md-5" style={{ verticalAlign: 'middle' }}>
+                                <td
+                                    className="col-md-5"
+                                    style={{ verticalAlign: 'middle' }}
+                                >
                                     <Input
                                         readOnly
-                                        style={{ border: 'none', width: '100%' }}
+                                        style={{
+                                            border: 'none',
+                                            width: '100%',
+                                        }}
                                         type="text"
                                         value={`${accountNumber} - ${accountName}`}
                                     />
                                 </td>
-                                <td className="col-md-2" style={{ verticalAlign: 'middle' }}>
+
+                                <td
+                                    className="col-md-2"
+                                    style={{ verticalAlign: 'middle' }}
+                                >
                                     <Input
                                         readOnly
-                                        style={{ border: 'none', width: '100%' }}
+                                        style={{
+                                            border: 'none',
+                                            width: '100%'
+                                        }}
                                         type="text"
                                         value={assetTypeName}
                                     />
                                 </td>
+
                                 <td className="col-md-2">
                                     <Input
                                         id={`${bemBlockName}--edit_debit_amount_input_${safeAccountId}`}
@@ -300,6 +326,7 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                                         value={amountType === AmountType.Debit ? amountAsString ?? '' : ''}
                                     />
                                 </td>
+
                                 <td className="col-md-2">
                                     <Input
                                         id={`${bemBlockName}--edit_credit_amount_input_${safeAccountId}`}
@@ -310,7 +337,11 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                                         value={amountType === AmountType.Credit ? amountAsString ?? '' : ''}
                                     />
                                 </td>
-                                <td className="col-md-1" style={{ textAlign: 'right' }}>
+
+                                <td
+                                    className="col-md-1"
+                                    style={{ textAlign: 'right' }}
+                                >
                                     <Button
                                         color="danger"
                                         id={`${bemBlockName}--remove_account_button_${safeAccountId}`}
@@ -322,6 +353,7 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                             </tr>
                         );
                     })}
+
                     <tr>
                         <td className="col-md-5">
                             <AccountSelector
@@ -333,6 +365,7 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                                 value={newJournalEntryAccount.accountId ?? ''}
                             />
                         </td>
+
                         <td className="col-md-2">
                             <AssetTypeSelector
                                 assetTypes={assetTypes ?? []}
@@ -342,6 +375,7 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                                 value={newJournalEntryAccount.assetType?.id ?? null}
                             />
                         </td>
+
                         <td className="col-md-2">
                             <Input
                                 id={`${bemBlockName}--add_account_debit_amount_input`}
@@ -352,6 +386,7 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                                 value={newJournalEntryAccount.debitAsString ?? ''}
                             />
                         </td>
+
                         <td className="col-md-2">
                             <Input
                                 id={`${bemBlockName}--add_account_credit_amount_input`}
@@ -362,10 +397,14 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                                 value={newJournalEntryAccount.creditAsString ?? ''}
                             />
                         </td>
-                        <td className="col-md-1" style={{ textAlign: 'right' }}>
+
+                        <td
+                            className="col-md-1"
+                            style={{ textAlign: 'right' }}
+                        >
                             <Button
-                                color="primary"
                                 className="w-100"
+                                color="primary"
                                 disabled={!isNewJournalEntryAccountComplete}
                                 id={`${bemBlockName}--add_account_button`}
                                 onClick={onAddClick}
@@ -375,24 +414,29 @@ function JournalEntryAccountsEditor(props: PropTypes) {
                         </td>
                     </tr>
                 </tbody>
+
                 <tfoot>
                     <tr>
                         <td className="col-md-5">
                             <strong>TOTALS</strong>
                         </td>
+
                         <td className="col-md-2" />
+
                         <td className="col-md-2 font-weight-bold text-right">
                             <AmountDisplay
                                 amount={totalDebitsAmount}
                                 showCurrency
                             />
                         </td>
+
                         <td className="col-md-2 font-weight-bold text-right">
                             <AmountDisplay
                                 amount={totalCreditsAmount}
                                 showCurrency
                             />
                         </td>
+
                         <td className="col-md-1" />
                     </tr>
                 </tfoot>

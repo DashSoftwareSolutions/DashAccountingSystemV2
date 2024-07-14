@@ -80,8 +80,8 @@ export interface JournalEntryState {
     isDeleting: boolean;
     isFetching: boolean;
     isSaving: boolean;
-    totalCredits: number,
-    totalDebits: number,
+    totalCredits: number;
+    totalDebits: number;
     validation: JournalEntryValidationState;
 }
 

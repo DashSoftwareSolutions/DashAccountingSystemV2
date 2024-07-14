@@ -59,7 +59,10 @@ function MainContent({
     }, []);
 
     return (
-        <div className="container main-content-container" ref={elementRef}>
+        <div
+            className="container main-content-container"
+            ref={elementRef}
+        >
             {children}
         </div>
     );

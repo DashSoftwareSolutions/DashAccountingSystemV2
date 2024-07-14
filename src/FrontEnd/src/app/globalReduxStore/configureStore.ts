@@ -5,7 +5,10 @@ import {
     createStore,
 } from 'redux';
 import thunk from 'redux-thunk';
-import { RootState, reducers } from './';
+import {
+    RootState,
+    reducers,
+} from './';
 import IAction from './action.interface';
 import ActionType from './actionType';
 import sessionStorageMiddleware from './sessionStorageMiddleware';

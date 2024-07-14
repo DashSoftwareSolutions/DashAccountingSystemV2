@@ -37,7 +37,10 @@ const actionCreators = {
                 })
                 .then(data => {
                     if (!isNil(data)) {
-                        dispatch({ type: ActionType.RECEIVE_ACCOUNTS, accounts: data });
+                        dispatch({
+                            type: ActionType.RECEIVE_ACCOUNTS,
+                            accounts: data,
+                        });
                     }
                 });
 
@@ -46,7 +49,10 @@ const actionCreators = {
     },
 
     selectAccount: (account: Account): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.SELECT_ACCOUNT, account });
+        dispatch({
+            type: ActionType.SELECT_ACCOUNT,
+            account,
+        });
     },
 };
 

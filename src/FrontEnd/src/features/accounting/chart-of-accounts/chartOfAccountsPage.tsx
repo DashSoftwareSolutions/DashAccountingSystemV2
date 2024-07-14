@@ -74,7 +74,10 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 <Row>
                     <Col>
                         <h1>Chart of Accounts</h1>
@@ -99,7 +102,9 @@ function ChartOfAccountsPage(props: ChartOfAccountsPageProps) {
                         </thead>
                         <tbody>
                             {accounts?.map((account: Account) =>
-                                <tr key={account.accountNumber} onClick={() => onAccountSelected(account)} style={{ cursor: 'pointer' }}>
+                                <tr key={account.accountNumber}
+                                    onClick={() => onAccountSelected(account)}
+                                    style={{ cursor: 'pointer' }}>
                                     <td>{account.accountNumber}</td>
                                     <td>{account.name}</td>
                                     <td>{account.accountType.name}</td>

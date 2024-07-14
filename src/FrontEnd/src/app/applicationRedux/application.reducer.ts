@@ -1,5 +1,8 @@
 import { isNil } from 'lodash';
-import { Action, Reducer } from 'redux';
+import {
+    Action,
+    Reducer,
+} from 'redux';
 import { KnownAction } from './application.actions';
 import {
     BootstrapInfo,
@@ -16,7 +19,7 @@ export interface ApplicationState extends BootstrapInfo {
     isFetchingVersion: boolean;
     mainContentContainerHeight: number;
     selectedNavigationSection: NavigationSection | null;
-    selectedTenant: Tenant | null,
+    selectedTenant: Tenant | null;
 }
 
 const unloadedState: ApplicationState = {

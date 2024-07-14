@@ -35,10 +35,11 @@ function HomePage(props: PropTypes) {
         navigate,
     ]);
 
+    /* eslint-disable react/jsx-max-props-per-line */
     return (
         <Row className="mt-4">
             <Col>
-                <img src={dashHeroImage} alt="Dash!" />
+                <img alt="Dash!" src={dashHeroImage} />
             </Col>
             <Col>
                 <h4>Welcome to</h4>
@@ -54,6 +55,7 @@ function HomePage(props: PropTypes) {
             </Col>
         </Row>
     );
+    /* eslint-enable react/jsx-max-props-per-line */
 }
 
 export default connector(HomePage);

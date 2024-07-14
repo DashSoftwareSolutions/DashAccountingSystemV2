@@ -40,7 +40,10 @@ const actionCreators = {
                 })
                 .then((accounts) => {
                     if (!isNil(accounts)) {
-                        dispatch({ type: ActionType.RECEIVE_LEDGER_REPORT_DATA, accounts });
+                        dispatch({
+                            type: ActionType.RECEIVE_LEDGER_REPORT_DATA,
+                            accounts,
+                        });
                     }
                 });
 
@@ -49,15 +52,24 @@ const actionCreators = {
     },
 
     updateDateRange: (dateRange: DateRange): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_LEDGER_REPORT_DATE_RANGE, dateRange });
+        dispatch({
+            type: ActionType.UPDATE_LEDGER_REPORT_DATE_RANGE,
+            dateRange,
+        });
     },
 
     updateDateRangeStart: (dateRangeStart: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_LEDGER_REPORT_DATE_RANGE_START, dateRangeStart });
+        dispatch({
+            type: ActionType.UPDATE_LEDGER_REPORT_DATE_RANGE_START,
+            dateRangeStart,
+        });
     },
 
     updateDateRangeEnd: (dateRangeEnd: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_LEDGER_REPORT_DATE_RANGE_END, dateRangeEnd });
+        dispatch({
+            type: ActionType.UPDATE_LEDGER_REPORT_DATE_RANGE_END,
+            dateRangeEnd,
+        });
     },
 
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {

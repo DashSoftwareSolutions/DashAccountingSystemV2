@@ -59,7 +59,10 @@ function AccountDetailsPage(props: AccountDetailsPageProps) {
 
     return (
         <React.Fragment>
-            <div className="page_header" id={`${bemBlockName}--header`}>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
                 {isNil(selectedAccount) ? (<></>) : (
                     <Row>
                         <Col>

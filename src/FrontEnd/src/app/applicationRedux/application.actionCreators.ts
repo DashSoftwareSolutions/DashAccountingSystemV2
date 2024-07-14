@@ -32,7 +32,10 @@ const actionCreators = {
                     response
                         .json()
                         .then((appVersionInfo) => {
-                            dispatch({ type: ActionType.RECEIVE_APPLICATION_VERSION, applicationVersion: appVersionInfo.version });
+                            dispatch({
+                                type: ActionType.RECEIVE_APPLICATION_VERSION,
+                                applicationVersion: appVersionInfo.version,
+                            });
                         });
                 });
 
@@ -64,11 +67,17 @@ const actionCreators = {
                 })
                 .then((bootstrapInfo) => {
                     if (!isNil(bootstrapInfo)) {
-                        dispatch({ type: ActionType.RECEIVE_BOOTSTRAP_INFO, bootstrapInfo });
+                        dispatch({
+                            type: ActionType.RECEIVE_BOOTSTRAP_INFO,
+                            bootstrapInfo,
+                        });
 
                         if (!isEmpty(bootstrapInfo.tenants) &&
                             bootstrapInfo.tenants.length === 1) {
-                            dispatch({ type: ActionType.SELECT_TENANT, tenant: bootstrapInfo.tenants[0] });
+                            dispatch({
+                                type: ActionType.SELECT_TENANT,
+                                tenant: bootstrapInfo.tenants[0],
+                            });
                         }
                     }
                 });
@@ -78,15 +87,24 @@ const actionCreators = {
     },
 
     selectTenant: (tenant: Tenant): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.SELECT_TENANT, tenant });
+        dispatch({
+            type: ActionType.SELECT_TENANT,
+            tenant,
+        });
     },
 
     setMainContentContainerHeight: (height: number): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.SET_MAIN_CONTENT_CONTAINER_HEIGHT, height });
+        dispatch({
+            type: ActionType.SET_MAIN_CONTENT_CONTAINER_HEIGHT,
+            height,
+        });
     },
 
     setNavigationSection: (navigationSection: NavigationSection | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.SET_NAVIGATION_SECTION, navigationSection });
+        dispatch({
+            type: ActionType.SET_NAVIGATION_SECTION,
+            navigationSection,
+        });
     },
 };
 

@@ -9,7 +9,10 @@ function PrivacyPage() {
     return (
         <Row className="mt-4">
             <Col>
-                <img src={dashHeroImage} alt="Dash!" />
+                <img
+                    alt="Dash!"
+                    src={dashHeroImage}
+                />
             </Col>
             <Col>
                 <h1>Dash Accounting System v2.0</h1>

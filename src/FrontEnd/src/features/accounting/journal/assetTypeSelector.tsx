@@ -47,7 +47,10 @@ function AssetTypeSelector(props: PropTypes) {
         >
             <option value="">Select</option>
             {assetTypes.map((at) => ((
-                <option key={at.id} value={at.id}>
+                <option
+                    key={at.id}
+                    value={at.id}
+                >
                     {trim(`${at.name} ${at.symbol ?? ''}`)}
                 </option>
             )))}

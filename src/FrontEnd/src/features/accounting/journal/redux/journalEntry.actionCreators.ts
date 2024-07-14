@@ -30,7 +30,10 @@ const actionCreators = {
             return;
         }
 
-        dispatch({ type: ActionType.INITIALIZE_NEW_JOURNAL_ENTRY, tenantId });
+        dispatch({
+            type: ActionType.INITIALIZE_NEW_JOURNAL_ENTRY,
+            tenantId,
+        });
     },
 
     editJournalEntry: (): AppThunkAction<KnownAction> => (dispatch) => {
@@ -66,7 +69,10 @@ const actionCreators = {
                 })
                 .then(entry => {
                     if (!isNil(entry)) {
-                        dispatch({ type: ActionType.RECEIVE_JOURNAL_ENTRY, entry });
+                        dispatch({
+                            type: ActionType.RECEIVE_JOURNAL_ENTRY,
+                            entry,
+                        });
                     }
                 });
 
@@ -111,7 +117,10 @@ const actionCreators = {
             })
             .then(savedEntry => {
                 if (!isNil(savedEntry)) {
-                    dispatch({ type: ActionType.NEW_JOURNAL_ENTRY_SAVE_COMPLETED, savedEntry });
+                    dispatch({
+                        type: ActionType.NEW_JOURNAL_ENTRY_SAVE_COMPLETED,
+                        savedEntry,
+                    });
                 }
             });
 
@@ -154,7 +163,10 @@ const actionCreators = {
             })
             .then(savedEntry => {
                 if (!isNil(savedEntry)) {
-                    dispatch({ type: ActionType.POST_JOURNAL_ENTRY_COMPLETED, savedEntry });
+                    dispatch({
+                        type: ActionType.POST_JOURNAL_ENTRY_COMPLETED,
+                        savedEntry,
+                    });
                 }
             });
 
@@ -192,7 +204,10 @@ const actionCreators = {
             })
             .then(savedEntry => {
                 if (!isNil(savedEntry)) {
-                    dispatch({ type: ActionType.UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED, savedEntry });
+                    dispatch({
+                        type: ActionType.UPDATED_JOURNAL_ENTRY_SAVE_COMPLETED,
+                        savedEntry,
+                    });
                 }
             });
 
@@ -226,31 +241,52 @@ const actionCreators = {
     },
 
     updateEntryDate: (entryDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_ENTRY_DATE, entryDate });
+        dispatch({
+            type: ActionType.UPDATE_JOURNAL_ENTRY_ENTRY_DATE,
+            entryDate,
+        });
     },
 
     updatePostDate: (postDate: string | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_POST_DATE, postDate });
+        dispatch({
+            type: ActionType.UPDATE_JOURNAL_ENTRY_POST_DATE,
+            postDate,
+        });
     },
 
     updateDescription: (description: string | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_DESCRIPTION, description });
+        dispatch({
+            type: ActionType.UPDATE_JOURNAL_ENTRY_DESCRIPTION,
+            description,
+        });
     },
 
     updateNote: (note: string | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_NOTE, note });
+        dispatch({
+            type: ActionType.UPDATE_JOURNAL_ENTRY_NOTE,
+            note,
+        });
     },
 
     updateCheckNumber: (checkNumber: number | null): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_JOURNAL_ENTRY_CHECK_NUMBER, checkNumber });
+        dispatch({
+            type: ActionType.UPDATE_JOURNAL_ENTRY_CHECK_NUMBER,
+            checkNumber,
+        });
     },
 
     addAccount: (account: JournalEntryAccount): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.ADD_JOURNAL_ENTRY_ACCOUNT, account });
+        dispatch({
+            type: ActionType.ADD_JOURNAL_ENTRY_ACCOUNT,
+            account,
+        });
     },
 
     removeAccount: (accountId: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.REMOVE_JOURNAL_ENTRY_ACCOUNT, accountId });
+        dispatch({
+            type: ActionType.REMOVE_JOURNAL_ENTRY_ACCOUNT,
+            accountId,
+        });
     },
 
     updateAccountAmount: (accountId: string, amountAsString: string | null, amount: number | null): AppThunkAction<KnownAction> => (dispatch) => {

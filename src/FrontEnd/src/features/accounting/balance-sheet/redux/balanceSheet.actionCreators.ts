@@ -40,7 +40,10 @@ const actionCreators = {
                 })
                 .then((report) => {
                     if (!isNil(report)) {
-                        dispatch({ type: ActionType.RECEIVE_BALANCE_SHEET_REPORT_DATA, report });
+                        dispatch({
+                            type: ActionType.RECEIVE_BALANCE_SHEET_REPORT_DATA,
+                            report,
+                        });
                     }
                 });
 
@@ -88,7 +91,10 @@ const actionCreators = {
                 })
                 .then((downloadInfo) => {
                     if (!isNil(downloadInfo)) {
-                        dispatch({ type: ActionType.RECEIVE_EXPORT_DOWNLOAD_INFO, downloadInfo });
+                        dispatch({
+                            type: ActionType.RECEIVE_EXPORT_DOWNLOAD_INFO,
+                            downloadInfo,
+                        });
                     }
                 });
 
@@ -97,15 +103,24 @@ const actionCreators = {
     },
 
     updateDateRange: (dateRange: DateRange): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE, dateRange });
+        dispatch({
+            type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE,
+            dateRange,
+        });
     },
 
     updateDateRangeStart: (dateRangeStart: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START, dateRangeStart });
+        dispatch({
+            type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START,
+            dateRangeStart,
+        });
     },
 
     updateDateRangeEnd: (dateRangeEnd: string): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END, dateRangeEnd });
+        dispatch({
+            type: ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_END,
+            dateRangeEnd,
+        });
     },
 
     reset: (): AppThunkAction<KnownAction> => (dispatch) => {

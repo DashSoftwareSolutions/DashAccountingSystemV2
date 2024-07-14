@@ -19,7 +19,7 @@ export interface AccountsState {
     isFetching: boolean;
     accounts: Account[];
     accountSelectOptions: AccountCategoryList[];
-    selectedAccount: Account | null,
+    selectedAccount: Account | null;
 }
 
 const unloadedState: AccountsState = {

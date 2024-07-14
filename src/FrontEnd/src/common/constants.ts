@@ -6,7 +6,11 @@ import {
 
 export const AUTH_SESSION_STORAGE_KEY = 'DashAccountingSystem.Auth';
 
-export const DEFAULT_ASSET_TYPE: AssetType = { id: 1, name: 'USD', symbol: '$' };
+export const DEFAULT_ASSET_TYPE: AssetType = {
+    id: 1,
+    name: 'USD',
+    symbol: '$',
+};
 
 export const DEFAULT_AMOUNT: Amount = {
     amount: 0,

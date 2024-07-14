@@ -61,7 +61,10 @@ function LogoutPage(props: PropTypes) {
     return (
         <Row className="mt-4">
             <Col>
-                <img src={dashHeroImage} alt="Dash!" />
+                <img
+                    alt="Dash!"
+                    src={dashHeroImage}
+                />
             </Col>
 
             <Col>

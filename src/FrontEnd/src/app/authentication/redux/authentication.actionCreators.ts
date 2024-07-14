@@ -50,7 +50,10 @@ const actionCreators = {
                     logger.info('Login Tokens received.  Current access token will expire at', expires.toISO());
                     accessTokenResponse.expires = expires.toISO();
 
-                    dispatch({ type: ActionType.RECEIVE_SUCCESSFUL_LOGIN_RESPONSE, accessTokenResponse });
+                    dispatch({
+                        type: ActionType.RECEIVE_SUCCESSFUL_LOGIN_RESPONSE,
+                        accessTokenResponse,
+                    });
                 }
             });
 
@@ -115,7 +118,10 @@ const actionCreators = {
                         logger.info('Updated Tokens from successful refresh operation received.  Current access token will expire at', expires.toISO());
                         accessTokenResponse.expires = expires.toISO();
 
-                        dispatch({ type: ActionType.RECEIVE_UPDATED_TOKENS, accessTokenResponse });
+                        dispatch({
+                            type: ActionType.RECEIVE_UPDATED_TOKENS,
+                            accessTokenResponse,
+                        });
                     }
                 });
 
@@ -124,7 +130,10 @@ const actionCreators = {
     },
 
     setTokens: (tokens: AccessTokenResponse): AppThunkAction<KnownAction> => (dispatch) => {
-        dispatch({ type: ActionType.SET_EXISTING_TOKENS_FROM_SESSION_STORAGE, tokens });
+        dispatch({
+            type: ActionType.SET_EXISTING_TOKENS_FROM_SESSION_STORAGE,
+            tokens,
+        });
     },
 };
 

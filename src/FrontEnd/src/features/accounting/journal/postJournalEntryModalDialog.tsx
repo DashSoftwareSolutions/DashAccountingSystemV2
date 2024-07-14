@@ -111,8 +111,8 @@ function PostJournalEntryModalDialog(props: PostJournalEntryModalDialogProps) {
                             <Input
                                 id={`bemBlockNamebemBlockName}--note_textarea`}
                                 name="note_textarea"
-                                placeholder="Optional additional note on the transaction"
                                 onChange={onNoteChanged}
+                                placeholder="Optional additional note on the transaction"
                                 rows={3}
                                 style={{ resize: 'none' }}
                                 type="textarea"
