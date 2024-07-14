@@ -49,7 +49,10 @@ namespace DashAccountingSystemV2.Tests.Extensions
 
             input = "1,3,5,7,9,11, 13, 15,  19";
             results = input.ParseCommaSeparatedIntegers();
+            
+            Assert.NotNull(results);
             Assert.Equal(9, results.Count());
+            
             var expectedValues = new uint[] { 1, 3, 5, 7, 9, 11, 13, 15, 19 };
 
             foreach (var expected in expectedValues)
