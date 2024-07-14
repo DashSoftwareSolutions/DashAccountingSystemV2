@@ -1,10 +1,13 @@
+using DashAccountingSystemV2.BackEnd.Extensions;
 using DashAccountingSystemV2.BackEnd.Security.ExportDownloads;
 using DashAccountingSystemV2.BackEnd.Services.Caching;
+using static DashAccountingSystemV2.BackEnd.Services.Caching.Constants;
 
 namespace DashAccountingSystemV2.BackEnd.Services.Export
 {
     public class ExportService(
         IExtendedDistributedCache cache,
+        IDataExporterFactory dataExporterFactory,
         IExportDownloadSecurityTokenService securityTokenService,
         ILogger<ExportService> logger)
         : IExportService
@@ -13,14 +16,28 @@ namespace DashAccountingSystemV2.BackEnd.Services.Export
             ExportRequestParameters parameters,
             TUnderlyingData data) where TUnderlyingData : class
         {
-            // TODO: Generate the extracts
+            var dataExporter = dataExporterFactory.CreateDataExporter(typeof(TUnderlyingData), parameters) as IDataExporter<TUnderlyingData>;
+            var exportedData = await dataExporter!.GetDataExport(parameters, data);
 
-            var downloadAccessToken = await securityTokenService.RequestExportDownloadToken(
-                parameters.TenantId,
-                parameters.RequestingUserId,
-                parameters.ExportType);
+            if (exportedData != null &&
+                !string.IsNullOrEmpty(exportedData.FileName) &&
+                exportedData.Content.HasAny())
+            {
+                var cacheKey = $"{ApplicationCacheKeyPrefix}/{parameters.TenantId}/{exportedData.FileName}";
+                await cache.SetAsync(cacheKey, exportedData.Content, TimeSpan.FromMinutes(5));
 
-            return new ExportResultDto(parameters, /*exportedData.FileName*/"foo.xlsx", downloadAccessToken);
+                var downloadAccessToken = await securityTokenService.RequestExportDownloadToken(
+                    parameters.TenantId,
+                    parameters.RequestingUserId,
+                    parameters.ExportType);
+
+                return new ExportResultDto(parameters, exportedData.FileName, downloadAccessToken);
+            }
+            else
+            {
+                logger.LogDebug("Data exporter returned no content");
+                return new ExportResultDto(parameters, "Error generating requested data export");
+            }
         }
     }
 }

@@ -1,51 +1,68 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup Label="Package">
-	<PackageId>DashAccountingSystemV2.BackEnd</PackageId>
-	<Version>2.1.0</Version>
-	<Authors>Geoffrey Roberts</Authors>
-	<Company>Dash Software Solutions, Inc.</Company>
-	<Copyright>Copyright (C) 2022 - 2024 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
+    <PackageId>DashAccountingSystemV2.BackEnd</PackageId>
+    <Version>2.1.0</Version>
+    <Authors>Geoffrey Roberts</Authors>
+    <Company>Dash Software Solutions, Inc.</Company>
+    <Copyright>Copyright (C) 2022 - 2024 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
   </PropertyGroup>
-	
+
   <PropertyGroup Label="Build">
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-	<UserSecretsId>2b3006e2-bf37-4b89-badd-06c844ef21cf</UserSecretsId>
+    <UserSecretsId>2b3006e2-bf37-4b89-badd-06c844ef21cf</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Label="Front-End Single Page Application (SPA) Proxy Support">
-	<SpaRoot>..\FrontEnd\build</SpaRoot>
-	<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
-	<SpaProxyServerUrl>https://localhost:3000</SpaProxyServerUrl>
+    <SpaRoot>..\FrontEnd\build</SpaRoot>
+    <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
+    <SpaProxyServerUrl>https://localhost:3000</SpaProxyServerUrl>
   </PropertyGroup>
 
   <ItemGroup Label="Reference Front-End Project">
-	<ProjectReference Include="..\FrontEnd\DashAccountingSystemV2.FrontEnd.esproj">
-	  <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-	</ProjectReference>
+    <ProjectReference Include="..\FrontEnd\DashAccountingSystemV2.FrontEnd.esproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup Label="Package References">
-	<PackageReference Include="Dapper" Version="2.1.35" />
-	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
-	<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.7" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
-	  <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+    <PackageReference Include="ClosedXML.Report" Version="0.2.10" />
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
-	<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
-	<PackageReference Include="NodaTime" Version="3.1.11" />
-	<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
-	<PackageReference Include="Serilog" Version="4.0.0" />
-	<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
-	<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
+    <PackageReference Include="NodaTime" Version="3.1.11" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
+
+  <ItemGroup Label="Folder Includes">
+    <Folder Include="Services\Export\ExcelTemplates\" />
+  </ItemGroup>
+
+  <ItemGroup Label="Excel Template Includes">
+    <ExcelTemplates Include="Services\Export\ExcelTemplates\*.xlsx" />
+  </ItemGroup>
+
+  <Target Name="CopyTemplates" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(ExcelTemplates)" DestinationFolder="$(OutDir)\ExcelTemplates" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyTemplatesOnPublish" AfterTargets="Publish">
+    <Copy SourceFiles="@(ExcelTemplates)" DestinationFolder="$(PublishDir)\ExcelTemplates" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

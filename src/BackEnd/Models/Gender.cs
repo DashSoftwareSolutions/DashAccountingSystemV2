@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace DashAccountingSystemV2.BackEnd.Models
 {
     public sealed class Gender : IEquatable<Gender>
@@ -16,11 +14,11 @@ namespace DashAccountingSystemV2.BackEnd.Models
             _gender = gender.ToString().ToUpper()[0];
         }
 
-        public static Gender Male = new Gender('M');
+        public static Gender Male = new('M');
 
-        public static Gender Female = new Gender('F');
+        public static Gender Female = new('F');
 
-        public bool Equals(Gender other)
+        public bool Equals(Gender? other)
         {
             if (other == null)
                 return false;
@@ -28,7 +26,7 @@ namespace DashAccountingSystemV2.BackEnd.Models
             return string.Equals(_gender.ToString(), other._gender.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is Gender other)
                 return Equals(other);

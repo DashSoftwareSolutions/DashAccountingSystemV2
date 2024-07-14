@@ -24,20 +24,18 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
             var tenantId = User.FindFirstValue(DashClaimTypes.TenantId);
             logger.LogInformation("Tenant ID is {tenantId}", tenantId);
 
-            //var cacheKey = $"{ApplicationCacheKeyPrefix}/{tenantId}/{viewModel.FileName}";
+            var cacheKey = $"{ApplicationCacheKeyPrefix}/{tenantId}/{viewModel.FileName}";
 
-            //var exportContent = await cache.GetAsync(cacheKey);
+            var exportContent = await cache.GetAsync(cacheKey);
 
-            //if (exportContent == null)
-            //    return this.ErrorResponse("Requested data export not found", StatusCodes.Status404NotFound);
+            if (exportContent == null)
+                return this.ErrorResponse("Requested data export not found", StatusCodes.Status404NotFound);
 
-            //var fileNameWithExtension = AppendExtensionToFileName(viewModel.FileName, viewModel.Format);
-            //var mimeType = GetMimeTypeFromFormat(viewModel.Format);
+            var fileNameWithExtension = AppendExtensionToFileName(viewModel.FileName, viewModel.Format);
+            var mimeType = GetMimeTypeFromFormat(viewModel.Format);
 
-            //this.AppendContentDispositionResponseHeader(fileNameWithExtension);
-            //return new FileContentResult(exportContent, mimeType);
-
-            return Ok();
+            this.AppendContentDispositionResponseHeader(fileNameWithExtension);
+            return new FileContentResult(exportContent, mimeType);
         }
 
         private static string AppendExtensionToFileName(string baseFileName, ExportFormat format)
