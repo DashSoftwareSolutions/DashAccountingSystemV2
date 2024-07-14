@@ -9,7 +9,6 @@ import {
     Col,
     Row,
 } from 'reactstrap';
-import { BalanceSheetReport } from './models';
 import { actionCreators as balanceSheetActionCreators } from './redux';
 import { actionCreators as exportActionCreators } from '../../../app/export';
 import { RootState } from '../../../app/globalReduxStore';
@@ -22,7 +21,10 @@ import {
     ILogger,
     Logger,
 } from '../../../common/logging';
-import { DateRange } from '../../../common/models';
+import {
+    AmountType,
+    DateRange,
+} from '../../../common/models';
 import useNamedState from '../../../common/utilities/useNamedState';
 import usePrevious from '../../../common/utilities/usePrevious';
 
@@ -149,6 +151,8 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
         setIsDownloadInProgress(true);
     };
 
+    const hasBalanceSheetData = !isNil(balanceSheet);
+
     return (
         <React.Fragment>
             <div className="page_header" id={`${bemBlockName}--header`}>
@@ -171,10 +175,124 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
                     showDownloadExcelButton
                 />
 
-                {isFetching ? (
+                {isFetching && (
                     <Loader />
-                ) : (
-                    <p>TODO: Render the Balance Sheet</p>
+                )}
+
+                {!isFetching && !hasBalanceSheetData && (
+                    <p>No data</p>
+                )}
+
+                {!isFetching && hasBalanceSheetData && (
+                    <table className="table table-hover table-sm report-table">
+                        <thead>
+                            <tr>
+                                <th className="col-md-10 bg-white sticky-top sticky-border" />
+                                <th className="col-md-2 bg-white sticky-top sticky-border text-right">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className="report-section-header">
+                                <td colSpan={2}>ASSETS</td>
+                            </tr>
+                            {balanceSheet.assets.map((assetAccount) => ((
+                                <tr key={assetAccount.id}>
+                                    <td className="account-name">
+                                        {`${assetAccount.accountNumber} - ${assetAccount.name}`}
+                                    </td>
+                                    <td className="text-right">
+                                        <AmountDisplay
+                                            amount={assetAccount.balance}
+                                            normalBalanceType={AmountType.Debit}
+                                        />
+                                    </td>
+                                </tr>
+                            )))}
+                            <tr className="report-total-row">
+                                <td>TOTAL ASSETS</td>
+                                <td className="text-right">
+                                    <AmountDisplay
+                                        amount={balanceSheet.totalAssets}
+                                        normalBalanceType={AmountType.Debit}
+                                        showCurrency
+                                    />
+                                </td>
+                            </tr>
+                            <tr className="report-section-header">
+                                <td colSpan={2}>LIABILITIES</td>
+                            </tr>
+                            {balanceSheet.liabilities.map((liabilityAccount) => ((
+                                <tr key={liabilityAccount.id}>
+                                    <td className="account-name">
+                                        {`${liabilityAccount.accountNumber} - ${liabilityAccount.name}`}
+                                    </td>
+                                    <td className="text-right">
+                                        <AmountDisplay
+                                            amount={liabilityAccount.balance}
+                                            normalBalanceType={AmountType.Credit}
+                                        />
+                                    </td>
+                                </tr>
+                            )))}
+                            <tr className="report-total-row">
+                                <td>TOTAL LIABILITIES</td>
+                                <td className="text-right">
+                                    <AmountDisplay
+                                        amount={balanceSheet.totalLiabilities}
+                                        normalBalanceType={AmountType.Credit}
+                                        showCurrency
+                                    />
+                                </td>
+                            </tr>
+                            <tr className="report-section-header">
+                                <td colSpan={2}>EQUITY</td>
+                            </tr>
+                            {balanceSheet.equity.map((equityAccount) => ((
+                                <tr key={equityAccount.id}>
+                                    <td className="account-name">
+                                        {`${equityAccount.accountNumber} - ${equityAccount.name}`}
+                                    </td>
+                                    <td className="text-right">
+                                        <AmountDisplay
+                                            amount={equityAccount.balance}
+                                            normalBalanceType={AmountType.Credit}
+                                        />
+                                    </td>
+                                </tr>
+                            )))}
+                            <tr>
+                                <td className="account-name">Net Income</td>
+                                <td className="text-right">
+                                    <AmountDisplay
+                                        amount={balanceSheet.netIncome}
+                                        normalBalanceType={AmountType.Credit}
+                                    />
+                                </td>
+                            </tr>
+                            <tr className="report-total-row">
+                                <td>TOTAL EQUITY</td>
+                                <td className="text-right">
+                                    <AmountDisplay
+                                        amount={balanceSheet.totalEquity}
+                                        normalBalanceType={AmountType.Credit}
+                                        showCurrency
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr className="report-grand-total-row">
+                                <td>TOTAL LIABILITIES &amp; EQUITY</td>
+                                <td className="text-right">
+                                    <AmountDisplay
+                                        amount={balanceSheet.totalLiabilitiesAndEquity}
+                                        normalBalanceType={AmountType.Credit}
+                                        showCurrency
+                                    />
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 )}
             </MainPageContent>
         </React.Fragment>
