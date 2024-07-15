@@ -18,24 +18,24 @@ namespace DashAccountingSystemV2.Tests.Fakes
             return null;
         }
 
-        public Task<byte[]> GetAsync(string key, CancellationToken token = default)
+        public Task<byte[]?> GetAsync(string key, CancellationToken token = default)
         {
             if (_internalCacheStore.ContainsKey(key))
             {
-                return Task.FromResult((byte[])_internalCacheStore[key].Item1);
+                return Task.FromResult((byte[]?)_internalCacheStore[key].Item1);
             }
 
-            return Task.FromResult<byte[]>(null);
+            return Task.FromResult<byte[]?>(null);
         }
 
-        public Task<TCachedData> GetObjectAsync<TCachedData>(string key)
+        public Task<TCachedData?> GetObjectAsync<TCachedData>(string key)
         {
             if (_internalCacheStore.ContainsKey(key))
             {
-                return Task.FromResult((TCachedData)_internalCacheStore[key].Item1);
+                return Task.FromResult((TCachedData?)_internalCacheStore[key].Item1);
             }
 
-            return Task.FromResult(default(TCachedData));
+            return Task.FromResult(default(TCachedData?));
         }
 
         public void Refresh(string key)

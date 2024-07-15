@@ -9,7 +9,7 @@ namespace DashAccountingSystemV2.BackEnd.Models
         /// to sort by.  To specify sorting by descending order, the value should be prefixed with a "-".
         /// Otherwise it represents an ascending sort.
         /// </summary>
-        public string SortBy { get; set; }
+        public string? SortBy { get; set; }
 
         /// <summary>
         /// Sort Columns that are translated from the SortingQuery

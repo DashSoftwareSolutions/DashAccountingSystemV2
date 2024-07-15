@@ -79,7 +79,7 @@ function InvoiceListPage(props: InvoiceListPageProps) {
     };
 
     const onClickExistingInvoice = (invoice: InvoiceLite) => {
-
+        navigate(`/app/invoice/view/${invoice.invoiceNumber}`);
     };
 
     const hasInvoices = !isEmpty(invoiceList) && !isEmpty(invoiceList.results);

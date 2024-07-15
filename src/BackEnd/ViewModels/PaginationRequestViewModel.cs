@@ -20,7 +20,7 @@ namespace DashAccountingSystemV2.BackEnd.ViewModels
         /// to sort by.  To specify sorting by descending order, the value should be prefixed with a "-".
         /// Otherwise it represents an ascending sort.
         /// </summary>
-        public string SortBy { get; set; }
+        public string? SortBy { get; set; }
 
         public static Pagination ToModel(PaginationRequestViewModel viewModel)
         {

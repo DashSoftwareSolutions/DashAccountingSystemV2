@@ -96,7 +96,7 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
         /// </remarks>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static string RemoveDiacritics(this string input)
+        public static string? RemoveDiacritics(this string? input)
         {
             if (input == null) return null;
 
@@ -143,10 +143,10 @@ namespace DashAccountingSystemV2.BackEnd.Extensions
                 .Select(s => s.Value);
         }
 
-        public static IEnumerable<Guid> ParseCommaSeparatedGuids(this string? commaSeparatedGuidList)
+        public static IEnumerable<Guid>? ParseCommaSeparatedGuids(this string? commaSeparatedGuidList)
         {
             if (string.IsNullOrWhiteSpace(commaSeparatedGuidList))
-                return [];
+                return null;
 
 #pragma warning disable CS8629 // Nullable value type may be null.
             return commaSeparatedGuidList
