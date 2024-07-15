@@ -1,10 +1,8 @@
 import InvoiceLineItem from './invoiceLineItem.model';
 import InvoiceStatus from './invoiceStatus.model';
 import InvoiceTerms from './invoiceTerms.model';
-import {
-    Amount,
-    CustomerLite,
-} from '../../../common/models';
+import { Amount } from '../../../../common/models';
+import { CustomerLite } from '../../../sales/customers/models';
 
 export default interface Invoice {
     id?: string; // GUID (not required to create; required to update)

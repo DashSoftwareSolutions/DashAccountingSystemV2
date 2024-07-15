@@ -1,9 +1,7 @@
-import {
-    CustomerLite,
-    DateTimeString,
-    EmployeeLite,
-    ProductLite
-} from '../../../common/models';
+import { DateTimeString } from '../../../../common/models';
+import { CustomerLite } from '../../../sales/customers/models';
+import { ProductLite } from '../../../sales/products/models';
+import { EmployeeLite } from '../../employees/models';
 
 export default interface TimeActivity {
     id?: string | null; // GUID

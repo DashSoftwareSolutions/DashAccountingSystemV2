@@ -1,4 +1,4 @@
-import Address from './address.model';
+import { Address } from '../../../../common/models';
 
 export default interface Customer {
     id: string; // GUID

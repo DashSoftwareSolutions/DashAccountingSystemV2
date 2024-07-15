@@ -2,7 +2,7 @@ import InvoiceStatus from './invoiceStatus.model';
 import {
     Amount,
     DateTimeString,
-} from '../../../common/models';
+} from '../../../../common/models';
 
 export default interface InvoiceLite {
     id: string; // GUID

@@ -8,10 +8,10 @@ a.navbar-brand {
     box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
-.pending-badge {
-    background-color: #fff3cd;
-    border: solid 1px #e2c45d;
-    color: #856404;
+.dotnet-8-badge {
+    background-color: rgb(81 43 212);
+    border: solid 1px rgb(81 43 212);
+    color: #fff;
     font-weight: 600;
     margin-top: 2px;
     vertical-align: text-top;

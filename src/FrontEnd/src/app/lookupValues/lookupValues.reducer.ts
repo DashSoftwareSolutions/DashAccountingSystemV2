@@ -12,7 +12,7 @@ import {
     AccountSubType,
     AccountType,
 } from '../../features/accounting/chart-of-accounts/models';
-import { PaymentMethod } from '../../features/invoicing/models';
+import { PaymentMethod } from '../../features/invoicing/payments/models';
 import ActionType from '../globalReduxStore/actionType';
 
 export interface LookupValuesState {

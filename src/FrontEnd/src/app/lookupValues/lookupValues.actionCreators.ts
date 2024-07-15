@@ -13,7 +13,7 @@ import {
     AccountSubType,
     AccountType,
 } from '../../features/accounting/chart-of-accounts/models';
-import { PaymentMethod } from '../../features/invoicing/models';
+import { PaymentMethod } from '../../features/invoicing/payments/models';
 import { AppThunkAction } from '../globalReduxStore';
 import IAction from '../globalReduxStore/action.interface';
 import ActionType from '../globalReduxStore/actionType';

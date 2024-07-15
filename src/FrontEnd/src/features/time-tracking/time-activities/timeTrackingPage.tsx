@@ -3,17 +3,22 @@ import { isNil } from 'lodash';
 import {
     ConnectedProps,
     connect,
+    useDispatch,
 } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
+    Button,
     Col,
     Row,
 } from 'reactstrap';
-import { RootState } from '../../app/globalReduxStore';
+import { Dispatch } from 'redux';
+import { RootState } from '../../../app/globalReduxStore';
+import IAction from '../../../app/globalReduxStore/action.interface';
 import {
     ILogger,
     Logger,
-} from '../../common/logging';
+} from '../../../common/logging';
+import { apiErrorHandler } from '../../../common/utilities/errorHandling';
 
 const logger: ILogger = new Logger('Time Tracking Page');
 const bemBlockName: string = 'time_tracking_page';
@@ -34,6 +39,7 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
     } = props;
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (isNil(selectedTenant)) {
@@ -44,6 +50,32 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
         navigate,
         selectedTenant,
     ]);
+
+    const onClick500 = (() => {
+        fetch('/api/test-errors/problem-500')
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                }
+            });
+    });
+
+    const oncClick400 = (() => {
+        const requestOptions = {
+            method: 'POST',
+            body: JSON.stringify({}),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch('/api/test-errors/request-validation', requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                }
+            });
+    });
 
     return (
         <React.Fragment>
@@ -59,7 +91,25 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
                 </Row>
             </div>
             <div id={`${bemBlockName}--content`}>
-                TODO: Time Activities Report
+                <p>TODO: Time Activities Report</p>
+
+                <Button
+                    color="danger"
+                    onClick={onClick500}
+                >
+                    Test 500 Error Toast
+                </Button>
+
+                <br />
+
+                <br />
+
+                <Button
+                    color="warning"
+                    onClick={oncClick400}
+                >
+                    Test Validation Error Toast
+                </Button>
             </div>
         </React.Fragment>
     );

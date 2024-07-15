@@ -1,4 +1,4 @@
-import { Amount } from '../../../common/models';
+import { Amount } from '../../../../common/models';
 
 export default interface InvoiceLineItem {
     id: string | null; // GUID (not required to create)

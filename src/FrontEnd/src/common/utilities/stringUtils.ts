@@ -4,6 +4,29 @@ import {
 } from 'lodash';
 
 /**
+ * Formats a string representing a decimal number with two decimal places (e.g. for currency amounts).
+ * 
+ * @param {String} input - string to format
+ * 
+ * @returns {String}
+ */
+export function formatWithTwoDecimalPlaces(input: string): string {
+    if (isEmpty(input)) {
+        return input;
+    }
+
+    if (!input.includes('.')) {
+        return `${input}.00`;
+    }
+
+    if (/\.\d$/.test(input)) {
+        return `${input}0`;
+    }
+
+    return input;
+}
+
+/**
  * Determines whether or not a string contains valid data.
  * Intended to provide similar semantics as C# `String.IsNullOrWhiteSpace()`
  *

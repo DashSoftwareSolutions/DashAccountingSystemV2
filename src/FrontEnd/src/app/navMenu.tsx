@@ -73,9 +73,9 @@ function NavMenu({
             >
                 <Link className="navbar-brand"
                     to="/">
-                    Dash Accounting System v2.0
+                    Dash Accounting System v2.1
                     {'\u00a0'}
-                    <span className="badge pending-badge">.NET 8</span>
+                    <span className="badge dotnet-8-badge">.NET 8</span>
                 </Link>
 
 

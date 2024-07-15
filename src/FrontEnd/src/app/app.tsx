@@ -20,8 +20,10 @@ import EditJournalEntryPage from '../features/accounting/journal/editJournalEntr
 import ViewJournalEntryPage from '../features/accounting/journal/viewJournalEntryPage';
 import ProfitAndLossPage from '../features/accounting/profit-and-loss/profitAndLossPage';
 import DashboardPage from '../features/dashboard/dashboardPage';
-import InvoiceListPage from '../features/invoicing/invoiceListPage';
-import TimeTrackingPage from '../features/time-tracking/timeTrackingPage';
+import AddInvoicePage from '../features/invoicing/invoices/addInvoicePage';
+import InvoiceListPage from '../features/invoicing/invoices/invoiceListPage';
+import ViewInvoicePage from '../features/invoicing/invoices/viewInvoicePage';
+import TimeTrackingPage from '../features/time-tracking/time-activities/timeTrackingPage';
 
 /* eslint-disable react/jsx-sort-props, react/jsx-max-props-per-line */
 function App() {
@@ -41,6 +43,8 @@ function App() {
                 <Route path='/app/journal-entry/edit/:entryId' element={<EditJournalEntryPage />} />
                 <Route path='/app/journal-entry/view/:entryId' element={<ViewJournalEntryPage />} />
                 <Route path='/app/invoicing' element={<InvoiceListPage />} />
+                <Route path='/app/invoice/new' element={<AddInvoicePage />} />
+                <Route path='/app/invoice/view/:invoiceNumber' element={<ViewInvoicePage />} />
                 <Route path='/app/ledger' element={<GeneralLedgerPage />} />
                 <Route path='/app/profit-and-loss' element={<ProfitAndLossPage />} />
                 <Route path='/app/time-tracking' element={<TimeTrackingPage />} />

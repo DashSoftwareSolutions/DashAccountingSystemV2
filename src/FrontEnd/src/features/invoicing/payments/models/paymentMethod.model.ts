@@ -1,4 +1,4 @@
-import { LookupValue } from '../../../common/models';
+import { LookupValue } from '../../../../common/models';
 
 export default interface PaymentMethod extends LookupValue {
 
