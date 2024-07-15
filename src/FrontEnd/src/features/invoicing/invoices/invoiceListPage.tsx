@@ -129,7 +129,6 @@ function InvoiceListPage(props: InvoiceListPageProps) {
                                 <th className="col-md-2 bg-white sticky-top sticky-border text-end">Amount</th>
                                 <th className="col-md-2 bg-white sticky-top sticky-border">Status</th>
                                 <th className="col-md-1 bg-white sticky-top sticky-border">Due</th>
-                                <th className="col-md-1 bg-white sticky-top sticky-border">&nbsp;</th>
                             </tr>
                         </thead>
 
@@ -141,7 +140,9 @@ function InvoiceListPage(props: InvoiceListPageProps) {
                                             className="btn-link-report-item"
                                             onClick={() => onClickExistingInvoice(invoice)}
                                         >
-                                            {DateTime.fromISO(invoice.issueDate).toLocaleString(DateTime.DATE_SHORT)}
+                                            {/* TODO/FIXME: Would like localization support but want months and days to have two digits always (w/ leading zeros if necessary) in en-US locale */}
+                                            {/*DateTime.fromISO(invoice.issueDate).toLocaleString(DateTime.DATE_SHORT)*/}
+                                            {DateTime.fromISO(invoice.issueDate).toFormat('MM/dd/yyyy')}
                                         </LinkButton>
                                     </td>
                                     <td className="col-md-1">
@@ -184,11 +185,10 @@ function InvoiceListPage(props: InvoiceListPageProps) {
                                             className="btn-link-report-item"
                                             onClick={() => onClickExistingInvoice(invoice)}
                                         >
-                                            {DateTime.fromISO(invoice.dueDate).toLocaleString(DateTime.DATE_SHORT)}
+                                            {/* TODO/FIXME: Would like localization support but want months and days to have two digits always (w/ leading zeros if necessary) in en-US locale */}
+                                            {/*DateTime.fromISO(invoice.dueDate).toLocaleString(DateTime.DATE_SHORT)*/}
+                                            {DateTime.fromISO(invoice.dueDate).toFormat('MM/dd/yyyy')}
                                         </LinkButton>
-                                    </td>
-                                    <td>
-                                        &nbsp;
                                     </td>
                                 </tr>
                             )))}

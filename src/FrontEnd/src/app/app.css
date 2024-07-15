@@ -88,10 +88,12 @@ a.hoverable-link {
         line-height: 1.5;
         padding: 0;
         text-align: left;
+        text-decoration: none;
     }
 
         .btn.btn-link.btn-link-report-item:hover {
             color: #0366d6;
+            text-decoration: underline;
         }
 
 /* Sticky Table Header Borders */

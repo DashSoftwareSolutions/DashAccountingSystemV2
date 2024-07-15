@@ -198,7 +198,9 @@ function GeneralLedgerPage(props: GeneralLedgerPageProps) {
                                                                 className="hoverable-link"
                                                                 to={journalEntryViewRoute}
                                                             >
-                                                                {DateTime.fromISO(transaction.postDate ?? transaction.entryDate).toLocaleString(DateTime.DATE_SHORT)}
+                                                                {/* TODO/FIXME: Would like localization support but want months and days to have two digits always (w/ leading zeros if necessary) in en-US locale */}
+                                                                {/*DateTime.fromISO(transaction.postDate ?? transaction.entryDate).toLocaleString(DateTime.DATE_SHORT)*/}
+                                                                {DateTime.fromISO(transaction.postDate ?? transaction.entryDate).toFormat('MM/dd/yyyy')}
                                                             </Link>
                                                         </td>
 
