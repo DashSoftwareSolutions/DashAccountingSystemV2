@@ -1,5 +1,4 @@
-﻿/*
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using DashAccountingSystemV2.BackEnd.Services.Template;
 
 namespace DashAccountingSystemV2.Tests.Services.Template
@@ -19,4 +18,3 @@ namespace DashAccountingSystemV2.Tests.Services.Template
         }
     }
 }
-*/

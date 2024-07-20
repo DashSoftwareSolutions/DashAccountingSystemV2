@@ -13,6 +13,7 @@ using DashAccountingSystemV2.BackEnd.Security.Authorization;
 using DashAccountingSystemV2.BackEnd.Security.ExportDownloads;
 using DashAccountingSystemV2.BackEnd.Services.Caching;
 using DashAccountingSystemV2.BackEnd.Services.Export;
+using DashAccountingSystemV2.BackEnd.Services.Template;
 using static DashAccountingSystemV2.BackEnd.Security.Constants;
 
 try
@@ -90,6 +91,7 @@ try
     builder.Services.AddCaching();
     builder.Services.AddRepositories();
     builder.Services.AddBusinessLogic();
+    builder.Services.AddTemplateService();
     builder.Services.AddExportDownloadSecurityTokenService();
     builder.Services.AddExportService();
 

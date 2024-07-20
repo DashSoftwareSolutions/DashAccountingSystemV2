@@ -1,16 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
+  <PropertyGroup Label="Package">
+	<PackageId>DashAccountingSystemV2.Tests</PackageId>
+	<Version>2.1.0</Version>
+	<Authors>Geoffrey Roberts</Authors>
+	<Company>Dash Software Solutions, Inc.</Company>
+	<Copyright>Copyright (C) 2022 - 2024 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Build">
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <UserSecretsId>215dfb3f-4958-402e-9016-4d21e4dd8f83</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Package References">
     <PackageReference Include="coverlet.collector" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -31,18 +38,31 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Project References">
     <ProjectReference Include="..\..\src\BackEnd\DashAccountingSystemV2.BackEnd.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Implicit Usings">
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Label="Resources">
     <None Update="appsettings.UnitTests.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <PropertyGroup Label="Stuff to allow use of Razor Templating">
+    <PreserveCompilationReferences>true</PreserveCompilationReferences>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+
+  <ItemGroup Label="Razor Templates Include">
+	<RazorTemplates Include="Services\Template\RazorTemplates\*.cshtml" />
+  </ItemGroup>
+
+  <Target Name="CopyTemplates" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(RazorTemplates)" DestinationFolder="$(OutDir)\RazorTemplates" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>
