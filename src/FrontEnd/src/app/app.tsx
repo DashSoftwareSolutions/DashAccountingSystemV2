@@ -24,6 +24,7 @@ import AddInvoicePage from '../features/invoicing/invoices/addInvoicePage';
 import InvoiceListPage from '../features/invoicing/invoices/invoiceListPage';
 import ViewInvoicePage from '../features/invoicing/invoices/viewInvoicePage';
 import TimeTrackingPage from '../features/time-tracking/time-activities/timeTrackingPage';
+import ManageUserAccountPage from '../features/user-profile/manageUserAccountPage';
 
 /* eslint-disable react/jsx-sort-props, react/jsx-max-props-per-line */
 function App() {
@@ -48,6 +49,7 @@ function App() {
                 <Route path='/app/ledger' element={<GeneralLedgerPage />} />
                 <Route path='/app/profit-and-loss' element={<ProfitAndLossPage />} />
                 <Route path='/app/time-tracking' element={<TimeTrackingPage />} />
+                <Route path='/app/manage-user-account' element={<ManageUserAccountPage />} />
             </Route>
         </Routes>
     );

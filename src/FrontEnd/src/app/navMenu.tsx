@@ -163,7 +163,7 @@ function NavMenu({
                                     <NavLink
                                         className="text-dark"
                                         tag={Link}
-                                        to="/manage-user-account"
+                                        to="/app/manage-user-account"
                                     >
                                         {`Hello ${userInfo ? (userInfo.firstName + ' ' + userInfo.lastName) : 'User'}`}
                                     </NavLink>

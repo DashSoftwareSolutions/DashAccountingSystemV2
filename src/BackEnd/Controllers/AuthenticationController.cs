@@ -2,11 +2,14 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
-using DashAccountingSystemV2.BackEnd.Models;
 using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using DashAccountingSystemV2.BackEnd.Models;
+using DashAccountingSystemV2.BackEnd.Extensions;
 using DashAccountingSystemV2.BackEnd.Security.Authorization;
+using DashAccountingSystemV2.BackEnd.ViewModels;
 
 namespace DashAccountingSystemV2.BackEnd.Controllers
 {
@@ -17,18 +20,21 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
         private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
         private readonly ILogger<AuthenticationController> _logger;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly TimeProvider _timeProvider;
 
         public AuthenticationController(
             IOptionsMonitor<BearerTokenOptions> bearerTokenOptions,
             ILogger<AuthenticationController> logger,
             SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager,
             TimeProvider timeProvider)
         {
             _bearerTokenOptions = bearerTokenOptions;
             _logger = logger;
             _signInManager = signInManager;
             _signInManager.AuthenticationScheme = IdentityConstants.BearerScheme;
+            _userManager = userManager;
             _timeProvider = timeProvider;
         }
 
@@ -71,7 +77,6 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
         /// Refresh Access Token
         /// </summary>
         /// <param name="refreshRequest">Token Refresh request parameters</param>
-        /// <returns></returns>
         [HttpPost("refresh-token")]
         [ProducesResponseType(typeof(AccessTokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -96,11 +101,60 @@ namespace DashAccountingSystemV2.BackEnd.Controllers
             return SignIn(newPrincipal, authenticationScheme: IdentityConstants.BearerScheme);
         }
 
+        /// <summary>
+        /// Logout
+        /// </summary>
         [ApiAuthorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] object _)
         {
             await _signInManager.SignOutAsync();
+            return Ok();
+        }
+
+        /// <summary>
+        /// Allows an authenticated user to change his/her password
+        /// </summary>
+        /// <param name="changePasswordRequest">Change password request parameters</param>
+        [ApiAuthorize]
+        [HttpPost("change-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestViewModel changePasswordRequest)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            
+            if (user == null)
+            {
+                _logger.LogError("Unable to find user with ID {userId}", _userManager.GetUserId(User));
+
+                return Problem(
+                    detail: "An unexpected error occurred while attempting to serve this request.",
+                    instance: HttpContext.Request.GetEncodedPathAndQuery(),
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    title: "Internal Server Error");
+            }
+
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, changePasswordRequest.OldPassword, changePasswordRequest.NewPassword);
+
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    if (error.Description == "Incorrect password.")
+                        ModelState.AddModelError(string.Empty, "Existing password is incorrect.");
+                    else
+                        ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                return this.ErrorResponse(ModelState);
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            _logger.LogInformation("User {userId} changed their password successfully.", _userManager.GetUserId(User));
+
             return Ok();
         }
     }
