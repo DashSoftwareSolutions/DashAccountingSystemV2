@@ -25,6 +25,7 @@
     <ProjectReference Include="..\FrontEnd\DashAccountingSystemV2.FrontEnd.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\DashAccountingSystemV2.Aspire.ServiceDefaults\DashAccountingSystemV2.Aspire.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup Label="Package References">
@@ -45,10 +46,10 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageReference Include="RazorLight" Version="2.3.1" />
     <PackageReference Include="Select.HtmlToPdf.NetCore" Version="24.1.0" />
-    <PackageReference Include="Serilog" Version="4.0.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+    <PackageReference Include="Serilog" Version="4.0.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
   </ItemGroup>
 
   <ItemGroup Label="Folder Includes">

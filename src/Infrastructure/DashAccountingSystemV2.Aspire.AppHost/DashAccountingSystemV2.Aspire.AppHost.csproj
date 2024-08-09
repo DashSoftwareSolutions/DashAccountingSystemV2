@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup Label="Package">
+    <PackageId>DashAccountingSystemV2.Aspire.AppHost</PackageId>
+    <Version>2.1.0</Version>
+    <Authors>Geoffrey Roberts</Authors>
+    <Company>Dash Software Solutions, Inc.</Company>
+    <Copyright>Copyright (C) 2022 - 2024 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="Build">
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>0220bdbb-eba6-4d11-9776-ac25dc7a0f60</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup Label="Package References">
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.1.0" />
+    <PackageReference Include="Aspire.Hosting.NodeJs" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\..\BackEnd\DashAccountingSystemV2.BackEnd.csproj" />
+  </ItemGroup>
+
+</Project>

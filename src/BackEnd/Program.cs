@@ -20,9 +20,15 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // Add services to the container.
-    // Web API and Swagger
+    // Add services to the container
+
+    // .NET Aspire Service Defaults
+    builder.AddServiceDefaults();
+
+    // Web API Controllers
     builder.Services.AddControllers();
+
+    // Swagger
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
@@ -103,6 +109,9 @@ try
         .WriteTo.Console());
 
     var app = builder.Build();
+
+    // .NET Aspire
+    app.MapDefaultEndpoints();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
