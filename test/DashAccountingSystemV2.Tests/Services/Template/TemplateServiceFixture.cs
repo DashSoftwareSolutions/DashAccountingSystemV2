@@ -1,8 +1,6 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Xunit;
-using DashAccountingSystemV2.Models;
-using DashAccountingSystemV2.Services.Template;
+﻿using Microsoft.Extensions.Logging;
+using DashAccountingSystemV2.BackEnd.Models;
+using DashAccountingSystemV2.BackEnd.Services.Template;
 
 namespace DashAccountingSystemV2.Tests.Services.Template
 {

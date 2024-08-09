@@ -1,12 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
-using Xunit;
-using DashAccountingSystemV2.Models;
-using DashAccountingSystemV2.Repositories;
+using DashAccountingSystemV2.BackEnd.Models;
+using DashAccountingSystemV2.BackEnd.Repositories;
 
 namespace DashAccountingSystemV2.Tests.Repositories
 {
@@ -43,7 +39,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var revenueAccount = await MakeAccount(
                     4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
-                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Unspecified);
                 var postDate = entryDate.AddDays(3);
 
                 var journalEntry = new JournalEntry(
@@ -105,7 +101,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var revenueAccount = await MakeAccount(
                     4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
-                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Unspecified);
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
@@ -183,7 +179,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var revenueAccount = await MakeAccount(
                     4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
-                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Unspecified);
                 var postDate = entryDate.AddDays(3);
 
                 var journalEntry = new JournalEntry(
@@ -263,7 +259,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var revenueAccount = await MakeAccount(
                     4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
-                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Unspecified);
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
@@ -360,7 +356,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                     4030, "Revenue from Sale of Bar Widgets", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
                 //    MAKE INITIAL PENDING JOURNAL ENTRY
-                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Unspecified);
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
@@ -454,7 +450,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
                 var revenueAccount = await MakeAccount(
                     4010, "Payments for Services Rendered", accountTypeRevenue, accountSubTypeOperatingRevenue, assetTypeUSD, AmountType.Credit);
 
-                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Utc);
+                var entryDate = new DateTime(2018, 12, 11, 0, 0, 0, DateTimeKind.Unspecified);
 
                 var journalEntry = new JournalEntry(
                     _tenantId,
@@ -551,8 +547,8 @@ namespace DashAccountingSystemV2.Tests.Repositories
             {
                 // Make a Tenant
                 _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
-                    INSERT INTO ""Tenant"" ( ""Name"" )
-                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
+                    INSERT INTO ""Tenant"" ( ""Name"", ""DefaultAssetTypeId"" )
+                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.', 1 )
                     RETURNING ""Id"";");
 
                 // Get a User to use

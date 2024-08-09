@@ -1,0 +1,118 @@
+import React, { useEffect } from 'react';
+import { isNil } from 'lodash';
+import {
+    ConnectedProps,
+    connect,
+    useDispatch,
+} from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+    Button,
+    Col,
+    Row,
+} from 'reactstrap';
+import { Dispatch } from 'redux';
+import { RootState } from '../../../app/globalReduxStore';
+import IAction from '../../../app/globalReduxStore/action.interface';
+import {
+    ILogger,
+    Logger,
+} from '../../../common/logging';
+import { apiErrorHandler } from '../../../common/utilities/errorHandling';
+
+const logger: ILogger = new Logger('Time Tracking Page');
+const bemBlockName: string = 'time_tracking_page';
+
+const mapStateToProps = (state: RootState) => ({
+    selectedTenant: state.application.selectedTenant,
+});
+
+const connector = connect(mapStateToProps);
+
+type TimeTrackingPageReduxProps = ConnectedProps<typeof connector>;
+
+type TimeTrackingPageProps = TimeTrackingPageReduxProps;
+
+function TimeTrackingPage(props: TimeTrackingPageProps) {
+    const {
+        selectedTenant,
+    } = props;
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (isNil(selectedTenant)) {
+            logger.info(`No Tenant has been selected.  Navigating to home page...`);
+            navigate('/app');
+        }
+    }, [
+        navigate,
+        selectedTenant,
+    ]);
+
+    const onClick500 = (() => {
+        fetch('/api/test-errors/problem-500')
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                }
+            });
+    });
+
+    const oncClick400 = (() => {
+        const requestOptions = {
+            method: 'POST',
+            body: JSON.stringify({}),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
+
+        fetch('/api/test-errors/request-validation', requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    apiErrorHandler.handleError(response, dispatch as Dispatch<IAction>);
+                }
+            });
+    });
+
+    return (
+        <React.Fragment>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
+                <Row>
+                    <Col>
+                        <h1>Time Activities Report</h1>
+                        <p className="page_header--subtitle">{selectedTenant?.name}</p>
+                    </Col>
+                </Row>
+            </div>
+            <div id={`${bemBlockName}--content`}>
+                <p>TODO: Time Activities Report</p>
+
+                <Button
+                    color="danger"
+                    onClick={onClick500}
+                >
+                    Test 500 Error Toast
+                </Button>
+
+                <br />
+
+                <br />
+
+                <Button
+                    color="warning"
+                    onClick={oncClick400}
+                >
+                    Test Validation Error Toast
+                </Button>
+            </div>
+        </React.Fragment>
+    );
+}
+
+export default connector(TimeTrackingPage);

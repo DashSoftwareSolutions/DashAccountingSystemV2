@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
-using DashAccountingSystemV2.Repositories;
+﻿using DashAccountingSystemV2.BackEnd.Repositories;
 
 namespace DashAccountingSystemV2.Tests.Repositories
 {

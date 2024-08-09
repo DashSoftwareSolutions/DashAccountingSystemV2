@@ -1,12 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
-using Xunit;
-using DashAccountingSystemV2.Models;
-using DashAccountingSystemV2.Repositories;
+using DashAccountingSystemV2.BackEnd.Models;
+using DashAccountingSystemV2.BackEnd.Repositories;
 
 namespace DashAccountingSystemV2.Tests.Repositories
 {
@@ -24,7 +20,7 @@ namespace DashAccountingSystemV2.Tests.Repositories
         private TimeActivity _timeActivity2;
         private TimeActivity _timeActivity3;
 
-        private static readonly DateTime _timeActivitiesDate = new DateTime(2022, 2, 17, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly DateTime _timeActivitiesDate = new DateTime(2022, 2, 17, 0, 0, 0, DateTimeKind.Unspecified);
 
         [Fact]
         [Trait("Category", "Requires Database")]
@@ -315,9 +311,9 @@ namespace DashAccountingSystemV2.Tests.Repositories
             using (var connection = new NpgsqlConnection(connString))
             {
                 // Make a Tenant
-                _tenantId = connection.QueryFirstOrDefault<Guid>($@"
-                    INSERT INTO ""Tenant"" ( ""Name"" )
-                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
+                _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
+                    INSERT INTO ""Tenant"" ( ""Name"", ""DefaultAssetTypeId"" )
+                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.', 1 )
                     RETURNING ""Id"";");
 
                 // Get a User to use

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Dapper;
+﻿using Dapper;
 using Npgsql;
-using Xunit;
-using DashAccountingSystemV2.Models;
-using DashAccountingSystemV2.Repositories;
+using DashAccountingSystemV2.BackEnd.Models;
+using DashAccountingSystemV2.BackEnd.Repositories;
 
 namespace DashAccountingSystemV2.Tests.Repositories
 {

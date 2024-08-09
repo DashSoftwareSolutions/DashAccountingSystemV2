@@ -1,0 +1,70 @@
+import React, { useEffect } from 'react';
+import { isNil } from 'lodash';
+import {
+    ConnectedProps,
+    connect,
+} from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+    Col,
+    Row,
+} from 'reactstrap';
+import { RootState } from '../../app/globalReduxStore';
+import MainPageContent from '../../common/components/mainPageContent';
+import {
+    ILogger,
+    Logger,
+} from '../../common/logging';
+
+const logger: ILogger = new Logger('Dashboard Page');
+const bemBlockName: string = 'dashboard_page';
+
+const mapStateToProps = (state: RootState) => ({
+    selectedTenant: state.application.selectedTenant,
+});
+
+const connector = connect(mapStateToProps);
+
+type DashboardPageReduxProps = ConnectedProps<typeof connector>;
+
+type DashboardPageProps = DashboardPageReduxProps;
+
+function DashboardPage(props: DashboardPageProps) {
+    const {
+        selectedTenant,
+    } = props;
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isNil(selectedTenant)) {
+            logger.info(`No Tenant has been selected.  Navigating to home page...`);
+            navigate('/app');
+        }
+    }, [
+        navigate,
+        selectedTenant,
+    ]);
+
+    return (
+        <React.Fragment>
+            <div
+                className="page_header"
+                id={`${bemBlockName}--header`}
+            >
+                <Row>
+                    <Col>
+                        <h1>{selectedTenant?.name}</h1>
+                        <p className="page_header--subtitle">Dashboard</p>
+                    </Col>
+                </Row>
+            </div>
+
+            <MainPageContent id={`${bemBlockName}--content`}>
+                <p>Coming soon...</p>
+            </MainPageContent>
+        </React.Fragment>
+    );
+}
+
+export default connector(DashboardPage);
