@@ -22,7 +22,14 @@ const logger: ILogger = new Logger('Add Invoice Page');
 const bemBlockName: string = 'add_invoice_page';
 
 const mapStateToProps = (state: RootState) => ({
+    customers: state.customers.list.customers,
+    customDetails: state.customers.details.customer,
+    invoiceTermsOptions: state.invoice.details.invoiceTermsOptions,
+    isFetchingCustomerDetails: state.customers.details.isFetching,
+    isFetchingCustomers: state.customers.list.isFetching,
+    isFetchingInvoiceTerms: state.invoice.details.isFetchingInvoiceTerms,
     isSaving: state.invoice.details.isSaving,
+    savedInvoice: state.invoice.details.existingInvoice,
     selectedTenant: state.application.selectedTenant,
 });
 
