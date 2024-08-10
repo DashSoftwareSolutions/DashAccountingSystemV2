@@ -176,7 +176,7 @@ function Layout(props: LayoutProps) {
                                 </Col>
 
                                 <Col
-                                    className="text-right"
+                                    className="text-end"
                                     sm="6"
                                 >
                                     {application.applicationVersion}

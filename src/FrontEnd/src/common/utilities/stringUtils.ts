@@ -1,7 +1,29 @@
 import {
     isEmpty,
+    isNil,
     isString,
 } from 'lodash';
+import { Address } from '../models';
+
+/**
+ * Formats a mailing address.
+ * 
+ * @param {Address} address - Address to format
+ * 
+ * @returns {String} - formatted address with line breaks and such
+ */
+export function formatAddress(address: Address): string {
+    if (isNil(address)) {
+        return '';
+    }
+
+    const isUnitedStatesAddress = address.country.twoLetterCode === 'US';
+    const cityRegionSeparator = isUnitedStatesAddress ? ', ' : ' ';
+
+    return `${address.streetAddress1}${!isEmpty(address.streetAddress2) ? '\n' + address.streetAddress2 + '\n' : ''}
+${address.city}${cityRegionSeparator}${isUnitedStatesAddress ? address.region.code : address.region.name} ${address.postalCode}
+${address.country.name}`;
+}
 
 /**
  * Formats a string representing a decimal number with two decimal places (e.g. for currency amounts).
