@@ -1,5 +1,9 @@
-import React, { useEffect } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+} from 'react';
 import { isNil } from 'lodash';
+import { DateTime } from 'luxon';
 import {
     ConnectedProps,
     connect,
@@ -11,12 +15,25 @@ import {
 import {
     Button,
     Col,
+    ListGroup,
+    ListGroupItem,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
     Row,
 } from 'reactstrap';
+import InvoiceLineItemsTable from './invoiceLineItemsTable';
+import InvoiceStatusLabel from './invoiceStatusLabel';
 import { InvoiceStatus } from './models';
 import { actionCreators as invoiceActionCreators } from './redux';
 import { actionCreators as exportActionCreators } from '../../../app/export';
 import { RootState } from '../../../app/globalReduxStore';
+import {
+    actionCreators as notificationActionCreators,
+    NotificationLevel,
+} from '../../../app/notifications';
+import AmountDisplay from '../../../common/components/amountDisplay';
 import Loader from '../../../common/components/loader';
 import MainPageContent from '../../../common/components/mainPageContent';
 import {
@@ -25,44 +42,69 @@ import {
 } from '../../../common/logging';
 import useNamedState from '../../../common/utilities/useNamedState';
 import usePrevious from '../../../common/utilities/usePrevious';
+import ReceivePaymentModalDialog from '../payments/receivePaymentModalDialog';
+import { actionCreators as paymentActionCreators } from '../payments/redux';
 
 const logger: ILogger = new Logger('View Invoice Page');
 const bemBlockName: string = 'view_invoice_page';
 
 const mapStateToProps = (state: RootState) => ({
     invoice: state.invoice?.details.existingInvoice ?? null,
+    isDeleting: state.invoice?.details.isDeleting ?? false,
     isDownloading: state?.exportDownload?.isFetching ?? false,
     isFetching: state.invoice?.details.isFetchingInvoice ?? false,
+    isSaving: state.invoice?.details.isSaving ?? false,
+    isSavingPayment: state.payments?.isSaving ?? false,
     pdfDownloadError: state?.exportDownload?.error ?? null,
     pdfDownloadInfo: state?.exportDownload?.downloadInfo ?? null,
+    savedPayment: state.payments?.existingPayment ?? null,
     selectedTenant: state.application.selectedTenant,
 });
 
 const mapDispatchToProps = {
     ...invoiceActionCreators,
+    initializeNewPayment: paymentActionCreators.initializeNewPayment,
     reportDownloadError: exportActionCreators.reportError,
+    resetPaymentStore: paymentActionCreators.reset,
+    showAlert: notificationActionCreators.showAlert,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type ViewInvoicePageReduxProps = ConnectedProps<typeof connector>;
 
-type ViewInvoicePagePageProps = ViewInvoicePageReduxProps;
+type PropTypes = ViewInvoicePageReduxProps;
 
-function ViewInvoicePage(props: ViewInvoicePagePageProps) {
+function ViewInvoicePage(props: PropTypes) {
     const {
+        deleteInvoice,
+        initializeNewPayment,
         invoice,
+        isDeleting,
         isDownloading,
         isFetching,
+        isSaving,
+        isSavingPayment,
         pdfDownloadError,
         pdfDownloadInfo,
         reportDownloadError,
         requestInvoice,
         requestInvoicePdfExport,
+        reset,
+        resetExistingInvoice,
+        resetInvoiceList,
+        resetPaymentStore,
+        savedPayment,
         selectedTenant,
+        sendInvoice,
+        showAlert,
     } = props;
 
+    const [isConfirmDeleteInvoiceModalOpen, setIsConfirmDeleteInvoiceModalOpen] = useNamedState<boolean>('isConfirmDeleteInvoiceModalOpen', false);
+    const [isConfirmSendInvoiceModalOpen, setIsConfirmSendInvoiceModalOpen] = useNamedState<boolean>('isConfirmSendInvoiceModalOpen', false);
     const [isDownloadInProgress, setIsDownloadInProgress] = useNamedState<boolean>('isDownloadInProgress', false);
+    const [isReceivePaymentModalOpen, setIsReceivePaymentModalOpen] = useNamedState<boolean>('isReceivePaymentModalOpen', false);
+    const [isViewPaymentModalOpen, setIsViewPaymentModalOpen] = useNamedState<boolean>('isViewPaymentModalOpen', false);
 
     const navigate = useNavigate();
 
@@ -70,7 +112,10 @@ function ViewInvoicePage(props: ViewInvoicePagePageProps) {
     const invoiceNumber = parseInt(invoiceNumberParam ?? '', 10);
     const hasInvoice = !isNil(invoice);
 
+    const wasDeleting = usePrevious(isDeleting);
     const wasDownloading = usePrevious(isDownloading);
+    const wasSaving = usePrevious(isSaving);
+    const wasSavingPayment = usePrevious(isSavingPayment);
 
     useEffect(() => {
         if (isNil(selectedTenant)) {
@@ -137,6 +182,63 @@ function ViewInvoicePage(props: ViewInvoicePagePageProps) {
         wasDownloading,
     ]);
 
+    useEffect(() => {
+        if (wasSaving &&
+            !isSaving &&
+            !isNil(invoice)) {
+            setIsConfirmSendInvoiceModalOpen(false);
+            showAlert(NotificationLevel.Success, `Successfully updated Invoice # ${invoiceNumber} from 'Draft' to 'Sent'`, true);
+            resetInvoiceList();
+        }
+    }, [
+        invoice,
+        invoiceNumber,
+        isSaving,
+        resetInvoiceList,
+        setIsConfirmSendInvoiceModalOpen,
+        showAlert,
+        wasSaving,
+    ]);
+
+    useEffect(() => {
+        if (wasDeleting && !isDeleting) {
+            setIsConfirmDeleteInvoiceModalOpen(false);
+            showAlert(NotificationLevel.Success, `Successfully deleted Invoice # ${invoiceNumber}`, true);
+            reset();
+            navigate('/app/invoicing');
+        }
+    }, [
+        invoiceNumber,
+        isDeleting,
+        navigate,
+        reset,
+        setIsConfirmDeleteInvoiceModalOpen,
+        showAlert,
+        wasDeleting,
+    ]);
+
+    useEffect(() => {
+        if (wasSavingPayment &&
+            !isSavingPayment &&
+            !isNil(savedPayment)) {
+            showAlert(NotificationLevel.Success, `Successfully recorded payment for Invoice # ${invoiceNumber}`, true);
+            resetPaymentStore();
+            resetExistingInvoice();
+            resetInvoiceList();
+            requestInvoice(invoiceNumber); // re-fetch the Invoice details so it now shows Paid status
+        }
+    }, [
+        invoiceNumber,
+        isSavingPayment,
+        requestInvoice,
+        resetExistingInvoice,
+        resetInvoiceList,
+        resetPaymentStore,
+        savedPayment,
+        showAlert,
+        wasSavingPayment,
+    ]);
+
     const onClickBack = () => { navigate(-1); };
 
     const onClickDeleteInvoice = () => {
@@ -155,17 +257,129 @@ function ViewInvoicePage(props: ViewInvoicePagePageProps) {
         // TODO: Implement edit invoice action
     };
 
-    const onClickReceivePayment = () => {
-        logger.info('Open modal to receive payment for the invoice...');
-    };
+    const onClickReceivePayment = useCallback(() => {
+        if (!isNil(invoice)) {
+            initializeNewPayment(invoice);
+            setIsReceivePaymentModalOpen(true);
+        }
+    }, [
+        initializeNewPayment,
+        invoice,
+        setIsReceivePaymentModalOpen,
+    ]);
 
     const onClickSendInvoice = () => {
-        logger.info('Open modal to confirm sending the invoice...');
+        setIsConfirmSendInvoiceModalOpen(true);
     };
 
     const onClickViewPayment = () => {
-        logger.info('Open modal to view payment info...');
+        setIsViewPaymentModalOpen(true);
     };
+
+    const onCloseReceivePaymentModal = () => {
+        setIsReceivePaymentModalOpen(false);
+    };
+
+    const onCloseViewPaymentModal = () => {
+        setIsViewPaymentModalOpen(false);
+    };
+
+    const onDeleteInvoiceConfirmed = () => {
+        logger.info('We\'re sure we want to delete the invoice.  Doing it...');
+        deleteInvoice();
+    };
+
+    const onDeleteInvoiceDeclined = () => {
+        setIsConfirmDeleteInvoiceModalOpen(false);
+    };
+
+    const onSendInvoiceConfirmed = () => {
+        sendInvoice();
+    };
+
+    const onSendInvoiceDeclined = () => {
+        setIsConfirmSendInvoiceModalOpen(false);
+    };
+
+    const renderInvoice = useCallback((): JSX.Element => {
+        if (!hasInvoice) {
+            return (<React.Fragment />);
+        }
+
+        const issueDate = DateTime.fromISO(invoice.issueDate ?? '');
+        const dueDate = DateTime.fromISO(invoice.dueDate ?? '');
+        const isPastDue = dueDate.startOf('day') < DateTime.now().startOf('day');
+
+        return (
+            <React.Fragment>
+                <ListGroup>
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2}><strong>Invoice #</strong></Col>
+                            <Col md={2}>{invoice.invoiceNumber}</Col>
+                            <Col md={2}><strong>Amount</strong></Col>
+                            <Col md={2}>
+                                {!isNil(invoice.amount) && (
+                                    <AmountDisplay
+                                        amount={invoice.amount}
+                                        showCurrency
+                                    />
+                                )}
+                            </Col>
+                            <Col md={2}><strong>Status</strong></Col>
+                            <Col md={2}>
+                                <InvoiceStatusLabel
+                                    isPastDue={isPastDue}
+                                    status={invoice.status}
+                                />
+                            </Col>
+                        </Row>
+                    </ListGroupItem>
+
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2}><strong>Issue Date</strong></Col>
+                            <Col md={2}>{issueDate.toFormat('MM/dd/yyyy')}</Col>
+                            <Col md={2}><strong>Terms</strong></Col>
+                            <Col md={2}>{invoice.invoiceTerms?.name}</Col>
+                            <Col md={2}><strong>Due Date</strong></Col>
+                            <Col md={2}>{dueDate.toFormat('MM/dd/yyyy')}</Col>
+                        </Row>
+                    </ListGroupItem>
+
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2}><strong>Customer</strong></Col>
+                            <Col md={10}>{invoice.customer?.displayName}</Col>
+                        </Row>
+                    </ListGroupItem>
+
+                    <ListGroupItem>
+                        <Row>
+                            <Col md={2}><strong>Message</strong></Col>
+
+                            <Col md={10}>
+                                {!isNil(invoice.message) && (
+                                    <span
+                                        dangerouslySetInnerHTML={{
+                                            __html: invoice.message.replace(/\n/g, '<br />'),
+                                        }}
+                                    />
+                                )}
+                            </Col>
+                        </Row>
+                    </ListGroupItem>
+                </ListGroup>
+
+                <div style={{ marginTop: 22 }}>
+                    <InvoiceLineItemsTable lineItems={invoice.lineItems} />
+                </div>
+            </React.Fragment>
+        );
+    }, [
+        hasInvoice,
+        invoice,
+    ]);
 
     const isDownloadingAuthoritative = isDownloading || isDownloadInProgress;
 
@@ -286,10 +500,90 @@ function ViewInvoicePage(props: ViewInvoicePagePageProps) {
                 )}
 
                 {!isFetching && hasInvoice && (
-                    <p>TODO: View Invoice Page content</p>
+                    <React.Fragment>
+                        {renderInvoice()}
+                    </React.Fragment>
                 )}
 
-                
+                <Modal
+                    backdrop="static"
+                    id={`${bemBlockName}--delete_confirm_modal`}
+                    isOpen={isConfirmDeleteInvoiceModalOpen}
+                    toggle={onDeleteInvoiceDeclined}
+                >
+                    <ModalHeader toggle={onDeleteInvoiceDeclined}>Delete Invoice</ModalHeader>
+
+                    <ModalBody>
+                        This action cannot be undone.  Are you sure?
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button
+                            color="danger"
+                            disabled={isDeleting}
+                            onClick={onDeleteInvoiceConfirmed}
+                        >
+                            {isDeleting ? 'Deleting...' : 'Yes, Delete It'}
+                        </Button>
+                        {' '}
+                        <Button
+                            color="secondary"
+                            disabled={isDeleting}
+                            onClick={onDeleteInvoiceDeclined}
+                        >
+                            No, Cancel
+                        </Button>
+                    </ModalFooter>
+                </Modal>
+
+                <Modal
+                    backdrop="static"
+                    id={`${bemBlockName}--send_invoice_confirm_modal`}
+                    isOpen={isConfirmSendInvoiceModalOpen}
+                    toggle={onSendInvoiceDeclined}
+                >
+                    <ModalHeader toggle={onSendInvoiceDeclined}>Send Invoice</ModalHeader>
+
+                    <ModalBody>
+                        This should only be done once the draft invoice is finalized.  Are you sure?
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button
+                            color="primary"
+                            disabled={isSaving}
+                            onClick={onSendInvoiceConfirmed}
+                        >
+                            {isSaving ? 'Sending...' : 'Yes, Send It'}
+                        </Button>
+                        {' '}
+                        <Button
+                            color="secondary"
+                            disabled={isSaving}
+                            onClick={onSendInvoiceDeclined}
+                        >
+                            No, Cancel
+                        </Button>
+                    </ModalFooter>
+                </Modal>
+
+                <ReceivePaymentModalDialog
+                    isOpen={isReceivePaymentModalOpen}
+                    onClose={onCloseReceivePaymentModal}
+                />
+
+                <Modal
+                    backdrop="static"
+                    id={`${bemBlockName}--view_payment_modal`}
+                    isOpen={isViewPaymentModalOpen}
+                    toggle={onCloseViewPaymentModal}
+                >
+                    <ModalHeader toggle={onCloseViewPaymentModal}>View Invoice Payment</ModalHeader>
+
+                    <ModalBody>
+                        Coming Coon...
+                    </ModalBody>
+                </Modal>
             </MainPageContent>
         </React.Fragment>
     );
