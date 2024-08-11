@@ -9,6 +9,7 @@ import * as Payments from '../../features/invoicing/payments/redux';
 import * as Customers from '../../features/sales/customers/redux';
 import * as Products from '../../features/sales/products/redux';
 import * as Employees from '../../features/time-tracking/employees/redux';
+import * as TimeTracking from '../../features/time-tracking/time-activities/redux';
 import * as Application from '../applicationRedux'
 import * as Authentication from '../authentication/redux';
 import * as ExportDownload from '../export';
@@ -34,6 +35,7 @@ export interface RootState {
     products: Products.state;
     profitAndLoss: ProfitAndLoss.state;
     systemNotifications: SystemNotifications.state;
+    timeTracking: TimeTracking.state;
 }
 
 /**
@@ -55,6 +57,7 @@ export const reducers = {
     products: Products.reducer,
     profitAndLoss: ProfitAndLoss.reducer,
     systemNotifications: SystemNotifications.reducer,
+    timeTracking: TimeTracking.reducer,
 };
 
 /**
