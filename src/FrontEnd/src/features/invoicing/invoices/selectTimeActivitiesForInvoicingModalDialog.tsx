@@ -233,7 +233,7 @@ function SelectTimeActivitiesForInvoicingModalDialog(props: PropTypes) {
 
             <ModalBody>
                 <Form>
-                    <Row form>
+                    <Row>
                         <Col md={3}>
                             <Label for={`${bemBlockName}--date_range_start_input`}>Date Range Start</Label>
 

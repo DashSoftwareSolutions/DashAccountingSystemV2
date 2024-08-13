@@ -307,7 +307,7 @@ function TimeActivityEntryModalDialog(props: PropTypes) {
 
             <ModalBody>
                 <Form>
-                    <Row form>
+                    <Row>
                         <Col sm={6}>
                             <FormGroup>
                                 <Label for={`${bemBlockName}--time_activity_date_input`}>Date</Label>
@@ -349,7 +349,7 @@ function TimeActivityEntryModalDialog(props: PropTypes) {
                         </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                         <Col sm={6}>
                             <FormGroup>
                                 <Label for={`${bemBlockName}--customer_select`}>Customer</Label>
@@ -391,7 +391,7 @@ function TimeActivityEntryModalDialog(props: PropTypes) {
                         </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                         <Col sm={6}>
                             <FormGroup>
                                 <Label for={`${bemBlockName}--activity_select`}>Activity</Label>
@@ -432,7 +432,7 @@ function TimeActivityEntryModalDialog(props: PropTypes) {
                         </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                         <Col sm={6}>
                             <FormGroup>
                                 <Label for={`${bemBlockName}--employee_select`}>Employee</Label>
@@ -476,7 +476,7 @@ function TimeActivityEntryModalDialog(props: PropTypes) {
                         </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                         <Col sm={3}>
                             <FormGroup
                                 check
@@ -508,7 +508,7 @@ function TimeActivityEntryModalDialog(props: PropTypes) {
                         </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                         <Col sm={12}>
                             <FormGroup>
                                 <Label for={`${bemBlockName}--description_textarea`}>Description</Label>

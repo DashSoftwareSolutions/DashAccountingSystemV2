@@ -284,7 +284,7 @@ function AddInvoicePage(props: AddInvoicePageProps) {
 
             <MainPageContent id={`${bemBlockName}--content`}>
                 <Form style={{ marginTop: 22 }}>
-                    <Row form>
+                    <Row>
                         <Col
                             md={4}
                             sm={6}

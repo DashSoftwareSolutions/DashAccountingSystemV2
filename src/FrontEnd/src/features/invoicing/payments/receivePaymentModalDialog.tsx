@@ -447,7 +447,7 @@ function ReceivePaymentModalDialog(props: PropTypes) {
 
             <ModalBody>
                 <Form>
-                    <Row form>
+                    <Row>
                         <Col sm={4}>
                             <Label for={`${bemBlockName}--customer_input`}>Customer</Label>
 
@@ -491,7 +491,7 @@ function ReceivePaymentModalDialog(props: PropTypes) {
                         </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                         <Col sm={4}>
                             <FormGroup>
                                 <Label for={`${bemBlockName}--payment_method_select`}>Payment Method</Label>
@@ -564,7 +564,7 @@ function ReceivePaymentModalDialog(props: PropTypes) {
                         </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                         <Col sm={6}>
                             <FormGroup>
                                 <Label for={`${bemBlockName}--deposit_account_select`}>Deposit Account</Label>
@@ -618,7 +618,7 @@ function ReceivePaymentModalDialog(props: PropTypes) {
                         </Col>
                     </Row>
 
-                    <Row form>
+                    <Row>
                         <Col sm={12}>
                             <FormGroup>
                                 <Label for={`${bemBlockName}--description_textarea`}>Description</Label>
