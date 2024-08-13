@@ -44,6 +44,7 @@ namespace DashAccountingSystemV2.BackEnd.ViewModels
 
         [DataType(DataType.Duration)]
         [RegularExpression(@"^([01]\d|2[0-3]):?([0-5]\d):?([0-5]\d)?$", ErrorMessage = "Break does not appear to be a valid duration")]
+        [JsonConverter(typeof(JsonNullableTimeSpanConverter))]
         public TimeSpan? Break { get; set; }
 
         [Required(AllowEmptyStrings = false)]
