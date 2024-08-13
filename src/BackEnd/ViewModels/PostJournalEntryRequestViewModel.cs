@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using DashAccountingSystemV2.BackEnd.ViewModels.Serialization;
 
@@ -11,6 +11,6 @@ namespace DashAccountingSystemV2.BackEnd.ViewModels
         [JsonConverter(typeof(JsonDateConverter))]
         public DateTime PostDate { get; set; }
 
-        public string Note { get; set; }
+        public string? Note { get; set; }
     }
 }

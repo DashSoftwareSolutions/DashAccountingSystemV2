@@ -191,7 +191,7 @@ ORDER BY c.""DisplayName""
                 timeActivityToUpdate.ProductId = timeActivity.ProductId;
                 timeActivityToUpdate.Description = timeActivity.Description;
                 timeActivityToUpdate.TimeZone = timeActivity.TimeZone;
-                timeActivityToUpdate.Date = timeActivity.Date;
+                timeActivityToUpdate.Date = timeActivity.Date.Unkind();
                 timeActivityToUpdate.StartTime = timeActivity.StartTime;
                 timeActivityToUpdate.EndTime = timeActivity.EndTime;
                 timeActivityToUpdate.Break = timeActivity.Break;

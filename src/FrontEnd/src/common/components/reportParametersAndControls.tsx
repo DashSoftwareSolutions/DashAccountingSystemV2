@@ -1,6 +1,7 @@
 import {
     FormEvent,
     MouseEvent,
+    useCallback,
     useState,
 } from 'react';
 import { noop } from 'lodash';
@@ -44,35 +45,39 @@ function ReportParametersAndControls({
     const [currentDateRangeStart, setCurrentDateRangeStart] = useState(dateRangeStart);
     const [currentDateRangeEnd, setCurrentDateRangeEnd] = useState(dateRangeEnd);
 
-    const onDateRangeEndInputChanged = (event: FormEvent<HTMLInputElement>) => {
+    const onDateRangeEndInputChanged = useCallback((event: FormEvent<HTMLInputElement>) => {
         setCurrentDateRangeEnd(event.currentTarget.value);
 
         if (selectedDateRangeMacro !== DateRangeMacroType.Custom) {
             setSelectedDateRangeMacro(DateRangeMacroType.Custom);
         }
-    };
+    }, [selectedDateRangeMacro]);
 
-    const onDateRangeStartInputChanged = (event: FormEvent<HTMLInputElement>) => {
+    const onDateRangeStartInputChanged = useCallback((event: FormEvent<HTMLInputElement>) => {
         setCurrentDateRangeStart(event.currentTarget.value);
 
         if (selectedDateRangeMacro !== DateRangeMacroType.Custom) {
             setSelectedDateRangeMacro(DateRangeMacroType.Custom);
         }
-    };
+    }, [selectedDateRangeMacro]);
 
     const onDownloadExcelButtonClicked = (event: MouseEvent<HTMLElement>) => {
         event.preventDefault();
         onDownloadExcelSafe();
     };
 
-    const onRunReportButtonClicked = (event: MouseEvent<HTMLElement>) => {
+    const onRunReportButtonClicked = useCallback((event: MouseEvent<HTMLElement>) => {
         event.preventDefault();
 
         onRunReport({
             dateRangeStart: currentDateRangeStart ?? '',
             dateRangeEnd: currentDateRangeEnd ?? '',
         });
-    };
+    }, [
+        currentDateRangeEnd,
+        currentDateRangeStart,
+        onRunReport,
+    ]);
 
     const onDateRangeMacroSelectionChanged = (selectedMacro: DateRangeMacroType, dateRange: DateRange) => {
         setSelectedDateRangeMacro(selectedMacro);

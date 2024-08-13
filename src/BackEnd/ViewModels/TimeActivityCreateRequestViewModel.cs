@@ -63,7 +63,7 @@ namespace DashAccountingSystemV2.BackEnd.ViewModels
                 ProductId = viewModel.ProductId,
                 IsBillable = viewModel.IsBillable,
                 HourlyBillingRate = viewModel.HourlyBillingRate,
-                Date = viewModel.Date.AsUtc(),
+                Date = viewModel.Date,
                 StartTime = viewModel.StartTime,
                 EndTime = viewModel.EndTime,
                 Break = viewModel.Break,

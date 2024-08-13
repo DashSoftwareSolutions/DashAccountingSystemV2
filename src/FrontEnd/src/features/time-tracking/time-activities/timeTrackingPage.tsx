@@ -22,6 +22,7 @@ import {
 } from 'reactstrap';
 import { TimeActivity } from './models';
 import { actionCreators as timeTrackingActionCreators } from './redux';
+import TimeActivityEntryModalDialog from './timeActivityEntryModalDialog';
 import { RootState } from '../../../app/globalReduxStore';
 import { actionCreators as lookupValueActionCreators } from '../../../app/lookupValues';
 import {
@@ -31,6 +32,7 @@ import {
 import AmountDisplay from '../../../common/components/amountDisplay';
 import LinkButton from '../../../common/components/linkButton';
 import Loader from '../../../common/components/loader';
+import MainPageContent from '../../../common/components/mainPageContent';
 import ReportParametersAndControls from '../../../common/components/reportParametersAndControls';
 import {
     ILogger,
@@ -84,10 +86,8 @@ type TimeTrackingPageProps = TimeTrackingPageReduxProps;
 
 function TimeTrackingPage(props: TimeTrackingPageProps) {
     const {
-        customers,
         dateRangeEnd,
         dateRangeStart,
-        employees,
         initializeNewTimeActivity,
         isDeleting,
         isFetchingCustomers,
@@ -270,7 +270,7 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
                 </Row>
             </div>
 
-            <div id={`${bemBlockName}--content`}>
+            <MainPageContent id={`${bemBlockName}--content`}>
                 <ReportParametersAndControls
                     bemBlockName={bemBlockName}
                     dateRangeEnd={dateRangeEnd ?? null}
@@ -383,10 +383,10 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
                                             <td colSpan={2}>
                                                 {`Total for ${customerGroup.customerDisplayName}`}
                                             </td>
-                                            <td className="text-right">
+                                            <td className="text-end">
                                                 {displayHhMm(totalDuration)}
                                             </td>
-                                            <td className="text-right">
+                                            <td className="text-end">
                                                 <AmountDisplay
                                                     amount={{
                                                         amount: totalBillableAmount,
@@ -403,7 +403,14 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
                         </tbody>
                     </table>
                 )}
-            </div>
+
+                <TimeActivityEntryModalDialog
+                    isOpen={isTimeActivityEntryModalOpen}
+                    mode={timeActivityEntryModalMode}
+                    onCancel={onCancelTimeEntryModal}
+                    onClose={onCloseTimeActivityEntryModal}
+                />
+            </MainPageContent>
         </React.Fragment>
     );
 }

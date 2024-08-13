@@ -14,7 +14,8 @@ import { Address } from '../models';
  * @returns {String} - formatted duration
  */
 export function displayHhMm(input: Duration): string {
-    return `${pad(Math.floor(input.as('hours')), 2)}:${pad(input.minutes, 2)}`;
+    const normalizedInput = input.rescale();
+    return `${pad(Math.floor(normalizedInput.as('hours')), 2)}:${pad(normalizedInput.minutes, 2)}`;
 }
 
 /**

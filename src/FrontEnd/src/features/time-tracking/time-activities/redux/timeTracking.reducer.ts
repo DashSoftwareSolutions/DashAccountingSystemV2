@@ -126,7 +126,7 @@ const poorMansHumanize = (duration: Duration | null): string => {
         return '';
     }
 
-    const { hours, minutes } = duration.toObject();
+    let { hours = 0, minutes = 0 } = duration.rescale().toObject();
     const hourString = hours === 0 ? '' : `${hours} ${hours === 1 ? 'hour' : 'hours'}`; // TODO: i18n on 'hour(s)'
     const minutesString = minutes === 0 ? '' : `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`; // TODO: i18n on 'minute(s)'
     return trim(`${hourString} ${minutesString}`);
@@ -179,7 +179,7 @@ const updateTimeActivityDurationState = (state: TimeActivityStoreState, updatedD
             updatedValidationState.workTimeDuration = updatedValidationState.endTime.diff(updatedValidationState.startTime);
 
             if (!isEmpty(updatedDirtyTimeActivity.break)) {
-                updatedValidationState.breakTimeDuration = Duration.fromISOTime(`${updatedDirtyTimeActivity.break}:00`);
+                updatedValidationState.breakTimeDuration = Duration.fromISOTime(`0${updatedDirtyTimeActivity.break!.replace(/_/g, '0')}:00`);
 
                 if (updatedValidationState.breakTimeDuration.valueOf() >= updatedValidationState.workTimeDuration.valueOf()) {
                     updatedValidationState.message = 'The break time must be less than the total time worked. Please correct.';
@@ -304,6 +304,13 @@ const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStoreState 
                 return {
                     ...state,
                     filterByCustomerNumber: action.customerNumber,
+                };
+
+            case ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE:
+                return {
+                    ...state,
+                    dateRangeEnd: action.dateRange.dateRangeEnd,
+                    dateRangeStart: action.dateRange.dateRangeStart,
                 };
 
             case ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE_END:
