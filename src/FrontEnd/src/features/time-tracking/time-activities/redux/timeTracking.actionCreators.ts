@@ -11,6 +11,7 @@ import {
     ILogger,
     Logger,
 } from '../../../../common/logging';
+import { DateRange } from '../../../../common/models';
 import { apiErrorHandler } from '../../../../common/utilities/errorHandling';
 import {
     TimeActivity,
@@ -255,6 +256,13 @@ const actionCreators = {
     /* END: Initialize New/Select Existing Time Activity to View/Manage */
 
     /* BEGIN: UI Gesture Actions for Time Activity Details Report/Listing Page */
+    updateDateRange: (dateRange: DateRange): AppThunkAction<KnownAction> => (dispatch) => {
+        dispatch({
+            type: ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE,
+            dateRange,
+        });
+    },
+
     updateDateRangeStart: (dateRangeStart: string): AppThunkAction<KnownAction> => (dispatch) => {
         dispatch({
             type: ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE_START,

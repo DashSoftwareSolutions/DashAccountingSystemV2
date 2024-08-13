@@ -1,5 +1,6 @@
 import IAction from '../../../../app/globalReduxStore/action.interface';
 import ActionType from '../../../../app/globalReduxStore/actionType';
+import { DateRange } from '../../../../common/models';
 import { EmployeeLite } from '../../employees/models';
 import {
     TimeActivity,
@@ -52,6 +53,11 @@ interface DeleteTimeActivityErrorAction extends IAction {
 /* END: REST API Actions */
 
 /* BEGIN: UI Gesture Actions */
+interface UpdateTimeActivityReportDateRangeAction extends IAction {
+    type: ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE;
+    dateRange: DateRange;
+}
+
 interface UpdateTimeActivityReportDateRangeStartAction extends IAction {
     type: ActionType.UPDATE_TIME_ACTIVITY_DETAILS_REPORT_DATE_RANGE_START;
     dateRangeStart: string;
@@ -164,6 +170,7 @@ export type KnownAction = RequestTimeActivityDetailsReportDataAction |
     DeleteTimeActivityRequestAction |
     DeleteTimeActivityReponseAction |
     DeleteTimeActivityErrorAction |
+    UpdateTimeActivityReportDateRangeAction |
     UpdateTimeActivityReportDateRangeStartAction |
     UpdateTimeActivityReportDateRangeEndAction |
     UpdateTimeActivityReportCustomerFilterAction |

@@ -38,14 +38,14 @@ function InvoiceLineItemsTable({ lineItems }: PropTypes) {
                                 style={{ wordWrap: 'break-word' }}
                             />
                         </td>
-                        <td className="text-right">{li.quantity}</td>
-                        <td className="text-right">
+                        <td className="text-end">{li.quantity}</td>
+                        <td className="text-end">
                             <AmountDisplay
                                 amount={li.unitPrice ?? DEFAULT_AMOUNT}
                                 showCurrency
                             />
                         </td>
-                        <td className="text-right">
+                        <td className="text-end">
                             <AmountDisplay
                                 amount={li.total ?? DEFAULT_AMOUNT}
                                 showCurrency

@@ -3,7 +3,19 @@ import {
     isNil,
     isString,
 } from 'lodash';
+import { Duration } from 'luxon';
 import { Address } from '../models';
+
+/**
+ * Formats Durations strings as hh:mm
+ * 
+ * @param input - Should be a Luxon Duration object
+ * 
+ * @returns {String} - formatted duration
+ */
+export function displayHhMm(input: Duration): string {
+    return `${pad(Math.floor(input.as('hours')), 2)}:${pad(input.minutes, 2)}`;
+}
 
 /**
  * Formats a mailing address.
@@ -78,4 +90,34 @@ export function formatWithTwoDecimalPlaces(input: string): string {
  */
 export function isStringNullOrWhiteSpace(input: any) {
     return !isString(input) || isEmpty(input) || /^\s+$/.test(input);
+}
+
+/**
+ * Pads a number with leading zeroes until it has reached the specified size.
+ * 
+ * @param {Number} num - The number to pad
+ * @param {Number} size - The desired size, including as many leading zeroes as necessary
+ * 
+ * @example
+ * // returns 05
+ * pad(5, 2);
+ * 
+ * @example
+ * // returns 007
+ * pad(7, 3);
+ * 
+ * @example
+ * // returns 0042
+ * pad(42, 4);
+ * 
+ * @returns {String}
+ */
+export function pad(num: number, size: number): string {
+    let result = num.toString();
+
+    while (result.length < size) {
+        result = `0${result}`;
+    }
+
+    return result;
 }

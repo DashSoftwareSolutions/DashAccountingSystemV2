@@ -36,6 +36,7 @@ import {
     Logger,
 } from '../../../common/logging';
 import { AmountType } from '../../../common/models';
+import { displayHhMm } from '../../../common/utilities/stringUtils';
 import useNamedState from '../../../common/utilities/useNamedState';
 import { TimeActivity } from '../../time-tracking/time-activities/models';
 
@@ -338,10 +339,10 @@ function SelectTimeActivitiesForInvoicingModalDialog(props: PropTypes) {
                                                         style={{ wordWrap: 'break-word' }}
                                                     />
                                                 </td>
-                                                <td className="text-right">
-                                                    {Duration.fromISOTime(ta.totalTime ?? '').toFormat('hh:mm:ss')}
+                                                <td className="text-end">
+                                                    {displayHhMm(Duration.fromISOTime(ta.totalTime ?? ''))}
                                                 </td>
-                                                <td className="text-right">
+                                                <td className="text-end">
                                                     <AmountDisplay
                                                         amount={{
                                                             amount: ta.totalBillableAmount ?? 0,
