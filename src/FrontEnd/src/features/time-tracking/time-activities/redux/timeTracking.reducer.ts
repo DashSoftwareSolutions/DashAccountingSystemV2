@@ -252,13 +252,13 @@ const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStoreState 
             case ActionType.REQUEST_TIME_ACTIVITY_DETAILS_REPORT:
                 return {
                     ...state,
-                    isLoading: true,
+                    isFetching: true,
                 };
 
             case ActionType.RECEIVE_TIME_ACTIVITY_DETAILS_REPORT:
                 return {
                     ...state,
-                    isLoading: false,
+                    isFetching: false,
                     detailsReportData: action.data,
                 };
 
@@ -327,7 +327,7 @@ const reducer: Reducer<TimeActivityStoreState> = (state: TimeActivityStoreState 
             case ActionType.RESET_TIME_ACTIVITY_DETAILS_REPORT_DATA:
                 return {
                     ...state,
-                    isLoading: false,
+                    isFetching: false,
                     detailsReportData: null,
                 };
             /* END: UI Gesture Actions for Time Activity Details Report/Listing Page */
