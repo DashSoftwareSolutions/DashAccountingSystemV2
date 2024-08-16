@@ -110,6 +110,7 @@ function TimeActivityEntryModalDialog(props: PropTypes) {
     };
 
     const onClickCancel = (event: React.MouseEvent<any>) => {
+        resetDirtyTimeActivity();
         onCancel(event);
     };
 

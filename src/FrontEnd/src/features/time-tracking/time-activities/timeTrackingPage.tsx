@@ -115,8 +115,9 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
 
     const [isTimeActivityEntryModalOpen, setIsTimeActivityEntryModalOpen] = useNamedState<boolean>('isTimeActivityEntryModalOpen', false);
     const [timeActivityEntryModalMode, setTimeActivityEntryModalMode] = useNamedState<Mode | null>('timeActivityEntryModalMode', null);
-
     const navigate = useNavigate();
+
+    logger.info(`Is Saving: ${isSaving}.  Was Saving: ${wasSaving}.  Mode: ${timeActivityEntryModalMode}`);
 
     useEffect(() => {
         if (isNil(selectedTenant)) {
@@ -142,21 +143,23 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
     // handle save action completed
     useEffect(() => {
         if (wasSaving && !isSaving) {
-            logger.info('Finished saving!');
-
             if (timeActivityEntryModalMode === Mode.Add &&
                 !isNil(savedTimeActivity)) {
+                logger.info('Finished creating the time activity.');
                 showAlert(NotificationLevel.Success, 'Successfully created the Time Activity', true);
                 resetDirtyTimeActivity();
                 resetTimeActivityDetailsReportData();
                 requestTimeActivityDetailsReportData();
+                setTimeActivityEntryModalMode(null);
             } else if (timeActivityEntryModalMode === Mode.Edit) {
                 // TODO/FIXME: How to detect if save was unsuccessful?!
                 // For now, assume it succeeded
+                logger.info('Finished updating the time activity.');
                 showAlert(NotificationLevel.Success, 'Successfully updated the Time Activity', true);
                 resetDirtyTimeActivity();
                 resetTimeActivityDetailsReportData();
                 requestTimeActivityDetailsReportData();
+                setTimeActivityEntryModalMode(null);
             }
         }
     }, [
@@ -165,6 +168,7 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
         resetDirtyTimeActivity,
         resetTimeActivityDetailsReportData,
         savedTimeActivity,
+        setTimeActivityEntryModalMode,
         showAlert,
         timeActivityEntryModalMode,
         wasSaving,
