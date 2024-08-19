@@ -423,14 +423,14 @@ function JournalEntryAccountsEditor(props: PropTypes) {
 
                         <td className="col-md-2" />
 
-                        <td className="col-md-2 font-weight-bold text-right">
+                        <td className="col-md-2 font-weight-bold text-end">
                             <AmountDisplay
                                 amount={totalDebitsAmount}
                                 showCurrency
                             />
                         </td>
 
-                        <td className="col-md-2 font-weight-bold text-right">
+                        <td className="col-md-2 font-weight-bold text-end">
                             <AmountDisplay
                                 amount={totalCreditsAmount}
                                 showCurrency
