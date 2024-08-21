@@ -95,7 +95,10 @@ const reducer: Reducer<ApplicationState> = (state: ApplicationState | undefined,
 
     // All stores should get reset to default state on logout
     if (incomingAction.type === ActionType.RECEIVE_LOGOUT_RESPONSE) {
-        return unloadedState;
+        return {
+            ...unloadedState,
+            applicationVersion: state.applicationVersion,
+        };
     }
 
     return state;
