@@ -128,9 +128,11 @@ th.sticky-border:after {
 }
 
 .report-total-row td {
+    border-bottom-color: #212529;
+    border-bottom-style: double;
+    border-bottom-width: 3px;
     border-top-color: #212529;
     border-top-width: 2px;
-    border-bottom-style: double;
     font-weight: bold;
 }
 
