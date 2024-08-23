@@ -77,7 +77,9 @@ function AddInvoicePage(props: AddInvoicePageProps) {
         invoiceTermsOptions,
         isFetchingCustomerDetails,
         isSaving,
+        requestCustomers,
         requestCustomerDetails,
+        requestInvoiceTerms,
         resetDirtyInvoice,
         resetInvoiceList,
         savedInvoice,
@@ -110,6 +112,15 @@ function AddInvoicePage(props: AddInvoicePageProps) {
         selectedTenant,
     ]);
 
+    // component did mount - fetch the data
+    useEffect(() => {
+        requestCustomers();
+        requestInvoiceTerms();
+        // Suppressing "react-hooks/exhaustive-deps" to use an empty dependencies array for "component did mount" type semantics
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // component did update - handle receipt of customer data
     useEffect(() => {
         if (wasFetchingCustomerDetails &&
             !isFetchingCustomerDetails &&
@@ -126,6 +137,7 @@ function AddInvoicePage(props: AddInvoicePageProps) {
         wasFetchingCustomerDetails,
     ]);
 
+    // component did update -- handle finish saving
     useEffect(() => {
         if (wasSaving &&
             !isSaving &&
