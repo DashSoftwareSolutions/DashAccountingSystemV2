@@ -2,7 +2,6 @@ import {
     FormEvent,
     MouseEvent,
     useCallback,
-    useState,
 } from 'react';
 import { noop } from 'lodash';
 import {
@@ -17,6 +16,7 @@ import {
     DateRange,
     DateRangeMacroType,
 } from '../models';
+import useNamedState from '../utilities/useNamedState';
 
 function ReportParametersAndControls({
     bemBlockName,
@@ -41,9 +41,9 @@ function ReportParametersAndControls({
     const showDownloadExcelButtonSafe = showDownloadExcelButton ?? false;
     const isRequestingExcelDownloadSafe = isRequestingExcelDownload ?? false;
 
-    const [selectedDateRangeMacro, setSelectedDateRangeMacro] = useState(defaultDateRangeMacro ?? DateRangeMacroType.Custom);
-    const [currentDateRangeStart, setCurrentDateRangeStart] = useState(dateRangeStart);
-    const [currentDateRangeEnd, setCurrentDateRangeEnd] = useState(dateRangeEnd);
+    const [selectedDateRangeMacro, setSelectedDateRangeMacro] = useNamedState('selectedDateRangeMacro', defaultDateRangeMacro ?? DateRangeMacroType.Custom);
+    const [currentDateRangeStart, setCurrentDateRangeStart] = useNamedState('currentDateRangeStart', dateRangeStart);
+    const [currentDateRangeEnd, setCurrentDateRangeEnd] = useNamedState('currentDateRangeEnd', dateRangeEnd);
 
     const onDateRangeEndInputChanged = useCallback((event: FormEvent<HTMLInputElement>) => {
         setCurrentDateRangeEnd(event.currentTarget.value);

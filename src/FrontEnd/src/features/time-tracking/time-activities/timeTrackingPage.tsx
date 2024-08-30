@@ -41,6 +41,7 @@ import {
 import {
     AmountType,
     DateRange,
+    DateRangeMacroType,
     Mode,
 } from '../../../common/models';
 import { displayHhMm } from '../../../common/utilities/stringUtils';
@@ -279,6 +280,7 @@ function TimeTrackingPage(props: TimeTrackingPageProps) {
                     bemBlockName={bemBlockName}
                     dateRangeEnd={dateRangeEnd ?? null}
                     dateRangeStart={dateRangeStart ?? null}
+                    defaultDateRangeMacro={DateRangeMacroType.Today}
                     onRunReport={onRunReport}
                 />             
 

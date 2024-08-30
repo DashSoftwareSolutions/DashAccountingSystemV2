@@ -8,10 +8,6 @@ import {
     dateRangeMacroOptions,
 } from '../utilities/dateRangeMacros';
 
-const getSelectedMacro = (value: string): DateRangeMacroType => {
-    return parseInt(value, 10) as DateRangeMacroType;
-};
-
 function DateRangeMacroSelector({
     id,
     onChange,
@@ -24,7 +20,7 @@ function DateRangeMacroSelector({
     const onSelectionChanged = (event: ChangeEvent<HTMLSelectElement>) => {
         const selectElement = event.target;
         const selectedOption = selectElement.selectedOptions[0];
-        const selectedMacro = getSelectedMacro(selectedOption.value);
+        const selectedMacro = selectedOption.value as DateRangeMacroType;
         const dateRange = computeDateRangeFromMacro(selectedMacro);
         onChange(selectedMacro, dateRange);
     };

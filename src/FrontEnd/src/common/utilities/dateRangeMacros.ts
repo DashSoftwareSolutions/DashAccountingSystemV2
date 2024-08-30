@@ -5,7 +5,7 @@ import {
     DateRangeMacroType,
 } from '../models';
 
-export const dateRangeMacroOptions = new Map<number, string>([
+export const dateRangeMacroOptions = new Map<DateRangeMacroType, string>([
     [DateRangeMacroType.All, 'All'],
     [DateRangeMacroType.Custom, 'Custom'],
     [DateRangeMacroType.Today, 'Today'],
