@@ -37,7 +37,7 @@ try
     var connectionStringBuilder = new NpgsqlConnectionStringBuilder(
         builder.Configuration.GetConnectionString("DefaultConnection"))
     {
-        Password = builder.Configuration["NewDbPassword"]
+        Password = builder.Configuration["DashAccountingDbPassword"]
     };
 
     var connectionString = connectionStringBuilder.ConnectionString;
