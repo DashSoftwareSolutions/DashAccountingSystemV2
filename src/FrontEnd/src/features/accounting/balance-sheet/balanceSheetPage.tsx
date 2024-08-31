@@ -24,6 +24,7 @@ import {
 import {
     AmountType,
     DateRange,
+    DateRangeMacroType,
 } from '../../../common/models';
 import useNamedState from '../../../common/utilities/useNamedState';
 import usePrevious from '../../../common/utilities/usePrevious';
@@ -173,6 +174,7 @@ function BalanceSheetPage(props: BalanceSheetPageProps) {
                     bemBlockName={bemBlockName}
                     dateRangeEnd={dateRangeEnd ?? null}
                     dateRangeStart={dateRangeStart ?? null}
+                    defaultDateRangeMacro={DateRangeMacroType.ThisYearToDate}
                     isRequestingExcelDownload={isDownloadingAuthoritative}
                     onDownloadExcel={onDownloadExcel}
                     onRunReport={onRunReport}
