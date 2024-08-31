@@ -1,6 +1,0 @@
-@DashAccountingSystemV2.BackEnd_HostAddress = http://localhost:5208
-
-GET {{DashAccountingSystemV2.BackEnd_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
