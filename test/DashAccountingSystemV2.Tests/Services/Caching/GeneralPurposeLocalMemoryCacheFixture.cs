@@ -1,11 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using Xunit;
-using DashAccountingSystemV2.Models;
-using DashAccountingSystemV2.Services.Caching;
+using DashAccountingSystemV2.BackEnd.Models;
+using DashAccountingSystemV2.BackEnd.Services.Caching;
 
 namespace DashAccountingSystemV2.Tests.Services.Caching
 {

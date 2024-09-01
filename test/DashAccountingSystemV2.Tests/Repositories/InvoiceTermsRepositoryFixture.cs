@@ -1,13 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Dapper;
 using Npgsql;
-using Xunit;
-using DashAccountingSystemV2.Extensions;
-using DashAccountingSystemV2.Models;
-using DashAccountingSystemV2.Repositories;
+using DashAccountingSystemV2.BackEnd.Extensions;
+using DashAccountingSystemV2.BackEnd.Models;
+using DashAccountingSystemV2.BackEnd.Repositories;
 
 namespace DashAccountingSystemV2.Tests.Repositories
 {
@@ -109,8 +105,8 @@ namespace DashAccountingSystemV2.Tests.Repositories
             {
                 // Make a Tenant
                 _tenantId = await connection.QueryFirstOrDefaultAsync<Guid>($@"
-                    INSERT INTO ""Tenant"" ( ""Name"" )
-                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.' )
+                    INSERT INTO ""Tenant"" ( ""Name"", ""DefaultAssetTypeId"" )
+                    VALUES ( 'Unit Testing {Guid.NewGuid()}, Inc.', 1 )
                     RETURNING ""Id"";");
 
                 // Get a User to use

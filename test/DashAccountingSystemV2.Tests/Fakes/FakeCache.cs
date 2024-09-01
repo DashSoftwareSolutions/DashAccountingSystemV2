@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
-using DashAccountingSystemV2.Services.Caching;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using DashAccountingSystemV2.BackEnd.Services.Caching;
 
 namespace DashAccountingSystemV2.Tests.Fakes
 {
@@ -22,24 +18,24 @@ namespace DashAccountingSystemV2.Tests.Fakes
             return null;
         }
 
-        public Task<byte[]> GetAsync(string key, CancellationToken token = default)
+        public Task<byte[]?> GetAsync(string key, CancellationToken token = default)
         {
             if (_internalCacheStore.ContainsKey(key))
             {
-                return Task.FromResult((byte[])_internalCacheStore[key].Item1);
+                return Task.FromResult((byte[]?)_internalCacheStore[key].Item1);
             }
 
-            return Task.FromResult<byte[]>(null);
+            return Task.FromResult<byte[]?>(null);
         }
 
-        public Task<TCachedData> GetObjectAsync<TCachedData>(string key)
+        public Task<TCachedData?> GetObjectAsync<TCachedData>(string key)
         {
             if (_internalCacheStore.ContainsKey(key))
             {
-                return Task.FromResult((TCachedData)_internalCacheStore[key].Item1);
+                return Task.FromResult((TCachedData?)_internalCacheStore[key].Item1);
             }
 
-            return Task.FromResult(default(TCachedData));
+            return Task.FromResult(default(TCachedData?));
         }
 
         public void Refresh(string key)

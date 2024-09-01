@@ -1,10 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Xunit;
-using DashAccountingSystemV2.Security.ExportDownloads;
-using DashAccountingSystemV2.Services.Export;
-using DashAccountingSystemV2.Services.Time;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
+using DashAccountingSystemV2.BackEnd.Security.ExportDownloads;
+using DashAccountingSystemV2.BackEnd.Services.Export;
 using DashAccountingSystemV2.Tests.Fakes;
 
 namespace DashAccountingSystemV2.Tests.Security.ExportDownloads
@@ -26,7 +23,7 @@ namespace DashAccountingSystemV2.Tests.Security.ExportDownloads
             AssertDownloadAuthenticationTicket(tenantId, userId, exportType, exportDownloadAuthenticationTicket);
         }
 
-        private void AssertDownloadAuthenticationTicket(
+        private static void AssertDownloadAuthenticationTicket(
             Guid expectedTenantId,
             Guid expectedUserId,
             ExportType expectedExportType,
@@ -38,10 +35,10 @@ namespace DashAccountingSystemV2.Tests.Security.ExportDownloads
             Assert.Equal(expectedExportType, actualTicket.ExportType);
         }
 
-        private ExportDownloadSecurityTokenService GetSecurityTokenService()
+        private static ExportDownloadSecurityTokenService GetSecurityTokenService()
         {
             var fakeCache = new FakeCache();
-            var timeProvider = new TimeProvider();
+            var timeProvider = new FakeTimeProvider();
             var loggerFactory = TestUtilities.GetLoggerFactory();
             
             return new ExportDownloadSecurityTokenService(
