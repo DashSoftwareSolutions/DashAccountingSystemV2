@@ -113,17 +113,20 @@ function Layout(props: LayoutProps) {
             const intervalId = setInterval(() => {
                 const now = DateTime.now();
                 const tokenExpirationDate = DateTime.fromISO(tokenExpires);
+                let shouldRefreshToken = false;
 
                 if (tokenExpirationDate > now) {
                     const remainingTime = tokenExpirationDate.diff(now);
                     logger.info(`Token expiration will happen in ${remainingTime.rescale().toHuman({ unitDisplay: 'short' })}`);
-
-                    if (remainingTime <= tokenExpirationPollingFrequency) {
-                        logger.info('Attempting token refresh ...');
-                        refreshTokens();
-                    }
+                    shouldRefreshToken = remainingTime <= tokenExpirationPollingFrequency;
                 } else {
-                    logger.warn('Token is already expired!  It expired at:', tokenExpires);
+                    logger.info('Token expired at:', tokenExpires);
+                    shouldRefreshToken = true;
+                }
+
+                if (shouldRefreshToken) {
+                    logger.info('Attempting token refresh ...');
+                    refreshTokens();
                 }
             }, TOKEN_LIFETIME_MONITOR_INTERVAL_MS);
 
