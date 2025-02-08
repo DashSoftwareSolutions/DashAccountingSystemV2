@@ -45,6 +45,13 @@ const reducer: Reducer<BalanceSheetState> = (state: BalanceSheetState | undefine
                     reportData: action.report,
                 };
 
+            case ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE:
+                return {
+                    ...state,
+                    dateRangeEnd: action.dateRange.dateRangeEnd,
+                    dateRangeStart: action.dateRange.dateRangeStart,
+                };
+
             case ActionType.UPDATE_BALANCE_SHEET_REPORT_DATE_RANGE_START:
                 return {
                     ...state,
