@@ -302,7 +302,7 @@ function ProfitAndLossPage(props: ProfitAndLossPageProps) {
                             </tr>
 
                             <tr className="report-section-header">
-                                <td>OTHER EXPENSES</td>
+                                <td colSpan={2}>OTHER EXPENSES</td>
                             </tr>
 
                             {profitAndLossReport.otherExpenses.map((otherExpenseAccount) => ((
