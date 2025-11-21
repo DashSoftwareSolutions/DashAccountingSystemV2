@@ -1,5 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.0.0" />
+
   <PropertyGroup Label="Package">
     <PackageId>DashAccountingSystemV2.Aspire.AppHost</PackageId>
     <Version>2.1.0</Version>
@@ -7,7 +9,7 @@
     <Company>Dash Software Solutions, Inc.</Company>
     <Copyright>Copyright (C) 2022 - 2024 Dash Software Solutions, Inc.  All rights reserved.</Copyright>
   </PropertyGroup>
-  
+
   <PropertyGroup Label="Build">
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -18,8 +20,8 @@
   </PropertyGroup>
 
   <ItemGroup Label="Package References">
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.1.0" />
-    <PackageReference Include="Aspire.Hosting.NodeJs" Version="8.1.0" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.0" />
+    <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
   </ItemGroup>
 
   <ItemGroup Label="Project References">
