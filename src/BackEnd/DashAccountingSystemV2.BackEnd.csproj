@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Build">
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>2b3006e2-bf37-4b89-badd-06c844ef21cf</UserSecretsId>
@@ -29,27 +29,34 @@
   </ItemGroup>
 
   <ItemGroup Label="Package References">
-    <PackageReference Include="ClosedXML.Report" Version="0.2.10" />
+    <PackageReference Include="ClosedXML.Report" Version="0.2.12" />
     <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.3" />
     <PackageReference Include="NodaTime" Version="3.1.11" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     <PackageReference Include="RazorLight" Version="2.3.1" />
     <PackageReference Include="Select.HtmlToPdf.NetCore" Version="24.1.0" />
     <PackageReference Include="Serilog" Version="4.0.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Pinned transitive dependencies to resolve security advisories">
+    <!-- Select.HtmlToPdf.NetCore drags in System.Drawing.Common 4.5.1 (CVE-2021-24112, CRITICAL).
+         5.0.3 is the patched, minimal-drift version (avoids the Windows-only platform attribute added in 6.0+). -->
+    <PackageReference Include="System.Drawing.Common" Version="5.0.3" />
+    <!-- ClosedXML.Report -> ClosedXML -> DocumentFormat.OpenXml drags in System.IO.Packaging 6.0.0 (HIGH). -->
+    <PackageReference Include="System.IO.Packaging" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup Label="Folder Includes">

@@ -75,7 +75,7 @@ function NavMenu({
                     to="/">
                     Dash Accounting System v2.1
                     {'\u00a0'}
-                    <span className="badge dotnet-8-badge">.NET 8</span>
+                    <span className="badge dotnet-badge">.NET 10</span>
                 </Link>
 
 
