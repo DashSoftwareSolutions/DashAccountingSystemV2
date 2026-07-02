@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Dash Accounting System V2 is a multi-tenant simple ledger + time-tracking system for small businesses. It is an ASP.NET Core 8 Web API back end paired with a React 18 / Redux SPA front end, orchestrated locally with .NET Aspire and backed by PostgreSQL.
+Dash Accounting System V2 is a multi-tenant simple ledger + time-tracking system for small businesses. It is an ASP.NET Core 10 Web API back end paired with a React 18 / Redux SPA front end, orchestrated locally with .NET Aspire and backed by PostgreSQL.
 
 ## Solution Layout
 
 The Visual Studio solution is `src/DashAccountingSystemV2.sln` and contains five projects:
 
-- **`src/BackEnd`** (`DashAccountingSystemV2.BackEnd.csproj`) — ASP.NET Core Web API (`net8.0`). The core of the system.
+- **`src/BackEnd`** (`DashAccountingSystemV2.BackEnd.csproj`) — ASP.NET Core Web API (`net10.0`). The core of the system.
 - **`src/FrontEnd`** (`.esproj`) — React 18 + TypeScript SPA created with Create React App (`react-scripts`). Not built by `dotnet build`; managed via npm.
 - **`src/Infrastructure/DashAccountingSystemV2.Aspire.AppHost`** — .NET Aspire orchestrator that launches the back end and the npm front end together.
 - **`src/Infrastructure/DashAccountingSystemV2.Aspire.ServiceDefaults`** — shared Aspire service defaults (telemetry, health checks, service discovery).
