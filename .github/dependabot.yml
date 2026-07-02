@@ -1,0 +1,18 @@
+version: 2
+
+updates:
+  # Front-end (Create React App) npm dependencies.
+  - package-ecosystem: "npm"
+    directory: "/src/FrontEnd"
+    schedule:
+      interval: "weekly"
+    # We only want Dependabot SECURITY updates here, not proactive version bumps.
+    # open-pull-requests-limit: 0 disables version-update PRs for this ecosystem;
+    # security updates still run and honor the group below.
+    open-pull-requests-limit: 0
+    groups:
+      # Batch all npm security fixes into a single PR to reduce PR volume.
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
