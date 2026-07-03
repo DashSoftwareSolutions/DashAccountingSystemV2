@@ -82,6 +82,7 @@ type ReceivePaymentModalDialogReduxProps = ConnectedProps<typeof connector>;
 
 type PropTypes = ReceivePaymentModalDialogOwnProps & ReceivePaymentModalDialogReduxProps;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger: ILogger = new Logger('Receive Payment Modal Dialog');
 
 const bemBlockName: string = 'receive_payment_modal';

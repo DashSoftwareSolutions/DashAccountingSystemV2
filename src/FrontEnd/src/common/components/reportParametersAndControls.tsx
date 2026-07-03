@@ -51,7 +51,11 @@ function ReportParametersAndControls({
         if (selectedDateRangeMacro !== DateRangeMacroType.Custom) {
             setSelectedDateRangeMacro(DateRangeMacroType.Custom);
         }
-    }, [selectedDateRangeMacro]);
+    }, [
+        selectedDateRangeMacro,
+        setCurrentDateRangeEnd,
+        setSelectedDateRangeMacro,
+    ]);
 
     const onDateRangeStartInputChanged = useCallback((event: FormEvent<HTMLInputElement>) => {
         setCurrentDateRangeStart(event.currentTarget.value);
@@ -59,7 +63,11 @@ function ReportParametersAndControls({
         if (selectedDateRangeMacro !== DateRangeMacroType.Custom) {
             setSelectedDateRangeMacro(DateRangeMacroType.Custom);
         }
-    }, [selectedDateRangeMacro]);
+    }, [
+        selectedDateRangeMacro,
+        setCurrentDateRangeStart,
+        setSelectedDateRangeMacro,
+    ]);
 
     const onDownloadExcelButtonClicked = (event: MouseEvent<HTMLElement>) => {
         event.preventDefault();

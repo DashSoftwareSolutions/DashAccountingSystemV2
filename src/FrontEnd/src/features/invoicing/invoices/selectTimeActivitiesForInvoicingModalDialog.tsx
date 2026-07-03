@@ -40,6 +40,7 @@ import { displayHhMm } from '../../../common/utilities/stringUtils';
 import useNamedState from '../../../common/utilities/useNamedState';
 import { TimeActivity } from '../../time-tracking/time-activities/models';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logger: ILogger = new Logger('Select Time Activities For Invoicing Modal');
 const bemBlockName: string = 'select_time_activities_for_invoicing_modal';
 
