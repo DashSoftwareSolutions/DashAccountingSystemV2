@@ -195,8 +195,7 @@ const actionCreators = {
             !appState.invoice.details.isFetchingUnbilledTimeActivities &&
             !isNil(appState.invoice.details.dirtyInvoice?.customerId) &&
             !isNil(appState.invoice.details.unbilledTimeActivitiesFilterStartDate) &&
-            !isNil(appState.invoice.details.unbilledTimeActivitiesFilterEndDate) &&
-            isEmpty(appState.invoice?.details.unbilledTimeActivities)) {
+            !isNil(appState.invoice.details.unbilledTimeActivitiesFilterEndDate)) {
             const customer = appState.customers?.list?.customers?.find((c) => c.id === appState.invoice?.details.dirtyInvoice?.customerId);
 
             if (!isNil(customer)) {

@@ -125,6 +125,10 @@ function SelectTimeActivitiesForInvoicingModalDialog(props: PropTypes) {
     const onClickCheckForUnbilledTimeActivities = (event: React.MouseEvent<any>) => {
         requestUnbilledTimeActivities();
         setHasCheckedForTimeActivities(true);
+
+        // Clear any selections from a previous check; the result set is being replaced
+        setIsSelectAllChecked(false);
+        setSelectedTimeActivityIds([]);
     };
 
     const onEndDateChanged = (event: React.FormEvent<HTMLInputElement>) => {
