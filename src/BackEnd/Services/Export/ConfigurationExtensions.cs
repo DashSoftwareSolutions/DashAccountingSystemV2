@@ -1,5 +1,6 @@
 using DashAccountingSystemV2.BackEnd.Models;
 using DashAccountingSystemV2.BackEnd.Services.Export.DataExporters;
+using DashAccountingSystemV2.BackEnd.Services.Export.PdfDocuments;
 
 namespace DashAccountingSystemV2.BackEnd.Services.Export
 {
@@ -7,6 +8,9 @@ namespace DashAccountingSystemV2.BackEnd.Services.Export
     {
         public static IServiceCollection AddExportService(this IServiceCollection services)
         {
+            // PDF Generation Library
+            QuestPdfConfiguration.EnsureConfigured();
+
             // Data Exporters
             services.AddTransient<BalanceSheetReportExcelExporter>();
             services.AddTransient<InvoicePdfExporter>();
